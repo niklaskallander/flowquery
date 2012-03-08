@@ -1,0 +1,137 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{F72E62CF-6DAC-49E4-B533-89E5069AB942}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>NHibernate.FlowQuery</RootNamespace>
+    <AssemblyName>NHibernate.FlowQuery</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>3.5</OldToolsVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\build\debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\build\release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="NHibernate, Version=2.1.2.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\NHibernate-2.1.2\NHibernate.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Aggregate.cs" />
+    <Compile Include="AutoMapping\DefaultMapper.cs" />
+    <Compile Include="AutoMapping\IMapper.cs" />
+    <Compile Include="Core\IFlowQuery.join.cs" />
+    <Compile Include="Core\FlowQueryImpl.join.cs" />
+    <Compile Include="Core\OrderByStatement.cs" />
+    <Compile Include="Core\SelectDistinctSetup.cs" />
+    <Compile Include="Core\SelectSetup.cs" />
+    <Compile Include="Core\SelectSetupPart.cs" />
+    <Compile Include="Core\ExampleWrapper.cs" />
+    <Compile Include="Core\FlowQuerySelection.cs" />
+    <Compile Include="Core\ISelectSetup.cs" />
+    <Compile Include="Core\ISelectSetupPart.cs" />
+    <Compile Include="Core\IExampleWrapper.cs" />
+    <Compile Include="Core\WhereDelegate.cs" />
+    <Compile Include="DetachedCriteriaExtensions.cs" />
+    <Compile Include="Expressions\IsHelper.cs" />
+    <Compile Include="Expressions\SubqueryExpressions\IsEqualToAllSubqueryExpression.cs" />
+    <Compile Include="Expressions\SubqueryExpressions\IsEqualToSubqueryExpression.cs" />
+    <Compile Include="Expressions\SubqueryExpressions\IsGreaterThanAllSubqueryExpression.cs" />
+    <Compile Include="Expressions\SubqueryExpressions\IsGreaterThanOrEqualToAllSubqueryExpression.cs" />
+    <Compile Include="Expressions\SubqueryExpressions\IsGreaterThanOrEqualToSomeSubqueryExpression.cs" />
+    <Compile Include="Expressions\SubqueryExpressions\IsGreaterThanOrEqualToSubqueryExpression.cs" />
+    <Compile Include="Expressions\SubqueryExpressions\IsGreaterThanSomeSubqueryExpression.cs" />
+    <Compile Include="Expressions\SubqueryExpressions\IsGreaterThanSubqueryExpression.cs" />
+    <Compile Include="Expressions\SubqueryExpressions\IsLessThanOrEqualToAllSubqueryExpression.cs" />
+    <Compile Include="Expressions\SubqueryExpressions\IsLessThanOrEqualToSomeSubqueryExpression.cs" />
+    <Compile Include="Expressions\SubqueryExpressions\IsLessThanOrEqualToSubqueryExpression.cs" />
+    <Compile Include="Expressions\SubqueryExpressions\IsLessThanAllSubqueryExpression.cs" />
+    <Compile Include="Expressions\SubqueryExpressions\IsLessThanSomeSubqueryExpression.cs" />
+    <Compile Include="Expressions\SubqueryExpressions\IsLessThanSubqueryExpression.cs" />
+    <Compile Include="ExtensionHelpers\AggregateExtensions.cs" />
+    <Compile Include="ExtensionHelpers\IsExtensions.cs" />
+    <Compile Include="ExtensionHelpers\PropertyExtensions.cs" />
+    <Compile Include="FlowQueryOptions.cs" />
+    <Compile Include="Helpers\ConstructionHelper.cs" />
+    <Compile Include="Helpers\ExpressionHelper.cs" />
+    <Compile Include="Helpers\ProjectionHelper.cs" />
+    <Compile Include="Helpers\ReflectionHelper.cs" />
+    <Compile Include="Helpers\RestrictionHelper.cs" />
+    <Compile Include="Mapping.cs" />
+    <Compile Include="Revealing\Conventions\CustomConvention.cs" />
+    <Compile Include="Revealing\Conventions\IRevealConvention.cs" />
+    <Compile Include="Is.cs" />
+    <Compile Include="Property.cs" />
+    <Compile Include="Reveal.cs" />
+    <Compile Include="Revealing\Conventions\MConvention.cs" />
+    <Compile Include="Revealing\Conventions\MUnderscoreConvention.cs" />
+    <Compile Include="Revealing\Conventions\UnderscoreConvention.cs" />
+    <Compile Include="Revealing\IRevealer%271.cs" />
+    <Compile Include="Revealing\IRevealer.cs" />
+    <Compile Include="Revealing\IRevealerBase.cs" />
+    <Compile Include="Revealing\Revealer%271.cs" />
+    <Compile Include="Revealing\Revealer.cs" />
+    <Compile Include="Revealing\RevealerBase.cs" />
+    <Compile Include="SessionExtensions.cs" />
+    <Compile Include="ProjectionListExtensions.cs" />
+    <Compile Include="Expressions\IsBetweenExpression.cs" />
+    <Compile Include="Expressions\IsEqualExpression.cs" />
+    <Compile Include="Expressions\IsExpression.cs" />
+    <Compile Include="Expressions\IsGreaterThanExpression.cs" />
+    <Compile Include="Expressions\IsGreaterThanOrEqualExpression.cs" />
+    <Compile Include="Expressions\SubqueryExpressions\IsInSubqueryExpression.cs" />
+    <Compile Include="Expressions\IsInValuesExpression.cs" />
+    <Compile Include="Expressions\IsLessThanExpression.cs" />
+    <Compile Include="Expressions\IsLessThanOrEqualExpression.cs" />
+    <Compile Include="Expressions\IsLikeExpression.cs" />
+    <Compile Include="Expressions\IsNullExpression.cs" />
+    <Compile Include="Expressions\SimpleIsExpression.cs" />
+    <Compile Include="Core\FlowQueryImpl.cs" />
+    <Compile Include="Core\ISubFlowQuery.cs" />
+    <Compile Include="Core\IFlowQuery.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Core\SubFlowQuery.cs" />
+    <Compile Include="Core\SubFlowQueryImpl.cs" />
+    <Compile Include="SubQuery.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
