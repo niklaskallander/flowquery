@@ -7,8 +7,6 @@ using NUnit.Framework;
 namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
 {
     using Is = NUnit.Framework.Is;
-    using NHibernate.Criterion;
-    using NHibernate.SqlCommand;
 
     [TestFixture]
     public class JoinTest : BaseTest
@@ -27,13 +25,6 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                 .SelectDistinct(u => new { group.Id });
 
             Assert.That(groups1.Count(), Is.EqualTo(2));
-
-            var groups2 = Query<UserEntity>()
-                .Join(u => u.Groups, () => link)
-                .Join(() => link.Group, () => group, x => group.Id == null, new CustomConvention(x => x))
-                .SelectDistinct(u => new { group.Id });
-
-            Assert.That(groups2.Count(), Is.EqualTo(0));
         }
 
         [Test]
@@ -73,34 +64,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
 
             Assert.That(groups1.Count(), Is.EqualTo(4));
 
-            var groups2 = Query<UserEntity>()
-                .Join(u => u.Groups, () => link, x => link.Id == null)
-                .Join(() => link.Group, () => group, x => group.Id == null)
-                .Join(() => group.Customers, () => customerLink, x => customerLink.Id == null)
-                .Join(() => customerLink.Customer, () => customer, x => customer.Id == null)
-                .SelectDistinct(u => customer.Name);
-
-            Assert.That(groups2.Count(), Is.EqualTo(0));
-
             Reveal.ClearDefaultConvention();
-        }
-
-        [Test]
-        public void CanJoinWithSpecifiedOnClause()
-        {
-            UserGroupLinkEntity link = null;
-
-            var groups1 = Query<UserEntity>()
-                .Join(u => u.Groups, () => link, u => link.Id == null)
-                .SelectDistinct(u => new { link.Group });
-
-            Assert.That(groups1.Count(), Is.EqualTo(0));
-
-            var groups2 = Query<UserEntity>()
-                .Join("Groups", () => link, u => link.Id == null)
-                .SelectDistinct(u => new { link.Group });
-
-            Assert.That(groups2.Count(), Is.EqualTo(0));
         }
 
         [Test]
@@ -127,12 +91,6 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                 .SelectDistinct(u => new { link.Group });
 
             Assert.That(groups1.Count(), Is.EqualTo(2));
-
-            var groups2 = Query<UserEntity>()
-                .Join(r.Reveal(x => x.Groups), () => link, x => link.Id == null)
-                .SelectDistinct(u => new { link.Group });
-
-            Assert.That(groups2.Count(), Is.EqualTo(0));
         }
 
         [Test]
@@ -147,13 +105,6 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                 .SelectDistinct(u => new { group.Name });
 
             Assert.That(groups1.Count(), Is.EqualTo(2));
-
-            var groups2 = Query<UserEntity>()
-                .Join(u => u.Groups, () => link, x => link.Id == null)
-                .Join(u => link.Group, () => group, x=> group.Id == null)
-                .SelectDistinct(u => new { group.Name });
-
-            Assert.That(groups2.Count(), Is.EqualTo(0));
         }
 
         [Test]
@@ -198,13 +149,6 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                 .SelectDistinct(u => new { group.Id });
 
             Assert.That(groups1.Count(), Is.EqualTo(2));
-
-            var groups2 = Query<UserEntity>()
-                .InnerJoin(u => u.Groups, () => link)
-                .InnerJoin(() => link.Group, () => group, x => group.Id == null, new CustomConvention(x => x))
-                .SelectDistinct(u => new { group.Id });
-
-            Assert.That(groups2.Count(), Is.EqualTo(0));
         }
 
         [Test]
@@ -244,27 +188,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
 
             Assert.That(groups1.Count(), Is.EqualTo(4));
 
-            var groups2 = Query<UserEntity>()
-                .InnerJoin(u => u.Groups, () => link, x => link.Id == null)
-                .InnerJoin(() => link.Group, () => group, x => group.Id == null)
-                .InnerJoin(() => group.Customers, () => customerLink, x => customerLink.Id == null)
-                .InnerJoin(() => customerLink.Customer, () => customer, x => customer.Id == null)
-                .SelectDistinct(u => customer.Name);
-
-            Assert.That(groups2.Count(), Is.EqualTo(0));
             Reveal.ClearDefaultConvention();
-        }
-
-        [Test]
-        public void CanInnerJoinWithSpecifiedOnClause()
-        {
-            UserGroupLinkEntity link = null;
-
-            var groups = Query<UserEntity>()
-                .InnerJoin(u => u.Groups, () => link, u => link.Id == null)
-                .SelectDistinct(u => new { link.Group });
-
-            Assert.That(groups.Count(), Is.EqualTo(0));
         }
 
         [Test]
@@ -291,12 +215,6 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                 .SelectDistinct(u => new { link.Group });
 
             Assert.That(groups.Count(), Is.EqualTo(2));
-
-            var groups2 = Query<UserEntity>()
-                .InnerJoin(r.Reveal(x => x.Groups), () => link, x => link.Id == null)
-                .SelectDistinct(u => new { link.Group });
-
-            Assert.That(groups2.Count(), Is.EqualTo(0));
         }
 
         [Test]
@@ -311,13 +229,6 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                 .SelectDistinct(u => new { group.Name });
 
             Assert.That(groups1.Count(), Is.EqualTo(2));
-
-            var groups2 = Query<UserEntity>()
-                .InnerJoin(u => u.Groups, () => link, x => link.Id == null)
-                .InnerJoin(u => link.Group, () => group, x => group.Id == null)
-                .SelectDistinct(u => new { group.Name });
-
-            Assert.That(groups2.Count(), Is.EqualTo(0));
         }
 
         [Test]
@@ -365,13 +276,6 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
 
             Assert.That(groups1.Count(), Is.EqualTo(6));
 
-            var groups2 = Query<UserEntity>()
-                .LeftOuterJoin(u => u.Groups, () => link, x => link.Id == null)
-                .LeftOuterJoin(() => link.Group, () => group, x => group.Id == null)
-                .Select(u => new { group.Id });
-
-            Assert.That(groups2.Count(), Is.EqualTo(4));
-
             Reveal.ClearDefaultConvention();
         }
 
@@ -387,13 +291,6 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                 .Select(u => new { group.Id });
 
             Assert.That(groups1.Count(), Is.EqualTo(6));
-
-            var groups2 = Query<UserEntity>()
-                .LeftOuterJoin(u => u.Groups, () => link, x => link.Id == null)
-                .LeftOuterJoin(() => link.Group, () => group, x => group.Id == null, new CustomConvention(x => x))
-                .Select(u => new { group.Id });
-
-            Assert.That(groups2.Count(), Is.EqualTo(4));
         }
 
         [Test]
@@ -440,12 +337,6 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                 .Select(u => new { link.Group });
 
             Assert.That(groups1.Count(), Is.EqualTo(6));
-
-            var groups2 = Query<UserEntity>()
-                .LeftOuterJoin("Groups", () => link, x => link.Id == null)
-                .Select(u => new { link.Group });
-
-            Assert.That(groups2.Count(), Is.EqualTo(4));
         }
 
         [Test]
@@ -458,12 +349,6 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                 .Select(u => new { setting.Id });
 
             Assert.That(settings1.Count(), Is.EqualTo(4));
-
-            var settings2 = Query<UserEntity>()
-                .LeftOuterJoin(x => x.Setting, () => setting,x => setting.Id == null)
-                .Select(u => new { setting.Id });
-
-            Assert.That(settings2.Count(), Is.EqualTo(4));
         }
 
         #endregion
@@ -482,13 +367,6 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                 .Select(u => new { group.Id });
 
             Assert.That(groups1.Count(), Is.EqualTo(5));
-
-            var groups2 = Query<UserEntity>()
-                .RightOuterJoin(u => u.Groups, () => link, x => link.Id == null)
-                .RightOuterJoin(() => link.Group, () => group, x => group.Id == null, new CustomConvention(x => x))
-                .Select(u => new { group.Id });
-
-            Assert.That(groups2.Count(), Is.EqualTo(2));
         }
 
         [Test]
@@ -505,13 +383,6 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                 .Select(u => new { group.Id });
 
             Assert.That(groups1.Count(), Is.EqualTo(5));
-
-            var groups2 = Query<UserEntity>()
-                .RightOuterJoin(u => u.Groups, () => link, x => link.Id == null)
-                .RightOuterJoin(() => link.Group, () => group, x => group.Id == null)
-                .Select(u => new { group.Id });
-
-            Assert.That(groups2.Count(), Is.EqualTo(2));
 
             Reveal.ClearDefaultConvention();
         }
@@ -535,15 +406,6 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
 
             Assert.That(groups1.Count(), Is.EqualTo(4));
 
-            var groups2 = Query<UserEntity>()
-                .RightOuterJoin(u => u.Groups, () => link, x => link.Id == null)
-                .RightOuterJoin(() => link.Group, () => group, x => group.Id == null)
-                .RightOuterJoin(() => group.Customers, () => customerLink, x => customerLink.Id == null)
-                .RightOuterJoin(() => customerLink.Customer, () => customer, x => customer.Id == null)
-                .SelectDistinct(u => customer.Name);
-
-            Assert.That(groups2.Count(), Is.EqualTo(4));
-
             Reveal.ClearDefaultConvention();
         }
 
@@ -557,12 +419,6 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                 .Select(u => new { link.Group });
 
             Assert.That(groups1.Count(), Is.EqualTo(5));
-
-            var groups2 = Query<UserEntity>()
-                .RightOuterJoin(u => u.Groups, () => link, x => link.Id == null)
-                .Select(u => new { link.Group });
-
-            Assert.That(groups2.Count(), Is.EqualTo(5));
         }
 
         [Test]
@@ -575,12 +431,6 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                 .Select(u => new { link.Group });
 
             Assert.That(groups1.Count(), Is.EqualTo(5));
-
-            var groups2 = Query<UserEntity>()
-                .RightOuterJoin("Groups", () => link, x => link.Id == null)
-                .Select(u => new { link.Group });
-
-            Assert.That(groups2.Count(), Is.EqualTo(5));
         }
 
         [Test]
@@ -593,12 +443,6 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                 .Select(u => new { setting.Id });
 
             Assert.That(settings1.Count(), Is.EqualTo(9));
-
-            var settings2 = Query<UserEntity>()
-                .RightOuterJoin(x => x.Setting, () => setting, x => setting.Id == null)
-                .Select(u => new { setting.Id });
-
-            Assert.That(settings2.Count(), Is.EqualTo(6));
         }
 
         #endregion
@@ -620,13 +464,6 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
 
             Assert.That(groups1.Count(), Is.EqualTo(6));
 
-            var groups2 = Query<UserEntity>()
-                .FullJoin(u => u.Groups, () => link, x => link.Id == null)
-                .FullJoin(() => link.Group, () => group, x => group.Id == null)
-                .Select(u => new { group.Id });
-
-            Assert.That(groups2.Count(), Is.EqualTo(11));
-
             Reveal.ClearDefaultConvention();
         }
 
@@ -642,13 +479,6 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                 .Select(u => new { group.Id });
 
             Assert.That(groups1.Count(), Is.EqualTo(6));
-
-            var groups2 = Query<UserEntity>()
-                .FullJoin(u => u.Groups, () => link, x => link.Id == null)
-                .FullJoin(() => link.Group, () => group, x => group.Id == null, new CustomConvention(x => x))
-                .Select(u => new { group.Id });
-
-            Assert.That(groups2.Count(), Is.EqualTo(11));
         }
 
         [Test]
@@ -670,15 +500,6 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
 
             Assert.That(groups1.Count(), Is.EqualTo(5));
 
-            var groups2 = Query<UserEntity>()
-                .FullJoin(u => u.Groups, () => link, x => link.Id == null)
-                .FullJoin(() => link.Group, () => group, x => group.Id == null)
-                .FullJoin(() => group.Customers, () => customerLink, x => customerLink.Id == null)
-                .FullJoin(() => customerLink.Customer, () => customer, x => customer.Id == null)
-                .SelectDistinct(u => customer.Name);
-
-            Assert.That(groups2.Count(), Is.EqualTo(5));
-
             Reveal.ClearDefaultConvention();
         }
 
@@ -692,12 +513,6 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                 .Select(u => new { link.Group });
 
             Assert.That(groups1.Count(), Is.EqualTo(6));
-
-            var groups2 = Query<UserEntity>()
-                .FullJoin(u => u.Groups, () => link, x => link.Id == null)
-                .Select(u => new { link.Group });
-
-            Assert.That(groups2.Count(), Is.EqualTo(9));
         }
 
         [Test]
@@ -710,12 +525,6 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                 .Select(u => new { link.Group });
 
             Assert.That(groups1.Count(), Is.EqualTo(6));
-
-            var groups2 = Query<UserEntity>()
-                .FullJoin("Groups", () => link, x => link.Id == null)
-                .Select(u => new { link.Group });
-
-            Assert.That(groups2.Count(), Is.EqualTo(9));
         }
 
         [Test]
@@ -728,12 +537,6 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                 .Select(u => new { setting.Id });
 
             Assert.That(settings1.Count(), Is.EqualTo(9));
-
-            var settings2 = Query<UserEntity>()
-                .FullJoin(x => x.Setting, () => setting, x => setting.Id == null)
-                .Select(u => new { setting.Id });
-
-            Assert.That(settings2.Count(), Is.EqualTo(10));
         }
 
         #endregion
