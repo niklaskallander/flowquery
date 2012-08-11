@@ -11,7 +11,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
     [TestFixture]
     public class ExpressionHelperTest
     {
-		#region Methods (28) 
+        #region Methods (28)
 
         [Test]
         public void CanGetConstantRootStringForReferenceType()
@@ -182,6 +182,42 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
         }
 
         [Test]
+        public void IsRootedThrowsIfExpressionIsNull()
+        {
+            Expression<Func<UserDto, object>> expression = null;
+
+            Assert.That(() =>
+            {
+                ExpressionHelper.IsRooted(expression, "x");
+
+            }, Throws.InstanceOf<ArgumentNullException>());
+        }
+
+        [Test]
+        public void IsRootedThrowsIfExpectedRootIsNull()
+        {
+            Expression<Func<UserDto, object>> expression = x => x.Id;
+
+            Assert.That(() =>
+            {
+                ExpressionHelper.IsRooted(expression, null);
+
+            }, Throws.ArgumentException);
+        }
+
+        [Test]
+        public void IsRootedThrowsIfExpectedRootIsEmpty()
+        {
+            Expression<Func<UserDto, object>> expression = x => x.Id;
+
+            Assert.That(() =>
+            {
+                ExpressionHelper.IsRooted(expression, string.Empty);
+
+            }, Throws.ArgumentException);
+        }
+
+        [Test]
         public void GetPropertyNameFromExpressionAndExpectedRootThrowsWhenExpectedIsEmpty()
         {
             Expression<Func<UserDto, object>> expression = u => u.Username;
@@ -266,6 +302,6 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
             Assert.That(ExpressionHelper.HasConstantRoot(null), Is.False);
         }
 
-		#endregion Methods 
+        #endregion Methods
     }
 }

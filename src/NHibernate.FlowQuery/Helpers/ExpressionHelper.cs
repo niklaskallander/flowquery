@@ -5,7 +5,7 @@ namespace NHibernate.FlowQuery.Helpers
 {
     public static class ExpressionHelper
     {
-		#region Methods (8) 
+        #region Methods (8)
 
         public static string GetConstantRootString(Expression expression)
         {
@@ -74,6 +74,25 @@ namespace NHibernate.FlowQuery.Helpers
             }
 
             throw new NotSupportedException("The expression contains unsupported features please revise your code");
+        }
+
+        public static bool IsRooted(Expression expression, string expectedRoot)
+        {
+            if (expression == null)
+            {
+                throw new ArgumentNullException("expression");
+            }
+
+            if (string.IsNullOrEmpty(expectedRoot))
+            {
+                throw new ArgumentException("expectedRoot");
+            }
+
+            string property = GetPropertyName(expression);
+
+            string[] splits = property.Split('.');
+
+            return splits.Length != 1 || splits[0] == expectedRoot;
         }
 
         public static string GetPropertyName(Expression expression, string expectedRoot)
@@ -180,6 +199,6 @@ namespace NHibernate.FlowQuery.Helpers
             return false;
         }
 
-		#endregion Methods 
+        #endregion Methods
     }
 }

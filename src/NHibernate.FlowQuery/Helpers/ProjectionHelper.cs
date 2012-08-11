@@ -209,7 +209,11 @@ namespace NHibernate.FlowQuery.Helpers
                 case ExpressionType.Call:
                     return GetMethodCallProjection(expression as MethodCallExpression, root);
                 case ExpressionType.MemberAccess:
-                    return Projections.Property(ExpressionHelper.GetPropertyName(expression, root));
+                    if (ExpressionHelper.IsRooted(expression, root))
+                    {
+                        return Projections.Property(ExpressionHelper.GetPropertyName(expression, root));
+                    }
+                    return Projections.Constant(ExpressionHelper.GetValue(expression));
                 case ExpressionType.Convert:
                     return GetProjection((expression as UnaryExpression).Operand, root);
                 case ExpressionType.Constant:

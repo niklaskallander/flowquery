@@ -4,8 +4,6 @@ using System.Linq.Expressions;
 using NHibernate.Criterion;
 using NHibernate.FlowQuery.Expressions;
 using NHibernate.FlowQuery.Helpers;
-using NHibernate.FlowQuery.Revealing.Conventions;
-using NHibernate.SqlCommand;
 using NHibernate.Transform;
 
 namespace NHibernate.FlowQuery.Core
@@ -333,6 +331,27 @@ namespace NHibernate.FlowQuery.Core
         protected virtual FlowQuerySelection<TReturn> SelectDistinct<TReturn>(Expression<Func<TSource, TReturn>> expression)
         {
             return SelectWithConstruction(expression, true);
+        }
+
+        #endregion
+
+        #region SelectDictionary
+
+        protected virtual Dictionary<TKey, TValue> SelectDictionary<TKey, TValue>(Expression<Func<TSource, TKey>> key, Expression<Func<TSource, TValue>> value)
+        {
+            Pair<TKey, TValue>[] pairs = Select<Pair<TKey, TValue>>()
+                .For(x => x.Key).Use(key)
+                .For(x => x.Value).Use(value)
+                .Select();
+
+            Dictionary<TKey, TValue> temp = new Dictionary<TKey, TValue>();
+
+            foreach (Pair<TKey, TValue> pair in pairs)
+            {
+                temp.Add(pair.Key, pair.Value);
+            }
+
+            return temp;
         }
 
         #endregion
@@ -670,6 +689,11 @@ namespace NHibernate.FlowQuery.Core
         FlowQuerySelection<TReturn> IFlowQuery<TSource>.Select<TReturn>(Expression<Func<TSource, TReturn>> expression)
         {
             return Select<TReturn>(expression);
+        }
+
+        Dictionary<TKey, TValue> IFlowQuery<TSource>.SelectDictionary<TKey, TValue>(Expression<Func<TSource, TKey>> key, Expression<Func<TSource, TValue>> value)
+        {
+            return SelectDictionary(key, value);
         }
 
         FlowQuerySelection<TSource> IFlowQuery<TSource>.SelectDistinct(IProjection projection)

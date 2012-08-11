@@ -45,9 +45,22 @@ namespace NHibernate.FlowQuery
             return list.Add(Projections.Property(property), alias);
         }
 
-        public static ProjectionList AddProperty<TSource>(this ProjectionList list, Expression<Func<TSource, object>> property)
+        public static ProjectionList AddProperty<TSource, TProperty>(this ProjectionList list, Expression<Func<TSource, TProperty>> property)
         {
-            return list.AddProperty(ExpressionHelper.GetPropertyName(property.Body, property.Parameters[0].Name));
+            IProjection projection = ProjectionHelper.GetProjection(property.Body, property.Parameters[0].Name);
+
+            string alias = null;
+
+            IPropertyProjection propertyProjection = projection as IPropertyProjection;
+
+            if (propertyProjection != null)
+            {
+                alias = propertyProjection.PropertyName;
+            }
+
+            list.Add(projection, alias);
+
+            return list;
         }
 
         #endregion Methods

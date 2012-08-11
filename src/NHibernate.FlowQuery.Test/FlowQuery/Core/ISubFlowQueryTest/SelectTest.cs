@@ -1,17 +1,91 @@
-using System.Linq;
-using NHibernate.Criterion;
 using NHibernate.FlowQuery.Test.Setup.Entities;
 using NUnit.Framework;
 
 namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
 {
+    using System.Linq;
+    using NHibernate.Criterion;
     using FlowQueryIs = NHibernate.FlowQuery.Is;
     using Is = NUnit.Framework.Is;
 
     [TestFixture]
     public class SelectTest : BaseTest
     {
-		#region Methods (3) 
+        #region Methods (3)
+
+        [Test]
+        public void CanSelectAggregationUsingAggregateHelper()
+        {
+            //avg
+
+            var aggregation = SubQuery.For<UserEntity>()
+                .Select(u => Aggregate.Average(u.Id));
+
+            UserEntity[] users = Query<UserEntity>()
+                .Where(x => x.Id, FlowQueryIs.GreaterThan(aggregation))
+                .Select();
+
+            Assert.That(users.Length, Is.EqualTo(2));
+
+            //sum
+
+            aggregation = SubQuery.For<UserEntity>()
+                .Select(u => Aggregate.Sum(u.Id));
+
+            users = Query<UserEntity>()
+                .Where(x => x.Id, FlowQueryIs.LessThan(aggregation))
+                .Select();
+
+            Assert.That(users.Length, Is.EqualTo(4));
+
+            //min
+
+            aggregation = SubQuery.For<UserEntity>()
+                .Select(u => Aggregate.Min(u.Id));
+
+            users = Query<UserEntity>()
+                .Where(x => x.Id, FlowQueryIs.EqualTo(aggregation))
+                .Select();
+
+            Assert.That(users.Length, Is.EqualTo(1));
+            Assert.That(users.First().Id, Is.EqualTo(1));
+
+            //max
+
+            aggregation = SubQuery.For<UserEntity>()
+                .Select(u => Aggregate.Max(u.Id));
+
+            users = Query<UserEntity>()
+                .Where(x => x.Id, FlowQueryIs.EqualTo(aggregation))
+                .Select();
+
+            Assert.That(users.Length, Is.EqualTo(1));
+            Assert.That(users.First().Id, Is.EqualTo(4));
+
+            //count
+
+            aggregation = SubQuery.For<UserEntity>()
+                .Select(u => Aggregate.Count(u.Id));
+
+            users = Query<UserEntity>()
+                .Where(x => x.Id, FlowQueryIs.EqualTo(aggregation))
+                .Select();
+
+            Assert.That(users.Length, Is.EqualTo(1));
+            Assert.That(users.First().Id, Is.EqualTo(4));
+
+            //count distinct
+
+            aggregation = SubQuery.For<UserEntity>()
+                .Select(u => Aggregate.CountDistinct(u.Id));
+
+            users = Query<UserEntity>()
+                .Where(x => x.Id, FlowQueryIs.EqualTo(aggregation))
+                .Select();
+
+            Assert.That(users.Length, Is.EqualTo(1));
+            Assert.That(users.First().Id, Is.EqualTo(4));
+        }
 
         [Test]
         public void CanSelectUsingExpression()
@@ -55,6 +129,6 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
             Assert.That(users.Count(), Is.EqualTo(3));
         }
 
-		#endregion Methods 
+        #endregion Methods
     }
 }
