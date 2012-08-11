@@ -12,7 +12,7 @@ namespace NHibernate.FlowQuery.Core
 
         ISelectSetup<TSource, TReturn> Use(IProjection projection);
 
-        ISelectSetup<TSource, TReturn> Use(Expression<Func<TSource, object>> expression);
+        ISelectSetup<TSource, TReturn> Use<TProjection>(Expression<Func<TSource, TProjection>> expression);
 
         #endregion Operations
     }

@@ -65,7 +65,7 @@ namespace NHibernate.FlowQuery.Core
             return Setup;
         }
 
-        protected virtual ISelectSetup<TSource, TReturn> Use(Expression<Func<TSource, object>> expression)
+        protected virtual ISelectSetup<TSource, TReturn> Use<TProjection>(Expression<Func<TSource, TProjection>> expression)
         {
             if (expression == null)
             {
@@ -93,7 +93,7 @@ namespace NHibernate.FlowQuery.Core
             return Use(projection);
         }
 
-        ISelectSetup<TSource, TReturn> ISelectSetupPart<TSource, TReturn>.Use(Expression<Func<TSource, object>> expression)
+        ISelectSetup<TSource, TReturn> ISelectSetupPart<TSource, TReturn>.Use<TProjection>(Expression<Func<TSource, TProjection>> expression)
         {
             return Use(expression);
         }

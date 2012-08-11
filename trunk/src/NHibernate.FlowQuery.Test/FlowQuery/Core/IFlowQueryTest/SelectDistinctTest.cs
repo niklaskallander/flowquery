@@ -227,6 +227,34 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         }
 
         [Test]
+        public void CanSelectDistinctUsingBasicProjection()
+        {
+            var users = Query<UserEntity>()
+                .OrderBy("Id")
+                .SelectDistinct
+                (
+                    Projections
+                        .ProjectionList()
+                            .AddProperty("Id")
+                            .AddProperty("Username")
+                );
+
+            Assert.That(users.Count(), Is.EqualTo(4));
+            Assert.That(users.ElementAt(0).Id, Is.EqualTo(1));
+            Assert.That(users.ElementAt(1).Id, Is.EqualTo(2));
+            Assert.That(users.ElementAt(2).Id, Is.EqualTo(3));
+            Assert.That(users.ElementAt(3).Id, Is.EqualTo(4));
+            Assert.That(users.ElementAt(0).Username, Is.EqualTo("Wimpy"));
+            Assert.That(users.ElementAt(1).Username, Is.EqualTo("Izmid"));
+            Assert.That(users.ElementAt(2).Username, Is.EqualTo("Empor"));
+            Assert.That(users.ElementAt(3).Username, Is.EqualTo("Lajsa"));
+            Assert.That(users.ElementAt(0).Firstname, Is.Null);
+            Assert.That(users.ElementAt(1).Firstname, Is.Null);
+            Assert.That(users.ElementAt(2).Firstname, Is.Null);
+            Assert.That(users.ElementAt(3).Firstname, Is.Null);
+        }
+
+        [Test]
         public void CanSelectDistinctUsingProjection()
         {
             var users = Query<UserEntity>().SelectDistinct<UserDto>(Projections.ProjectionList().AddProperty("Username").AddProperty("Firstname", "SomeValue"));

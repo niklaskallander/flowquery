@@ -55,6 +55,7 @@
     <Compile Include="Core\IFlowQuery.join.cs" />
     <Compile Include="Core\FlowQueryImpl.join.cs" />
     <Compile Include="Core\OrderByStatement.cs" />
+    <Compile Include="Core\Pair.cs" />
     <Compile Include="Core\SelectDistinctSetup.cs" />
     <Compile Include="Core\SelectSetup.cs" />
     <Compile Include="Core\SelectSetupPart.cs" />

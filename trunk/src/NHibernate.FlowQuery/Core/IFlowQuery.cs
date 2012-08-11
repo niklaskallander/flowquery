@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using NHibernate.Criterion;
 using NHibernate.FlowQuery.Expressions;
-using NHibernate.FlowQuery.Revealing.Conventions;
 
 namespace NHibernate.FlowQuery.Core
 {
@@ -33,6 +32,12 @@ namespace NHibernate.FlowQuery.Core
         FlowQuerySelection<TSource> Select(params Expression<Func<TSource, object>>[] properties);
 
         FlowQuerySelection<TReturn> Select<TReturn>(Expression<Func<TSource, TReturn>> expression);
+
+        #endregion
+
+        #region SelectDictionary
+
+        Dictionary<TKey, TValue> SelectDictionary<TKey, TValue>(Expression<Func<TSource, TKey>> key, Expression<Func<TSource, TValue>> value);
 
         #endregion
 

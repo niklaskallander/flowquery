@@ -261,6 +261,49 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
             }
         }
 
+        [Test, Ignore("NHibernate currently translates the system types to mismatching ITypes making NHibernate throw exceptions. YesNoType is not the same type as BooleanType. Have not found a way to work-around this issue yet.")]
+        public void CanSelectConditionalsWithMixedProjectionAndConstant()
+        {
+            var anonymous = Query<UserEntity>()
+                .Select(u => new { IsAdministrator = u.Role == RoleEnum.Administrator ? u.IsOnline : false, u.Role, u.IsOnline });
+
+            Assert.That(anonymous.Count(), Is.EqualTo(4));
+
+            foreach (var item in anonymous)
+            {
+                if (item.Role == RoleEnum.Administrator && item.IsOnline)
+                {
+                    Assert.That(item.IsAdministrator, Is.True);
+                }
+                else
+                {
+                    Assert.That(item.IsAdministrator, Is.False);
+                }
+            }
+        }
+
+        [Test]
+        public void CanSelectConditionalsWithMixedProjectionAndLocalVariable()
+        {
+            bool notTrue = false;
+
+            var anonymous = Query<UserEntity>()
+                .Select(u => new { IsAdministrator = u.Role == RoleEnum.Administrator ? true : notTrue, u.Role });
+
+            Assert.That(anonymous.Count(), Is.EqualTo(4));
+            foreach (var item in anonymous)
+            {
+                if (item.Role == RoleEnum.Administrator)
+                {
+                    Assert.That(item.IsAdministrator, Is.True);
+                }
+                else
+                {
+                    Assert.That(item.IsAdministrator, Is.False);
+                }
+            }
+        }
+
         [Test]
         public void CanSelectFromJoinedEntityProjections()
         {
