@@ -1,0 +1,132 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{B32A2715-CD50-43F5-89BD-EB34D6C0E4E3}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>NHibernate.FlowQuery.Test</RootNamespace>
+    <AssemblyName>NHibernate.FlowQuery.Test</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <StartupObject>
+    </StartupObject>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>3.5</OldToolsVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="AutoMapper, Version=1.1.0.188, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
+      <HintPath>..\..\lib\AutoMapper\AutoMapper.dll</HintPath>
+    </Reference>
+    <Reference Include="FluentNHibernate, Version=1.3.0.733, Culture=neutral, PublicKeyToken=8aa435e3cb308880, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\FluentNHibernate.1.3.0.733\lib\FluentNHibernate.dll</HintPath>
+    </Reference>
+    <Reference Include="HibernatingRhinos.Profiler.Appender">
+      <HintPath>C:\Program Files (x86)\NHprof\HibernatingRhinos.Profiler.Appender.dll</HintPath>
+    </Reference>
+    <Reference Include="Iesi.Collections, Version=1.0.1.0, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Iesi.Collections.3.2.0.4000\lib\Net35\Iesi.Collections.dll</HintPath>
+    </Reference>
+    <Reference Include="NHibernate, Version=3.3.1.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
+      <HintPath>..\packages\NHibernate.3.3.2.4000\lib\Net35\NHibernate.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit.framework, Version=2.5.10.11092, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="FlowQuery\Core\FlowQuerySelectionTest.cs" />
+    <Compile Include="FlowQuery\Core\IFlowQueryTest\AndTest.cs" />
+    <Compile Include="FlowQuery\Core\IFlowQueryTest\ConstructorTest.cs" />
+    <Compile Include="FlowQuery\Core\IFlowQueryTest\Mappers\AutoMapMapper.cs" />
+    <Compile Include="FlowQuery\Core\IFlowQueryTest\Mappers\CustomMapper.cs" />
+    <Compile Include="FlowQuery\Core\IFlowQueryTest\SelectDictionaryTest.cs" />
+    <Compile Include="FlowQuery\Core\ISubFlowQueryTest\AndTest.cs" />
+    <Compile Include="FlowQuery\Core\ISubFlowQueryTest\ConstructorTest.cs" />
+    <Compile Include="FlowQuery\Core\ISubFlowQueryTest\CountTest.cs" />
+    <Compile Include="FlowQuery\Core\ISubFlowQueryTest\OrderTest.cs" />
+    <Compile Include="FlowQuery\Core\ISubFlowQueryTest\SelectDistinctTest.cs" />
+    <Compile Include="FlowQuery\Core\ISubFlowQueryTest\JoinTest.cs" />
+    <Compile Include="FlowQuery\Core\ISubFlowQueryTest\LimitTest.cs" />
+    <Compile Include="FlowQuery\Core\ISubFlowQueryTest\SelectTest.cs" />
+    <Compile Include="FlowQuery\Core\ISubFlowQueryTest\WhereTest.cs" />
+    <Compile Include="FlowQuery\ExtensionHelpers\AggregateExtensionsTest.cs" />
+    <Compile Include="FlowQuery\AggregateTest.cs" />
+    <Compile Include="BaseTest.cs" />
+    <Compile Include="FlowQuery\Core\IFlowQueryTest\CountTest.cs" />
+    <Compile Include="FlowQuery\DetachedCriteriaExtensionsTest.cs" />
+    <Compile Include="FlowQuery\Helpers\ConstructionHelperTest.cs" />
+    <Compile Include="FlowQuery\Helpers\ExpressionHelperTest.cs" />
+    <Compile Include="FlowQuery\Helpers\RestrictionHelperTest.cs" />
+    <Compile Include="FlowQuery\Helpers\TypeHelperTest.cs" />
+    <Compile Include="Setup\Entities\Setting.cs" />
+    <Compile Include="FlowQuery\Core\IDistinctSetupPartTest.cs" />
+    <Compile Include="FlowQuery\Core\IDistinctSetupTest.cs" />
+    <Compile Include="FlowQuery\Core\IExampleWrapperTest.cs" />
+    <Compile Include="FlowQuery\PropertyTest.cs" />
+    <Compile Include="FlowQuery\SessionExtensionsTest.cs" />
+    <Compile Include="FlowQuery\ExtensionHelpers\IsExtensionsTest.cs" />
+    <Compile Include="FlowQuery\IsTest.cs" />
+    <Compile Include="FlowQuery\Core\IFlowQueryTest\JoinTest.cs" />
+    <Compile Include="FlowQuery\Core\IFlowQueryTest\OrderTest.cs" />
+    <Compile Include="Setup\Entities\Customer.cs" />
+    <Compile Include="Setup\Entities\CustomerGroupLink.cs" />
+    <Compile Include="Setup\Entities\Group.cs" />
+    <Compile Include="Setup\Entities\Role.cs" />
+    <Compile Include="Setup\Entities\User.cs" />
+    <Compile Include="Setup\Entities\UserGroupLink.cs" />
+    <Compile Include="Setup\Dtos\UserDto.cs" />
+    <Compile Include="FlowQuery\Core\IFlowQueryTest\LimitTest.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="FlowQuery\ExtensionHelpers\PropertyExtensionsTest.cs" />
+    <Compile Include="FlowQuery\Revealing\Revealer%271Test.cs" />
+    <Compile Include="FlowQuery\Revealing\RevealerTest.cs" />
+    <Compile Include="FlowQuery\RevealTest.cs" />
+    <Compile Include="FlowQuery\Core\IFlowQueryTest\SelectDistinctTest.cs" />
+    <Compile Include="FlowQuery\Core\IFlowQueryTest\SelectTest.cs" />
+    <Compile Include="Setup\NHibernateConfigurer.cs" />
+    <Compile Include="FlowQuery\Core\IFlowQueryTest\WhereTest.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NHibernate.FlowQuery\NHibernate.FlowQuery.csproj">
+      <Project>{F72E62CF-6DAC-49E4-B533-89E5069AB942}</Project>
+      <Name>NHibernate.FlowQuery</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
