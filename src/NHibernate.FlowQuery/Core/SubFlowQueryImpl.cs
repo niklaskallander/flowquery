@@ -382,7 +382,7 @@ namespace NHibernate.FlowQuery.Core
             (
                 Projections
                     .ProjectionList()
-                        .AddProperties(expressions)
+                        .AddProperties(PropertyAliases, expressions)
             );
         }
 
@@ -407,7 +407,7 @@ namespace NHibernate.FlowQuery.Core
             (
                 Projections
                     .ProjectionList()
-                        .AddProperties(expressions)
+                        .AddProperties(PropertyAliases, expressions)
             );
         }
 

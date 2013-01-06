@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 using NHibernate.Criterion;
 using NHibernate.FlowQuery.Helpers;
@@ -10,7 +11,7 @@ namespace NHibernate.FlowQuery.Core
     {
         #region Constructors (1)
 
-        public SelectSetupPart(string forProperty, ISelectSetup<TSource, TReturn> setup)
+        public SelectSetupPart(string forProperty, ISelectSetup<TSource, TReturn> setup, Dictionary<string, string> propertyAliases)
         {
             if (string.IsNullOrEmpty(forProperty))
             {
@@ -28,9 +29,11 @@ namespace NHibernate.FlowQuery.Core
 
         #endregion Constructors
 
-        #region Properties (2)
+        #region Properties (3)
 
         private string ForProperty { get; set; }
+
+        private Dictionary<string, string> PropertyAliases { get; set; }
 
         private ISelectSetup<TSource, TReturn> Setup { get; set; }
 
@@ -72,7 +75,7 @@ namespace NHibernate.FlowQuery.Core
                 throw new ArgumentNullException("expression");
             }
 
-            IProjection projection = ProjectionHelper.GetProjection(expression.Body, expression.Parameters[0].Name);
+            IProjection projection = ProjectionHelper.GetProjection(expression.Body, expression.Parameters[0].Name, PropertyAliases);
 
             return Use(projection);
         }

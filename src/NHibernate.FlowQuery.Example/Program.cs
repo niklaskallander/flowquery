@@ -5,7 +5,6 @@ using FluentNHibernate.Automapping;
 using FluentNHibernate.Cfg;
 using FluentNHibernate.Cfg.Db;
 using FluentNHibernate.Conventions.Helpers;
-using HibernatingRhinos.Profiler.Appender.NHibernate;
 using NHibernate.Criterion;
 using NHibernate.FlowQuery.Test.Entities;
 
@@ -17,8 +16,6 @@ namespace NHibernate.FlowQuery.Test
 
         private static ISessionFactory CreateSessionFactory()
         {
-            NHibernateProfiler.Initialize();
-
             return Fluently.Configure()
                 .Database(
                     MsSqlConfiguration

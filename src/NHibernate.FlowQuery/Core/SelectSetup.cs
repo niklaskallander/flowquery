@@ -10,7 +10,7 @@ namespace NHibernate.FlowQuery.Core
     {
         #region Constructors (1)
 
-        public SelectSetup(IFlowQuery<TSource> query)
+        public SelectSetup(IFlowQuery<TSource> query, Dictionary<string, string> propertyAliases)
         {
             if (query == null)
             {
@@ -20,6 +20,8 @@ namespace NHibernate.FlowQuery.Core
             Query = query;
 
             ProjectionList = Projections.ProjectionList();
+
+            PropertyAliases = propertyAliases;
 
             Mappings = new Dictionary<string, IProjection>();
         }
@@ -31,6 +33,8 @@ namespace NHibernate.FlowQuery.Core
         protected virtual Dictionary<string, IProjection> Mappings { get; private set; }
 
         protected virtual ProjectionList ProjectionList { get; private set; }
+
+        protected virtual Dictionary<string, string> PropertyAliases { get; set; }
 
         protected virtual IFlowQuery<TSource> Query { get; private set; }
 
@@ -45,7 +49,7 @@ namespace NHibernate.FlowQuery.Core
                 throw new ArgumentException("property");
             }
 
-            return new SelectSetupPart<TSource, TReturn>(property, this);
+            return new SelectSetupPart<TSource, TReturn>(property, this, PropertyAliases);
         }
 
         protected virtual ISelectSetupPart<TSource, TReturn> For(Expression<Func<TReturn, object>> expression)

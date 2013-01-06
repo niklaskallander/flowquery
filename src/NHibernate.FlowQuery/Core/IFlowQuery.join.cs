@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using NHibernate.Criterion;
-using NHibernate.FlowQuery.Expressions;
 using NHibernate.FlowQuery.Revealing.Conventions;
 
 namespace NHibernate.FlowQuery.Core
@@ -10,7 +8,7 @@ namespace NHibernate.FlowQuery.Core
     public partial interface IFlowQuery<TSource>
     {
         #region Join
-        
+
         /// <summary>
         /// Performs an Inner Join.
         /// </summary>
@@ -19,7 +17,7 @@ namespace NHibernate.FlowQuery.Core
         /// <summary>
         /// Performs an Inner Join.
         /// </summary>
-        IFlowQuery<TSource> Join<TAlias>(string property, Expression<Func<TAlias>> alias, Expression<Func<TSource, bool>> joinOnClause);
+        IFlowQuery<TSource> Join<TAlias>(string property, Expression<Func<TAlias>> alias, Expression<Func<TAlias, bool>> joinOnClause);
 
         /// <summary>
         /// Performs an Inner Join.
@@ -29,7 +27,7 @@ namespace NHibernate.FlowQuery.Core
         /// <summary>
         /// Performs an Inner Join.
         /// </summary>
-        IFlowQuery<TSource> Join<TAlias>(Expression<Func<TSource, TAlias>> projection, Expression<Func<TAlias>> alias, Expression<Func<TSource, bool>> joinOnClause);
+        IFlowQuery<TSource> Join<TAlias>(Expression<Func<TSource, TAlias>> projection, Expression<Func<TAlias>> alias, Expression<Func<TAlias, bool>> joinOnClause);
 
         /// <summary>
         /// Performs an Inner Join.
@@ -39,7 +37,7 @@ namespace NHibernate.FlowQuery.Core
         /// <summary>
         /// Performs an Inner Join.
         /// </summary>
-        IFlowQuery<TSource> Join<TAlias>(Expression<Func<TSource, IEnumerable<TAlias>>> projection, Expression<Func<TAlias>> alias, Expression<Func<TSource, bool>> joinOnClause);
+        IFlowQuery<TSource> Join<TAlias>(Expression<Func<TSource, IEnumerable<TAlias>>> projection, Expression<Func<TAlias>> alias, Expression<Func<TAlias, bool>> joinOnClause);
 
         /// <summary>
         /// Performs an Inner Join.
@@ -51,7 +49,7 @@ namespace NHibernate.FlowQuery.Core
         /// Performs an Inner Join.
         /// Uses the default revealing convention to convert the projection to a string.
         /// </summary>
-        IFlowQuery<TSource> Join<TAlias>(Expression<Func<object>> projection, Expression<Func<TAlias>> alias, Expression<Func<TSource, bool>> joinOnClause);
+        IFlowQuery<TSource> Join<TAlias>(Expression<Func<object>> projection, Expression<Func<TAlias>> alias, Expression<Func<TAlias, bool>> joinOnClause);
 
         /// <summary>
         /// Performs an Inner Join.
@@ -63,23 +61,23 @@ namespace NHibernate.FlowQuery.Core
         /// Performs an Inner Join.
         /// Uses the provided revealing convention to convert the projection to a string.
         /// </summary>
-        IFlowQuery<TSource> Join<TAlias>(Expression<Func<object>> projection, Expression<Func<TAlias>> alias, Expression<Func<TSource, bool>> joinOnClause, IRevealConvention revealConvention);
+        IFlowQuery<TSource> Join<TAlias>(Expression<Func<object>> projection, Expression<Func<TAlias>> alias, Expression<Func<TAlias, bool>> joinOnClause, IRevealConvention revealConvention);
 
         #endregion
 
         #region Inner Join
-        
+
         IFlowQuery<TSource> InnerJoin<TAlias>(string property, Expression<Func<TAlias>> alias);
 
-        IFlowQuery<TSource> InnerJoin<TAlias>(string property, Expression<Func<TAlias>> alias, Expression<Func<TSource, bool>> joinOnClause);
+        IFlowQuery<TSource> InnerJoin<TAlias>(string property, Expression<Func<TAlias>> alias, Expression<Func<TAlias, bool>> joinOnClause);
 
         IFlowQuery<TSource> InnerJoin<TAlias>(Expression<Func<TSource, TAlias>> projection, Expression<Func<TAlias>> alias);
 
-        IFlowQuery<TSource> InnerJoin<TAlias>(Expression<Func<TSource, TAlias>> projection, Expression<Func<TAlias>> alias, Expression<Func<TSource, bool>> joinOnClause);
+        IFlowQuery<TSource> InnerJoin<TAlias>(Expression<Func<TSource, TAlias>> projection, Expression<Func<TAlias>> alias, Expression<Func<TAlias, bool>> joinOnClause);
 
         IFlowQuery<TSource> InnerJoin<TAlias>(Expression<Func<TSource, IEnumerable<TAlias>>> projection, Expression<Func<TAlias>> alias);
 
-        IFlowQuery<TSource> InnerJoin<TAlias>(Expression<Func<TSource, IEnumerable<TAlias>>> projection, Expression<Func<TAlias>> alias, Expression<Func<TSource, bool>> joinOnClause);
+        IFlowQuery<TSource> InnerJoin<TAlias>(Expression<Func<TSource, IEnumerable<TAlias>>> projection, Expression<Func<TAlias>> alias, Expression<Func<TAlias, bool>> joinOnClause);
 
         /// <summary>
         /// Uses the default revealing convention to convert the projection to a string.
@@ -89,7 +87,7 @@ namespace NHibernate.FlowQuery.Core
         /// <summary>
         /// Uses the default revealing convention to convert the projection to a string.
         /// </summary>
-        IFlowQuery<TSource> InnerJoin<TAlias>(Expression<Func<object>> projection, Expression<Func<TAlias>> alias, Expression<Func<TSource, bool>> joinOnClause);
+        IFlowQuery<TSource> InnerJoin<TAlias>(Expression<Func<object>> projection, Expression<Func<TAlias>> alias, Expression<Func<TAlias, bool>> joinOnClause);
 
         /// <summary>
         /// Uses the provided revealing convention to convert the projection to a string.
@@ -99,23 +97,23 @@ namespace NHibernate.FlowQuery.Core
         /// <summary>
         /// Uses the provided revealing convention to convert the projection to a string.
         /// </summary>
-        IFlowQuery<TSource> InnerJoin<TAlias>(Expression<Func<object>> projection, Expression<Func<TAlias>> alias, Expression<Func<TSource, bool>> joinOnClause, IRevealConvention revealConvention);
+        IFlowQuery<TSource> InnerJoin<TAlias>(Expression<Func<object>> projection, Expression<Func<TAlias>> alias, Expression<Func<TAlias, bool>> joinOnClause, IRevealConvention revealConvention);
 
         #endregion
 
         #region Left Outer Join
-        
+
         IFlowQuery<TSource> LeftOuterJoin<TAlias>(string property, Expression<Func<TAlias>> alias);
 
-        IFlowQuery<TSource> LeftOuterJoin<TAlias>(string property, Expression<Func<TAlias>> alias, Expression<Func<TSource, bool>> joinOnClause);
+        IFlowQuery<TSource> LeftOuterJoin<TAlias>(string property, Expression<Func<TAlias>> alias, Expression<Func<TAlias, bool>> joinOnClause);
 
         IFlowQuery<TSource> LeftOuterJoin<TAlias>(Expression<Func<TSource, TAlias>> projection, Expression<Func<TAlias>> alias);
 
-        IFlowQuery<TSource> LeftOuterJoin<TAlias>(Expression<Func<TSource, TAlias>> projection, Expression<Func<TAlias>> alias, Expression<Func<TSource, bool>> joinOnClause);
+        IFlowQuery<TSource> LeftOuterJoin<TAlias>(Expression<Func<TSource, TAlias>> projection, Expression<Func<TAlias>> alias, Expression<Func<TAlias, bool>> joinOnClause);
 
         IFlowQuery<TSource> LeftOuterJoin<TAlias>(Expression<Func<TSource, IEnumerable<TAlias>>> projection, Expression<Func<TAlias>> alias);
 
-        IFlowQuery<TSource> LeftOuterJoin<TAlias>(Expression<Func<TSource, IEnumerable<TAlias>>> projection, Expression<Func<TAlias>> alias, Expression<Func<TSource, bool>> joinOnClause);
+        IFlowQuery<TSource> LeftOuterJoin<TAlias>(Expression<Func<TSource, IEnumerable<TAlias>>> projection, Expression<Func<TAlias>> alias, Expression<Func<TAlias, bool>> joinOnClause);
 
         /// <summary>
         /// Uses the default revealing convention to convert the projection to a string.
@@ -125,7 +123,7 @@ namespace NHibernate.FlowQuery.Core
         /// <summary>
         /// Uses the default revealing convention to convert the projection to a string.
         /// </summary>
-        IFlowQuery<TSource> LeftOuterJoin<TAlias>(Expression<Func<object>> projection, Expression<Func<TAlias>> alias, Expression<Func<TSource, bool>> joinOnClause);
+        IFlowQuery<TSource> LeftOuterJoin<TAlias>(Expression<Func<object>> projection, Expression<Func<TAlias>> alias, Expression<Func<TAlias, bool>> joinOnClause);
 
         /// <summary>
         /// Uses the provided revealing convention to convert the projection to a string.
@@ -135,7 +133,7 @@ namespace NHibernate.FlowQuery.Core
         /// <summary>
         /// Uses the provided revealing convention to convert the projection to a string.
         /// </summary>
-        IFlowQuery<TSource> LeftOuterJoin<TAlias>(Expression<Func<object>> projection, Expression<Func<TAlias>> alias, Expression<Func<TSource, bool>> joinOnClause, IRevealConvention revealConvention);
+        IFlowQuery<TSource> LeftOuterJoin<TAlias>(Expression<Func<object>> projection, Expression<Func<TAlias>> alias, Expression<Func<TAlias, bool>> joinOnClause, IRevealConvention revealConvention);
 
         #endregion
 
@@ -143,15 +141,15 @@ namespace NHibernate.FlowQuery.Core
 
         IFlowQuery<TSource> RightOuterJoin<TAlias>(string property, Expression<Func<TAlias>> alias);
 
-        IFlowQuery<TSource> RightOuterJoin<TAlias>(string property, Expression<Func<TAlias>> alias, Expression<Func<TSource, bool>> joinOnClause);
+        IFlowQuery<TSource> RightOuterJoin<TAlias>(string property, Expression<Func<TAlias>> alias, Expression<Func<TAlias, bool>> joinOnClause);
 
         IFlowQuery<TSource> RightOuterJoin<TAlias>(Expression<Func<TSource, TAlias>> projection, Expression<Func<TAlias>> alias);
 
-        IFlowQuery<TSource> RightOuterJoin<TAlias>(Expression<Func<TSource, TAlias>> projection, Expression<Func<TAlias>> alias, Expression<Func<TSource, bool>> joinOnClause);
+        IFlowQuery<TSource> RightOuterJoin<TAlias>(Expression<Func<TSource, TAlias>> projection, Expression<Func<TAlias>> alias, Expression<Func<TAlias, bool>> joinOnClause);
 
         IFlowQuery<TSource> RightOuterJoin<TAlias>(Expression<Func<TSource, IEnumerable<TAlias>>> projection, Expression<Func<TAlias>> alias);
 
-        IFlowQuery<TSource> RightOuterJoin<TAlias>(Expression<Func<TSource, IEnumerable<TAlias>>> projection, Expression<Func<TAlias>> alias, Expression<Func<TSource, bool>> joinOnClause);
+        IFlowQuery<TSource> RightOuterJoin<TAlias>(Expression<Func<TSource, IEnumerable<TAlias>>> projection, Expression<Func<TAlias>> alias, Expression<Func<TAlias, bool>> joinOnClause);
 
         /// <summary>
         /// Uses the default revealing convention to convert the projection to a string.
@@ -161,7 +159,7 @@ namespace NHibernate.FlowQuery.Core
         /// <summary>
         /// Uses the default revealing convention to convert the projection to a string.
         /// </summary>
-        IFlowQuery<TSource> RightOuterJoin<TAlias>(Expression<Func<object>> projection, Expression<Func<TAlias>> alias, Expression<Func<TSource, bool>> joinOnClause);
+        IFlowQuery<TSource> RightOuterJoin<TAlias>(Expression<Func<object>> projection, Expression<Func<TAlias>> alias, Expression<Func<TAlias, bool>> joinOnClause);
 
         /// <summary>
         /// Uses the provided revealing convention to convert the projection to a string.
@@ -171,7 +169,7 @@ namespace NHibernate.FlowQuery.Core
         /// <summary>
         /// Uses the provided revealing convention to convert the projection to a string.
         /// </summary>
-        IFlowQuery<TSource> RightOuterJoin<TAlias>(Expression<Func<object>> projection, Expression<Func<TAlias>> alias, Expression<Func<TSource, bool>> joinOnClause, IRevealConvention revealConvention);
+        IFlowQuery<TSource> RightOuterJoin<TAlias>(Expression<Func<object>> projection, Expression<Func<TAlias>> alias, Expression<Func<TAlias, bool>> joinOnClause, IRevealConvention revealConvention);
 
         #endregion
 
@@ -179,15 +177,15 @@ namespace NHibernate.FlowQuery.Core
 
         IFlowQuery<TSource> FullJoin<TAlias>(string property, Expression<Func<TAlias>> alias);
 
-        IFlowQuery<TSource> FullJoin<TAlias>(string property, Expression<Func<TAlias>> alias, Expression<Func<TSource, bool>> joinOnClause);
+        IFlowQuery<TSource> FullJoin<TAlias>(string property, Expression<Func<TAlias>> alias, Expression<Func<TAlias, bool>> joinOnClause);
 
         IFlowQuery<TSource> FullJoin<TAlias>(Expression<Func<TSource, TAlias>> projection, Expression<Func<TAlias>> alias);
 
-        IFlowQuery<TSource> FullJoin<TAlias>(Expression<Func<TSource, TAlias>> projection, Expression<Func<TAlias>> alias, Expression<Func<TSource, bool>> joinOnClause);
+        IFlowQuery<TSource> FullJoin<TAlias>(Expression<Func<TSource, TAlias>> projection, Expression<Func<TAlias>> alias, Expression<Func<TAlias, bool>> joinOnClause);
 
         IFlowQuery<TSource> FullJoin<TAlias>(Expression<Func<TSource, IEnumerable<TAlias>>> projection, Expression<Func<TAlias>> alias);
 
-        IFlowQuery<TSource> FullJoin<TAlias>(Expression<Func<TSource, IEnumerable<TAlias>>> projection, Expression<Func<TAlias>> alias, Expression<Func<TSource, bool>> joinOnClause);
+        IFlowQuery<TSource> FullJoin<TAlias>(Expression<Func<TSource, IEnumerable<TAlias>>> projection, Expression<Func<TAlias>> alias, Expression<Func<TAlias, bool>> joinOnClause);
 
         /// <summary>
         /// Uses the default revealing convention to convert the projection to a string.
@@ -197,7 +195,7 @@ namespace NHibernate.FlowQuery.Core
         /// <summary>
         /// Uses the default revealing convention to convert the projection to a string.
         /// </summary>
-        IFlowQuery<TSource> FullJoin<TAlias>(Expression<Func<object>> projection, Expression<Func<TAlias>> alias, Expression<Func<TSource, bool>> joinOnClause);
+        IFlowQuery<TSource> FullJoin<TAlias>(Expression<Func<object>> projection, Expression<Func<TAlias>> alias, Expression<Func<TAlias, bool>> joinOnClause);
 
         /// <summary>
         /// Uses the provided revealing convention to convert the projection to a string.
@@ -207,7 +205,7 @@ namespace NHibernate.FlowQuery.Core
         /// <summary>
         /// Uses the provided revealing convention to convert the projection to a string.
         /// </summary>
-        IFlowQuery<TSource> FullJoin<TAlias>(Expression<Func<object>> projection, Expression<Func<TAlias>> alias, Expression<Func<TSource, bool>> joinOnClause, IRevealConvention revealConvention);
+        IFlowQuery<TSource> FullJoin<TAlias>(Expression<Func<object>> projection, Expression<Func<TAlias>> alias, Expression<Func<TAlias, bool>> joinOnClause, IRevealConvention revealConvention);
 
         #endregion
     }

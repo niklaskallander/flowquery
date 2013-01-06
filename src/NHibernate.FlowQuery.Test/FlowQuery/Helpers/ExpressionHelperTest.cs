@@ -188,7 +188,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
 
             Assert.That(() =>
             {
-                ExpressionHelper.IsRooted(expression, "x");
+                ExpressionHelper.IsRooted(expression, "x", null);
 
             }, Throws.InstanceOf<ArgumentNullException>());
         }
@@ -200,7 +200,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
 
             Assert.That(() =>
             {
-                ExpressionHelper.IsRooted(expression, null);
+                ExpressionHelper.IsRooted(expression, null, null);
 
             }, Throws.ArgumentException);
         }
@@ -212,7 +212,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
 
             Assert.That(() =>
             {
-                ExpressionHelper.IsRooted(expression, string.Empty);
+                ExpressionHelper.IsRooted(expression, string.Empty, null);
 
             }, Throws.ArgumentException);
         }

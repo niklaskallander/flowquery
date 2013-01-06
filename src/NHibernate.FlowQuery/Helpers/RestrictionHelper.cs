@@ -105,7 +105,7 @@ namespace NHibernate.FlowQuery.Helpers
 
             if (aIsProjected && bIsProjected) // Projection Projection
             {
-                return GetProjectionProjectionCriterion(ProjectionHelper.GetProjection(a, root), ProjectionHelper.GetProjection(b, root), type);
+                return GetProjectionProjectionCriterion(ProjectionHelper.GetProjection(a, root, aliases), ProjectionHelper.GetProjection(b, root, aliases), type);
             }
             else if ((aIsProjected && !bIsProjected) || (!aIsProjected && !bIsProjected))
             {
@@ -118,7 +118,7 @@ namespace NHibernate.FlowQuery.Helpers
         {
             if (IsProjected(expression, root, aliases)) // Not a value expression
             {
-                IProjection projection = ProjectionHelper.GetProjection(expression.Object ?? expression.Arguments[0], root);
+                IProjection projection = ProjectionHelper.GetProjection(expression.Object ?? expression.Arguments[0], root, aliases);
 
                 int i = expression.Object == null ? 1 : 0;
                 switch (expression.Method.Name)
@@ -331,7 +331,7 @@ namespace NHibernate.FlowQuery.Helpers
                 }
             }
 
-            IProjection projection = ProjectionHelper.GetProjection(expression, root);
+            IProjection projection = ProjectionHelper.GetProjection(expression, root, aliases);
             switch (type)
             {
                 case ExpressionType.Equal:

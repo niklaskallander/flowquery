@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 using NHibernate.Criterion;
 using NHibernate.FlowQuery.Helpers;
@@ -22,7 +23,7 @@ namespace NHibernate.FlowQuery
             return list;
         }
 
-        public static ProjectionList AddProperties<TSource>(this ProjectionList list, params Expression<Func<TSource, object>>[] properties)
+        public static ProjectionList AddProperties<TSource>(this ProjectionList list, Dictionary<string, string> aliases, params Expression<Func<TSource, object>>[] properties)
         {
             foreach (var property in properties)
             {
@@ -30,7 +31,7 @@ namespace NHibernate.FlowQuery
                 {
                     throw new ArgumentNullException("property");
                 }
-                list.AddProperty(property);
+                list.AddProperty(property, aliases);
             }
             return list;
         }
@@ -45,9 +46,9 @@ namespace NHibernate.FlowQuery
             return list.Add(Projections.Property(property), alias);
         }
 
-        public static ProjectionList AddProperty<TSource, TProperty>(this ProjectionList list, Expression<Func<TSource, TProperty>> property)
+        public static ProjectionList AddProperty<TSource, TProperty>(this ProjectionList list, Expression<Func<TSource, TProperty>> property, Dictionary<string, string> aliases)
         {
-            IProjection projection = ProjectionHelper.GetProjection(property.Body, property.Parameters[0].Name);
+            IProjection projection = ProjectionHelper.GetProjection(property.Body, property.Parameters[0].Name, aliases);
 
             string alias = null;
 
