@@ -7,8 +7,6 @@ using NUnit.Framework;
 namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
 {
     using Is = NUnit.Framework.Is;
-    using NHibernate.Criterion;
-    using NHibernate.SqlCommand;
 
     [TestFixture]
     public class JoinTest : BaseTest
@@ -150,7 +148,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
 
             var groups2 = Query<UserEntity>()
                 .Join(u => u.Groups, () => link, x => link.Id == null)
-                .Join(u => link.Group, () => group, x=> group.Id == null)
+                .Join(u => link.Group, () => group, x => group.Id == null)
                 .SelectDistinct(u => new { group.Name });
 
             Assert.That(groups2.Count(), Is.EqualTo(0));
@@ -261,10 +259,44 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
             UserGroupLinkEntity link = null;
 
             var groups = Query<UserEntity>()
-                .InnerJoin(u => u.Groups, () => link, u => link.Id == null)
+                .InnerJoin(u => u.Groups, () => link, u => link.Id == 0)
                 .SelectDistinct(u => new { link.Group });
 
             Assert.That(groups.Count(), Is.EqualTo(0));
+        }
+
+        [Test]
+        public void CanJoinMultipleTimesWithSpecifiedOnClauses()
+        {
+            UserGroupLinkEntity link = null;
+
+            UserEntity user = null;
+
+            GroupEntity group = null;
+
+            var groups = Session.FlowQuery<UserEntity>(() => user)
+                .InnerJoin(u => u.Groups, () => link, u => link.Id == user.Id)
+                .InnerJoin(u => link.Group, () => group, u => group.Name == "A1")
+                .SelectDistinct(u => new { link.Group });
+
+            Assert.That(groups.Count(), Is.EqualTo(1));
+        }
+
+        [Test]
+        public void CanJoinWithoutInParameterAndWithoutConvention()
+        {
+            UserGroupLinkEntity link = null;
+
+            UserEntity user = null;
+
+            GroupEntity group = null;
+
+            var groups = Session.FlowQuery<UserEntity>(() => user)
+                .InnerJoin(u => u.Groups, () => link)
+                .InnerJoin(() => link.Group, () => group)
+                .SelectDistinct(u => new { link.Group });
+
+            Assert.That(groups.Count(), Is.EqualTo(2));
         }
 
         [Test]
@@ -460,7 +492,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
             Assert.That(settings1.Count(), Is.EqualTo(4));
 
             var settings2 = Query<UserEntity>()
-                .LeftOuterJoin(x => x.Setting, () => setting,x => setting.Id == null)
+                .LeftOuterJoin(x => x.Setting, () => setting, x => setting.Id == null)
                 .Select(u => new { setting.Id });
 
             Assert.That(settings2.Count(), Is.EqualTo(4));
@@ -741,7 +773,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         #region Overall Tests
 
         [Test]
-        public void JoiningWithProvidedRevealConventionThrowsIfConventionIsNull()
+        public void JoiningWithProvidedRevealConventionDoesNotThrowIfConventionIsNull()
         {
             UserGroupLinkEntity link = null;
             GroupEntity group = null;
@@ -752,7 +784,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                     .InnerJoin(u => u.Groups, () => link)
                     .InnerJoin(() => link.Group, () => group, (IRevealConvention)null);
 
-            }, Throws.InstanceOf<ArgumentNullException>());
+            }, Throws.Nothing);
 
             Assert.That(() =>
             {
@@ -760,7 +792,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                     .Join(u => u.Groups, () => link)
                     .Join(() => link.Group, () => group, (IRevealConvention)null);
 
-            }, Throws.InstanceOf<ArgumentNullException>());
+            }, Throws.Nothing);
 
             Assert.That(() =>
             {
@@ -768,7 +800,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                     .FullJoin(u => u.Groups, () => link)
                     .FullJoin(() => link.Group, () => group, (IRevealConvention)null);
 
-            }, Throws.InstanceOf<ArgumentNullException>());
+            }, Throws.Nothing);
 
             Assert.That(() =>
             {
@@ -776,7 +808,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                     .RightOuterJoin(u => u.Groups, () => link)
                     .RightOuterJoin(() => link.Group, () => group, (IRevealConvention)null);
 
-            }, Throws.InstanceOf<ArgumentNullException>());
+            }, Throws.Nothing);
 
             Assert.That(() =>
             {
@@ -784,7 +816,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                     .LeftOuterJoin(u => u.Groups, () => link)
                     .LeftOuterJoin(() => link.Group, () => group, (IRevealConvention)null);
 
-            }, Throws.InstanceOf<ArgumentNullException>());
+            }, Throws.Nothing);
         }
 
         [Test]

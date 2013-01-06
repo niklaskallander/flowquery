@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 
 namespace NHibernate.FlowQuery.Helpers
@@ -76,7 +77,7 @@ namespace NHibernate.FlowQuery.Helpers
             throw new NotSupportedException("The expression contains unsupported features please revise your code");
         }
 
-        public static bool IsRooted(Expression expression, string expectedRoot)
+        public static bool IsRooted(Expression expression, string expectedRoot, Dictionary<string, string> aliases)
         {
             if (expression == null)
             {
@@ -92,7 +93,7 @@ namespace NHibernate.FlowQuery.Helpers
 
             string[] splits = property.Split('.');
 
-            return splits.Length != 1 || splits[0] == expectedRoot;
+            return splits.Length != 1 && (splits[0] == expectedRoot || (aliases != null && aliases.ContainsValue(splits[0])));
         }
 
         public static string GetPropertyName(Expression expression, string expectedRoot)

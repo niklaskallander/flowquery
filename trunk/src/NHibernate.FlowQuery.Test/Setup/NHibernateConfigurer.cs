@@ -2,6 +2,7 @@
 using FluentNHibernate.Automapping;
 using FluentNHibernate.Cfg;
 using FluentNHibernate.Cfg.Db;
+using HibernatingRhinos.Profiler.Appender.NHibernate;
 //using HibernatingRhinos.Profiler.Appender.NHibernate;
 using NHibernate.Cfg;
 using NHibernate.FlowQuery.Test.Setup.Entities;
@@ -51,7 +52,7 @@ namespace NHibernate.FlowQuery.Test.Setup
                 var u1 = new UserEntity("Wimpy", "Cool01", "Niklas", "Källander", new DateTime(2001, 9, 11), RoleEnum.Administrator, "1") { LastLoggedInStamp = DateTime.Now, IsOnline = true, Setting = s6 };
                 var u2 = new UserEntity("Izmid", "Cool02", "Lars", "Wilk", new DateTime(2001, 4, 22), RoleEnum.Webmaster, "2") { LastLoggedInStamp = DateTime.Now, IsOnline = true, Setting = s6 };
                 var u3 = new UserEntity("Empor", "Cool03", "Kossan", "Muu", new DateTime(2001, 5, 3), RoleEnum.Administrator, "3") { LastLoggedInStamp = DateTime.Now, IsOnline = true, Setting = s6 };
-                var u4 = new UserEntity("Lajsa", "Cool04", "Lotta", "Bråk", DateTime.Now, RoleEnum.Standard, "4") { Setting = s6 };
+                var u4 = new UserEntity("Lajsa", "", "Lotta", "Bråk", DateTime.Now, RoleEnum.Standard, "4") { Setting = s6 };
 
                 session.Save(u1);
                 session.Save(u2);
@@ -128,7 +129,7 @@ namespace NHibernate.FlowQuery.Test.Setup
 
         public static void Configure()
         {
-            //NHibernateProfiler.Initialize();
+            NHibernateProfiler.Initialize();
 
             m_Factory = Fluently.Configure()
                 .Database(MsSqlConfiguration.MsSql2008.ConnectionString(@"Data Source=.\sqlexpress; Initial Catalog=FlowQueryTestDB; Integrated Security=SSPI;"))

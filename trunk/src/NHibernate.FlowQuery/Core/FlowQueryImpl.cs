@@ -40,9 +40,13 @@ namespace NHibernate.FlowQuery.Core
 
             Session = session;
 
+            string aliasName = null;
+
             if (alias != null)
             {
-                Criteria = Session.CreateCriteria<TSource>(ExpressionHelper.GetPropertyName(alias));
+                aliasName = ExpressionHelper.GetPropertyName(alias);
+
+                Criteria = Session.CreateCriteria<TSource>(aliasName);
             }
             else
             {
@@ -50,6 +54,11 @@ namespace NHibernate.FlowQuery.Core
             }
 
             PropertyAliases = new Dictionary<string, string>();
+
+            if (aliasName != null)
+            {
+                PropertyAliases.Add("entity.root.alias", aliasName);
+            }
 
             OrderByStatements = new List<OrderByStatement>();
         }
@@ -111,7 +120,7 @@ namespace NHibernate.FlowQuery.Core
 
             Dictionary<string, IProjection> mappings = new Dictionary<string, IProjection>();
 
-            var list = ProjectionHelper.GetProjectionListForExpression(expression.Body, expression.Parameters[0].Name, ref mappings);
+            var list = ProjectionHelper.GetProjectionListForExpression(expression.Body, expression.Parameters[0].Name, PropertyAliases, ref mappings);
             if (list == null || list.Length == 0)
             {
                 throw new NotSupportedException("The provided expression contains unsupported features please revise your code.");
@@ -154,7 +163,7 @@ namespace NHibernate.FlowQuery.Core
 
         protected virtual ISelectSetup<TSource, TReturn> Select<TReturn>()
         {
-            return new SelectSetup<TSource, TReturn>(this);
+            return new SelectSetup<TSource, TReturn>(this, PropertyAliases);
         }
 
         protected virtual FlowQuerySelection<TReturn> Select<TReturn>(ISelectSetup<TSource, TReturn> setup)
@@ -229,7 +238,7 @@ namespace NHibernate.FlowQuery.Core
             (
                 Projections
                     .ProjectionList()
-                        .AddProperties(properties)
+                        .AddProperties(PropertyAliases, properties)
             );
         }
 
@@ -244,7 +253,7 @@ namespace NHibernate.FlowQuery.Core
 
         protected virtual ISelectSetup<TSource, TReturn> SelectDistinct<TReturn>()
         {
-            return new SelectDistinctSetup<TSource, TReturn>(this);
+            return new SelectDistinctSetup<TSource, TReturn>(this, PropertyAliases);
         }
 
         protected virtual ISelectSetup<TSource, TSource> SelectDistinct()
@@ -324,7 +333,7 @@ namespace NHibernate.FlowQuery.Core
             (
                 Projections
                     .ProjectionList()
-                        .AddProperties(expressions)
+                        .AddProperties(PropertyAliases, expressions)
             );
         }
 

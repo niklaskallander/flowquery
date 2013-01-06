@@ -241,6 +241,56 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
             }
         }
 
+
+        public class Test
+        {
+            public virtual bool IsAdmin { get; set; }
+
+            public virtual RoleEnum Role { get; set; }
+        }
+
+        [Test]
+        public void CanUseLocalVariableInProjections()
+        {
+            string local = "TEST";
+
+            var anonymous = Query<UserEntity>()
+                .Select(x => new { Prop = x.Role == RoleEnum.Administrator ? local : x.Username, local, x.Role, x.Username });
+
+            foreach (var item in anonymous)
+            {
+                Assert.That(item.local, Is.EqualTo(local));
+
+                if (item.Role == RoleEnum.Administrator)
+                {
+                    Assert.That(item.Prop, Is.EqualTo(local));
+                }
+                else
+                {
+                    Assert.That(item.Prop, Is.EqualTo(item.Username));
+                }
+            }
+        }
+
+        [Test]
+        public void CanSelectWithStringEmptyInProjections()
+        {
+            var anonymous = Query<UserEntity>()
+                .Select(x => new { Prop = x.Role == RoleEnum.Administrator ? "Admin" : string.Empty, x.Role });
+
+            foreach (var item in anonymous)
+            {
+                if (item.Role == RoleEnum.Administrator)
+                {
+                    Assert.That(item.Prop, Is.EqualTo("Admin"));
+                }
+                else
+                {
+                    Assert.That(item.Prop, Is.Not.EqualTo("Admin"));
+                }
+            }
+        }
+
         [Test]
         public void CanSelectConditionals()
         {
@@ -248,6 +298,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                 .Select(u => new { IsAdministrator = u.Role == RoleEnum.Administrator ? true : false, u.Role });
 
             Assert.That(anonymous.Count(), Is.EqualTo(4));
+
             foreach (var item in anonymous)
             {
                 if (item.Role == RoleEnum.Administrator)
@@ -261,7 +312,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
             }
         }
 
-        [Test, Ignore("NHibernate currently translates the system types to mismatching ITypes making NHibernate throw exceptions. YesNoType is not the same type as BooleanType. Have not found a way to work-around this issue yet.")]
+        [Test]//, Ignore("NHibernate currently translates the system types to mismatching ITypes making NHibernate throw exceptions. YesNoType is not the same type as BooleanType. Have not found a way to work-around this issue yet.")
         public void CanSelectConditionalsWithMixedProjectionAndConstant()
         {
             var anonymous = Query<UserEntity>()

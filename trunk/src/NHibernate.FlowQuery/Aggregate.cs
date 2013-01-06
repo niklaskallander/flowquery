@@ -4,9 +4,15 @@ namespace NHibernate.FlowQuery
 {
     public static class Aggregate
     {
-        #region Methods (8)
+        #region Methods (15)
 
         public static decimal Average<TReturn>(TReturn property)
+        {
+            throw Exception();
+        }
+
+        public static decimal Average<TReturn>(TReturn? property)
+            where TReturn : struct
         {
             throw Exception();
         }
@@ -16,7 +22,19 @@ namespace NHibernate.FlowQuery
             throw Exception();
         }
 
+        public static int Count<TReturn>(TReturn? property)
+            where TReturn : struct
+        {
+            throw Exception();
+        }
+
         public static int CountDistinct<TReturn>(TReturn property)
+        {
+            throw Exception();
+        }
+
+        public static int CountDistinct<TReturn>(TReturn? property)
+            where TReturn : struct
         {
             throw Exception();
         }
@@ -31,7 +49,19 @@ namespace NHibernate.FlowQuery
             throw Exception();
         }
 
+        public static TReturn GroupBy<TReturn>(TReturn? property)
+            where TReturn : struct
+        {
+            throw Exception();
+        }
+
         public static TReturn Max<TReturn>(TReturn property)
+        {
+            throw Exception();
+        }
+
+        public static TReturn Max<TReturn>(TReturn? property)
+            where TReturn : struct
         {
             throw Exception();
         }
@@ -41,7 +71,19 @@ namespace NHibernate.FlowQuery
             throw Exception();
         }
 
+        public static TReturn Min<TReturn>(TReturn? property)
+            where TReturn : struct
+        {
+            throw Exception();
+        }
+
         public static TReturn Sum<TReturn>(TReturn property)
+        {
+            throw Exception();
+        }
+
+        public static TReturn Sum<TReturn>(TReturn? property)
+            where TReturn : struct
         {
             throw Exception();
         }

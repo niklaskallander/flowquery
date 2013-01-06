@@ -14,14 +14,14 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core
     [TestFixture]
     public class IDistinctSetupPartTest : BaseTest
     {
-		#region Methods (8) 
+        #region Methods (8)
 
         [Test]
         public void CanConstruct()
         {
-            var setup = new SelectSetup<UserEntity, UserDto>(Query<UserEntity>());
+            var setup = new SelectSetup<UserEntity, UserDto>(Query<UserEntity>(), null);
 
-            var part = new SelectSetupPart<UserEntity, UserDto>("IsOnline", setup);
+            var part = new SelectSetupPart<UserEntity, UserDto>("IsOnline", setup, null);
 
             Assert.That(part, Is.Not.Null);
         }
@@ -57,7 +57,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core
         {
             Assert.That(() =>
             {
-                new SelectSetupPart<UserEntity, UserDto>("IsOnline", null);
+                new SelectSetupPart<UserEntity, UserDto>("IsOnline", null, null);
 
             }, Throws.InstanceOf<ArgumentNullException>());
         }
@@ -65,11 +65,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core
         [Test]
         public void ConstructorThrowsIfStringIsEmpty()
         {
-            var setup = new SelectSetup<UserEntity, UserDto>(Query<UserEntity>());
+            var setup = new SelectSetup<UserEntity, UserDto>(Query<UserEntity>(), null);
 
             Assert.That(() =>
             {
-                new SelectSetupPart<UserEntity, UserDto>(string.Empty, setup);
+                new SelectSetupPart<UserEntity, UserDto>(string.Empty, setup, null);
 
             }, Throws.ArgumentException);
         }
@@ -77,11 +77,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core
         [Test]
         public void ConstructorThrowsIfStringIsNull()
         {
-            var setup = new SelectSetup<UserEntity, UserDto>(Query<UserEntity>());
+            var setup = new SelectSetup<UserEntity, UserDto>(Query<UserEntity>(), null);
 
             Assert.That(() =>
                         {
-                            new SelectSetupPart<UserEntity, UserDto>(null, setup);
+                            new SelectSetupPart<UserEntity, UserDto>(null, setup, null);
 
                         }, Throws.ArgumentException);
         }
@@ -114,6 +114,6 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core
                         }, Throws.InstanceOf<ArgumentNullException>());
         }
 
-		#endregion Methods 
+        #endregion Methods
     }
 }

@@ -12,7 +12,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core
     [TestFixture]
     public class IDistinctSetupTest : BaseTest
     {
-		#region Methods (9) 
+        #region Methods (9)
 
         [Test]
         public void CanConstruct()
@@ -49,7 +49,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core
 
             Assert.That(() =>
                         {
-                            new SelectSetup<UserEntity, UserDto>(query);
+                            new SelectSetup<UserEntity, UserDto>(query, null);
 
                         }, Throws.InstanceOf<ArgumentNullException>());
         }
@@ -112,6 +112,6 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core
                         }, Throws.InstanceOf<InvalidOperationException>());
         }
 
-		#endregion Methods 
+        #endregion Methods
     }
 }
