@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace NHibernate.FlowQuery.Helpers
 {
@@ -160,10 +161,17 @@ namespace NHibernate.FlowQuery.Helpers
                 throw new ArgumentNullException("expression");
             }
 
-            return Expression
-                    .Lambda(expression, null)
-                        .Compile()
-                            .DynamicInvoke(null);
+            try
+            {
+                return Expression
+                        .Lambda(expression, null)
+                            .Compile()
+                                .DynamicInvoke(null);
+            }
+            catch (TargetInvocationException)
+            {
+                return null;
+            }
         }
 
         public static T GetValue<T>(Expression expression)
