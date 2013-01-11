@@ -164,9 +164,9 @@ namespace NHibernate.FlowQuery.Helpers
             try
             {
                 return Expression
-                        .Lambda(expression, null)
-                            .Compile()
-                                .DynamicInvoke(null);
+                    .Lambda(expression, null)
+                        .Compile()
+                            .DynamicInvoke(null);
             }
             catch (TargetInvocationException)
             {

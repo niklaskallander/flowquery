@@ -206,6 +206,24 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
         }
 
         [Test]
+        public void GetValueDoesNotThrowWhereTargetInvocationExceptionMightBeExpected()
+        {
+            object argument = null;
+
+            Expression<Func<object>> expression = () => argument.ToString();
+
+            object value = 1;
+
+            Assert.That(() =>
+            {
+                value = ExpressionHelper.GetValue(expression.Body);
+
+            }, Throws.Nothing);
+
+            Assert.That(value, Is.Null);
+        }
+
+        [Test]
         public void IsRootedThrowsIfExpectedRootIsEmpty()
         {
             Expression<Func<UserDto, object>> expression = x => x.Id;
