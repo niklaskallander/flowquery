@@ -144,7 +144,7 @@ namespace NHibernate.FlowQuery.Helpers
         {
             return Projections.Conditional
             (
-                RestrictionHelper.GetCriterion(expression.Test, rootName, new Dictionary<string, string>()),
+                RestrictionHelper.GetCriterion(expression.Test, rootName, aliases),
                 GetProjection(expression.IfTrue, rootName, aliases),
                 GetProjection(expression.IfFalse, rootName, aliases)
             );
@@ -216,7 +216,7 @@ namespace NHibernate.FlowQuery.Helpers
 
                     object value = ExpressionHelper.GetValue(expression);
 
-                    return Projections.Constant(value, TypeHelper.GuessType(value.GetType()));
+                    return Projections.Constant(value, TypeHelper.GuessType(expression.Type));
 
                 case ExpressionType.Convert:
                     return GetProjection((expression as UnaryExpression).Operand, root, aliases);
@@ -225,7 +225,7 @@ namespace NHibernate.FlowQuery.Helpers
 
                     value = ExpressionHelper.GetValue(expression);
 
-                    return Projections.Constant(value, TypeHelper.GuessType(value.GetType()));
+                    return Projections.Constant(value, TypeHelper.GuessType(expression.Type));
             }
         }
 
