@@ -20,6 +20,48 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         #region Methods (53)
 
         [Test]
+        public void MultiTest()
+        {
+            var firstnames = Session.QueryOver<UserEntity>()
+                .Select(x => x.Firstname)
+                .Future<string>()
+                ;
+
+            var lastnames = Session.QueryOver<UserEntity>()
+                .Select(x => x.Lastname)
+                .Future<string>()
+                ;
+
+            var some = Session.QueryOver<UserEntity>()
+                .Select(x => x.Password)
+                .Future<string>()
+                ;
+
+            foreach (var item in some)
+            {
+                Assert.That(item, Is.Not.Null);
+            }
+
+            var firstnames2 = Query<UserEntity>()
+                .Select(x => x.Firstname)
+                ;
+
+            var lastnames2 = Query<UserEntity>()
+                .Select(x => x.Lastname)
+                ;
+
+            var some2 = Query<UserEntity>()
+                .Select(x => x.Password)
+                ;
+
+            foreach (var item in some2)
+            {
+                Assert.That(item, Is.Not.Null);
+            }
+        }
+
+
+        [Test]
         public void AttemptToSelectInvalidAggregationThrows()
         {
             Assert.That(() =>
