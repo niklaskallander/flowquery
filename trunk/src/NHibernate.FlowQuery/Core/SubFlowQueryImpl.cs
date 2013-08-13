@@ -4,15 +4,11 @@ using System.Linq.Expressions;
 using NHibernate.Criterion;
 using NHibernate.FlowQuery.Expressions;
 using NHibernate.FlowQuery.Helpers;
-using NHibernate.FlowQuery.Revealing.Conventions;
-using NHibernate.SqlCommand;
 
 namespace NHibernate.FlowQuery.Core
 {
-    public class SubFlowQueryImpl<TSource> : SubFlowQuery, ISubFlowQuery<TSource>
+    public partial class SubFlowQueryImpl<TSource> : SubFlowQuery, ISubFlowQuery<TSource>
     {
-        #region Constructors (1)
-
         public SubFlowQueryImpl(DetachedCriteria criteria)
         {
             if (criteria == null)
@@ -27,19 +23,9 @@ namespace NHibernate.FlowQuery.Core
             OrderByStatements = new List<OrderByStatement>();
         }
 
-        #endregion Constructors
-
-        #region Properties (2)
-
         protected virtual List<OrderByStatement> OrderByStatements { get; private set; }
 
         protected virtual Dictionary<string, string> PropertyAliases { get; private set; }
-
-        #endregion Properties
-
-        #region Methods (32)
-
-        #region OrderBy
 
         protected virtual ISubFlowQuery<TSource> OrderBy(string property)
         {
@@ -78,10 +64,6 @@ namespace NHibernate.FlowQuery.Core
         {
             return OrderByDescending(ExpressionHelper.GetPropertyName(property.Body, property.Parameters[0].Name));
         }
-
-        #endregion
-
-        #region Count
 
         protected virtual ISubFlowQuery<TSource> Count()
         {
@@ -134,8 +116,6 @@ namespace NHibernate.FlowQuery.Core
             return Count(Projections.RowCountInt64(), false);
         }
 
-        #endregion
-
         protected virtual ISubFlowQuery<TSource> And(params ICriterion[] criterions)
         {
             return Where(criterions);
@@ -156,170 +136,6 @@ namespace NHibernate.FlowQuery.Core
             return Where(property, expression);
         }
 
-        protected virtual ISubFlowQuery<TSource> FullJoin<TAlias>(string property, Expression<Func<TAlias>> alias)
-        {
-            return Join(property, alias, JoinType.FullJoin);
-        }
-
-        protected virtual ISubFlowQuery<TSource> FullJoin<TAlias>(Expression<Func<TSource, TAlias>> projection, Expression<Func<TAlias>> alias)
-        {
-            return Join(projection, alias, JoinType.FullJoin);
-        }
-
-        protected virtual ISubFlowQuery<TSource> FullJoin<TAlias>(Expression<Func<TSource, IEnumerable<TAlias>>> projection, Expression<Func<TAlias>> alias)
-        {
-            return Join(projection, alias, JoinType.FullJoin);
-        }
-
-        protected virtual ISubFlowQuery<TSource> FullJoin<TAlias>(Expression<Func<object>> projection, Expression<Func<TAlias>> alias)
-        {
-            return Join(projection, alias, JoinType.FullJoin);
-        }
-
-        protected virtual ISubFlowQuery<TSource> FullJoin<TAlias>(Expression<Func<object>> projection, Expression<Func<TAlias>> alias, IRevealConvention revealConvention)
-        {
-            return Join(projection, alias, JoinType.FullJoin, revealConvention);
-        }
-
-        protected virtual ISubFlowQuery<TSource> InnerJoin<TAlias>(string property, Expression<Func<TAlias>> alias)
-        {
-            return Join(property, alias, JoinType.InnerJoin);
-        }
-
-        protected virtual ISubFlowQuery<TSource> InnerJoin<TAlias>(Expression<Func<TSource, TAlias>> projection, Expression<Func<TAlias>> alias)
-        {
-            return Join(projection, alias, JoinType.InnerJoin);
-        }
-
-        protected virtual ISubFlowQuery<TSource> InnerJoin<TAlias>(Expression<Func<TSource, IEnumerable<TAlias>>> projection, Expression<Func<TAlias>> alias)
-        {
-            return Join(projection, alias, JoinType.InnerJoin);
-        }
-
-        protected virtual ISubFlowQuery<TSource> InnerJoin<TAlias>(Expression<Func<object>> projection, Expression<Func<TAlias>> alias)
-        {
-            return Join(projection, alias, JoinType.InnerJoin);
-        }
-
-        protected virtual ISubFlowQuery<TSource> InnerJoin<TAlias>(Expression<Func<object>> projection, Expression<Func<TAlias>> alias, IRevealConvention revealConvention)
-        {
-            return Join(projection, alias, JoinType.InnerJoin, revealConvention);
-        }
-
-        /// <summary>
-        /// Performs an Inner Join.
-        /// </summary>
-        protected virtual ISubFlowQuery<TSource> Join<TAlias>(string property, Expression<Func<TAlias>> alias)
-        {
-            return Join(property, alias, JoinType.InnerJoin);
-        }
-
-        /// <summary>
-        /// Performs an Inner Join.
-        /// </summary>
-        protected virtual ISubFlowQuery<TSource> Join<TAlias>(Expression<Func<TSource, TAlias>> projection, Expression<Func<TAlias>> alias)
-        {
-            return Join(projection, alias, JoinType.InnerJoin);
-        }
-
-        protected virtual ISubFlowQuery<TSource> Join<TAlias>(Expression<Func<TSource, IEnumerable<TAlias>>> projection, Expression<Func<TAlias>> alias)
-        {
-            return Join(projection, alias, JoinType.InnerJoin);
-        }
-
-        protected virtual ISubFlowQuery<TSource> Join<TAlias>(Expression<Func<TSource, TAlias>> projection, Expression<Func<TAlias>> alias, JoinType joinType)
-        {
-            return Join(projection.Body, projection.Parameters[0].Name, alias, joinType);
-        }
-
-        protected virtual ISubFlowQuery<TSource> Join<TAlias>(Expression<Func<TSource, IEnumerable<TAlias>>> projection, Expression<Func<TAlias>> alias, JoinType joinType)
-        {
-            return Join(projection.Body, projection.Parameters[0].Name, alias, joinType);
-        }
-
-        protected virtual ISubFlowQuery<TSource> Join<TAlias>(Expression<Func<object>> projection, Expression<Func<TAlias>> alias)
-        {
-            return InnerJoin(projection, alias);
-        }
-
-        protected virtual ISubFlowQuery<TSource> Join<TAlias>(Expression<Func<object>> projection, Expression<Func<TAlias>> alias, IRevealConvention revealConvention)
-        {
-            return InnerJoin(projection, alias, revealConvention);
-        }
-
-        protected virtual ISubFlowQuery<TSource> Join<TAlias>(Expression<Func<object>> projection, Expression<Func<TAlias>> alias, JoinType joinType)
-        {
-            return Join(projection, alias, joinType, Reveal.DefaultConvention);
-        }
-
-        protected virtual ISubFlowQuery<TSource> Join<TAlias>(Expression<Func<object>> projection, Expression<Func<TAlias>> alias, JoinType joinType, IRevealConvention revealConvention)
-        {
-            if (revealConvention == null)
-            {
-                throw new ArgumentNullException("revealConvention");
-            }
-
-            return Join(Reveal.ByConvention(projection, revealConvention), alias, joinType);
-        }
-
-        protected virtual ISubFlowQuery<TSource> Join<TAlias>(string property, Expression<Func<TAlias>> aliasProjection, JoinType joinType)
-        {
-            string alias = ExpressionHelper.GetPropertyName(aliasProjection);
-
-            if (PropertyAliases.ContainsKey(property))
-            {
-                if (PropertyAliases[property] == alias)
-                {
-                    // Already exists
-                    return this;
-                }
-                throw new InvalidOperationException("Property already aliased");
-            }
-
-            if (PropertyAliases.ContainsValue(alias))
-            {
-                throw new InvalidOperationException("Alias already in use");
-            }
-
-            PropertyAliases.Add(property, alias);
-
-            Criteria.CreateAlias(property, alias, joinType);
-
-            return this;
-        }
-
-        protected virtual ISubFlowQuery<TSource> Join<TAlias>(System.Linq.Expressions.Expression propertyProjection, string root, Expression<Func<TAlias>> aliasProjection, JoinType joinType)
-        {
-            string property = ExpressionHelper.GetPropertyName(propertyProjection, root);
-
-            return Join(property, aliasProjection, joinType);
-        }
-
-        protected virtual ISubFlowQuery<TSource> LeftOuterJoin<TAlias>(string property, Expression<Func<TAlias>> alias)
-        {
-            return Join(property, alias, JoinType.LeftOuterJoin);
-        }
-
-        protected virtual ISubFlowQuery<TSource> LeftOuterJoin<TAlias>(Expression<Func<TSource, TAlias>> projection, Expression<Func<TAlias>> alias)
-        {
-            return Join(projection, alias, JoinType.LeftOuterJoin);
-        }
-
-        protected virtual ISubFlowQuery<TSource> LeftOuterJoin<TAlias>(Expression<Func<TSource, IEnumerable<TAlias>>> projection, Expression<Func<TAlias>> alias)
-        {
-            return Join(projection, alias, JoinType.LeftOuterJoin);
-        }
-
-        protected virtual ISubFlowQuery<TSource> LeftOuterJoin<TAlias>(Expression<Func<object>> projection, Expression<Func<TAlias>> alias)
-        {
-            return Join(projection, alias, JoinType.LeftOuterJoin);
-        }
-
-        protected virtual ISubFlowQuery<TSource> LeftOuterJoin<TAlias>(Expression<Func<object>> projection, Expression<Func<TAlias>> alias, IRevealConvention revealConvention)
-        {
-            return Join(projection, alias, JoinType.LeftOuterJoin, revealConvention);
-        }
-
         protected virtual ISubFlowQuery<TSource> Limit(int limit)
         {
             Criteria.SetMaxResults(limit);
@@ -332,31 +148,6 @@ namespace NHibernate.FlowQuery.Core
             Criteria.SetFirstResult(offset);
 
             return Limit(limit);
-        }
-
-        protected virtual ISubFlowQuery<TSource> RightOuterJoin<TAlias>(string property, Expression<Func<TAlias>> alias)
-        {
-            return Join(property, alias, JoinType.RightOuterJoin);
-        }
-
-        protected virtual ISubFlowQuery<TSource> RightOuterJoin<TAlias>(Expression<Func<TSource, TAlias>> projection, Expression<Func<TAlias>> alias)
-        {
-            return Join(projection, alias, JoinType.RightOuterJoin);
-        }
-
-        protected virtual ISubFlowQuery<TSource> RightOuterJoin<TAlias>(Expression<Func<TSource, IEnumerable<TAlias>>> projection, Expression<Func<TAlias>> alias)
-        {
-            return Join(projection, alias, JoinType.RightOuterJoin);
-        }
-
-        protected virtual ISubFlowQuery<TSource> RightOuterJoin<TAlias>(Expression<Func<object>> projection, Expression<Func<TAlias>> alias)
-        {
-            return Join(projection, alias, JoinType.RightOuterJoin);
-        }
-
-        protected virtual ISubFlowQuery<TSource> RightOuterJoin<TAlias>(Expression<Func<object>> projection, Expression<Func<TAlias>> alias, IRevealConvention revealConvention)
-        {
-            return Join(projection, alias, JoinType.RightOuterJoin, revealConvention);
         }
 
         protected virtual ISubFlowQuery<TSource> Select(params string[] properties)
@@ -475,13 +266,9 @@ namespace NHibernate.FlowQuery.Core
             return Where(ExpressionHelper.GetPropertyName(property.Body, property.Parameters[0].Name), expression);
         }
 
-        #endregion Methods
-
 
 
         #region ISubFlowQuery<TSource> Members
-
-        #region Count
 
         ISubFlowQuery<TSource> ISubFlowQuery<TSource>.Count()
         {
@@ -516,139 +303,6 @@ namespace NHibernate.FlowQuery.Core
         ISubFlowQuery<TSource> ISubFlowQuery<TSource>.CountLong()
         {
             return CountLong();
-        }
-
-        #endregion
-
-        ISubFlowQuery<TSource> ISubFlowQuery<TSource>.FullJoin<TAlias>(string property, Expression<Func<TAlias>> alias)
-        {
-            return FullJoin(property, alias);
-        }
-
-        ISubFlowQuery<TSource> ISubFlowQuery<TSource>.FullJoin<TAlias>(Expression<Func<TSource, TAlias>> projection, Expression<Func<TAlias>> alias)
-        {
-            return FullJoin(projection, alias);
-        }
-
-        ISubFlowQuery<TSource> ISubFlowQuery<TSource>.FullJoin<TAlias>(Expression<Func<TSource, IEnumerable<TAlias>>> projection, Expression<Func<TAlias>> alias)
-        {
-            return FullJoin(projection, alias);
-        }
-
-        ISubFlowQuery<TSource> ISubFlowQuery<TSource>.FullJoin<TAlias>(Expression<Func<object>> projection, Expression<Func<TAlias>> alias)
-        {
-            return FullJoin(projection, alias);
-        }
-
-        ISubFlowQuery<TSource> ISubFlowQuery<TSource>.FullJoin<TAlias>(Expression<Func<object>> projection, Expression<Func<TAlias>> alias, IRevealConvention revealConvention)
-        {
-            return FullJoin(projection, alias, revealConvention);
-        }
-
-        ISubFlowQuery<TSource> ISubFlowQuery<TSource>.InnerJoin<TAlias>(string property, Expression<Func<TAlias>> alias)
-        {
-            return InnerJoin(property, alias);
-        }
-
-        ISubFlowQuery<TSource> ISubFlowQuery<TSource>.InnerJoin<TAlias>(Expression<Func<TSource, TAlias>> projection, Expression<Func<TAlias>> alias)
-        {
-            return InnerJoin(projection, alias);
-        }
-
-        ISubFlowQuery<TSource> ISubFlowQuery<TSource>.InnerJoin<TAlias>(Expression<Func<TSource, IEnumerable<TAlias>>> projection, Expression<Func<TAlias>> alias)
-        {
-            return InnerJoin(projection, alias);
-        }
-
-        ISubFlowQuery<TSource> ISubFlowQuery<TSource>.InnerJoin<TAlias>(Expression<Func<object>> projection, Expression<Func<TAlias>> alias)
-        {
-            return InnerJoin(projection, alias);
-        }
-
-        ISubFlowQuery<TSource> ISubFlowQuery<TSource>.InnerJoin<TAlias>(Expression<Func<object>> projection, Expression<Func<TAlias>> alias, IRevealConvention revealConvention)
-        {
-            return InnerJoin(projection, alias, revealConvention);
-        }
-
-        /// <summary>
-        /// Performs an Inner Join.
-        /// </summary>
-        ISubFlowQuery<TSource> ISubFlowQuery<TSource>.Join<TAlias>(string property, Expression<Func<TAlias>> alias)
-        {
-            return Join(property, alias);
-        }
-
-        /// <summary>
-        /// Performs an Inner Join.
-        /// </summary>
-        ISubFlowQuery<TSource> ISubFlowQuery<TSource>.Join<TAlias>(Expression<Func<TSource, TAlias>> projection, Expression<Func<TAlias>> alias)
-        {
-            return Join(projection, alias);
-        }
-
-        ISubFlowQuery<TSource> ISubFlowQuery<TSource>.Join<TAlias>(Expression<Func<object>> projection, Expression<Func<TAlias>> alias)
-        {
-            return Join(projection, alias);
-        }
-
-        ISubFlowQuery<TSource> ISubFlowQuery<TSource>.Join<TAlias>(Expression<Func<object>> projection, Expression<Func<TAlias>> alias, IRevealConvention revealConvention)
-        {
-            return Join(projection, alias, revealConvention);
-        }
-
-        ISubFlowQuery<TSource> ISubFlowQuery<TSource>.Join<TAlias>(Expression<Func<TSource, IEnumerable<TAlias>>> projection, Expression<Func<TAlias>> alias)
-        {
-            return Join(projection, alias);
-        }
-
-        ISubFlowQuery<TSource> ISubFlowQuery<TSource>.LeftOuterJoin<TAlias>(string property, Expression<Func<TAlias>> alias)
-        {
-            return LeftOuterJoin(property, alias);
-        }
-
-        ISubFlowQuery<TSource> ISubFlowQuery<TSource>.LeftOuterJoin<TAlias>(Expression<Func<TSource, TAlias>> projection, Expression<Func<TAlias>> alias)
-        {
-            return LeftOuterJoin(projection, alias);
-        }
-
-        ISubFlowQuery<TSource> ISubFlowQuery<TSource>.LeftOuterJoin<TAlias>(Expression<Func<TSource, IEnumerable<TAlias>>> projection, Expression<Func<TAlias>> alias)
-        {
-            return LeftOuterJoin(projection, alias);
-        }
-
-        ISubFlowQuery<TSource> ISubFlowQuery<TSource>.LeftOuterJoin<TAlias>(Expression<Func<object>> projection, Expression<Func<TAlias>> alias)
-        {
-            return LeftOuterJoin(projection, alias);
-        }
-
-        ISubFlowQuery<TSource> ISubFlowQuery<TSource>.LeftOuterJoin<TAlias>(Expression<Func<object>> projection, Expression<Func<TAlias>> alias, IRevealConvention revealConvention)
-        {
-            return LeftOuterJoin(projection, alias, revealConvention);
-        }
-
-        ISubFlowQuery<TSource> ISubFlowQuery<TSource>.RightOuterJoin<TAlias>(string property, Expression<Func<TAlias>> alias)
-        {
-            return RightOuterJoin(property, alias);
-        }
-
-        ISubFlowQuery<TSource> ISubFlowQuery<TSource>.RightOuterJoin<TAlias>(Expression<Func<TSource, TAlias>> projection, Expression<Func<TAlias>> alias)
-        {
-            return RightOuterJoin(projection, alias);
-        }
-
-        ISubFlowQuery<TSource> ISubFlowQuery<TSource>.RightOuterJoin<TAlias>(Expression<Func<TSource, IEnumerable<TAlias>>> projection, Expression<Func<TAlias>> alias)
-        {
-            return RightOuterJoin(projection, alias);
-        }
-
-        ISubFlowQuery<TSource> ISubFlowQuery<TSource>.RightOuterJoin<TAlias>(Expression<Func<object>> projection, Expression<Func<TAlias>> alias)
-        {
-            return RightOuterJoin(projection, alias);
-        }
-
-        ISubFlowQuery<TSource> ISubFlowQuery<TSource>.RightOuterJoin<TAlias>(Expression<Func<object>> projection, Expression<Func<TAlias>> alias, IRevealConvention revealConvention)
-        {
-            return RightOuterJoin(projection, alias, revealConvention);
         }
 
         ISubFlowQuery<TSource> ISubFlowQuery<TSource>.Select(params string[] properties)

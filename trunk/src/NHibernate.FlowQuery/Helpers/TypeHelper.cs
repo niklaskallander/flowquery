@@ -15,14 +15,15 @@ namespace NHibernate.FlowQuery.Helpers
 
             foreach (PropertyInfo info in properties)
             {
-                if (typeof(IType).IsAssignableFrom(info.PropertyType) == false)
+                bool isAssignable = typeof(IType)
+                    .IsAssignableFrom(info.PropertyType);
+
+                if (isAssignable)
                 {
-                    continue;
+                    IType type = (IType)info.GetValue(null, null);
+
+                    m_ClrTypeToNHibernateType[type.ReturnedClass] = type;
                 }
-
-                IType type = (IType)info.GetValue(null, null);
-
-                m_ClrTypeToNHibernateType[type.ReturnedClass] = type;
             }
         }
 
@@ -33,9 +34,14 @@ namespace NHibernate.FlowQuery.Helpers
                 type = type.GetGenericArguments()[0];
             }
 
-            if (m_ClrTypeToNHibernateType.ContainsKey(type))
+            IType iType;
+
+            bool flag = m_ClrTypeToNHibernateType
+                .TryGetValue(type, out iType);
+
+            if (flag)
             {
-                return m_ClrTypeToNHibernateType[type];
+                return iType;
             }
 
             return NHibernateUtil.GuessType(type);

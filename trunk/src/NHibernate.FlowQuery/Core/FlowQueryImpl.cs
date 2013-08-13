@@ -513,6 +513,42 @@ namespace NHibernate.FlowQuery.Core
             return Where(expression);
         }
 
+        protected virtual bool Any()
+        {
+            return Take(1)
+                .Count() > 0;
+        }
+
+        protected virtual bool Any(params ICriterion[] criterions)
+        {
+            return Where(criterions)
+                .Any();
+        }
+
+        protected virtual bool Any(Expression<Func<TSource, bool>> expression)
+        {
+            return Where(expression)
+                .Any();
+        }
+
+        protected virtual bool Any(string property, IsExpression expression)
+        {
+            return Where(property, expression)
+                .Any();
+        }
+
+        protected virtual bool Any(Expression<Func<TSource, object>> property, IsExpression expression)
+        {
+            return Where(property, expression)
+                .Any();
+        }
+
+        protected virtual bool Any(Expression<Func<TSource, WhereDelegate, bool>> expression)
+        {
+            return Where(expression)
+                .Any();
+        }
+
         protected virtual IFlowQuery<TSource> RestrictWithExample(TSource exampleInstance, Func<IExampleWrapper<TSource>, IExampleWrapper<TSource>> exampleConfigurer)
         {
             var wrapper = exampleConfigurer(new ExampleWrapper<TSource>(Example.Create(exampleInstance)));
@@ -898,6 +934,36 @@ namespace NHibernate.FlowQuery.Core
         IFlowQuery<TSource> IFlowQuery<TSource>.And(Expression<Func<TSource, WhereDelegate, bool>> expression)
         {
             return And(expression);
+        }
+
+        bool IFlowQuery<TSource>.Any()
+        {
+            return Any();
+        }
+
+        bool IFlowQuery<TSource>.Any(Expression<Func<TSource, object>> property, IsExpression expression)
+        {
+            return Any(property, expression);
+        }
+
+        bool IFlowQuery<TSource>.Any(string property, IsExpression expression)
+        {
+            return Any(property, expression);
+        }
+
+        bool IFlowQuery<TSource>.Any(Expression<Func<TSource, bool>> expression)
+        {
+            return Any(expression);
+        }
+
+        bool IFlowQuery<TSource>.Any(params ICriterion[] criterions)
+        {
+            return Any(criterions);
+        }
+
+        bool IFlowQuery<TSource>.Any(Expression<Func<TSource, WhereDelegate, bool>> expression)
+        {
+            return Any(expression);
         }
 
         FlowQuerySelection<object> IFlowQuery<TSource>.SelectDistinct(PropertyProjection projection)
