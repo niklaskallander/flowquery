@@ -31,6 +31,34 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         }
 
         [Test]
+        public void CanFullJoinWithSpecifiedOnClause()
+        {
+            UserGroupLinkEntity link = null;
+            GroupEntity group = null;
+
+            var query = SubQuery.For<UserEntity>()
+                .FullJoin(u => u.Groups, () => link, x => x.Id == null)
+                .FullJoin(() => link.Group, () => group, x => x.Id == null)
+                .Select(u => link.Group.Id);
+
+            var groups = Query<GroupEntity>()
+                .Where(g => g.Id, FlowQueryIs.In(query))
+                .Select();
+
+            Assert.That(groups.Count(), Is.EqualTo(2));
+
+            var query2 = SubQuery.For<UserEntity>()
+                .FullJoin("Groups", () => link, x => x.Id == null)
+                .Select(u => link.Group.Id);
+
+            var groups2 = Query<GroupEntity>()
+                .Where(g => g.Id, FlowQueryIs.In(query2))
+                .Select();
+
+            Assert.That(groups2.Count(), Is.EqualTo(2));
+        }
+
+        [Test]
         public void CanFullJoinUsingString()
         {
             UserGroupLinkEntity link = null;
@@ -76,6 +104,62 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
                 .Select();
 
             Assert.That(groups.Count(), Is.EqualTo(2));
+        }
+
+        [Test]
+        public void CanInnerJoinWithSpecifiedOnClause()
+        {
+            UserGroupLinkEntity link = null;
+            GroupEntity group = null;
+
+            var query = SubQuery.For<UserEntity>()
+                .InnerJoin(u => u.Groups, () => link, x => x.Id == 2)
+                .InnerJoin(() => link.Group, () => group, x => x.Id == 2)
+                .SelectDistinct(u => link.Group.Id);
+
+            var groups = Query<GroupEntity>()
+                .Where(g => g.Id, FlowQueryIs.In(query))
+                .Select();
+
+            Assert.That(groups.Count(), Is.EqualTo(1));
+
+            var query2 = SubQuery.For<UserEntity>()
+                .InnerJoin("Groups", () => link, x => x.Id == 2)
+                .SelectDistinct(u => link.Group.Id);
+
+            var groups2 = Query<GroupEntity>()
+                .Where(g => g.Id, FlowQueryIs.In(query2))
+                .Select();
+
+            Assert.That(groups2.Count(), Is.EqualTo(1));
+        }
+
+        [Test]
+        public void CanJoinWithSpecifiedOnClause()
+        {
+            UserGroupLinkEntity link = null;
+            GroupEntity group = null;
+
+            var query = SubQuery.For<UserEntity>()
+                .Join(u => u.Groups, () => link, x => x.Id == 2)
+                .Join(() => link.Group, () => group, x => x.Id == 2)
+                .SelectDistinct(u => link.Group.Id);
+
+            var groups = Query<GroupEntity>()
+                .Where(g => g.Id, FlowQueryIs.In(query))
+                .Select();
+
+            Assert.That(groups.Count(), Is.EqualTo(1));
+
+            var query2 = SubQuery.For<UserEntity>()
+                .Join("Groups", () => link, x => x.Id == 2)
+                .SelectDistinct(u => link.Group.Id);
+
+            var groups2 = Query<GroupEntity>()
+                .Where(g => g.Id, FlowQueryIs.In(query2))
+                .Select();
+
+            Assert.That(groups2.Count(), Is.EqualTo(1));
         }
 
         [Test]
@@ -251,6 +335,34 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         }
 
         [Test]
+        public void CanLeftOuterJoinWithSpecifiedOnClause()
+        {
+            UserGroupLinkEntity link = null;
+            GroupEntity group = null;
+
+            var query = SubQuery.For<UserEntity>()
+                .LeftOuterJoin(u => u.Groups, () => link, x => x.Id == 2)
+                .LeftOuterJoin(() => link.Group, () => group, x => x.Id == 1)
+                .Select(u => link.Group.Id);
+
+            var groups = Query<GroupEntity>()
+                .Where(g => g.Id, FlowQueryIs.In(query))
+                .Select();
+
+            Assert.That(groups.Count(), Is.EqualTo(1));
+
+            var query2 = SubQuery.For<UserEntity>()
+                .LeftOuterJoin("Groups", () => link, x => x.Id == 2)
+                .Select(u => link.Group.Id);
+
+            var groups2 = Query<GroupEntity>()
+                .Where(g => g.Id, FlowQueryIs.In(query2))
+                .Select();
+
+            Assert.That(groups2.Count(), Is.EqualTo(1));
+        }
+
+        [Test]
         public void CanLeftOuterJoinUsingString()
         {
             UserGroupLinkEntity link = null;
@@ -297,6 +409,34 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
                 .Select();
 
             Assert.That(groups.Count(), Is.EqualTo(2));
+        }
+
+        [Test]
+        public void CanRightOuterJoinWithSpecifiedOnClause()
+        {
+            UserGroupLinkEntity link = null;
+            GroupEntity group = null;
+
+            var query = SubQuery.For<UserEntity>()
+                .RightOuterJoin(u => u.Groups, () => link, x => x.Id == 2)
+                .RightOuterJoin(() => link.Group, () => group, x => x.Id == 2)
+                .Select(u => link.Group.Id);
+
+            var groups = Query<GroupEntity>()
+                .Where(g => g.Id, FlowQueryIs.In(query))
+                .Select();
+
+            Assert.That(groups.Count(), Is.EqualTo(1));
+
+            var query2 = SubQuery.For<UserEntity>()
+                .RightOuterJoin("Groups", () => link, x => x.Id == 2)
+                .Select(u => link.Group.Id);
+
+            var groups2 = Query<GroupEntity>()
+                .Where(g => g.Id, FlowQueryIs.In(query2))
+                .Select();
+
+            Assert.That(groups2.Count(), Is.EqualTo(2));
         }
 
         [Test]
@@ -577,7 +717,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         }
 
         [Test]
-        public void JoiningWithProvidedRevealConventionThrowsIfConventionIsNull()
+        public void JoiningWithProvidedRevealConventionDoesNotThrowIfConventionIsNull()
         {
             UserGroupLinkEntity link = null;
             GroupEntity group = null;
@@ -586,41 +726,41 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
                         {
                             SubQuery.For<UserEntity>()
                                 .InnerJoin(u => u.Groups, () => link)
-                                .InnerJoin(() => link.Group, () => group, null);
+                                .InnerJoin(() => link.Group, () => group, (IRevealConvention)null);
 
-                        }, Throws.InstanceOf<ArgumentNullException>());
+                        }, Throws.Nothing);
 
             Assert.That(() =>
                         {
                             SubQuery.For<UserEntity>()
                                 .Join(u => u.Groups, () => link)
-                                .Join(() => link.Group, () => group, null);
+                                .Join(() => link.Group, () => group, (IRevealConvention)null);
 
-                        }, Throws.InstanceOf<ArgumentNullException>());
+                        }, Throws.Nothing);
 
             Assert.That(() =>
                         {
                             SubQuery.For<UserEntity>()
                                 .FullJoin(u => u.Groups, () => link)
-                                .FullJoin(() => link.Group, () => group, null);
+                                .FullJoin(() => link.Group, () => group, (IRevealConvention)null);
 
-                        }, Throws.InstanceOf<ArgumentNullException>());
+                        }, Throws.Nothing);
 
             Assert.That(() =>
                         {
                             SubQuery.For<UserEntity>()
                                 .RightOuterJoin(u => u.Groups, () => link)
-                                .RightOuterJoin(() => link.Group, () => group, null);
+                                .RightOuterJoin(() => link.Group, () => group, (IRevealConvention)null);
 
-                        }, Throws.InstanceOf<ArgumentNullException>());
+                        }, Throws.Nothing);
 
             Assert.That(() =>
                         {
                             SubQuery.For<UserEntity>()
                                 .LeftOuterJoin(u => u.Groups, () => link)
-                                .LeftOuterJoin(() => link.Group, () => group, null);
+                                .LeftOuterJoin(() => link.Group, () => group, (IRevealConvention)null);
 
-                        }, Throws.InstanceOf<ArgumentNullException>());
+                        }, Throws.Nothing);
         }
 
         [Test]
@@ -646,6 +786,19 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
 
             Assert.That(customers.Count(), Is.EqualTo(4));
 
+            var query2 = SubQuery.For<UserEntity>()
+                .InnerJoin(u => u.Groups, () => link, x => x.Id == null)
+                .InnerJoin(x => link.Group, () => group, x => x.Id == null)
+                .InnerJoin(() => group.Customers, () => customerLink, x => x.Id == null, null)
+                .InnerJoin(() => customerLink.Customer, () => customer, x => x.Id == null)
+                .SelectDistinct(u => customer.Name);
+
+            var customers2 = Query<CustomerEntity>()
+                .Where(g => g.Name, FlowQueryIs.In(query2))
+                .Select();
+
+            Assert.That(customers2.Count(), Is.EqualTo(0));
+
             Reveal.ClearDefaultConvention();
         }
 
@@ -668,6 +821,19 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
 
             var customers = Query<CustomerEntity>()
                 .Where(g => g.Name, FlowQueryIs.In(query))
+                .Select();
+
+            Assert.That(customers.Count(), Is.EqualTo(4));
+
+            var query2 = SubQuery.For<UserEntity>()
+                .FullJoin(u => u.Groups, () => link, x => x.Id == null)
+                .FullJoin(x => link.Group, () => group, x => x.Id == null)
+                .FullJoin(() => group.Customers, () => customerLink, x => x.Id == null, null)
+                .FullJoin(() => customerLink.Customer, () => customer, x => x.Id == null)
+                .SelectDistinct(u => customer.Name);
+
+            var customers2 = Query<CustomerEntity>()
+                .Where(g => g.Name, FlowQueryIs.In(query2))
                 .Select();
 
             Assert.That(customers.Count(), Is.EqualTo(4));
@@ -698,6 +864,19 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
 
             Assert.That(customers.Count(), Is.EqualTo(4));
 
+            var query2 = SubQuery.For<UserEntity>()
+                .Join(u => u.Groups, () => link, x => x.Id == null)
+                .Join(x => link.Group, () => group, x => x.Id == null)
+                .Join(() => group.Customers, () => customerLink, x => x.Id == null, null)
+                .Join(() => customerLink.Customer, () => customer, x => x.Id == null)
+                .SelectDistinct(u => customer.Name);
+
+            var customers2 = Query<CustomerEntity>()
+                .Where(g => g.Name, FlowQueryIs.In(query2))
+                .Select();
+
+            Assert.That(customers.Count(), Is.EqualTo(4));
+
             Reveal.ClearDefaultConvention();
         }
 
@@ -724,6 +903,19 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
 
             Assert.That(customers.Count(), Is.EqualTo(4));
 
+            var query2 = SubQuery.For<UserEntity>()
+                .LeftOuterJoin(u => u.Groups, () => link, x => x.Id == null)
+                .LeftOuterJoin(x => link.Group, () => group, x => x.Id == null)
+                .LeftOuterJoin(() => group.Customers, () => customerLink, x => x.Id == null, null)
+                .LeftOuterJoin(() => customerLink.Customer, () => customer, x => x.Id == null)
+                .SelectDistinct(u => customer.Name);
+
+            var customers2 = Query<CustomerEntity>()
+                .Where(g => g.Name, FlowQueryIs.In(query2))
+                .Select();
+
+            Assert.That(customers.Count(), Is.EqualTo(4));
+
             Reveal.ClearDefaultConvention();
         }
 
@@ -746,6 +938,19 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
 
             var customers = Query<CustomerEntity>()
                 .Where(g => g.Name, FlowQueryIs.In(query))
+                .Select();
+
+            Assert.That(customers.Count(), Is.EqualTo(4));
+
+            var query2 = SubQuery.For<UserEntity>()
+                .RightOuterJoin(u => u.Groups, () => link, x => x.Id == null)
+                .RightOuterJoin(x => link.Group, () => group, x => x.Id == null)
+                .RightOuterJoin(() => group.Customers, () => customerLink, x => x.Id == null, null)
+                .RightOuterJoin(() => customerLink.Customer, () => customer, x => x.Id == null)
+                .SelectDistinct(u => customer.Name);
+
+            var customers2 = Query<CustomerEntity>()
+                .Where(g => g.Name, FlowQueryIs.In(query2))
                 .Select();
 
             Assert.That(customers.Count(), Is.EqualTo(4));

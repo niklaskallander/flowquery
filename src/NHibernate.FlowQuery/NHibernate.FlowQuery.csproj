@@ -54,6 +54,8 @@
     <Compile Include="Aggregate.cs" />
     <Compile Include="AutoMapping\DefaultMapper.cs" />
     <Compile Include="AutoMapping\IMapper.cs" />
+    <Compile Include="Core\SubFlowQueryImpl.join.cs" />
+    <Compile Include="Core\ISubFlowQuery.join.cs" />
     <Compile Include="Core\IFlowQuery.join.cs" />
     <Compile Include="Core\FlowQueryImpl.join.cs" />
     <Compile Include="Core\OrderByStatement.cs" />

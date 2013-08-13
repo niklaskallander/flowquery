@@ -87,6 +87,18 @@ namespace NHibernate.FlowQuery.Core
 
         IFlowQuery<TSource> And(Expression<Func<TSource, WhereDelegate, bool>> expression);
 
+        bool Any();
+
+        bool Any(params ICriterion[] criterions);
+
+        bool Any(string property, IsExpression expression);
+
+        bool Any(Expression<Func<TSource, bool>> expression);
+
+        bool Any(Expression<Func<TSource, object>> property, IsExpression expression);
+
+        bool Any(Expression<Func<TSource, WhereDelegate, bool>> expression);
+
         /// <summary>
         /// If you haven't set any values to non-nullable datatypes or non-zero-based datatypes you
         /// must exclude these properties manually, e.g. for DateTime, Enums, bool etc.
