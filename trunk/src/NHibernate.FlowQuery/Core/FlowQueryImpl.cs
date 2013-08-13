@@ -144,7 +144,7 @@ namespace NHibernate.FlowQuery.Core
         {
             AddOrders<TReturn>(mappings);
 
-            return CreateSelection(Criteria.List<TReturn>());
+            return CreateSelection(Criteria.Future<TReturn>());
         }
 
         protected virtual FlowQuerySelection<TReturn> SelectBase<TReturn>()
