@@ -6,15 +6,9 @@ namespace NHibernate.FlowQuery.Expressions
 {
     public class IsInValuesExpression : SimpleIsExpression
     {
-        #region Constructors (1)
-
         public IsInValuesExpression(IEnumerable value)
             : base(value)
         { }
-
-        #endregion Constructors
-
-        #region Methods (1)
 
         public override ICriterion Compile(string property)
         {
@@ -29,7 +23,5 @@ namespace NHibernate.FlowQuery.Expressions
             }
             return Restrictions.In(Projections.Property(property), Value as ICollection);
         }
-
-        #endregion Methods
     }
 }

@@ -6,13 +6,7 @@ namespace NHibernate.FlowQuery.Core
 {
     public interface IExampleWrapper<TEntity>
     {
-		#region Data Members (1) 
-
         Example Example { get; }
-
-		#endregion Data Members 
-
-		#region Operations (6) 
 
         IExampleWrapper<TEntity> EnableLike();
 
@@ -25,7 +19,5 @@ namespace NHibernate.FlowQuery.Core
         IExampleWrapper<TEntity> ExcludeProperty(Expression<Func<TEntity, object>> expression);
 
         IExampleWrapper<TEntity> ExcludeZeroes();
-
-		#endregion Operations 
     }
 }

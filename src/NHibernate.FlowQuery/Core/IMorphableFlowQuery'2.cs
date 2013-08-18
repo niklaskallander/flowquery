@@ -8,8 +8,6 @@ namespace NHibernate.FlowQuery.Core
         where TSource : class
         where TFlowQuery : class, IFlowQuery<TSource, TFlowQuery>
     {
-        #region Projection
-
         TFlowQuery Distinct();
 
         TFlowQuery Indistinct();
@@ -20,16 +18,10 @@ namespace NHibernate.FlowQuery.Core
 
         TFlowQuery Project(params Expression<Func<TSource, object>>[] properties);
 
-        #endregion
-
-        #region Alternations
-
         IDelayedFlowQuery<TSource> Delayed();
 
         IDetachedFlowQuery<TSource> Detached();
 
         IImmediateFlowQuery<TSource> Immediate();
-
-        #endregion
     }
 }

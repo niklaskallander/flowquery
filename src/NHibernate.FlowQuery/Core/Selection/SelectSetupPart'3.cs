@@ -9,8 +9,6 @@ namespace NHibernate.FlowQuery.Core.Selection
     public class SelectSetupPart<TSource, TDestination> : ISelectSetupPart<TSource, TDestination>
         where TSource : class
     {
-        #region Constructors (1)
-
         public SelectSetupPart(string forProperty, ISelectSetup<TSource, TDestination> setup, Dictionary<string, string> aliases)
         {
             if (string.IsNullOrEmpty(forProperty))
@@ -30,19 +28,11 @@ namespace NHibernate.FlowQuery.Core.Selection
             Setup = setup;
         }
 
-        #endregion Constructors
-
-        #region Properties (3)
-
         private string ForProperty { get; set; }
 
         private Dictionary<string, string> Aliases { get; set; }
 
         private ISelectSetup<TSource, TDestination> Setup { get; set; }
-
-        #endregion Properties
-
-        #region Methods (4)
 
         protected virtual ISelectSetup<TSource, TDestination> Use(string property)
         {
@@ -82,8 +72,6 @@ namespace NHibernate.FlowQuery.Core.Selection
 
             return Use(projection);
         }
-
-        #endregion Methods
 
 
 

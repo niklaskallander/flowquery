@@ -6,144 +6,143 @@ namespace NHibernate.FlowQuery
 {
     public static class Is
     {
+        private static readonly IsHelper m_Negative;
+        private static readonly IsHelper m_Positive;
+
         static Is()
         {
-            Positive = new IsHelper(false);
-            Negative = new IsHelper(true);
+            m_Positive = new IsHelper(false);
+            m_Negative = new IsHelper(true);
         }
-
-        private static IsHelper Negative { get; set; }
 
         public static IsHelper Not
         {
-            get { return Negative; }
+            get { return m_Negative; }
         }
-
-        private static IsHelper Positive { get; set; }
 
         public static IsExpression Between(object lowValue, object highValue)
         {
-            return Positive.Between(lowValue, highValue);
+            return m_Positive.Between(lowValue, highValue);
         }
 
         public static IsExpression EqualTo(object value)
         {
-            return Positive.EqualTo(value);
+            return m_Positive.EqualTo(value);
         }
 
         public static IsExpression EqualTo(IDetachedImmutableFlowQuery query)
         {
-            return Positive.EqualTo(query);
+            return m_Positive.EqualTo(query);
         }
 
         public static IsExpression EqualToAll(IDetachedImmutableFlowQuery query)
         {
-            return Positive.EqualToAll(query);
+            return m_Positive.EqualToAll(query);
         }
 
         public static IsExpression GreaterThan(object value)
         {
-            return Positive.GreaterThan(value);
+            return m_Positive.GreaterThan(value);
         }
 
         public static IsExpression GreaterThan(IDetachedImmutableFlowQuery query)
         {
-            return Positive.GreaterThan(query);
+            return m_Positive.GreaterThan(query);
         }
 
         public static IsExpression GreaterThanAll(IDetachedImmutableFlowQuery query)
         {
-            return Positive.GreaterThanAll(query);
+            return m_Positive.GreaterThanAll(query);
         }
 
         public static IsExpression GreaterThanOrEqualTo(object value)
         {
-            return Positive.GreaterThanOrEqualTo(value);
+            return m_Positive.GreaterThanOrEqualTo(value);
         }
 
         public static IsExpression GreaterThanOrEqualTo(IDetachedImmutableFlowQuery query)
         {
-            return Positive.GreaterThanOrEqualTo(query);
+            return m_Positive.GreaterThanOrEqualTo(query);
         }
 
         public static IsExpression GreaterThanOrEqualToAll(IDetachedImmutableFlowQuery query)
         {
-            return Positive.GreaterThanOrEqualToAll(query);
+            return m_Positive.GreaterThanOrEqualToAll(query);
         }
 
         public static IsExpression GreaterThanOrEqualToSome(IDetachedImmutableFlowQuery query)
         {
-            return Positive.GreaterThanOrEqualToSome(query);
+            return m_Positive.GreaterThanOrEqualToSome(query);
         }
 
         public static IsExpression GreaterThanSome(IDetachedImmutableFlowQuery query)
         {
-            return Positive.GreaterThanSome(query);
+            return m_Positive.GreaterThanSome(query);
         }
 
         public static IsExpression In(IDetachedImmutableFlowQuery query)
         {
-            return Positive.In(query);
+            return m_Positive.In(query);
         }
 
         public static IsExpression In(params object[] values)
         {
-            return Positive.In(values);
+            return m_Positive.In(values);
         }
 
         public static IsExpression In(IEnumerable value)
         {
-            return Positive.In(value);
+            return m_Positive.In(value);
         }
 
         public static IsExpression LessThan(object value)
         {
-            return Positive.LessThan(value);
+            return m_Positive.LessThan(value);
         }
 
         public static IsExpression LessThan(IDetachedImmutableFlowQuery query)
         {
-            return Positive.LessThan(query);
+            return m_Positive.LessThan(query);
         }
 
         public static IsExpression LessThanAll(IDetachedImmutableFlowQuery query)
         {
-            return Positive.LessThanAll(query);
+            return m_Positive.LessThanAll(query);
         }
 
         public static IsExpression LessThanOrEqualTo(object value)
         {
-            return Positive.LessThanOrEqualTo(value);
+            return m_Positive.LessThanOrEqualTo(value);
         }
 
         public static IsExpression LessThanOrEqualTo(IDetachedImmutableFlowQuery query)
         {
-            return Positive.LessThanOrEqualTo(query);
+            return m_Positive.LessThanOrEqualTo(query);
         }
 
         public static IsExpression LessThanOrEqualToAll(IDetachedImmutableFlowQuery query)
         {
-            return Positive.LessThanOrEqualToAll(query);
+            return m_Positive.LessThanOrEqualToAll(query);
         }
 
         public static IsExpression LessThanOrEqualToSome(IDetachedImmutableFlowQuery query)
         {
-            return Positive.LessThanOrEqualToSome(query);
+            return m_Positive.LessThanOrEqualToSome(query);
         }
 
         public static IsExpression LessThanSome(IDetachedImmutableFlowQuery query)
         {
-            return Positive.LessThanSome(query);
+            return m_Positive.LessThanSome(query);
         }
 
         public static IsExpression Like(object value)
         {
-            return Positive.Like(value);
+            return m_Positive.Like(value);
         }
 
         public static IsExpression Null()
         {
-            return Positive.Null();
+            return m_Positive.Null();
         }
     }
 }

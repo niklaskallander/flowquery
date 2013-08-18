@@ -6,22 +6,12 @@ namespace NHibernate.FlowQuery.Expressions
 {
     public class IsHelper
     {
-        #region Constructors (1)
-
         public IsHelper(bool isNegated)
         {
             IsNegated = isNegated;
         }
 
-        #endregion Constructors
-
-        #region Properties (1)
-
         protected bool IsNegated { get; private set; }
-
-        #endregion Properties
-
-        #region Methods (26)
 
         public IsExpression Between(object lowValue, object highValue)
         {
@@ -155,7 +145,5 @@ namespace NHibernate.FlowQuery.Expressions
         {
             return Fix(new IsNullExpression());
         }
-
-        #endregion Methods
     }
 }

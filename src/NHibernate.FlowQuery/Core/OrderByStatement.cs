@@ -1,4 +1,5 @@
 ﻿using NHibernate.Criterion;
+
 namespace NHibernate.FlowQuery.Core
 {
     public class OrderByStatement
