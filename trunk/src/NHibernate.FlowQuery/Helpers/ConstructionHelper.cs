@@ -10,8 +10,6 @@ namespace NHibernate.FlowQuery.Helpers
 {
     public static class ConstructionHelper
     {
-        #region Methods (7)
-
         private static IEnumerable<TDestination> ForMemberInitExpression<TDestination>(MemberInitExpression expression, IEnumerable list)
         {
             List<TDestination> temp = new List<TDestination>();
@@ -179,7 +177,5 @@ namespace NHibernate.FlowQuery.Helpers
                 }
             }
         }
-
-        #endregion Methods
     }
 }

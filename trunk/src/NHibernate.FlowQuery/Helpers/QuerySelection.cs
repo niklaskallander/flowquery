@@ -11,8 +11,6 @@ namespace NHibernate.FlowQuery.Helpers
 {
     public class QuerySelection : IQueryableFlowQuery
     {
-        #region Constructor
-
         protected QuerySelection(IQueryableFlowQuery query)
         {
             if (query == null)
@@ -43,8 +41,6 @@ namespace NHibernate.FlowQuery.Helpers
         {
             return new QuerySelection(query);
         }
-
-        #endregion
 
         public virtual string Alias { get; private set; }
 

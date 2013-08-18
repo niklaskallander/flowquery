@@ -11,8 +11,6 @@ namespace NHibernate.FlowQuery.Helpers
 {
     public static class RestrictionHelper
     {
-        #region Methods (8)
-
         public static ICriterion GetCriterionForInvoke(InvocationExpression expression, string root, Dictionary<string, string> aliases)
         {
             if (expression.Expression.Type == typeof(WhereDelegate))
@@ -50,16 +48,22 @@ namespace NHibernate.FlowQuery.Helpers
                 case ExpressionType.LessThan:
                 case ExpressionType.LessThanOrEqual:
                     return GetCriterionForBinary(expression as BinaryExpression, root, aliases);
+
                 case ExpressionType.Call:
                     return GetCriterionForMethodCall(expression as MethodCallExpression, root, aliases);
+
                 case ExpressionType.Lambda:
                     return GetCriterion((expression as LambdaExpression).Body, root, aliases);
+
                 case ExpressionType.Not:
                     return Restrictions.Not(GetCriterion((expression as UnaryExpression).Operand, root, aliases));
+
                 case ExpressionType.MemberAccess:
                     return Restrictions.Eq(ExpressionHelper.GetPropertyName(expression, root), true);
+
                 case ExpressionType.Invoke:
                     return GetCriterionForInvoke(expression as InvocationExpression, root, aliases);
+
                 case ExpressionType.Constant:
                 default:
                     return Restrictions.Eq(Projections.Constant(ExpressionHelper.GetValue<bool>(expression)), true);
@@ -87,16 +91,20 @@ namespace NHibernate.FlowQuery.Helpers
             {
                 case ExpressionType.AndAlso:
                     return Restrictions.And(GetCriterion(a, root, aliases), GetCriterion(b, root, aliases));
+
                 case ExpressionType.OrElse:
                     return Restrictions.Or(GetCriterion(a, root, aliases), GetCriterion(b, root, aliases));
+
                 case ExpressionType.ExclusiveOr:
                     ICriterion criterionA = GetCriterion(a, root, aliases);
                     ICriterion criterionB = GetCriterion(b, root, aliases);
+
                     return Restrictions.Or
                     (
                         Restrictions.And(criterionA, Restrictions.Not(criterionB)),
                         Restrictions.And(criterionB, Restrictions.Not(criterionA))
                     );
+
                 default:
                     break;
             }
@@ -112,6 +120,7 @@ namespace NHibernate.FlowQuery.Helpers
             {
                 return GetProjectionValueCriterion(a, ExpressionHelper.GetValue(b), type, root, aliases, false);
             }
+
             return GetProjectionValueCriterion(b, ExpressionHelper.GetValue(a), type, root, aliases, true);
         }
 
@@ -122,16 +131,19 @@ namespace NHibernate.FlowQuery.Helpers
                 IProjection projection = ProjectionHelper.GetProjection(expression.Object ?? expression.Arguments[0], root, aliases);
 
                 int i = expression.Object == null ? 1 : 0;
+
                 switch (expression.Method.Name)
                 {
                     case "In":
                     case "IsIn":
                         object value = ExpressionHelper.GetValue(expression.Arguments[i]);
+
                         if (!(value is ICollection))
                         {
                             if (value is IEnumerable)
                             {
                                 List<object> objs = new List<object>();
+
                                 foreach (var obj in value as IEnumerable)
                                 {
                                     objs.Add(obj);
@@ -153,11 +165,13 @@ namespace NHibernate.FlowQuery.Helpers
                                 );
                             }
                         }
+
                         return Restrictions.In
                         (
                             projection,
                             value as ICollection
                         );
+
                     case "Between":
                     case "IsBetween":
                         return Restrictions.Between
@@ -166,27 +180,38 @@ namespace NHibernate.FlowQuery.Helpers
                             ExpressionHelper.GetValue(expression.Arguments[i]),
                             ExpressionHelper.GetValue(expression.Arguments[i + 1])
                         );
+
                     case "Like":
                     case "IsLike":
                         return GetLikeCriterion(projection, expression.Arguments[i], MatchMode.Exact);
+
                     case "StartsWith":
                         return GetLikeCriterion(projection, expression.Arguments[i], MatchMode.Start);
+
                     case "EndsWith":
                         return GetLikeCriterion(projection, expression.Arguments[i], MatchMode.End);
+
                     case "Contains":
                         return GetLikeCriterion(projection, expression.Arguments[i], MatchMode.Anywhere);
+
                     case "IsLessThan":
                         return Restrictions.Lt(projection, ExpressionHelper.GetValue(expression.Arguments[i]));
+
                     case "IsLessThanOrEqualTo":
                         return Restrictions.Le(projection, ExpressionHelper.GetValue(expression.Arguments[i]));
+
                     case "IsGreaterThan":
                         return Restrictions.Gt(projection, ExpressionHelper.GetValue(expression.Arguments[i]));
+
                     case "IsGreaterThanOrEqualTo":
                         return Restrictions.Ge(projection, ExpressionHelper.GetValue(expression.Arguments[i]));
+
                     case "IsEqualTo":
                         return Restrictions.Eq(projection, ExpressionHelper.GetValue(expression.Arguments[i]));
+
                     case "IsNull":
                         return Restrictions.IsNull(projection);
+
                     case "IsNotNull":
                         return Restrictions.IsNotNull(projection);
                 }
@@ -208,6 +233,7 @@ namespace NHibernate.FlowQuery.Helpers
         {
             PropertyProjection a = projectionA as PropertyProjection;
             PropertyProjection b = projectionB as PropertyProjection;
+
             if (type == ExpressionType.Equal)
             {
                 if (a != null && b != null)
@@ -222,6 +248,7 @@ namespace NHibernate.FlowQuery.Helpers
                 {
                     return Restrictions.EqProperty(projectionA, b.PropertyName);
                 }
+
                 return Restrictions.EqProperty(projectionA, projectionB);
             }
             else if (type == ExpressionType.GreaterThan)
@@ -238,6 +265,7 @@ namespace NHibernate.FlowQuery.Helpers
                 {
                     return Restrictions.GtProperty(projectionA, b.PropertyName);
                 }
+
                 return Restrictions.GtProperty(projectionA, projectionB);
             }
             else if (type == ExpressionType.GreaterThanOrEqual)
@@ -254,6 +282,7 @@ namespace NHibernate.FlowQuery.Helpers
                 {
                     return Restrictions.GeProperty(projectionA, b.PropertyName);
                 }
+
                 return Restrictions.GeProperty(projectionA, projectionB);
             }
             else if (type == ExpressionType.LessThan)
@@ -270,6 +299,7 @@ namespace NHibernate.FlowQuery.Helpers
                 {
                     return Restrictions.LtProperty(projectionA, b.PropertyName);
                 }
+
                 return Restrictions.LtProperty(projectionA, projectionB);
             }
             else if (type == ExpressionType.LessThanOrEqual)
@@ -286,11 +316,13 @@ namespace NHibernate.FlowQuery.Helpers
                 {
                     return Restrictions.LeProperty(projectionA, b.PropertyName);
                 }
+
                 return Restrictions.LeProperty(projectionA, projectionB);
             }
             else
             {
                 ICriterion criterion = null;
+
                 if (a != null && b != null)
                 {
                     criterion = Restrictions.EqProperty(a.PropertyName, b.PropertyName);
@@ -307,6 +339,7 @@ namespace NHibernate.FlowQuery.Helpers
                 {
                     criterion = Restrictions.EqProperty(projectionA, projectionB);
                 }
+
                 return Restrictions.Not(criterion);
             }
         }
@@ -320,12 +353,15 @@ namespace NHibernate.FlowQuery.Helpers
                     case ExpressionType.GreaterThan:
                         type = ExpressionType.LessThan;
                         break;
+
                     case ExpressionType.GreaterThanOrEqual:
                         type = ExpressionType.LessThanOrEqual;
                         break;
+
                     case ExpressionType.LessThan:
                         type = ExpressionType.GreaterThan;
                         break;
+
                     case ExpressionType.LessThanOrEqual:
                         type = ExpressionType.GreaterThanOrEqual;
                         break;
@@ -333,6 +369,7 @@ namespace NHibernate.FlowQuery.Helpers
             }
 
             IProjection projection = ProjectionHelper.GetProjection(expression, root, aliases);
+
             switch (type)
             {
                 case ExpressionType.Equal:
@@ -344,7 +381,9 @@ namespace NHibernate.FlowQuery.Helpers
                     {
                         return GetCriterion((bool)value ? expression : Expression.Not(expression), root, aliases);
                     }
+
                     return Restrictions.Eq(projection, value);
+
                 case ExpressionType.NotEqual:
                     if (value == null)
                     {
@@ -354,15 +393,21 @@ namespace NHibernate.FlowQuery.Helpers
                     {
                         return GetCriterion(!(bool)value ? expression : Expression.Not(expression), root, aliases);
                     }
+
                     return Restrictions.Not(Restrictions.Eq(projection, value));
+
                 case ExpressionType.GreaterThan:
                     return Restrictions.Gt(projection, value);
+
                 case ExpressionType.GreaterThanOrEqual:
                     return Restrictions.Ge(projection, value);
+
                 case ExpressionType.LessThan:
                     return Restrictions.Lt(projection, value);
+
                 case ExpressionType.LessThanOrEqual:
                     return Restrictions.Le(projection, value);
+
                 default:
                     throw new NotSupportedException("the expression contains unsupported features, please revise your code");
             }
@@ -371,9 +416,8 @@ namespace NHibernate.FlowQuery.Helpers
         public static bool IsProjected(Expression expression, string root, Dictionary<string, string> aliases)
         {
             string expressionRoot = ExpressionHelper.GetRoot(expression);
+
             return expression is BinaryExpression || (expressionRoot != null && (expressionRoot == root || aliases.ContainsValue(expressionRoot)));
         }
-
-        #endregion Methods
     }
 }

@@ -68,7 +68,7 @@ namespace NHibernate.FlowQuery.Core
             return new FlowQuerySelection<TDestination>(delayedSelection);
         }
 
-        protected virtual IEnumerator<TSource> GetEnumerator()
+        public virtual IEnumerator<TSource> GetEnumerator()
         {
             return Selection.GetEnumerator();
         }
@@ -103,22 +103,9 @@ namespace NHibernate.FlowQuery.Core
             return selection.Selection.ToArray();
         }
 
-        #region IEnumerable<TSource> Members
-
-        IEnumerator<TSource> IEnumerable<TSource>.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
-        #endregion
-
-        #region IEnumerable Members
-
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
         }
-
-        #endregion
     }
 }

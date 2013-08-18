@@ -6,7 +6,6 @@ namespace NHibernate.FlowQuery
     {
         private Action<ICriteria> m_Options;
 
-
         public FlowQueryOptions()
         {
             m_Options = delegate { };

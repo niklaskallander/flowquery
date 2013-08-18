@@ -16,8 +16,10 @@ namespace NHibernate.FlowQuery
                 {
                     throw new ArgumentException("property cannot be null and it cannot be empty");
                 }
+
                 list.AddProperty(property);
             }
+
             return list;
         }
 
@@ -29,8 +31,10 @@ namespace NHibernate.FlowQuery
                 {
                     throw new ArgumentNullException("property");
                 }
+
                 list.AddProperty(property, aliases);
             }
+
             return list;
         }
 

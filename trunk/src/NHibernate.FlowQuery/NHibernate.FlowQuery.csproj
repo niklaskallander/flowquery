@@ -114,6 +114,7 @@
     <Compile Include="Helpers\ConstructionHelper.cs" />
     <Compile Include="Helpers\CriteriaHelper.cs" />
     <Compile Include="Helpers\ExpressionHelper.cs" />
+    <Compile Include="Helpers\ParameterReplaceVisitor.cs" />
     <Compile Include="Helpers\ProjectionHelper.cs" />
     <Compile Include="Helpers\ReflectionHelper.cs" />
     <Compile Include="Helpers\RestrictionHelper.cs" />

@@ -11,8 +11,6 @@ namespace NHibernate.FlowQuery.Core
         where TSource : class
         where TFlowQuery : class, IFlowQuery<TSource, TFlowQuery>
     {
-        #region Where, And
-
         TFlowQuery Where(params ICriterion[] criterions);
 
         TFlowQuery Where(string property, IsExpression expression);
@@ -39,10 +37,6 @@ namespace NHibernate.FlowQuery.Core
         /// </summary>
         TFlowQuery RestrictByExample(TSource exampleInstance, Action<IExampleWrapper<TSource>> example);
 
-        #endregion
-
-        #region Join
-
         IJoinBuilder<TSource, TFlowQuery> Inner { get; }
 
         IJoinBuilder<TSource, TFlowQuery> LeftOuter { get; }
@@ -51,17 +45,9 @@ namespace NHibernate.FlowQuery.Core
 
         IJoinBuilder<TSource, TFlowQuery> Full { get; }
 
-        #endregion
-
-        #region OrderBy
-
         IOrderBuilder<TSource, TFlowQuery> Order { get; }
 
         IOrderBuilder<TSource, TFlowQuery> Then { get; }
-
-        #endregion
-
-        #region Skip, Take, Limit
 
         TFlowQuery Limit(int limit);
 
@@ -70,7 +56,5 @@ namespace NHibernate.FlowQuery.Core
         TFlowQuery Skip(int skip);
 
         TFlowQuery Take(int take);
-
-        #endregion
     }
 }

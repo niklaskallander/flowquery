@@ -7,11 +7,7 @@ namespace NHibernate.FlowQuery
 {
     public static class Reveal
     {
-        public static IRevealConvention DefaultConvention
-        {
-            get;
-            private set;
-        }
+        public static IRevealConvention DefaultConvention { get; private set; }
 
         public static string ByConvention(Expression<Func<object>> expression)
         {
@@ -81,6 +77,7 @@ namespace NHibernate.FlowQuery
             {
                 return CreateRevealer<TEntity>(DefaultConvention);
             }
+
             return new Revealer<TEntity>();
         }
 
@@ -90,6 +87,7 @@ namespace NHibernate.FlowQuery
             {
                 return CreateRevealer(DefaultConvention);
             }
+
             return new Revealer();
         }
 

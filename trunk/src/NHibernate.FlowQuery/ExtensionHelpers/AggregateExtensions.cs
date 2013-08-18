@@ -1,10 +1,9 @@
 using System;
+
 namespace NHibernate.FlowQuery.ExtensionHelpers
 {
     public static class AggregateExtensions
     {
-        #region Methods (8)
-
         public static decimal Average<TDestination>(this TDestination property)
         {
             throw Exception();
@@ -44,7 +43,5 @@ namespace NHibernate.FlowQuery.ExtensionHelpers
         {
             throw Exception();
         }
-
-        #endregion Methods
     }
 }

@@ -4,8 +4,6 @@ namespace NHibernate.FlowQuery.AutoMapping
 {
     public class DefaultMapper : IMapper
     {
-        #region Methods (1)
-
         protected virtual TDestination Map<TSource, TDestination>(TSource source)
             where TDestination : new()
         {
@@ -15,6 +13,7 @@ namespace NHibernate.FlowQuery.AutoMapping
             System.Type sType = typeof(TSource);
 
             TDestination item = new TDestination();
+
             foreach (string property in properties)
             {
                 object value = sType.GetProperty(property).GetValue(source, null);
@@ -24,8 +23,6 @@ namespace NHibernate.FlowQuery.AutoMapping
 
             return item;
         }
-
-        #endregion Methods
 
 
 
