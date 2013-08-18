@@ -12,9 +12,9 @@ namespace NHibernate.FlowQuery.Helpers
     {
         #region Methods (7)
 
-        private static IEnumerable<TReturn> ForMemberInitExpression<TReturn>(MemberInitExpression expression, IEnumerable list)
+        private static IEnumerable<TDestination> ForMemberInitExpression<TDestination>(MemberInitExpression expression, IEnumerable list)
         {
-            List<TReturn> temp = new List<TReturn>();
+            List<TDestination> temp = new List<TDestination>();
 
             foreach (object o in list)
             {
@@ -22,15 +22,15 @@ namespace NHibernate.FlowQuery.Helpers
 
                 Invoke(expression, o as object[] ?? new object[] { o }, out instance);
 
-                temp.Add((TReturn)instance);
+                temp.Add((TDestination)instance);
             }
 
             return temp;
         }
 
-        private static IEnumerable<TReturn> ForNewExpression<TReturn>(NewExpression expression, IEnumerable list)
+        private static IEnumerable<TDestination> ForNewExpression<TDestination>(NewExpression expression, IEnumerable list)
         {
-            List<TReturn> temp = new List<TReturn>();
+            List<TDestination> temp = new List<TDestination>();
 
             foreach (object o in list)
             {
@@ -38,7 +38,7 @@ namespace NHibernate.FlowQuery.Helpers
 
                 Invoke(expression, o as object[] ?? new object[] { o }, out instance);
 
-                temp.Add((TReturn)instance);
+                temp.Add((TDestination)instance);
             }
 
             return temp;
@@ -62,7 +62,7 @@ namespace NHibernate.FlowQuery.Helpers
             return isNew || isMemberInit;
         }
 
-        public static IEnumerable<TReturn> GetListByExpression<TReturn>(Expression expression, IEnumerable list)
+        public static IEnumerable<TDestination> GetListByExpression<TDestination>(Expression expression, IEnumerable list)
         {
             if (expression == null)
             {
@@ -71,7 +71,7 @@ namespace NHibernate.FlowQuery.Helpers
 
             if (expression.NodeType == ExpressionType.Lambda)
             {
-                return GetListByExpression<TReturn>((expression as LambdaExpression).Body, list);
+                return GetListByExpression<TDestination>((expression as LambdaExpression).Body, list);
             }
 
             if (list == null)
@@ -85,10 +85,10 @@ namespace NHibernate.FlowQuery.Helpers
             {
                 if (expression.NodeType == ExpressionType.New)
                 {
-                    return ForNewExpression<TReturn>(expression as NewExpression, list);
+                    return ForNewExpression<TDestination>(expression as NewExpression, list);
                 }
 
-                return ForMemberInitExpression<TReturn>(expression as MemberInitExpression, list);
+                return ForMemberInitExpression<TDestination>(expression as MemberInitExpression, list);
             }
 
             return null;

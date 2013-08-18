@@ -6,6 +6,7 @@ using NUnit.Framework;
 
 namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
 {
+    using NHibernate.FlowQuery.Test.Setup.Entities;
     using Is = NUnit.Framework.Is;
 
     [TestFixture]
@@ -318,6 +319,50 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
         public void HasConstantRootReturnsFalseWhenProvidedWithNull()
         {
             Assert.That(ExpressionHelper.HasConstantRoot(null), Is.False);
+        }
+
+        [Test]
+        public void CombineThrowsIfExpressionsIsNull()
+        {
+            Assert.That(() =>
+                        {
+                            ExpressionHelper.Combine<UserEntity, UserDto>(null);
+
+                        }, Throws.InstanceOf<ArgumentNullException>());
+        }
+
+        [Test]
+        public void CombineThrowsNothingIfExpressionsContainsNull()
+        {
+            Assert.That(() =>
+                        {
+                            ExpressionHelper.Combine<UserEntity, UserDto>(x => new UserDto() { Id = x.Id }, null, x => new UserDto() { Username = x.Username });
+
+                        }, Throws.Nothing);
+        }
+
+        [Test]
+        public void CombineThrowsIfExpressionsContainsNonMemberInitExpression()
+        {
+            Assert.That(() =>
+                        {
+                            UserDto dto = new UserDto();
+
+                            ExpressionHelper.Combine<UserEntity, UserDto>(x => new UserDto() { Id = x.Id }, x => dto, x => new UserDto() { Username = x.Username });
+
+                        }, Throws.ArgumentException);
+        }
+
+        [Test]
+        public void CombineThrowsIfFirstExpressionIsOtherThanMemberInitExpressionOrNewExpression()
+        {
+            Assert.That(() =>
+            {
+                UserDto dto = new UserDto();
+
+                ExpressionHelper.Combine<UserEntity, UserDto>(x => dto, x => new UserDto() { Username = x.Username });
+
+            }, Throws.ArgumentException);
         }
 
         #endregion Methods

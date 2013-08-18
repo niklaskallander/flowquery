@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using NHibernate.Criterion;
-using NHibernate.FlowQuery.Core.SelectSetup;
+using NHibernate.FlowQuery.Core.Selection;
 using NHibernate.FlowQuery.Helpers;
 using NHibernate.Transform;
 
@@ -13,8 +13,6 @@ namespace NHibernate.FlowQuery.Core.Implementors
         where TSource : class
         where TFlowQuery : class, IFlowQuery<TSource, TFlowQuery>
     {
-        #region Constructor
-
         protected internal MorphableFlowQueryImplementorBase(Func<System.Type, string, ICriteria> criteriaFactory, string alias = null, FlowQueryOptions options = null, IMorphableFlowQuery query = null)
             : base(criteriaFactory, alias, options, query)
         {
@@ -35,11 +33,7 @@ namespace NHibernate.FlowQuery.Core.Implementors
             }
         }
 
-        #endregion
-
-        #region Projection
-
-        protected virtual TFlowQuery ProjectWithConstruction<TReturn>(Expression<Func<TSource, TReturn>> expression)
+        protected virtual TFlowQuery ProjectWithConstruction<TDestination>(Expression<Func<TSource, TDestination>> expression)
         {
             if (expression == null)
             {
@@ -55,7 +49,7 @@ namespace NHibernate.FlowQuery.Core.Implementors
                 throw new NotSupportedException("The provided expression contains unsupported features please revise your code.");
             }
 
-            return ProjectionBase<TReturn>(list, mappings, expression, false);
+            return ProjectionBase<TDestination>(list, mappings, expression, false);
         }
 
         public virtual TFlowQuery Distinct()
@@ -72,7 +66,7 @@ namespace NHibernate.FlowQuery.Core.Implementors
             return Query;
         }
 
-        protected virtual TFlowQuery ProjectionBase<TReturn>(IProjection projection, Dictionary<string, IProjection> mappings = null, LambdaExpression constructor = null, bool setResultTransformer = true)
+        protected virtual TFlowQuery ProjectionBase<TDestination>(IProjection projection, Dictionary<string, IProjection> mappings = null, LambdaExpression constructor = null, bool setResultTransformer = true)
         {
             Constructor = constructor;
 
@@ -82,20 +76,20 @@ namespace NHibernate.FlowQuery.Core.Implementors
 
             if (setResultTransformer)
             {
-                ResultTransformer = Transformers.AliasToBean<TReturn>();
+                ResultTransformer = Transformers.AliasToBean<TDestination>();
             }
 
             return Query;
         }
 
-        protected virtual TFlowQuery Project<TReturn>(ISelectSetup<TSource, TReturn> setup)
+        protected virtual TFlowQuery Project<TDestination>(ISelectSetup<TSource, TDestination> setup)
         {
             if (setup == null)
             {
                 throw new ArgumentNullException("setup");
             }
 
-            return ProjectionBase<TReturn>(setup.ProjectionList, setup.Mappings);
+            return ProjectionBase<TDestination>(setup.ProjectionList, setup.Mappings);
         }
 
         public virtual TFlowQuery Project(params string[] properties)
@@ -123,24 +117,24 @@ namespace NHibernate.FlowQuery.Core.Implementors
             return Project<object>(projection);
         }
 
-        protected virtual TFlowQuery Project<TReturn>(IProjection projection)
+        protected virtual TFlowQuery Project<TDestination>(IProjection projection)
         {
             if (projection == null)
             {
                 throw new ArgumentNullException("projecton");
             }
 
-            return ProjectionBase<TReturn>(projection);
+            return ProjectionBase<TDestination>(projection);
         }
 
-        protected virtual TFlowQuery Project<TReturn>(PropertyProjection projection)
+        protected virtual TFlowQuery Project<TDestination>(PropertyProjection projection)
         {
             if (projection == null)
             {
                 throw new ArgumentNullException("projection");
             }
 
-            return ProjectionBase<TReturn>(projection, setResultTransformer: false);
+            return ProjectionBase<TDestination>(projection, setResultTransformer: false);
         }
 
         public virtual TFlowQuery Project(params Expression<Func<TSource, object>>[] properties)
@@ -158,7 +152,7 @@ namespace NHibernate.FlowQuery.Core.Implementors
             );
         }
 
-        protected virtual TFlowQuery Project<TReturn>(Expression<Func<TSource, TReturn>> expression)
+        protected virtual TFlowQuery Project<TDestination>(Expression<Func<TSource, TDestination>> expression)
         {
             return ProjectWithConstruction(expression);
         }
@@ -172,10 +166,6 @@ namespace NHibernate.FlowQuery.Core.Implementors
         public virtual IProjection Projection { get; protected set; }
 
         public virtual IResultTransformer ResultTransformer { get; protected set; }
-
-        #endregion
-
-        #region Alterations
 
         public virtual IDelayedFlowQuery<TSource> Delayed()
         {
@@ -191,7 +181,5 @@ namespace NHibernate.FlowQuery.Core.Implementors
         {
             return new ImmediateFlowQueryImplementor<TSource>(CriteriaFactory, Alias, Options, this);
         }
-
-        #endregion
     }
 }

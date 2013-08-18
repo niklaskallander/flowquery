@@ -76,10 +76,13 @@
     <Compile Include="Core\Joins\JoinBuilder.cs" />
     <Compile Include="Core\Orders\OrderBuilder.cs" />
     <Compile Include="Core\Orders\IOrderBuilder.cs" />
-    <Compile Include="Core\SelectSetup\ISelectSetup%273.cs" />
-    <Compile Include="Core\SelectSetup\ISelectSetupPart%273.cs" />
-    <Compile Include="Core\SelectSetup\SelectSetup%273.cs" />
-    <Compile Include="Core\SelectSetup\SelectSetupPart%273.cs" />
+    <Compile Include="Core\Selection\PartialSelectionBuilder%272.cs" />
+    <Compile Include="Core\Selection\PartialSelection%272.cs" />
+    <Compile Include="Core\Selection\ISelectSetup%273.cs" />
+    <Compile Include="Core\Selection\ISelectSetupPart%273.cs" />
+    <Compile Include="Core\Selection\SelectionBuilder%272.cs" />
+    <Compile Include="Core\Selection\SelectSetup%273.cs" />
+    <Compile Include="Core\Selection\SelectSetupPart%273.cs" />
     <Compile Include="Core\OrderByStatement.cs" />
     <Compile Include="Core\Pair.cs" />
     <Compile Include="Core\ExampleWrapper.cs" />

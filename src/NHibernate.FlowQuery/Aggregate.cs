@@ -4,35 +4,35 @@ namespace NHibernate.FlowQuery
 {
     public static class Aggregate
     {
-        public static decimal Average<TReturn>(TReturn property)
+        public static decimal Average<TDestination>(TDestination property)
         {
             throw Exception();
         }
 
-        public static decimal Average<TReturn>(TReturn? property)
-            where TReturn : struct
+        public static decimal Average<TDestination>(TDestination? property)
+            where TDestination : struct
         {
             throw Exception();
         }
 
-        public static int Count<TReturn>(TReturn property)
+        public static int Count<TDestination>(TDestination property)
         {
             throw Exception();
         }
 
-        public static int Count<TReturn>(TReturn? property)
-            where TReturn : struct
+        public static int Count<TDestination>(TDestination? property)
+            where TDestination : struct
         {
             throw Exception();
         }
 
-        public static int CountDistinct<TReturn>(TReturn property)
+        public static int CountDistinct<TDestination>(TDestination property)
         {
             throw Exception();
         }
 
-        public static int CountDistinct<TReturn>(TReturn? property)
-            where TReturn : struct
+        public static int CountDistinct<TDestination>(TDestination? property)
+            where TDestination : struct
         {
             throw Exception();
         }
@@ -42,46 +42,46 @@ namespace NHibernate.FlowQuery
             return new InvalidOperationException("This is only a helper method for the NHibernate.FlowQuery API and should not be executed directly");
         }
 
-        public static TReturn GroupBy<TReturn>(TReturn property)
+        public static TDestination GroupBy<TDestination>(TDestination property)
         {
             throw Exception();
         }
 
-        public static TReturn GroupBy<TReturn>(TReturn? property)
-            where TReturn : struct
+        public static TDestination GroupBy<TDestination>(TDestination? property)
+            where TDestination : struct
         {
             throw Exception();
         }
 
-        public static TReturn Max<TReturn>(TReturn property)
+        public static TDestination Max<TDestination>(TDestination property)
         {
             throw Exception();
         }
 
-        public static TReturn Max<TReturn>(TReturn? property)
-            where TReturn : struct
+        public static TDestination Max<TDestination>(TDestination? property)
+            where TDestination : struct
         {
             throw Exception();
         }
 
-        public static TReturn Min<TReturn>(TReturn property)
+        public static TDestination Min<TDestination>(TDestination property)
         {
             throw Exception();
         }
 
-        public static TReturn Min<TReturn>(TReturn? property)
-            where TReturn : struct
+        public static TDestination Min<TDestination>(TDestination? property)
+            where TDestination : struct
         {
             throw Exception();
         }
 
-        public static TReturn Sum<TReturn>(TReturn property)
+        public static TDestination Sum<TDestination>(TDestination property)
         {
             throw Exception();
         }
 
-        public static TReturn Sum<TReturn>(TReturn? property)
-            where TReturn : struct
+        public static TDestination Sum<TDestination>(TDestination? property)
+            where TDestination : struct
         {
             throw Exception();
         }

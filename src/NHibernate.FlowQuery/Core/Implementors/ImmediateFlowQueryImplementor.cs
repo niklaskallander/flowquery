@@ -117,8 +117,6 @@ namespace NHibernate.FlowQuery.Core.Implementors
             return SelectImmediateDictionary<TKey, TValue>();
         }
 
-        #region Alterations
-
         IDelayedFlowQuery<TSource> IImmediateFlowQuery<TSource>.Delayed()
         {
             return base.Delayed();
@@ -128,7 +126,5 @@ namespace NHibernate.FlowQuery.Core.Implementors
         {
             return base.Detached();
         }
-
-        #endregion
     }
 }

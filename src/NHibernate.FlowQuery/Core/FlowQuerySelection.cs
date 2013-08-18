@@ -53,19 +53,19 @@ namespace NHibernate.FlowQuery.Core
             }
         }
 
-        public virtual FlowQuerySelection<TReturn> ToMap<TReturn>()
-            where TReturn : new()
+        public virtual FlowQuerySelection<TDestination> ToMap<TDestination>()
+            where TDestination : new()
         {
             IEnumerable<TSource> currentSelection = Selection;
 
-            IEnumerable<TReturn> delayedSelection = new FlowQuerySelection<TReturn>(() =>
+            IEnumerable<TDestination> delayedSelection = new FlowQuerySelection<TDestination>(() =>
 
                 from item
                 in currentSelection
-                select Mapping.Map<TSource, TReturn>(item)
+                select Mapping.Map<TSource, TDestination>(item)
             );
 
-            return new FlowQuerySelection<TReturn>(delayedSelection);
+            return new FlowQuerySelection<TDestination>(delayedSelection);
         }
 
         protected virtual IEnumerator<TSource> GetEnumerator()

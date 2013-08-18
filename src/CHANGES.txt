@@ -1,4 +1,7 @@
 2013-08-18:
+	- Added PartialSelect<TDestination>() (PartialSelection<TSource, TDestination>, ExpressionHelper.Combine<TSource, TDestination>(params Expression<Func<TSource, TDestination>>[] expressions);
+
+2013-08-18:
 	- Finished new syntax. Works wonders. A lot of breaking changes though:
 		- Joins (new syntax): 
 			- Instead of having .(Inner|LeftOuter|RightOuter|Full)Join() methods on the FlowQuery object you now only have four properties (Inner, LeftOuter, RightOuter, Full) where you get the Join() methods overloads

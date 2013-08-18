@@ -84,6 +84,7 @@
     <Compile Include="FlowQuery\Core\ISubFlowQueryTest\SelectTest.cs" />
     <Compile Include="FlowQuery\Core\ISubFlowQueryTest\WhereTest.cs" />
     <Compile Include="FlowQuery\Core\Orders\OrderBuilderTest.cs" />
+    <Compile Include="FlowQuery\Core\Selection\PartialSelectionTest.cs" />
     <Compile Include="FlowQuery\ExtensionHelpers\AggregateExtensionsTest.cs" />
     <Compile Include="FlowQuery\AggregateTest.cs" />
     <Compile Include="BaseTest.cs" />

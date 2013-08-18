@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -8,6 +9,83 @@ namespace NHibernate.FlowQuery.Helpers
     public static class ExpressionHelper
     {
         #region Methods (8)
+
+        public class ParameterReplaceVisitor : ExpressionVisitor
+        {
+            private readonly ParameterExpression from, to;
+            public ParameterReplaceVisitor(ParameterExpression from, ParameterExpression to)
+            {
+                this.from = from;
+                this.to = to;
+            }
+            protected override Expression VisitParameter(ParameterExpression node)
+            {
+                return node == from ? to : base.VisitParameter(node);
+            }
+        }
+
+        public static Expression<Func<TSource, TDestination>> Combine<TSource, TDestination>(params Expression<Func<TSource, TDestination>>[] expressions)
+        {
+            if (expressions == null)
+            {
+                throw new ArgumentNullException("expressions");
+            }
+
+            if (!expressions.Where(x => x != null).Skip(1).All(x => x.Body is MemberInitExpression))
+            {
+                throw new ArgumentException("All expressions must be MemberInitExpression except the first which can also be a NewExpression", "expressions");
+            }
+
+            Expression first = expressions[0].Body;
+
+            NewExpression constructor = null;
+
+            List<MemberBinding> bindings = new List<MemberBinding>();
+
+            if (first.NodeType == ExpressionType.MemberInit)
+            {
+                MemberInitExpression initializer = first as MemberInitExpression;
+
+                constructor = initializer.NewExpression;
+
+                bindings.AddRange(initializer.Bindings.OfType<MemberAssignment>());
+            }
+            else if (first.NodeType == ExpressionType.New)
+            {
+                constructor = first as NewExpression;
+            }
+            else
+            {
+                throw new ArgumentException("The first expression is not a MemberInitExpression, nor is it a NewExpression", "expressions");
+            }
+
+            ParameterExpression parameter = expressions[0].Parameters[0];
+
+            for (int i = 1; i < expressions.Length; i++)
+            {
+                if (expressions[i] == null)
+                {
+                    continue;
+                }
+
+                MemberInitExpression initializer = expressions[i].Body as MemberInitExpression;
+
+                ParameterReplaceVisitor replace = new ParameterReplaceVisitor(expressions[i].Parameters[0], parameter);
+
+                foreach (MemberAssignment binding in initializer.Bindings.OfType<MemberAssignment>())
+                {
+                    Expression converted = replace.VisitAndConvert(binding.Expression, "Combine");
+
+                    MemberAssignment assignment = Expression.Bind(binding.Member, converted);
+
+                    bindings.Add(assignment);
+                }
+            }
+
+            MemberInitExpression combined = Expression.MemberInit(constructor, bindings);
+
+            return Expression.Lambda<Func<TSource, TDestination>>(combined, parameter);
+        }
 
         public static string GetConstantRootString(Expression expression)
         {

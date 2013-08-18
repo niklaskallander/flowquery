@@ -4,7 +4,7 @@
     {
         #region Operations (1)
 
-        TReturn Map<TSource, TReturn>(TSource source) where TReturn : new();
+        TDestination Map<TSource, TDestination>(TSource source) where TDestination : new();
 
         #endregion Operations
     }

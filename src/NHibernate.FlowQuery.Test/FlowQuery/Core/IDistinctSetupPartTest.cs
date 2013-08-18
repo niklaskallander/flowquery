@@ -8,7 +8,7 @@ using NUnit.Framework;
 namespace NHibernate.FlowQuery.Test.FlowQuery.Core
 {
     using System.Linq;
-    using NHibernate.FlowQuery.Core.SelectSetup;
+    using NHibernate.FlowQuery.Core.Selection;
     using Is = NUnit.Framework.Is;
 
     [TestFixture]

@@ -4,6 +4,7 @@ using System.Linq.Expressions;
 using AutoMapper;
 using NHibernate.Criterion;
 using NHibernate.FlowQuery.AutoMapping;
+using NHibernate.FlowQuery.Core.Selection;
 using NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest.Mappers;
 using NHibernate.FlowQuery.Test.Setup.Dtos;
 using NHibernate.FlowQuery.Test.Setup.Entities;
@@ -11,14 +12,38 @@ using NUnit.Framework;
 
 namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
 {
-    using NHibernate.FlowQuery.Core.SelectSetup;
     using Is = NUnit.Framework.Is;
     using Property = NHibernate.FlowQuery.Property;
 
     [TestFixture]
     public class SelectTest : BaseTest
     {
-        #region Methods (53)
+        #region Methods
+
+        [Test]
+        public void CanSelectPartially()
+        {
+            var query = Query<UserEntity>();
+
+            var partialSelection = Query<UserEntity>()
+                .PartialSelect(x => new UserDto(x.Firstname + " " + x.Lastname));
+
+            partialSelection
+                .Add(x => new UserDto() { Id = x.Id });
+
+            partialSelection
+                .Add(x => new UserDto() { Username = x.Username });
+
+            var users = partialSelection
+                .Select();
+
+            foreach (var user in users)
+            {
+                Assert.That(user.Id, Is.GreaterThan(0));
+                Assert.That(Fullnames, Contains.Item(user.Fullname));
+                Assert.That(Usernames, Contains.Item(user.Username));
+            }
+        }
 
         [Test]
         public void AttemptToSelectInvalidAggregationThrows()
@@ -26,8 +51,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
             Assert.That(() =>
                         {
                             Query<UserEntity>()
-                                .Select(x => x.Id.GetHashCode())
-                                ;
+                                .Select(x => x.Id.GetHashCode());
 
                         }, Throws.InstanceOf<NotSupportedException>());
         }
