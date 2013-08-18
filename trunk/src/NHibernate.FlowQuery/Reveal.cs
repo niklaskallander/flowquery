@@ -7,17 +7,11 @@ namespace NHibernate.FlowQuery
 {
     public static class Reveal
     {
-        #region Properties (1)
-
         public static IRevealConvention DefaultConvention
         {
             get;
             private set;
         }
-
-        #endregion Properties
-
-        #region Methods (15)
 
         public static string ByConvention(Expression<Func<object>> expression)
         {
@@ -138,7 +132,5 @@ namespace NHibernate.FlowQuery
 
             DefaultConvention = new CustomConvention(convention);
         }
-
-        #endregion Methods
     }
 }

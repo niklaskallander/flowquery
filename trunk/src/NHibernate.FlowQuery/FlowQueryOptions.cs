@@ -4,35 +4,41 @@ namespace NHibernate.FlowQuery
 {
     public class FlowQueryOptions
     {
-        #region Fields (1)
-
         private Action<ICriteria> m_Options;
 
-        #endregion Fields
-
-        #region Constructors (1)
 
         public FlowQueryOptions()
         {
             m_Options = delegate { };
         }
 
-        #endregion Constructors
-
-        #region Methods (2)
-
-        public FlowQueryOptions Add(Action<ICriteria> option)
+        /// <summary>
+        /// Add an option filter to the options collection
+        /// </summary>
+        public virtual FlowQueryOptions Add(Action<ICriteria> option)
         {
-            m_Options += option;
+            if (option != null)
+            {
+                m_Options += option;
+            }
 
             return this;
         }
 
-        public void Use(ICriteria criteria)
+        /// <summary>
+        /// All added options will be run against the provided criteria object.
+        /// </summary>
+        protected internal virtual void Use(ICriteria criteria)
         {
-            m_Options(criteria);
+            if (criteria != null)
+            {
+                m_Options(criteria);
+            }
         }
 
-        #endregion Methods
+        /// <summary>
+        /// Should futures be used by default?
+        /// </summary>
+        public static bool DelayByDefault { get; set; }
     }
 }

@@ -3,40 +3,45 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using NHibernate.Criterion;
 using NHibernate.FlowQuery.Helpers;
-namespace NHibernate.FlowQuery.Core
+
+namespace NHibernate.FlowQuery.Core.SelectSetup
 {
+    public delegate FlowQuerySelection<TReturn> SelectionBuilder<TSource, TReturn>(ISelectSetup<TSource, TReturn> selectSetup)
+        where TSource : class;
+
     public class SelectSetup<TSource, TReturn> : ISelectSetup<TSource, TReturn>
         where TSource : class
     {
         #region Constructors (1)
 
-        public SelectSetup(IFlowQuery<TSource> query, Dictionary<string, string> propertyAliases)
+        public SelectSetup(SelectionBuilder<TSource, TReturn> selectionBuilder, Dictionary<string, string> aliases)
         {
-            if (query == null)
+            if (selectionBuilder == null)
             {
-                throw new ArgumentNullException("query");
+                throw new ArgumentNullException("selectionBuilder");
             }
 
-            Query = query;
+            Aliases = aliases;
+
+            Mappings = new Dictionary<string, IProjection>();
 
             ProjectionList = Projections.ProjectionList();
 
-            PropertyAliases = propertyAliases;
-
-            Mappings = new Dictionary<string, IProjection>();
+            SelectionBuilder = selectionBuilder;
         }
 
         #endregion Constructors
 
         #region Properties (3)
 
-        protected virtual Dictionary<string, IProjection> Mappings { get; private set; }
+
+        protected virtual Dictionary<string, string> Aliases { get; set; }
+
+        protected virtual Dictionary<string, IProjection> Mappings { get; set; }
 
         protected virtual ProjectionList ProjectionList { get; private set; }
 
-        protected virtual Dictionary<string, string> PropertyAliases { get; set; }
-
-        protected virtual IFlowQuery<TSource> Query { get; private set; }
+        protected virtual SelectionBuilder<TSource, TReturn> SelectionBuilder { get; set; }
 
         #endregion Properties
 
@@ -49,7 +54,7 @@ namespace NHibernate.FlowQuery.Core
                 throw new ArgumentException("property");
             }
 
-            return new SelectSetupPart<TSource, TReturn>(property, this, PropertyAliases);
+            return new SelectSetupPart<TSource, TReturn>(property, this, Aliases);
         }
 
         protected virtual ISelectSetupPart<TSource, TReturn> For(Expression<Func<TReturn, object>> expression)
@@ -71,14 +76,14 @@ namespace NHibernate.FlowQuery.Core
                 throw new InvalidOperationException("No setup has been made");
             }
 
-            return Query.Select<TReturn>(this);
+            return SelectionBuilder(this);
         }
 
         #endregion Methods
 
 
 
-        #region IDistinctSetup<TSource,TReturn> Members
+        #region ISelectSetup<TSource, TReturn> Members
 
         Dictionary<string, IProjection> ISelectSetup<TSource, TReturn>.Mappings
         {

@@ -18,9 +18,11 @@ namespace NHibernate.FlowQuery.Test
         {
             var users = Query<UserEntity>()
                 .Where(x => x.Id, QIs.Between(2, 4))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(3));
+
             foreach (var u in users)
             {
                 Assert.That(u.Id, Is.InRange(2, 4));
@@ -32,7 +34,8 @@ namespace NHibernate.FlowQuery.Test
         {
             var users = Query<UserEntity>()
                 .Where(x => x.Id, QIs.EqualTo(2))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(1));
             Assert.That(users.First().Id, Is.EqualTo(2));
@@ -43,7 +46,8 @@ namespace NHibernate.FlowQuery.Test
         {
             var users = Query<UserEntity>()
                 .Where(x => x.Id, QIs.GreaterThan(2))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(2));
             Assert.That(users.First().Id, Is.GreaterThan(2));
@@ -55,7 +59,8 @@ namespace NHibernate.FlowQuery.Test
         {
             var users = Query<UserEntity>()
                 .Where(x => x.Id, QIs.GreaterThanOrEqualTo(2))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(3));
             Assert.That(users.First().Id, Is.GreaterThanOrEqualTo(2));
@@ -68,7 +73,8 @@ namespace NHibernate.FlowQuery.Test
         {
             var users = Query<UserEntity>()
                 .Where(x => x.Id, QIs.In(new long[] { 1, 3 }))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(2));
             Assert.That(users.First().Id, Is.EqualTo(1));
@@ -80,7 +86,9 @@ namespace NHibernate.FlowQuery.Test
         {
             var users = Query<UserEntity>()
                 .Where(x => x.Id, QIs.In(new TestEnumerable(3, 1, 4)))
-                .Select();
+                .Select()
+                ;
+
             Assert.That(users.Count(), Is.EqualTo(3));
             Assert.That(users.ElementAt(0).Id, Is.EqualTo(1));
             Assert.That(users.ElementAt(1).Id, Is.EqualTo(3));
@@ -91,10 +99,12 @@ namespace NHibernate.FlowQuery.Test
         public void CanFilterInWithSubQuery()
         {
             var users = Query<UserEntity>()
-                .Where(x => x.Id, QIs.In(SubQuery.For<UserEntity>().Where(x => x.IsOnline).Select(x => x.Id)))
-                .Select();
+                .Where(x => x.Id, QIs.In(Query<UserEntity>().Detached().Where(x => x.IsOnline).Select(x => x.Id)))
+                .Select()
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(3));
+
             foreach (var u in users)
             {
                 Assert.That(u.IsOnline);
@@ -106,7 +116,8 @@ namespace NHibernate.FlowQuery.Test
         {
             var users = Query<UserEntity>()
                 .Where(x => x.Id, QIs.In(2, 4))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(2));
             Assert.That(users.First().Id, Is.EqualTo(2));
@@ -118,7 +129,8 @@ namespace NHibernate.FlowQuery.Test
         {
             var users = Query<UserEntity>()
                 .Where(x => x.Id, QIs.LessThan(2))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(1));
             Assert.That(users.First().Id, Is.LessThan(2));
@@ -129,7 +141,8 @@ namespace NHibernate.FlowQuery.Test
         {
             var users = Query<UserEntity>()
                 .Where(x => x.Id, QIs.LessThanOrEqualTo(2))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(2));
             Assert.That(users.First().Id, Is.LessThanOrEqualTo(2));
@@ -141,7 +154,8 @@ namespace NHibernate.FlowQuery.Test
         {
             var users = Query<UserEntity>()
                 .Where(x => x.Firstname, QIs.Like("%i%"))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(1));
             Assert.That(users.First().Firstname.Contains("i"));
@@ -152,9 +166,11 @@ namespace NHibernate.FlowQuery.Test
         {
             var users = Query<UserEntity>()
                 .Where(x => x.LastLoggedInStamp, QIs.Not.Null())
-                .Select();
+                .Select()
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(3));
+
             foreach (var u in users)
             {
                 Assert.That(u.LastLoggedInStamp, Is.Not.Null);
@@ -166,7 +182,8 @@ namespace NHibernate.FlowQuery.Test
         {
             var users = Query<UserEntity>()
                 .Where(x => x.LastLoggedInStamp, QIs.Null())
-                .Select();
+                .Select()
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(1));
             Assert.That(users.First().LastLoggedInStamp, Is.Null);
@@ -177,9 +194,11 @@ namespace NHibernate.FlowQuery.Test
         {
             var users = Query<UserEntity>()
                 .Where(x => x.Id, QIs.Not.EqualTo(2))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(3));
+
             foreach (var u in users)
             {
                 Assert.That(u.Id, Is.Not.EqualTo(2));

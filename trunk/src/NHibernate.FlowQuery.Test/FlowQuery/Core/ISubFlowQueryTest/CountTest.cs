@@ -15,8 +15,10 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void CanCountDistinctOnProperty()
         {
-            var query = SubQuery.For<UserEntity>()
-                .CountDistinct(x => x.Id);
+            var query = Query<UserEntity>()
+                .Detached()
+                .Distinct()
+                .Count(x => x.Id);
 
             var users = Query<UserEntity>()
                 .Where(x => x.Id, FlowQueryIs.EqualTo(query));
@@ -27,8 +29,10 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void CanCountDistinctOnPropertyUsingString()
         {
-            var query = SubQuery.For<UserEntity>()
-                .CountDistinct("Id");
+            var query = Query<UserEntity>()
+                .Detached()
+                .Distinct()
+                .Count("Id");
 
             var users = Query<UserEntity>()
                 .Where(x => x.Id, FlowQueryIs.EqualTo(query));
@@ -39,7 +43,8 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void CanCountLongOnStar()
         {
-            var query = SubQuery.For<UserEntity>()
+            var query = Query<UserEntity>()
+                .Detached()
                 .CountLong();
 
             var users = Query<UserEntity>()
@@ -51,7 +56,8 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void CanCountOnProjection()
         {
-            var query = SubQuery.For<UserEntity>()
+            var query = Query<UserEntity>()
+                .Detached()
                 .Count(Projections.Distinct(Projections.Property("Id")));
 
             var users = Query<UserEntity>()
@@ -63,7 +69,8 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void CanCountOnProperty()
         {
-            var query = SubQuery.For<UserEntity>()
+            var query = Query<UserEntity>()
+                .Detached()
                 .Count(x => x.Id);
 
             var users = Query<UserEntity>()
@@ -75,7 +82,8 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void CanCountOnPropertyUsingString()
         {
-            var query = SubQuery.For<UserEntity>()
+            var query = Query<UserEntity>()
+                .Detached()
                 .Count("Id");
 
             var users = Query<UserEntity>()
@@ -87,7 +95,8 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void CanCountOnStar()
         {
-            var query = SubQuery.For<UserEntity>()
+            var query = Query<UserEntity>()
+                .Detached()
                 .Count();
 
             var users = Query<UserEntity>()

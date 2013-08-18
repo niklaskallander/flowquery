@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>NHibernate.FlowQuery.Test</RootNamespace>
     <AssemblyName>NHibernate.FlowQuery.Test</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <StartupObject>
     </StartupObject>
@@ -19,6 +19,7 @@
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
     <OldToolsVersion>3.5</OldToolsVersion>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -60,10 +61,16 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FlowQuery\Core\IFlowQueryTest\DistinctTest.cs" />
+    <Compile Include="FlowQuery\Core\IFlowQueryTest\ReusabilityTest.cs" />
+    <Compile Include="FlowQuery\Core\Joins\JoinBuilderTest.cs" />
+    <Compile Include="FlowQuery\Core\MorphabilityTest.cs" />
     <Compile Include="FlowQuery\Core\FlowQuerySelectionTest.cs" />
     <Compile Include="FlowQuery\Core\IFlowQueryTest\AndTest.cs" />
     <Compile Include="FlowQuery\Core\IFlowQueryTest\ConstructorTest.cs" />
     <Compile Include="FlowQuery\Core\IFlowQueryTest\AnyTest.cs" />
+    <Compile Include="FlowQuery\Core\IFlowQueryTest\DelayedCountTest.cs" />
+    <Compile Include="FlowQuery\Core\IFlowQueryTest\DelayedTest.cs" />
     <Compile Include="FlowQuery\Core\IFlowQueryTest\Mappers\AutoMapMapper.cs" />
     <Compile Include="FlowQuery\Core\IFlowQueryTest\Mappers\CustomMapper.cs" />
     <Compile Include="FlowQuery\Core\IFlowQueryTest\SelectDictionaryTest.cs" />
@@ -76,12 +83,14 @@
     <Compile Include="FlowQuery\Core\ISubFlowQueryTest\LimitTest.cs" />
     <Compile Include="FlowQuery\Core\ISubFlowQueryTest\SelectTest.cs" />
     <Compile Include="FlowQuery\Core\ISubFlowQueryTest\WhereTest.cs" />
+    <Compile Include="FlowQuery\Core\Orders\OrderBuilderTest.cs" />
     <Compile Include="FlowQuery\ExtensionHelpers\AggregateExtensionsTest.cs" />
     <Compile Include="FlowQuery\AggregateTest.cs" />
     <Compile Include="BaseTest.cs" />
     <Compile Include="FlowQuery\Core\IFlowQueryTest\CountTest.cs" />
     <Compile Include="FlowQuery\DetachedCriteriaExtensionsTest.cs" />
     <Compile Include="FlowQuery\Helpers\ConstructionHelperTest.cs" />
+    <Compile Include="FlowQuery\Helpers\CriteriaHelperTest.cs" />
     <Compile Include="FlowQuery\Helpers\ExpressionHelperTest.cs" />
     <Compile Include="FlowQuery\Helpers\RestrictionHelperTest.cs" />
     <Compile Include="FlowQuery\Helpers\TypeHelperTest.cs" />

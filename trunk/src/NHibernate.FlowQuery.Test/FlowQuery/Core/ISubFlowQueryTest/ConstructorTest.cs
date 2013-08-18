@@ -15,7 +15,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void CanConstruct()
         {
-            var query = SubQuery.For<UserEntity>();
+            var query = Query<UserEntity>().Detached();
 
             Assert.That(query, Is.Not.Null);
         }
@@ -23,7 +23,8 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void CanConstructFromDetachedCriteria()
         {
-            var query = DetachedCriteria.For<UserEntity>().SubQuery<UserEntity>();
+            var query = DetachedCriteria.For<UserEntity>()
+                .DetachedFlowQuery();
 
             Assert.That(query, Is.Not.Null);
         }
@@ -33,7 +34,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         {
             DetachedCriteria criteria = null;
 
-            Assert.That(() => { criteria.SubQuery<UserEntity>(); }, Throws.InstanceOf<ArgumentNullException>());
+            Assert.That(() => { criteria.DetachedFlowQuery(); }, Throws.InstanceOf<ArgumentNullException>());
         }
 
         [Test]
@@ -41,7 +42,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         {
             Assert.That(() =>
                         {
-                            SubQuery.For<UserEntity>().SetRootAlias<UserEntity>(null);
+                            Query<UserEntity>().Detached().SetRootAlias<UserEntity>(null);
 
                         }, Throws.InstanceOf<ArgumentNullException>());
         }

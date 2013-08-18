@@ -11,6 +11,7 @@ using NUnit.Framework;
 
 namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
 {
+    using NHibernate.FlowQuery.Core.SelectSetup;
     using Is = NUnit.Framework.Is;
     using Property = NHibernate.FlowQuery.Property;
 
@@ -20,54 +21,13 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         #region Methods (53)
 
         [Test]
-        public void MultiTest()
-        {
-            var firstnames = Session.QueryOver<UserEntity>()
-                .Select(x => x.Firstname)
-                .Future<string>()
-                ;
-
-            var lastnames = Session.QueryOver<UserEntity>()
-                .Select(x => x.Lastname)
-                .Future<string>()
-                ;
-
-            var some = Session.QueryOver<UserEntity>()
-                .Select(x => x.Password)
-                .Future<string>()
-                ;
-
-            foreach (var item in some)
-            {
-                Assert.That(item, Is.Not.Null);
-            }
-
-            var firstnames2 = Query<UserEntity>()
-                .Select(x => x.Firstname)
-                ;
-
-            var lastnames2 = Query<UserEntity>()
-                .Select(x => x.Lastname)
-                ;
-
-            var some2 = Query<UserEntity>()
-                .Select(x => x.Password)
-                ;
-
-            foreach (var item in some2)
-            {
-                Assert.That(item, Is.Not.Null);
-            }
-        }
-
-
-        [Test]
         public void AttemptToSelectInvalidAggregationThrows()
         {
             Assert.That(() =>
                         {
                             Query<UserEntity>()
-                                .Select(x => x.Id.GetHashCode());
+                                .Select(x => x.Id.GetHashCode())
+                                ;
 
                         }, Throws.InstanceOf<NotSupportedException>());
         }
@@ -77,9 +37,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         {
             var users = Query<UserEntity>()
                 .Select(x => x.Id, x => x.Username)
+
                 .ToMap<UserDto>();
 
             Assert.That(users.Count(), Is.EqualTo(4));
+
             foreach (var u in users)
             {
                 Assert.That(u.Id, Is.GreaterThan(0));
@@ -92,13 +54,16 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void CanAutoMapUsingAutoMapMapper()
         {
             Mapper.CreateMap<UserEntity, UserDto>();
+
             Mapping.SetMapper(new AutoMapMapper());
 
             var dtos = Query<UserEntity>()
                 .Select()
+
                 .ToMap<UserDto>();
 
             Assert.That(dtos.Count(), Is.EqualTo(4));
+
             foreach (var item in dtos)
             {
                 Assert.That(Usernames, Contains.Item(item.Username));
@@ -113,20 +78,23 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         {
             CustomMapper mapper = new CustomMapper();
 
-            mapper.AddMap<UserEntity, UserDto>(x => new UserDto(x.Firstname + " " + x.Lastname)
-                                               {
-                                                   Id = x.Id,
-                                                   IsOnline = x.IsOnline,
-                                                   Username = x.Username
-                                               });
+            mapper
+                .AddMap<UserEntity, UserDto>(x => new UserDto(x.Firstname + " " + x.Lastname)
+                {
+                    Id = x.Id,
+                    IsOnline = x.IsOnline,
+                    Username = x.Username
+                });
 
             Mapping.SetMapper(mapper);
 
             var dtos = Query<UserEntity>()
                 .Select()
+
                 .ToMap<UserDto>();
 
             Assert.That(dtos.Count(), Is.EqualTo(4));
+
             foreach (var item in dtos)
             {
                 Assert.That(Usernames, Contains.Item(item.Username));
@@ -140,9 +108,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         {
             var users = Query<UserEntity>()
                 .Select("Username")
+
                 .ToMap<UserDto>();
 
             Assert.That(users.Count(), Is.EqualTo(4));
+
             foreach (var u in users)
             {
                 Assert.That(Usernames, Contains.Item(u.Username));
@@ -157,9 +127,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                         {
                             Count = Aggregate.Count(u.Id),
                             Role = Aggregate.GroupBy(u.Role)
-                        });
+                        })
+                        ;
 
             Assert.That(aggregations.Count(), Is.EqualTo(3));
+
             foreach (var a in aggregations)
             {
                 switch (a.Role)
@@ -186,7 +158,8 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                             Max = Aggregate.Max(u.Id),
                             Cnt = Aggregate.Count(u.Id),
                             Cnd = Aggregate.CountDistinct(u.Id)
-                        });
+                        })
+                        ;
 
             Assert.That(aggregation.Count(), Is.EqualTo(1));
 
@@ -211,9 +184,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void CanSelectAnonymous()
         {
             var anonymous = Query<UserEntity>()
-                .Select(u => new { u.Username });
+                .Select(u => new { u.Username })
+                ;
 
             Assert.That(anonymous.Count(), Is.EqualTo(4));
+
             foreach (var item in anonymous)
             {
                 Assert.That(Usernames, Contains.Item(item.Username));
@@ -228,9 +203,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                         {
                             Value = ((u.Id - 1) * 2 + 15) / u.Id,
                             u.Id
-                        });
+                        })
+                        ;
 
             Assert.That(anonymous.Count(), Is.EqualTo(4));
+
             foreach (var item in anonymous)
             {
                 Assert.That(Ids, Contains.Item(item.Id));
@@ -242,9 +219,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void CanSelectBinaryExpressions()
         {
             var anonymous = Query<UserEntity>()
-                .Select(u => new { IsAdministrator = u.Role == RoleEnum.Administrator, u.Role });
+                .Select(u => new { IsAdministrator = u.Role == RoleEnum.Administrator, u.Role })
+                ;
 
             Assert.That(anonymous.Count(), Is.EqualTo(4));
+
             foreach (var item in anonymous)
             {
                 if (item.Role == RoleEnum.Administrator)
@@ -262,9 +241,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void CanSelectConcatenatedProperties()
         {
             var anonymous = Query<UserEntity>()
-                .Select(u => new { Fullname = u.Firstname + (" " + u.Lastname) });
+                .Select(u => new { Fullname = u.Firstname + (" " + u.Lastname) })
+                ;
 
             Assert.That(anonymous.Count(), Is.EqualTo(4));
+
             foreach (var item in anonymous)
             {
                 Assert.That(Fullnames, Contains.Item(item.Fullname));
@@ -274,9 +255,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         [Test]
         public void CanSelectConcatenatedPropertiesWithoutNewExpression()
         {
-            var names = Query<UserEntity>().Select(u => u.Firstname + " " + u.Lastname);
+            var names = Query<UserEntity>().Select(u => u.Firstname + " " + u.Lastname)
+                ;
 
             Assert.That(names.Count(), Is.EqualTo(4));
+
             foreach (string name in names)
             {
                 Assert.That(Fullnames, Contains.Item(name));
@@ -297,7 +280,8 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
             string local = "TEST";
 
             var anonymous = Query<UserEntity>()
-                .Select(x => new { Prop = x.Role == RoleEnum.Administrator ? local : x.Username, local, x.Role, x.Username });
+                .Select(x => new { Prop = x.Role == RoleEnum.Administrator ? local : x.Username, local, x.Role, x.Username })
+                ;
 
             foreach (var item in anonymous)
             {
@@ -318,7 +302,8 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void CanSelectWithStringEmptyInProjections()
         {
             var anonymous = Query<UserEntity>()
-                .Select(x => new { Prop = x.Role == RoleEnum.Administrator ? "Admin" : string.Empty, x.Role });
+                .Select(x => new { Prop = x.Role == RoleEnum.Administrator ? "Admin" : string.Empty, x.Role })
+                ;
 
             foreach (var item in anonymous)
             {
@@ -337,7 +322,8 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void CanSelectConditionals()
         {
             var anonymous = Query<UserEntity>()
-                .Select(u => new { IsAdministrator = u.Role == RoleEnum.Administrator ? true : false, u.Role });
+                .Select(u => new { IsAdministrator = u.Role == RoleEnum.Administrator ? true : false, u.Role })
+                ;
 
             Assert.That(anonymous.Count(), Is.EqualTo(4));
 
@@ -358,7 +344,8 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void CanSelectConditionalsWithMixedProjectionAndConstant()
         {
             var anonymous = Query<UserEntity>()
-                .Select(u => new { IsAdministrator = u.Role == RoleEnum.Administrator ? u.IsOnline : false, u.Role, u.IsOnline });
+                .Select(u => new { IsAdministrator = u.Role == RoleEnum.Administrator ? u.IsOnline : false, u.Role, u.IsOnline })
+                ;
 
             Assert.That(anonymous.Count(), Is.EqualTo(4));
 
@@ -381,9 +368,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
             bool notTrue = false;
 
             var anonymous = Query<UserEntity>()
-                .Select(u => new { IsAdministrator = u.Role == RoleEnum.Administrator ? true : notTrue, u.Role });
+                .Select(u => new { IsAdministrator = u.Role == RoleEnum.Administrator ? true : notTrue, u.Role })
+                ;
 
             Assert.That(anonymous.Count(), Is.EqualTo(4));
+
             foreach (var item in anonymous)
             {
                 if (item.Role == RoleEnum.Administrator)
@@ -403,10 +392,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
             UserGroupLinkEntity link = null;
 
             var ids = Query<UserEntity>()
-                .Join(u => u.Groups, () => link)
-                .Select(u => new { link.Id });
+                .Inner.Join(u => u.Groups, () => link)
+                .Select(u => new { link.Id })
+                ;
 
             Assert.That(ids, Is.Not.Empty);
+
             foreach (var id in ids)
             {
                 Assert.That(id.Id, Is.GreaterThan(0));
@@ -425,9 +416,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                                 Id = u.Id,
                                 Username = u.Username
                             }
-                        });
+                        })
+                        ;
 
             Assert.That(anonymous.Count(), Is.EqualTo(4));
+
             foreach (var item in anonymous)
             {
                 Assert.That(item.Something, Is.Not.EqualTo(new DateTime()));
@@ -442,9 +435,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void CanSelectMultipleBinaryExpressions()
         {
             var anonymous = Query<UserEntity>()
-                .Select(u => new { IsAdministrator = u.Role == RoleEnum.Administrator && u.Id < 3, u.Role, u.Id });
+                .Select(u => new { IsAdministrator = u.Role == RoleEnum.Administrator && u.Id < 3, u.Role, u.Id })
+                ;
 
             Assert.That(anonymous.Count(), Is.EqualTo(4));
+
             foreach (var item in anonymous)
             {
                 if (item.Role == RoleEnum.Administrator && item.Id < 3)
@@ -462,9 +457,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void CanSelectMultipleBinaryExpressionsWithOr()
         {
             var anonymous = Query<UserEntity>()
-                .Select(u => new { IsAdministrator = u.Role == RoleEnum.Administrator || u.Id < 3, u.Role, u.Id });
+                .Select(u => new { IsAdministrator = u.Role == RoleEnum.Administrator || u.Id < 3, u.Role, u.Id })
+                ;
 
             Assert.That(anonymous.Count(), Is.EqualTo(4));
+
             foreach (var item in anonymous)
             {
                 if (item.Role == RoleEnum.Administrator || item.Id < 3)
@@ -482,9 +479,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void CanSelectNestedAnonymous()
         {
             var anonymous = Query<UserEntity>()
-                .Select(u => new { u.Username, Name = new { u.Firstname, u.Lastname } });
+                .Select(u => new { u.Username, Name = new { u.Firstname, u.Lastname } })
+                ;
 
             Assert.That(anonymous.Count(), Is.EqualTo(4));
+
             foreach (var item in anonymous)
             {
                 Assert.That(Usernames, Contains.Item(item.Username));
@@ -497,9 +496,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void CanSelectNestedConditionals()
         {
             var anonymous = Query<UserEntity>()
-                .Select(u => new { IsAdministrator = u.Role == RoleEnum.Administrator ? true : u.Id < 3 ? true : false, u.Role, u.Id });
+                .Select(u => new { IsAdministrator = u.Role == RoleEnum.Administrator ? true : u.Id < 3 ? true : false, u.Role, u.Id })
+                ;
 
             Assert.That(anonymous.Count(), Is.EqualTo(4));
+
             foreach (var item in anonymous)
             {
                 if (item.Role == RoleEnum.Administrator || item.Id < 3)
@@ -519,6 +520,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
             var ids = Query<UserEntity>().Select(u => u.Setting.Id);
 
             Assert.That(ids.Count(), Is.EqualTo(4));
+
             foreach (long id in ids)
             {
                 Assert.That(id, Is.EqualTo(6));
@@ -533,7 +535,8 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                         {
                             Id = x.Id,
                             Setting = new Setting() { Id = x.Setting.Id }
-                        });
+                        })
+                        ;
 
             Assert.That(users.Count(), Is.EqualTo(4));
 
@@ -551,6 +554,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
             var names = Query<UserEntity>().Select(u => u.Username);
 
             Assert.That(names.Count(), Is.EqualTo(4));
+
             foreach (string name in names)
             {
                 Assert.That(Usernames, Contains.Item(name));
@@ -564,6 +568,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                 .Select(u => u.Id, u => u.Role);
 
             Assert.That(users.Count(), Is.EqualTo(4));
+
             foreach (var user in users)
             {
                 Assert.That(user.Id, Is.Not.EqualTo(0));
@@ -584,6 +589,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                 .Select(u => new UserEntity() { Id = u.Id, Role = u.Role });
 
             Assert.That(users.Count(), Is.EqualTo(4));
+
             foreach (var user in users)
             {
                 Assert.That(user.Id, Is.Not.EqualTo(0));
@@ -601,9 +607,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void CanSelectSpecificPropertiesUsingStrings()
         {
             var users = Query<UserEntity>()
-                .Select("Id", "Role");
+                .Select("Id", "Role")
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(4));
+
             foreach (var user in users)
             {
                 Assert.That(user.Id, Is.Not.EqualTo(0));
@@ -623,6 +631,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
             var shortNames = Query<UserEntity>().Select(x => x.Username.Substring(0, 2));
 
             Assert.That(shortNames.Count(), Is.EqualTo(4));
+
             foreach (string shortName in shortNames)
             {
                 Assert.That(shortName.Length, Is.EqualTo(1)); // somehow you always get what you want - 1 ( database error or something ).
@@ -633,9 +642,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void CanSelectToClassWithPublicFields()
         {
             var puffClasses = Query<UserEntity>()
-                .Select(x => new PuffClass() { Puff = x.Firstname + " " + x.Lastname });
+                .Select(x => new PuffClass() { Puff = x.Firstname + " " + x.Lastname })
+                ;
 
             Assert.That(puffClasses.Count(), Is.EqualTo(4));
+
             foreach (PuffClass pc in puffClasses)
             {
                 Assert.That(Fullnames, Contains.Item(pc.Puff));
@@ -646,9 +657,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void CanSelectTypedUsingProjection()
         {
             var users = Query<UserEntity>()
-                .Select<UserDto>(Projections.Alias(Projections.Property("Username"), "Username"));
+                .Select<UserDto>(Projections.Alias(Projections.Property("Username"), "Username"))
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(4));
+
             foreach (var u in users)
             {
                 Assert.That(Usernames, Contains.Item(u.Username));
@@ -659,9 +672,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void CanSelectTypedUsingPropertyProjection()
         {
             var names = Query<UserEntity>()
-                .Select<string>(Projections.Property("Firstname"));
+                .Select<string>(Projections.Property("Firstname"))
+                ;
 
             Assert.That(names.Count(), Is.EqualTo(4));
+
             foreach (var name in names)
             {
                 Assert.That(Firstnames, Contains.Item(name));
@@ -676,6 +691,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                 .ToMap<UserDto>();
 
             Assert.That(dtos.Count(), Is.EqualTo(4));
+
             foreach (var item in dtos)
             {
                 Assert.That(Usernames, Contains.Item(item.Username));
@@ -688,9 +704,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void CanSelectUsingMemberInit()
         {
             var dtos = Query<UserEntity>()
-                .Select(u => new UserDto() { Fullname = u.Firstname + " " + u.Lastname, Id = u.Id });
+                .Select(u => new UserDto() { Fullname = u.Firstname + " " + u.Lastname, Id = u.Id })
+                ;
 
             Assert.That(dtos.Count(), Is.EqualTo(4));
+
             foreach (var item in dtos)
             {
                 Assert.That(Fullnames, Contains.Item(item.Fullname));
@@ -703,9 +721,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void CanSelectUsingMemberInitWithConstructor()
         {
             var dtos = Query<UserEntity>()
-                .Select(u => new UserDto(u.Firstname + " " + u.Lastname) { Id = u.Id });
+                .Select(u => new UserDto(u.Firstname + " " + u.Lastname) { Id = u.Id })
+                ;
 
             Assert.That(dtos.Count(), Is.EqualTo(4));
+
             foreach (var item in dtos)
             {
                 Assert.That(Fullnames, Contains.Item(item.Fullname));
@@ -718,9 +738,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void CanSelectUsingProjection()
         {
             var users = Query<UserEntity>()
-                .Select(Projections.Alias(Projections.Property("Firstname"), "Firstname"));
+                .Select(Projections.Alias(Projections.Property("Firstname"), "Firstname"))
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(4));
+
             foreach (var u in users)
             {
                 Assert.That(u.Firstname.Length, Is.GreaterThan(0));
@@ -731,9 +753,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void CanSelectUsingPropertyHelper()
         {
             var users = Query<UserEntity>()
-                .Select(u => new UserEntity() { Id = Property.As<long>("u.Id") });
+                .Select(u => new UserEntity() { Id = Property.As<long>("u.Id") })
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(4));
+
             foreach (var item in users)
             {
                 Assert.That(item.Id, Is.Not.EqualTo(0));
@@ -744,9 +768,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void CanSelectUsingPropertyProjection()
         {
             var names = Query<UserEntity>()
-                .Select(Projections.Property("Firstname"));
+                .Select(Projections.Property("Firstname"))
+                ;
 
             Assert.That(names.Count(), Is.EqualTo(4));
+
             foreach (var name in names)
             {
                 Assert.That(Firstnames, Contains.Item(name));
@@ -757,11 +783,25 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void CanSelectUsingSelectSetup()
         {
             var users = Query<UserEntity>()
-                            .Select<UserDto>()
-                                .For(x => x.IsOnline).Use(x => x.IsOnline)
-                                .Select();
+                .Select<UserDto>()
+                    .For(x => x.IsOnline).Use(x => x.IsOnline)
+                    .Select()
+                    ;
 
             Assert.That(users.Count(), Is.EqualTo(4));
+        }
+
+        [Test]
+        public void ProjectUsingSelectSetupThrowsIfSetupIsNull()
+        {
+            ISelectSetup<UserEntity, UserDto> setup = null;
+
+            Assert.That(() =>
+                        {
+                            Query<UserEntity>()
+                                .Select(setup);
+
+                        }, Throws.InstanceOf<ArgumentNullException>());
         }
 
         [Test]
@@ -770,7 +810,8 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
             var users = Query<UserEntity>()
                             .Select<UserDto>()
                                 .For(x => x.IsOnline).Use(Projections.Property("IsOnline"))
-                                .Select();
+                                .Select()
+                                ;
 
             Assert.That(users.Count(), Is.EqualTo(4));
         }
@@ -781,7 +822,8 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
             var users = Query<UserEntity>()
                             .Select<UserDto>()
                                 .For("IsOnline").Use(x => x.IsOnline)
-                                .Select();
+                                .Select()
+                                ;
 
             Assert.That(users.Count(), Is.EqualTo(4));
         }
@@ -792,7 +834,8 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
             var users = Query<UserEntity>()
                 .Select<UserDto>()
                     .For(x => x.IsOnline).Use("IsOnline")
-                    .Select();
+                    .Select()
+                    ;
 
             Assert.That(users.Count(), Is.EqualTo(4));
         }
@@ -800,9 +843,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         [Test]
         public void CanSelectWithProxyInterface()
         {
-            var users = Query<IUserEntity>().Select();
+            var users = Query<IUserEntity>()
+                .Select()
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(4));
+
             foreach (var user in users)
             {
                 Assert.That(Ids, Contains.Item(user.Id));
@@ -818,7 +864,8 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
             Assert.That(() =>
                         {
                             Query<UserEntity>()
-                                .Select(array);
+                                .Select(array)
+                                ;
 
                         }, Throws.InstanceOf<ArgumentNullException>());
         }
@@ -829,10 +876,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
             Expression<Func<UserEntity, object>>[] e = null;
 
             Assert.That(() =>
-            {
-                Query<UserEntity>().Select(e);
+                        {
+                            Query<UserEntity>()
+                                .Select(e)
+                                ;
 
-            }, Throws.InstanceOf<ArgumentNullException>());
+                        }, Throws.InstanceOf<ArgumentNullException>());
         }
 
         [Test]
@@ -842,7 +891,9 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
 
             Assert.That(() =>
                         {
-                            Query<UserEntity>().Select(p);
+                            Query<UserEntity>()
+                                .Select(p)
+                                ;
 
                         }, Throws.InstanceOf<ArgumentNullException>());
         }
@@ -853,35 +904,39 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
             PropertyProjection p = null;
 
             Assert.That(() =>
-            {
-                Query<UserEntity>().Select(p);
+                        {
+                            Query<UserEntity>()
+                                .Select(p)
+                                ;
 
-            }, Throws.InstanceOf<ArgumentNullException>());
+                        }, Throws.InstanceOf<ArgumentNullException>());
         }
 
         [Test]
         public void SelectUsingSelectSetupThrowsIfNoSetupIsMade()
         {
             Assert.That(() =>
-            {
-                Query<UserEntity>()
-                    .Select<UserDto>()
-                        .Select();
+                        {
+                            Query<UserEntity>()
+                                .Select<UserDto>()
+                                    .Select()
+                                    ;
 
-            }, Throws.InvalidOperationException);
+                        }, Throws.InvalidOperationException);
         }
 
         [Test]
         public void SelectUsingSelectSetupWithStringInUseStatementThrowsIfStringIsEmpty()
         {
             Assert.That(() =>
-            {
-                Query<UserEntity>()
-                    .Select<UserDto>()
-                        .For(x => x.IsOnline).Use(string.Empty)
-                        .Select();
+                        {
+                            Query<UserEntity>()
+                                .Select<UserDto>()
+                                    .For(x => x.IsOnline).Use(string.Empty)
+                                    .Select()
+                                    ;
 
-            }, Throws.ArgumentException);
+                        }, Throws.ArgumentException);
         }
 
         [Test]
@@ -892,7 +947,8 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                             Query<UserEntity>()
                                 .Select<UserDto>()
                                     .For(x => x.IsOnline).Use(null as string)
-                                    .Select();
+                                    .Select()
+                                    ;
 
                         }, Throws.ArgumentException);
         }
@@ -903,10 +959,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
             string[] strings = new string[] { "UserName", string.Empty };
 
             Assert.That(() =>
-            {
-                Query<UserEntity>().Select(strings);
+                        {
+                            Query<UserEntity>()
+                                .Select(strings)
+                                ;
 
-            }, Throws.ArgumentException);
+                        }, Throws.ArgumentException);
         }
 
         [Test]
@@ -916,7 +974,9 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
 
             Assert.That(() =>
                         {
-                            Query<UserEntity>().Select(strings);
+                            Query<UserEntity>()
+                                .Select(strings)
+                                ;
 
                         }, Throws.ArgumentException);
         }
@@ -928,7 +988,9 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
 
             Assert.That(() =>
                         {
-                            Query<UserEntity>().Select(strings);
+                            Query<UserEntity>()
+                                .Select(strings)
+                                ;
 
                         }, Throws.InstanceOf<ArgumentNullException>());
         }

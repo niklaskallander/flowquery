@@ -3,7 +3,7 @@ namespace NHibernate.FlowQuery.ExtensionHelpers
 {
     public static class AggregateExtensions
     {
-		#region Methods (8) 
+        #region Methods (8)
 
         public static decimal Average<TReturn>(this TReturn property)
         {
@@ -45,6 +45,6 @@ namespace NHibernate.FlowQuery.ExtensionHelpers
             throw Exception();
         }
 
-		#endregion Methods 
+        #endregion Methods
     }
 }

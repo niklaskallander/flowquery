@@ -9,14 +9,15 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
     [TestFixture]
     public class LimitTest : BaseTest
     {
-		#region Methods (4) 
+        #region Methods (4)
 
         [Test]
         public void CanConstrainFirstResultWithLimit()
         {
             var users = Query<UserEntity>()
                 .Limit(2, 1)
-                .Select();
+                .Select()
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(2));
             Assert.That(users.First().Id, Is.EqualTo(2));
@@ -27,7 +28,8 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         {
             var users = Query<UserEntity>()
                 .Skip(1)
-                .Select();
+                .Select()
+                ;
 
             Assert.That(users.First().Id, Is.EqualTo(2));
         }
@@ -37,7 +39,8 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         {
             var users = Query<UserEntity>()
                 .Limit(2)
-                .Select();
+                .Select()
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(2));
         }
@@ -47,11 +50,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         {
             var users = Query<UserEntity>()
                 .Take(2)
-                .Select();
+                .Select()
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(2));
         }
 
-		#endregion Methods 
+        #endregion Methods
     }
 }

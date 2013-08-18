@@ -8,8 +8,6 @@ namespace NHibernate.FlowQuery
 {
     public static class ProjectionListExtensions
     {
-        #region Methods (5)
-
         public static ProjectionList AddProperties(this ProjectionList list, params string[] properties)
         {
             foreach (string property in properties)
@@ -63,7 +61,5 @@ namespace NHibernate.FlowQuery
 
             return list;
         }
-
-        #endregion Methods
     }
 }

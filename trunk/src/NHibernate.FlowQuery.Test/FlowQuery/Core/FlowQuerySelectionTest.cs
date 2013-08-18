@@ -23,7 +23,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core
                 Assert.That(array[i], Is.EqualTo(i + 1));
             }
         }
-        
+
         [Test]
         public void CanImplicitlyCastToSingleTSourceItem()
         {
@@ -65,9 +65,19 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core
         {
             Assert.That(() =>
                         {
-                            new FlowQuerySelection<object>(null);
+                            new FlowQuerySelection<object>((IEnumerable<object>)null);
 
                         }, Throws.InstanceOf<ArgumentNullException>());
+        }
+
+        [Test]
+        public void ConstructorThrowsIfDelayedSelectionIsNull()
+        {
+            Assert.That(() =>
+            {
+                new FlowQuerySelection<object>((Func<IEnumerable<object>>)null);
+
+            }, Throws.InstanceOf<ArgumentNullException>());
         }
 
         [Test]

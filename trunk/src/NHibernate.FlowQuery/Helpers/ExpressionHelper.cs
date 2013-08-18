@@ -85,11 +85,6 @@ namespace NHibernate.FlowQuery.Helpers
                 throw new ArgumentNullException("expression");
             }
 
-            if (string.IsNullOrEmpty(expectedRoot))
-            {
-                throw new ArgumentException("expectedRoot");
-            }
-
             string property = GetPropertyName(expression);
 
             string[] splits = property.Split('.');
@@ -102,11 +97,6 @@ namespace NHibernate.FlowQuery.Helpers
             if (expression == null)
             {
                 throw new ArgumentNullException("expression");
-            }
-
-            if (string.IsNullOrEmpty(expectedRoot))
-            {
-                throw new ArgumentException("expectedRoot");
             }
 
             string property = GetPropertyName(expression);

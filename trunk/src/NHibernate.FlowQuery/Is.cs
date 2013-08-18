@@ -6,17 +6,11 @@ namespace NHibernate.FlowQuery
 {
     public static class Is
     {
-        #region Constructors (1)
-
         static Is()
         {
             Positive = new IsHelper(false);
             Negative = new IsHelper(true);
         }
-
-        #endregion Constructors
-
-        #region Properties (3)
 
         private static IsHelper Negative { get; set; }
 
@@ -26,10 +20,6 @@ namespace NHibernate.FlowQuery
         }
 
         private static IsHelper Positive { get; set; }
-
-        #endregion Properties
-
-        #region Methods (23)
 
         public static IsExpression Between(object lowValue, object highValue)
         {
@@ -41,12 +31,12 @@ namespace NHibernate.FlowQuery
             return Positive.EqualTo(value);
         }
 
-        public static IsExpression EqualTo<TSource>(ISubFlowQuery<TSource> query)
+        public static IsExpression EqualTo(IDetachedImmutableFlowQuery query)
         {
             return Positive.EqualTo(query);
         }
 
-        public static IsExpression EqualToAll<TSource>(ISubFlowQuery<TSource> query)
+        public static IsExpression EqualToAll(IDetachedImmutableFlowQuery query)
         {
             return Positive.EqualToAll(query);
         }
@@ -56,12 +46,12 @@ namespace NHibernate.FlowQuery
             return Positive.GreaterThan(value);
         }
 
-        public static IsExpression GreaterThan<TSource>(ISubFlowQuery<TSource> query)
+        public static IsExpression GreaterThan(IDetachedImmutableFlowQuery query)
         {
             return Positive.GreaterThan(query);
         }
 
-        public static IsExpression GreaterThanAll<TSource>(ISubFlowQuery<TSource> query)
+        public static IsExpression GreaterThanAll(IDetachedImmutableFlowQuery query)
         {
             return Positive.GreaterThanAll(query);
         }
@@ -71,27 +61,27 @@ namespace NHibernate.FlowQuery
             return Positive.GreaterThanOrEqualTo(value);
         }
 
-        public static IsExpression GreaterThanOrEqualTo<TSource>(ISubFlowQuery<TSource> query)
+        public static IsExpression GreaterThanOrEqualTo(IDetachedImmutableFlowQuery query)
         {
             return Positive.GreaterThanOrEqualTo(query);
         }
 
-        public static IsExpression GreaterThanOrEqualToAll<TSource>(ISubFlowQuery<TSource> query)
+        public static IsExpression GreaterThanOrEqualToAll(IDetachedImmutableFlowQuery query)
         {
             return Positive.GreaterThanOrEqualToAll(query);
         }
 
-        public static IsExpression GreaterThanOrEqualToSome<TSource>(ISubFlowQuery<TSource> query)
+        public static IsExpression GreaterThanOrEqualToSome(IDetachedImmutableFlowQuery query)
         {
             return Positive.GreaterThanOrEqualToSome(query);
         }
 
-        public static IsExpression GreaterThanSome<TSource>(ISubFlowQuery<TSource> query)
+        public static IsExpression GreaterThanSome(IDetachedImmutableFlowQuery query)
         {
             return Positive.GreaterThanSome(query);
         }
 
-        public static IsExpression In<TSource>(ISubFlowQuery<TSource> query)
+        public static IsExpression In(IDetachedImmutableFlowQuery query)
         {
             return Positive.In(query);
         }
@@ -101,8 +91,7 @@ namespace NHibernate.FlowQuery
             return Positive.In(values);
         }
 
-        public static IsExpression In<TEnumerable>(TEnumerable value)
-            where TEnumerable : IEnumerable
+        public static IsExpression In(IEnumerable value)
         {
             return Positive.In(value);
         }
@@ -112,12 +101,12 @@ namespace NHibernate.FlowQuery
             return Positive.LessThan(value);
         }
 
-        public static IsExpression LessThan<TSource>(ISubFlowQuery<TSource> query)
+        public static IsExpression LessThan(IDetachedImmutableFlowQuery query)
         {
             return Positive.LessThan(query);
         }
 
-        public static IsExpression LessThanAll<TSource>(ISubFlowQuery<TSource> query)
+        public static IsExpression LessThanAll(IDetachedImmutableFlowQuery query)
         {
             return Positive.LessThanAll(query);
         }
@@ -127,22 +116,22 @@ namespace NHibernate.FlowQuery
             return Positive.LessThanOrEqualTo(value);
         }
 
-        public static IsExpression LessThanOrEqualTo<TSource>(ISubFlowQuery<TSource> query)
+        public static IsExpression LessThanOrEqualTo(IDetachedImmutableFlowQuery query)
         {
             return Positive.LessThanOrEqualTo(query);
         }
 
-        public static IsExpression LessThanOrEqualToAll<TSource>(ISubFlowQuery<TSource> query)
+        public static IsExpression LessThanOrEqualToAll(IDetachedImmutableFlowQuery query)
         {
             return Positive.LessThanOrEqualToAll(query);
         }
 
-        public static IsExpression LessThanOrEqualToSome<TSource>(ISubFlowQuery<TSource> query)
+        public static IsExpression LessThanOrEqualToSome(IDetachedImmutableFlowQuery query)
         {
             return Positive.LessThanOrEqualToSome(query);
         }
 
-        public static IsExpression LessThanSome<TSource>(ISubFlowQuery<TSource> query)
+        public static IsExpression LessThanSome(IDetachedImmutableFlowQuery query)
         {
             return Positive.LessThanSome(query);
         }
@@ -156,7 +145,5 @@ namespace NHibernate.FlowQuery
         {
             return Positive.Null();
         }
-
-        #endregion Methods
     }
 }

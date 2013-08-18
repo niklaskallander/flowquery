@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using NHibernate.Criterion;
 using Expression = System.Linq.Expressions.Expression;
 
 namespace NHibernate.FlowQuery.Helpers
@@ -13,81 +12,94 @@ namespace NHibernate.FlowQuery.Helpers
     {
         #region Methods (7)
 
-        public static IEnumerable<TReturn> ForMemberInitExpression<TReturn>(MemberInitExpression expression, IList list)
+        private static IEnumerable<TReturn> ForMemberInitExpression<TReturn>(MemberInitExpression expression, IEnumerable list)
         {
-            List<TReturn> returnList = new List<TReturn>();
+            List<TReturn> temp = new List<TReturn>();
+
             foreach (object o in list)
             {
                 object instance;
+
                 Invoke(expression, o as object[] ?? new object[] { o }, out instance);
-                returnList.Add((TReturn)instance);
+
+                temp.Add((TReturn)instance);
             }
-            return returnList;
+
+            return temp;
         }
 
-        public static IEnumerable<TReturn> ForNewExpression<TReturn>(NewExpression expression, IList list)
+        private static IEnumerable<TReturn> ForNewExpression<TReturn>(NewExpression expression, IEnumerable list)
         {
-            List<TReturn> returnList = new List<TReturn>();
+            List<TReturn> temp = new List<TReturn>();
+
             foreach (object o in list)
             {
                 object instance;
+
                 Invoke(expression, o as object[] ?? new object[] { o }, out instance);
-                returnList.Add((TReturn)instance);
+
+                temp.Add((TReturn)instance);
             }
-            return returnList;
+
+            return temp;
         }
 
-        public static IEnumerable<TReturn> GetListByExpression<TReturn>(Expression expression, IProjection projection, ICriteria criteria)
+        public static bool CanHandle(Expression expression)
         {
             if (expression == null)
             {
                 throw new ArgumentNullException("expression");
             }
 
-            if (projection == null)
+            if (expression.NodeType == ExpressionType.Lambda)
             {
-                throw new ArgumentNullException("projection");
+                return CanHandle((expression as LambdaExpression).Body);
             }
 
-            if (criteria == null)
+            bool isNew = expression.NodeType == ExpressionType.New,
+                 isMemberInit = expression.NodeType == ExpressionType.MemberInit;
+
+            return isNew || isMemberInit;
+        }
+
+        public static IEnumerable<TReturn> GetListByExpression<TReturn>(Expression expression, IEnumerable list)
+        {
+            if (expression == null)
             {
-                throw new ArgumentNullException("criteria");
+                throw new ArgumentNullException("expression");
             }
 
-            switch (expression.NodeType)
+            if (expression.NodeType == ExpressionType.Lambda)
             {
-                case ExpressionType.New:
-                    return ForNewExpression<TReturn>
-                    (
-                        expression as NewExpression,
-                        criteria
-                            .SetProjection(projection)
-                            .List()
-                    );
-
-                case ExpressionType.MemberInit:
-                    return ForMemberInitExpression<TReturn>
-                    (
-                        expression as MemberInitExpression,
-                        criteria
-                            .SetProjection(projection)
-                            .List()
-                    );
-
-                case ExpressionType.Lambda:
-                    return GetListByExpression<TReturn>((expression as LambdaExpression).Body, projection, criteria);
-
-                default:
-                    return criteria
-                            .SetProjection(projection)
-                            .List<TReturn>();
+                return GetListByExpression<TReturn>((expression as LambdaExpression).Body, list);
             }
+
+            if (list == null)
+            {
+                return null;
+            }
+
+            bool canHandle = CanHandle(expression);
+
+            if (canHandle)
+            {
+                if (expression.NodeType == ExpressionType.New)
+                {
+                    return ForNewExpression<TReturn>(expression as NewExpression, list);
+                }
+
+                return ForMemberInitExpression<TReturn>(expression as MemberInitExpression, list);
+            }
+
+            return null;
         }
 
         private static int Invoke(NewExpression expression, object[] arguments, out object instance)
         {
             int i = 0;
+
             List<object> list = new List<object>();
+
             foreach (Expression argument in expression.Arguments)
             {
                 object value;
@@ -119,6 +131,7 @@ namespace NHibernate.FlowQuery.Helpers
         private static int Invoke(MemberInitExpression expression, object[] arguments, out object instance)
         {
             int i = Invoke(expression.NewExpression, arguments, out instance);
+
             foreach (MemberAssignment binding in expression.Bindings)
             {
                 object value;
@@ -141,6 +154,7 @@ namespace NHibernate.FlowQuery.Helpers
 
                 SetValue(binding.Member, instance, value);
             }
+
             return i;
         }
 
@@ -150,6 +164,7 @@ namespace NHibernate.FlowQuery.Helpers
         private static void SetValue(MemberInfo memberInfo, object instance, object value)
         {
             var field = memberInfo as FieldInfo;
+
             if (field != null)
             {
                 field.SetValue(instance, value);
@@ -157,6 +172,7 @@ namespace NHibernate.FlowQuery.Helpers
             else
             {
                 var prop = memberInfo as PropertyInfo;
+
                 if (prop != null)
                 {
                     prop.SetValue(instance, value, null);

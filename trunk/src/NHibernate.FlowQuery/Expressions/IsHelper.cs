@@ -33,14 +33,14 @@ namespace NHibernate.FlowQuery.Expressions
             return Fix(new IsEqualExpression(value));
         }
 
-        public IsExpression EqualTo<TSource>(ISubFlowQuery<TSource> query)
+        public IsExpression EqualTo(IDetachedImmutableFlowQuery query)
         {
-            return Fix(new IsEqualToSubqueryExpression<TSource>(query));
+            return Fix(new IsEqualToSubqueryExpression(query));
         }
 
-        public IsExpression EqualToAll<TSource>(ISubFlowQuery<TSource> query)
+        public IsExpression EqualToAll(IDetachedImmutableFlowQuery query)
         {
-            return Fix(new IsEqualToAllSubqueryExpression<TSource>(query));
+            return Fix(new IsEqualToAllSubqueryExpression(query));
         }
 
         protected virtual IsExpression Fix(IsExpression expression)
@@ -55,14 +55,14 @@ namespace NHibernate.FlowQuery.Expressions
             return Fix(new IsGreaterThanExpression(value));
         }
 
-        public IsExpression GreaterThan<TSource>(ISubFlowQuery<TSource> query)
+        public IsExpression GreaterThan(IDetachedImmutableFlowQuery query)
         {
-            return Fix(new IsGreaterThanSubqueryExpression<TSource>(query));
+            return Fix(new IsGreaterThanSubqueryExpression(query));
         }
 
-        public IsExpression GreaterThanAll<TSource>(ISubFlowQuery<TSource> query)
+        public IsExpression GreaterThanAll(IDetachedImmutableFlowQuery query)
         {
-            return Fix(new IsGreaterThanAllSubqueryExpression<TSource>(query));
+            return Fix(new IsGreaterThanAllSubqueryExpression(query));
         }
 
         public IsExpression GreaterThanOrEqualTo(object value)
@@ -70,29 +70,29 @@ namespace NHibernate.FlowQuery.Expressions
             return Fix(new IsGreaterThanOrEqualExpression(value));
         }
 
-        public IsExpression GreaterThanOrEqualTo<TSource>(ISubFlowQuery<TSource> query)
+        public IsExpression GreaterThanOrEqualTo(IDetachedImmutableFlowQuery query)
         {
-            return Fix(new IsGreaterThanOrEqualToSubqueryExpression<TSource>(query));
+            return Fix(new IsGreaterThanOrEqualToSubqueryExpression(query));
         }
 
-        public IsExpression GreaterThanOrEqualToAll<TSource>(ISubFlowQuery<TSource> query)
+        public IsExpression GreaterThanOrEqualToAll(IDetachedImmutableFlowQuery query)
         {
-            return Fix(new IsGreaterThanOrEqualToAllSubqueryExpression<TSource>(query));
+            return Fix(new IsGreaterThanOrEqualToAllSubqueryExpression(query));
         }
 
-        public IsExpression GreaterThanOrEqualToSome<TSource>(ISubFlowQuery<TSource> query)
+        public IsExpression GreaterThanOrEqualToSome(IDetachedImmutableFlowQuery query)
         {
-            return Fix(new IsGreaterThanOrEqualToSomeSubqueryExpression<TSource>(query));
+            return Fix(new IsGreaterThanOrEqualToSomeSubqueryExpression(query));
         }
 
-        public IsExpression GreaterThanSome<TSource>(ISubFlowQuery<TSource> query)
+        public IsExpression GreaterThanSome(IDetachedImmutableFlowQuery query)
         {
-            return Fix(new IsGreaterThanSomeSubqueryExpression<TSource>(query));
+            return Fix(new IsGreaterThanSomeSubqueryExpression(query));
         }
 
-        public IsExpression In<TSource>(ISubFlowQuery<TSource> query)
+        public IsExpression In(IDetachedImmutableFlowQuery query)
         {
-            return Fix(new IsInSubqueryExpression<TSource>(query));
+            return Fix(new IsInSubqueryExpression(query));
         }
 
         public IsExpression In(params object[] values)
@@ -106,9 +106,9 @@ namespace NHibernate.FlowQuery.Expressions
             return Fix(new IsInValuesExpression(value));
         }
 
-        public IsExpression LessThan<TSource>(ISubFlowQuery<TSource> query)
+        public IsExpression LessThan(IDetachedImmutableFlowQuery query)
         {
-            return Fix(new IsLessThanSubqueryExpression<TSource>(query));
+            return Fix(new IsLessThanSubqueryExpression(query));
         }
 
         public IsExpression LessThan(object value)
@@ -116,14 +116,14 @@ namespace NHibernate.FlowQuery.Expressions
             return Fix(new IsLessThanExpression(value));
         }
 
-        public IsExpression LessThanAll<TSource>(ISubFlowQuery<TSource> query)
+        public IsExpression LessThanAll(IDetachedImmutableFlowQuery query)
         {
-            return Fix(new IsLessThanAllSubqueryExpression<TSource>(query));
+            return Fix(new IsLessThanAllSubqueryExpression(query));
         }
 
-        public IsExpression LessThanOrEqualTo<TSource>(ISubFlowQuery<TSource> query)
+        public IsExpression LessThanOrEqualTo(IDetachedImmutableFlowQuery query)
         {
-            return Fix(new IsLessThanOrEqualToSubqueryExpression<TSource>(query));
+            return Fix(new IsLessThanOrEqualToSubqueryExpression(query));
         }
 
         public IsExpression LessThanOrEqualTo(object value)
@@ -131,19 +131,19 @@ namespace NHibernate.FlowQuery.Expressions
             return Fix(new IsLessThanOrEqualExpression(value));
         }
 
-        public IsExpression LessThanOrEqualToAll<TSource>(ISubFlowQuery<TSource> query)
+        public IsExpression LessThanOrEqualToAll(IDetachedImmutableFlowQuery query)
         {
-            return Fix(new IsLessThanOrEqualToAllSubqueryExpression<TSource>(query));
+            return Fix(new IsLessThanOrEqualToAllSubqueryExpression(query));
         }
 
-        public IsExpression LessThanOrEqualToSome<TSource>(ISubFlowQuery<TSource> query)
+        public IsExpression LessThanOrEqualToSome(IDetachedImmutableFlowQuery query)
         {
-            return Fix(new IsLessThanOrEqualToSomeSubqueryExpression<TSource>(query));
+            return Fix(new IsLessThanOrEqualToSomeSubqueryExpression(query));
         }
 
-        public IsExpression LessThanSome<TSource>(ISubFlowQuery<TSource> query)
+        public IsExpression LessThanSome(IDetachedImmutableFlowQuery query)
         {
-            return Fix(new IsLessThanSomeSubqueryExpression<TSource>(query));
+            return Fix(new IsLessThanSomeSubqueryExpression(query));
         }
 
         public IsExpression Like(object value)

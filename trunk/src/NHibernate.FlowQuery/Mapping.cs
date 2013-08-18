@@ -5,22 +5,12 @@ namespace NHibernate.FlowQuery
 {
     public static class Mapping
     {
-        #region Fields (1)
-
         private static IMapper m_Mapper;
-
-        #endregion Fields
-
-        #region Constructors (1)
 
         static Mapping()
         {
             m_Mapper = new DefaultMapper();
         }
-
-        #endregion Constructors
-
-        #region Methods (2)
 
         public static TReturn Map<TSource, TReturn>(TSource source)
              where TReturn : new()
@@ -37,7 +27,5 @@ namespace NHibernate.FlowQuery
 
             m_Mapper = mapper;
         }
-
-        #endregion Methods
     }
 }

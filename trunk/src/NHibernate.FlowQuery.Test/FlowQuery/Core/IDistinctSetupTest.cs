@@ -1,6 +1,6 @@
 using System;
 using System.Linq.Expressions;
-using NHibernate.FlowQuery.Core;
+using NHibernate.FlowQuery.Core.SelectSetup;
 using NHibernate.FlowQuery.Test.Setup.Dtos;
 using NHibernate.FlowQuery.Test.Setup.Entities;
 using NUnit.Framework;
@@ -17,7 +17,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core
         [Test]
         public void CanConstruct()
         {
-            var setup = Query<UserEntity>().SelectDistinct<UserDto>();
+            var setup = Query<UserEntity>().Distinct().Select<UserDto>();
 
             Assert.That(setup, Is.Not.Null);
         }
@@ -26,7 +26,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core
         public void CanUseExpressionInForCall()
         {
             var setupPart = Query<UserEntity>()
-                .SelectDistinct<UserDto>()
+                .Distinct().Select<UserDto>()
                     .For(x => x.IsOnline);
 
             Assert.That(setupPart, Is.Not.Null);
@@ -36,20 +36,18 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core
         public void CanUseStringInForCall()
         {
             var setupPart = Query<UserEntity>()
-                .SelectDistinct<UserDto>()
+                .Distinct().Select<UserDto>()
                     .For("IsOnline");
 
             Assert.That(setupPart, Is.Not.Null);
         }
 
         [Test]
-        public void ConstructorThrowsWhenFlowQueryIsNull()
+        public void ConstructorThrowsWhenSelectionBuilderIsNull()
         {
-            IFlowQuery<UserEntity> query = null;
-
             Assert.That(() =>
                         {
-                            new SelectSetup<UserEntity, UserDto>(query, null);
+                            new SelectSetup<UserEntity, UserDto>(null, null);
 
                         }, Throws.InstanceOf<ArgumentNullException>());
         }
@@ -60,7 +58,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core
             Assert.That(() =>
                         {
                             Query<UserEntity>()
-                                .SelectDistinct<UserDto>()
+                                .Distinct().Select<UserDto>()
                                     .For(x => true);
 
                         }, Throws.InstanceOf<NotSupportedException>());
@@ -73,7 +71,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core
                         {
                             Expression<Func<UserDto, object>> s = null;
 
-                            Query<UserEntity>().SelectDistinct<UserDto>().For(s);
+                            Query<UserEntity>().Distinct().Select<UserDto>().For(s);
 
                         }, Throws.InstanceOf<ArgumentNullException>());
         }
@@ -85,7 +83,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core
                         {
                             string s = string.Empty;
 
-                            Query<UserEntity>().SelectDistinct<UserDto>().For(s);
+                            Query<UserEntity>().Distinct().Select<UserDto>().For(s);
 
                         }, Throws.ArgumentException);
         }
@@ -97,7 +95,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core
                         {
                             string s = null;
 
-                            Query<UserEntity>().SelectDistinct<UserDto>().For(s);
+                            Query<UserEntity>().Distinct().Select<UserDto>().For(s);
 
                         }, Throws.ArgumentException);
         }
@@ -107,7 +105,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core
         {
             Assert.That(() =>
                         {
-                            Query<UserEntity>().SelectDistinct<UserDto>().Select();
+                            Query<UserEntity>().Distinct().Select<UserDto>().Select();
 
                         }, Throws.InstanceOf<InvalidOperationException>());
         }
