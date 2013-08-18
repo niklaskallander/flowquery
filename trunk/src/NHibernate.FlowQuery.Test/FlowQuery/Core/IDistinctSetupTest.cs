@@ -1,6 +1,6 @@
 using System;
 using System.Linq.Expressions;
-using NHibernate.FlowQuery.Core.SelectSetup;
+using NHibernate.FlowQuery.Core.Selection;
 using NHibernate.FlowQuery.Test.Setup.Dtos;
 using NHibernate.FlowQuery.Test.Setup.Entities;
 using NUnit.Framework;

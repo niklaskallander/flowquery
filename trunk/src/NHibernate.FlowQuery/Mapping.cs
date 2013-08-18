@@ -12,10 +12,10 @@ namespace NHibernate.FlowQuery
             m_Mapper = new DefaultMapper();
         }
 
-        public static TReturn Map<TSource, TReturn>(TSource source)
-             where TReturn : new()
+        public static TDestination Map<TSource, TDestination>(TSource source)
+             where TDestination : new()
         {
-            return m_Mapper.Map<TSource, TReturn>(source);
+            return m_Mapper.Map<TSource, TDestination>(source);
         }
 
         public static void SetMapper(IMapper mapper)

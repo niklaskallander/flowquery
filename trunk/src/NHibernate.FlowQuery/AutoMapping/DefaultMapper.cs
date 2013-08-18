@@ -6,15 +6,15 @@ namespace NHibernate.FlowQuery.AutoMapping
     {
         #region Methods (1)
 
-        protected virtual TReturn Map<TSource, TReturn>(TSource source)
-            where TReturn : new()
+        protected virtual TDestination Map<TSource, TDestination>(TSource source)
+            where TDestination : new()
         {
-            string[] properties = ReflectionHelper.GetNamesFromPublicToPublicTypeToTypeMappableProperties<TSource, TReturn>();
+            string[] properties = ReflectionHelper.GetNamesFromPublicToPublicTypeToTypeMappableProperties<TSource, TDestination>();
 
-            System.Type rType = typeof(TReturn);
+            System.Type rType = typeof(TDestination);
             System.Type sType = typeof(TSource);
 
-            TReturn item = new TReturn();
+            TDestination item = new TDestination();
             foreach (string property in properties)
             {
                 object value = sType.GetProperty(property).GetValue(source, null);
@@ -31,9 +31,9 @@ namespace NHibernate.FlowQuery.AutoMapping
 
         #region IMapper Members
 
-        TReturn IMapper.Map<TSource, TReturn>(TSource source)
+        TDestination IMapper.Map<TSource, TDestination>(TSource source)
         {
-            return Map<TSource, TReturn>(source);
+            return Map<TSource, TDestination>(source);
         }
 
         #endregion

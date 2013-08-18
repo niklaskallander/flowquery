@@ -70,7 +70,7 @@ namespace NHibernate.FlowQuery.Helpers
             return criteria;
         }
 
-        public static ICriteria BuildCriteria<TSource, TReturn>(QuerySelection query)
+        public static ICriteria BuildCriteria<TSource, TDestination>(QuerySelection query)
             where TSource : class
         {
             if (query == null)
@@ -128,7 +128,7 @@ namespace NHibernate.FlowQuery.Helpers
                     }
                     else if (query.Mappings != null)
                     {
-                        if (statement.ProjectionSourceType != typeof(TReturn))
+                        if (statement.ProjectionSourceType != typeof(TDestination))
                         {
                             throw new InvalidOperationException("unable to order by a projection property on a projection of a type other than the returned one.");
                         }

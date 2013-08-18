@@ -5,9 +5,9 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest.Mappers
 {
     public class AutoMapMapper : DefaultMapper
     {
-        protected override TReturn Map<TSource, TReturn>(TSource source)
+        protected override TDestination Map<TSource, TDestination>(TSource source)
         {
-            return Mapper.Map<TSource, TReturn>(source);
+            return Mapper.Map<TSource, TDestination>(source);
         }
     }
 }

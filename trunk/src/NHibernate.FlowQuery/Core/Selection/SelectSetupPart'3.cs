@@ -4,14 +4,14 @@ using System.Linq.Expressions;
 using NHibernate.Criterion;
 using NHibernate.FlowQuery.Helpers;
 
-namespace NHibernate.FlowQuery.Core.SelectSetup
+namespace NHibernate.FlowQuery.Core.Selection
 {
-    public class SelectSetupPart<TSource, TReturn> : ISelectSetupPart<TSource, TReturn>
+    public class SelectSetupPart<TSource, TDestination> : ISelectSetupPart<TSource, TDestination>
         where TSource : class
     {
         #region Constructors (1)
 
-        public SelectSetupPart(string forProperty, ISelectSetup<TSource, TReturn> setup, Dictionary<string, string> aliases)
+        public SelectSetupPart(string forProperty, ISelectSetup<TSource, TDestination> setup, Dictionary<string, string> aliases)
         {
             if (string.IsNullOrEmpty(forProperty))
             {
@@ -38,13 +38,13 @@ namespace NHibernate.FlowQuery.Core.SelectSetup
 
         private Dictionary<string, string> Aliases { get; set; }
 
-        private ISelectSetup<TSource, TReturn> Setup { get; set; }
+        private ISelectSetup<TSource, TDestination> Setup { get; set; }
 
         #endregion Properties
 
         #region Methods (4)
 
-        protected virtual ISelectSetup<TSource, TReturn> Use(string property)
+        protected virtual ISelectSetup<TSource, TDestination> Use(string property)
         {
             if (string.IsNullOrEmpty(property))
             {
@@ -54,7 +54,7 @@ namespace NHibernate.FlowQuery.Core.SelectSetup
             return Use(Projections.Property(property));
         }
 
-        protected virtual ISelectSetup<TSource, TReturn> Use(IProjection projection)
+        protected virtual ISelectSetup<TSource, TDestination> Use(IProjection projection)
         {
             if (projection == null)
             {
@@ -71,7 +71,7 @@ namespace NHibernate.FlowQuery.Core.SelectSetup
             return Setup;
         }
 
-        protected virtual ISelectSetup<TSource, TReturn> Use<TProjection>(Expression<Func<TSource, TProjection>> expression)
+        protected virtual ISelectSetup<TSource, TDestination> Use<TProjection>(Expression<Func<TSource, TProjection>> expression)
         {
             if (expression == null)
             {
@@ -87,19 +87,19 @@ namespace NHibernate.FlowQuery.Core.SelectSetup
 
 
 
-        #region IDistinctSetupPart<TSource, TReturn> Members
+        #region IDistinctSetupPart<TSource, TDestination> Members
 
-        ISelectSetup<TSource, TReturn> ISelectSetupPart<TSource, TReturn>.Use(string property)
+        ISelectSetup<TSource, TDestination> ISelectSetupPart<TSource, TDestination>.Use(string property)
         {
             return Use(property);
         }
 
-        ISelectSetup<TSource, TReturn> ISelectSetupPart<TSource, TReturn>.Use(IProjection projection)
+        ISelectSetup<TSource, TDestination> ISelectSetupPart<TSource, TDestination>.Use(IProjection projection)
         {
             return Use(projection);
         }
 
-        ISelectSetup<TSource, TReturn> ISelectSetupPart<TSource, TReturn>.Use<TProjection>(Expression<Func<TSource, TProjection>> expression)
+        ISelectSetup<TSource, TDestination> ISelectSetupPart<TSource, TDestination>.Use<TProjection>(Expression<Func<TSource, TProjection>> expression)
         {
             return Use(expression);
         }

@@ -5,17 +5,17 @@ namespace NHibernate.FlowQuery.ExtensionHelpers
     {
         #region Methods (8)
 
-        public static decimal Average<TReturn>(this TReturn property)
+        public static decimal Average<TDestination>(this TDestination property)
         {
             throw Exception();
         }
 
-        public static int Count<TReturn>(this TReturn property)
+        public static int Count<TDestination>(this TDestination property)
         {
             throw Exception();
         }
 
-        public static int CountDistinct<TReturn>(this TReturn property)
+        public static int CountDistinct<TDestination>(this TDestination property)
         {
             throw Exception();
         }
@@ -25,22 +25,22 @@ namespace NHibernate.FlowQuery.ExtensionHelpers
             return new InvalidOperationException("This is only a helper method for the NHibernate.FlowQuery API and should not be executed directly");
         }
 
-        public static TReturn GroupBy<TReturn>(this TReturn property)
+        public static TDestination GroupBy<TDestination>(this TDestination property)
         {
             throw Exception();
         }
 
-        public static TReturn Max<TReturn>(this TReturn property)
+        public static TDestination Max<TDestination>(this TDestination property)
         {
             throw Exception();
         }
 
-        public static TReturn Min<TReturn>(this TReturn property)
+        public static TDestination Min<TDestination>(this TDestination property)
         {
             throw Exception();
         }
 
-        public static TReturn Sum<TReturn>(this TReturn property)
+        public static TDestination Sum<TDestination>(this TDestination property)
         {
             throw Exception();
         }

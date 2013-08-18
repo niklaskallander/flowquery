@@ -8,15 +8,9 @@ namespace NHibernate.FlowQuery.Core.Implementors
     public class DetachedFlowQueryImplementor<TSource> : MorphableFlowQueryImplementorBase<TSource, IDetachedFlowQuery<TSource>>, IDetachedFlowQuery<TSource>
         where TSource : class
     {
-        #region Constructor
-
         protected internal DetachedFlowQueryImplementor(Func<System.Type, string, ICriteria> criteriaFactory, string alias = null, FlowQueryOptions options = null, IMorphableFlowQuery query = null)
             : base(criteriaFactory, alias, options, query)
         { }
-
-        #endregion
-
-        #region Projection
 
         public virtual IDetachedFlowQuery<TSource> Count()
         {
@@ -88,8 +82,6 @@ namespace NHibernate.FlowQuery.Core.Implementors
             return Project(expressions);
         }
 
-        #endregion
-
         public virtual DetachedCriteria Criteria
         {
             get { return CriteriaHelper.BuildDetachedCriteria<TSource>(this); }
@@ -110,8 +102,6 @@ namespace NHibernate.FlowQuery.Core.Implementors
             return this;
         }
 
-        #region Alterations
-
         IDelayedFlowQuery<TSource> IDetachedFlowQuery<TSource>.Delayed()
         {
             return base.Delayed();
@@ -121,7 +111,5 @@ namespace NHibernate.FlowQuery.Core.Implementors
         {
             return base.Immediate();
         }
-
-        #endregion
     }
 }

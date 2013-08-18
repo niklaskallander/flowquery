@@ -1,14 +1,14 @@
 ﻿using System;
+using System.Linq.Expressions;
 using NHibernate.FlowQuery.Core;
+using NHibernate.FlowQuery.Core.Implementors;
 using NHibernate.FlowQuery.Helpers;
+using NHibernate.FlowQuery.Test.Setup.Dtos;
 using NHibernate.FlowQuery.Test.Setup.Entities;
 using NUnit.Framework;
 
 namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
 {
-    using System.Linq.Expressions;
-    using NHibernate.FlowQuery.Core.Implementors;
-    using NHibernate.FlowQuery.Test.Setup.Dtos;
     using Is = NUnit.Framework.Is;
 
     [TestFixture]
@@ -231,9 +231,9 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
 
     internal class DummyQuery2 : MorphableFlowQueryImplementorBase<UserEntity, IDummyQuery2>, IDummyQuery2
     {
-        internal virtual DummyQuery2 XProject<TReturn>(Expression<Func<UserEntity, TReturn>> expression)
+        internal virtual DummyQuery2 XProject<TDestination>(Expression<Func<UserEntity, TDestination>> expression)
         {
-            base.ProjectWithConstruction<TReturn>(expression);
+            base.ProjectWithConstruction<TDestination>(expression);
 
             return this;
         }

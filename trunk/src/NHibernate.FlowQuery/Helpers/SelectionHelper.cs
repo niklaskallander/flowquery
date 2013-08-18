@@ -8,10 +8,10 @@ namespace NHibernate.FlowQuery.Helpers
 {
     public static class SelectionHelper
     {
-        public static FlowQuerySelection<TReturn> SelectList<TSource, TReturn>(QuerySelection query)
+        public static FlowQuerySelection<TDestination> SelectList<TSource, TDestination>(QuerySelection query)
             where TSource : class
         {
-            ICriteria criteria = CriteriaHelper.BuildCriteria<TSource, TReturn>(query);
+            ICriteria criteria = CriteriaHelper.BuildCriteria<TSource, TDestination>(query);
 
             if (query.Constructor != null)
             {
@@ -23,15 +23,15 @@ namespace NHibernate.FlowQuery.Helpers
                         ? criteria.Future<object>()
                         : (IEnumerable)criteria.List();
 
-                    return new FlowQuerySelection<TReturn>(() => ConstructionHelper.GetListByExpression<TReturn>(query.Constructor, enumerable));
+                    return new FlowQuerySelection<TDestination>(() => ConstructionHelper.GetListByExpression<TDestination>(query.Constructor, enumerable));
                 }
             }
 
-            IEnumerable<TReturn> selection = query.IsDelayed
-                ? criteria.Future<TReturn>()
-                : criteria.List<TReturn>();
+            IEnumerable<TDestination> selection = query.IsDelayed
+                ? criteria.Future<TDestination>()
+                : criteria.List<TDestination>();
 
-            return new FlowQuerySelection<TReturn>(() => selection);
+            return new FlowQuerySelection<TDestination>(() => selection);
         }
 
         public static Func<Dictionary<TKey, TValue>> SelectDictionary<TSource, TKey, TValue>(QuerySelection query)
@@ -42,19 +42,19 @@ namespace NHibernate.FlowQuery.Helpers
             return () => selection.ToDictionary(x => x.Key, x => x.Value);
         }
 
-        public static Func<TReturn> SelectValue<TSource, TReturn>(QuerySelection query)
+        public static Func<TDestination> SelectValue<TSource, TDestination>(QuerySelection query)
             where TSource : class
         {
-            ICriteria criteria = CriteriaHelper.BuildCriteria<TSource, TReturn>(query);
+            ICriteria criteria = CriteriaHelper.BuildCriteria<TSource, TDestination>(query);
 
             if (query.IsDelayed)
             {
-                var value = criteria.FutureValue<TReturn>();
+                var value = criteria.FutureValue<TDestination>();
 
                 return () => value.Value;
             }
 
-            return () => criteria.UniqueResult<TReturn>();
+            return () => criteria.UniqueResult<TDestination>();
         }
     }
 }

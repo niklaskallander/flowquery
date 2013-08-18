@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using NHibernate.Criterion;
-using NHibernate.FlowQuery.Core.SelectSetup;
+using NHibernate.FlowQuery.Core.Selection;
 using NHibernate.FlowQuery.Helpers;
 
 namespace NHibernate.FlowQuery.Core.Implementors
@@ -15,9 +15,9 @@ namespace NHibernate.FlowQuery.Core.Implementors
             : base(criteriaFactory, alias, options, query)
         { }
 
-        protected virtual FlowQuerySelection<TReturn> SelectList<TReturn>()
+        protected virtual FlowQuerySelection<TDestination> SelectList<TDestination>()
         {
-            return SelectionHelper.SelectList<TSource, TReturn>(QuerySelection.Create(this));
+            return SelectionHelper.SelectList<TSource, TDestination>(QuerySelection.Create(this));
         }
 
         protected virtual Func<Dictionary<TKey, TValue>> SelectDictionary<TKey, TValue>()
@@ -39,23 +39,23 @@ namespace NHibernate.FlowQuery.Core.Implementors
             return new Lazy<Dictionary<TKey, TValue>>(valueDelegate);
         }
 
-        protected virtual Func<TReturn> SelectValue<TReturn>()
+        protected virtual Func<TDestination> SelectValue<TDestination>()
         {
-            return SelectionHelper.SelectValue<TSource, TReturn>(QuerySelection.Create(this));
+            return SelectionHelper.SelectValue<TSource, TDestination>(QuerySelection.Create(this));
         }
 
-        protected virtual TReturn SelectImmediateValue<TReturn>()
+        protected virtual TDestination SelectImmediateValue<TDestination>()
         {
-            var valueDelegate = SelectValue<TReturn>();
+            var valueDelegate = SelectValue<TDestination>();
 
             return valueDelegate.Invoke();
         }
 
-        protected virtual Lazy<TReturn> SelectDelayedValue<TReturn>()
+        protected virtual Lazy<TDestination> SelectDelayedValue<TDestination>()
         {
-            var valueDelegate = SelectValue<TReturn>();
+            var valueDelegate = SelectValue<TDestination>();
 
-            return new Lazy<TReturn>(valueDelegate);
+            return new Lazy<TDestination>(valueDelegate);
         }
 
         public virtual FlowQuerySelection<TSource> Select()
@@ -68,16 +68,16 @@ namespace NHibernate.FlowQuery.Core.Implementors
             return SelectList<TSource>();
         }
 
-        public virtual ISelectSetup<TSource, TReturn> Select<TReturn>()
+        public virtual ISelectSetup<TSource, TDestination> Select<TDestination>()
         {
-            return new SelectSetup<TSource, TReturn>(Select<TReturn>, Aliases);
+            return new SelectSetup<TSource, TDestination>(Select<TDestination>, Aliases);
         }
 
-        public virtual FlowQuerySelection<TReturn> Select<TReturn>(ISelectSetup<TSource, TReturn> setup)
+        public virtual FlowQuerySelection<TDestination> Select<TDestination>(ISelectSetup<TSource, TDestination> setup)
         {
-            Project<TReturn>(setup);
+            Project<TDestination>(setup);
 
-            return SelectList<TReturn>();
+            return SelectList<TDestination>();
         }
 
         public virtual FlowQuerySelection<TSource> Select(params string[] properties)
@@ -101,18 +101,18 @@ namespace NHibernate.FlowQuery.Core.Implementors
             return SelectList<object>();
         }
 
-        public virtual FlowQuerySelection<TReturn> Select<TReturn>(IProjection projection)
+        public virtual FlowQuerySelection<TDestination> Select<TDestination>(IProjection projection)
         {
-            Project<TReturn>(projection);
+            Project<TDestination>(projection);
 
-            return SelectList<TReturn>();
+            return SelectList<TDestination>();
         }
 
-        public virtual FlowQuerySelection<TReturn> Select<TReturn>(PropertyProjection projection)
+        public virtual FlowQuerySelection<TDestination> Select<TDestination>(PropertyProjection projection)
         {
-            Project<TReturn>(projection);
+            Project<TDestination>(projection);
 
-            return SelectList<TReturn>();
+            return SelectList<TDestination>();
         }
 
         public virtual FlowQuerySelection<TSource> Select(params Expression<Func<TSource, object>>[] properties)
@@ -122,11 +122,33 @@ namespace NHibernate.FlowQuery.Core.Implementors
             return SelectList<TSource>();
         }
 
-        public virtual FlowQuerySelection<TReturn> Select<TReturn>(Expression<Func<TSource, TReturn>> expression)
+        public virtual FlowQuerySelection<TDestination> Select<TDestination>(Expression<Func<TSource, TDestination>> expression)
         {
-            Project<TReturn>(expression);
+            Project<TDestination>(expression);
 
-            return SelectList<TReturn>();
+            return SelectList<TDestination>();
+        }
+
+        public virtual FlowQuerySelection<TDestination> Select<TDestination>(PartialSelection<TSource, TDestination> combiner)
+        {
+            if (combiner == null)
+            {
+                throw new ArgumentNullException("combiner");
+            }
+
+            if (combiner.Count == 0)
+            {
+                throw new ArgumentException("No projection is made in ExpressionCombiner'2", "combiner");
+            }
+
+            Expression<Func<TSource, TDestination>> expression = combiner.Compile();
+
+            return Select<TDestination>(expression);
+        }
+
+        public virtual PartialSelection<TSource, TDestination> PartialSelect<TDestination>(Expression<Func<TSource, TDestination>> expression = null)
+        {
+            return new PartialSelection<TSource, TDestination>(Select).Add(expression);
         }
 
         public abstract bool IsDelayed { get; }

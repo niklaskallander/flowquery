@@ -23,19 +23,19 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest.Mappers
 
         #region Methods (3)
 
-        public virtual void AddMap<TSource, TReturn>(Func<TSource, TReturn> mappingDelegate)
-            where TReturn : new()
+        public virtual void AddMap<TSource, TDestination>(Func<TSource, TDestination> mappingDelegate)
+            where TDestination : new()
         {
             if (!m_Maps.ContainsKey(typeof(TSource)))
             {
                 m_Maps.Add(typeof(TSource), new Dictionary<System.Type, Delegate>());
             }
-            m_Maps[typeof(TSource)].Add(typeof(TReturn), mappingDelegate);
+            m_Maps[typeof(TSource)].Add(typeof(TDestination), mappingDelegate);
         }
 
-        protected override TReturn Map<TSource, TReturn>(TSource source)
+        protected override TDestination Map<TSource, TDestination>(TSource source)
         {
-            Func<TSource, TReturn> mappingDelegate = m_Maps[typeof(TSource)][typeof(TReturn)] as Func<TSource, TReturn>;
+            Func<TSource, TDestination> mappingDelegate = m_Maps[typeof(TSource)][typeof(TDestination)] as Func<TSource, TDestination>;
 
             return mappingDelegate(source);
         }

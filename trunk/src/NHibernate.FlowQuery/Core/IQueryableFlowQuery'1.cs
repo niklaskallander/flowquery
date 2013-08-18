@@ -1,18 +1,16 @@
 ﻿using System;
 using System.Linq.Expressions;
 using NHibernate.Criterion;
-using NHibernate.FlowQuery.Core.SelectSetup;
+using NHibernate.FlowQuery.Core.Selection;
 
 namespace NHibernate.FlowQuery.Core
 {
     public interface IQueryableFlowQuery<TSource>
         where TSource : class
     {
-        #region Select
-
         FlowQuerySelection<TSource> Select();
 
-        ISelectSetup<TSource, TReturn> Select<TReturn>();
+        ISelectSetup<TSource, TDestination> Select<TDestination>();
 
         FlowQuerySelection<TSource> Select(params string[] properties);
 
@@ -20,16 +18,18 @@ namespace NHibernate.FlowQuery.Core
 
         FlowQuerySelection<object> Select(PropertyProjection projection);
 
-        FlowQuerySelection<TReturn> Select<TReturn>(IProjection projection);
+        FlowQuerySelection<TDestination> Select<TDestination>(IProjection projection);
 
-        FlowQuerySelection<TReturn> Select<TReturn>(PropertyProjection projection);
+        FlowQuerySelection<TDestination> Select<TDestination>(PropertyProjection projection);
 
         FlowQuerySelection<TSource> Select(params Expression<Func<TSource, object>>[] properties);
 
-        FlowQuerySelection<TReturn> Select<TReturn>(Expression<Func<TSource, TReturn>> expression);
+        FlowQuerySelection<TDestination> Select<TDestination>(Expression<Func<TSource, TDestination>> expression);
 
-        FlowQuerySelection<TReturn> Select<TReturn>(ISelectSetup<TSource, TReturn> setup);
+        FlowQuerySelection<TDestination> Select<TDestination>(ISelectSetup<TSource, TDestination> setup);
 
-        #endregion
+        FlowQuerySelection<TDestination> Select<TDestination>(PartialSelection<TSource, TDestination> combiner);
+
+        PartialSelection<TSource, TDestination> PartialSelect<TDestination>(Expression<Func<TSource, TDestination>> expression = null);
     }
 }

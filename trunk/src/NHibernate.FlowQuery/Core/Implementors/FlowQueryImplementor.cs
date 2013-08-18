@@ -15,8 +15,6 @@ namespace NHibernate.FlowQuery.Core.Implementors
         where TSource : class
         where TFlowQuery : class, IFlowQuery<TSource, TFlowQuery>
     {
-        #region Constructor
-
         protected internal FlowQueryImplementor(Func<System.Type, string, ICriteria> criteriaFactory, string alias = null, FlowQueryOptions options = null, IFlowQuery query = null)
         {
             Query = this as TFlowQuery;
@@ -76,10 +74,6 @@ namespace NHibernate.FlowQuery.Core.Implementors
         public virtual Func<System.Type, string, ICriteria> CriteriaFactory { get; private set; }
 
         protected internal virtual TFlowQuery Query { get; private set; }
-
-        #endregion
-
-        #region Where / And
 
         public virtual TFlowQuery Where(params ICriterion[] criterions)
         {
@@ -172,10 +166,6 @@ namespace NHibernate.FlowQuery.Core.Implementors
 
         public virtual List<ICriterion> Criterions { get; private set; }
 
-        #endregion
-
-        #region Joins
-
         public virtual IJoinBuilder<TSource, TFlowQuery> Inner { get; private set; }
 
         public virtual IJoinBuilder<TSource, TFlowQuery> LeftOuter { get; private set; }
@@ -188,19 +178,11 @@ namespace NHibernate.FlowQuery.Core.Implementors
 
         public virtual List<Join> Joins { get; private set; }
 
-        #endregion
-
-        #region Orders
-
         public virtual IOrderBuilder<TSource, TFlowQuery> Order { get; private set; }
 
         public virtual IOrderBuilder<TSource, TFlowQuery> Then { get; private set; }
 
         public virtual List<OrderByStatement> Orders { get; private set; }
-
-        #endregion
-
-        #region Take / Skip / Limit
 
         public virtual TFlowQuery Limit(int limit)
         {
@@ -229,7 +211,5 @@ namespace NHibernate.FlowQuery.Core.Implementors
         public virtual int? ResultsToSkip { get; private set; }
 
         public virtual int? ResultsToTake { get; private set; }
-
-        #endregion
     }
 }
