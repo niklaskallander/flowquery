@@ -5,12 +5,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NHibernate.FlowQuery", "NHi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NHibernate.FlowQuery.Test", "NHibernate.FlowQuery.Test\NHibernate.FlowQuery.Test.csproj", "{B32A2715-CD50-43F5-89BD-EB34D6C0E4E3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NHibernate.FlowQuery.Example", "NHibernate.FlowQuery.Example\NHibernate.FlowQuery.Example.csproj", "{FE356D30-0D18-4B09-81B4-1C2A42A0762A}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{77724169-C975-46E7-B207-273434110B40}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RemoveSvnFootPrints", "Tools\RemoveSvnFootPrints\RemoveSvnFootPrints.csproj", "{90951C9B-EE67-4083-A341-EAB44283018E}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{576156D2-9809-4259-8DFC-EC1DD689BA2F}"
 	ProjectSection(SolutionItems) = preProject
 		CHANGES.txt = CHANGES.txt
@@ -47,35 +41,12 @@ Global
 		{B32A2715-CD50-43F5-89BD-EB34D6C0E4E3}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{B32A2715-CD50-43F5-89BD-EB34D6C0E4E3}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{B32A2715-CD50-43F5-89BD-EB34D6C0E4E3}.Release|x86.ActiveCfg = Release|Any CPU
-		{FE356D30-0D18-4B09-81B4-1C2A42A0762A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FE356D30-0D18-4B09-81B4-1C2A42A0762A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FE356D30-0D18-4B09-81B4-1C2A42A0762A}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{FE356D30-0D18-4B09-81B4-1C2A42A0762A}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{FE356D30-0D18-4B09-81B4-1C2A42A0762A}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{FE356D30-0D18-4B09-81B4-1C2A42A0762A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FE356D30-0D18-4B09-81B4-1C2A42A0762A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FE356D30-0D18-4B09-81B4-1C2A42A0762A}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{FE356D30-0D18-4B09-81B4-1C2A42A0762A}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{FE356D30-0D18-4B09-81B4-1C2A42A0762A}.Release|x86.ActiveCfg = Release|Any CPU
-		{90951C9B-EE67-4083-A341-EAB44283018E}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{90951C9B-EE67-4083-A341-EAB44283018E}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
-		{90951C9B-EE67-4083-A341-EAB44283018E}.Debug|Mixed Platforms.Build.0 = Debug|x86
-		{90951C9B-EE67-4083-A341-EAB44283018E}.Debug|x86.ActiveCfg = Debug|x86
-		{90951C9B-EE67-4083-A341-EAB44283018E}.Debug|x86.Build.0 = Debug|x86
-		{90951C9B-EE67-4083-A341-EAB44283018E}.Release|Any CPU.ActiveCfg = Release|x86
-		{90951C9B-EE67-4083-A341-EAB44283018E}.Release|Mixed Platforms.ActiveCfg = Release|x86
-		{90951C9B-EE67-4083-A341-EAB44283018E}.Release|Mixed Platforms.Build.0 = Release|x86
-		{90951C9B-EE67-4083-A341-EAB44283018E}.Release|x86.ActiveCfg = Release|x86
-		{90951C9B-EE67-4083-A341-EAB44283018E}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{90951C9B-EE67-4083-A341-EAB44283018E} = {77724169-C975-46E7-B207-273434110B40}
-	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		CodeStyleEnforcer_RulesLocation = 
 		CodeStyleEnforcer_Active = 0
+		CodeStyleEnforcer_RulesLocation = 
 	EndGlobalSection
 EndGlobal
