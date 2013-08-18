@@ -10,7 +10,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.ExtensionHelpers
     [TestFixture]
     public class AggregateExtensionsTest : BaseTest
     {
-		#region Methods (14) 
+        #region Methods (14)
 
         [Test]
         public void AverageThrowsWhenCalledOutsideLambdaExpression()
@@ -22,9 +22,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.ExtensionHelpers
         public void CanAggregateAverage()
         {
             var avgs = Query<UserEntity>()
-                .Select(u => u.Id.Average());
+                .Select(u => u.Id.Average())
+                ;
 
             Assert.That(avgs, Is.Not.Empty);
+
             foreach (var avg in avgs)
             {
                 Assert.That(avg, Is.EqualTo(2.5M));
@@ -35,9 +37,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.ExtensionHelpers
         public void CanAggregateCount()
         {
             var counts = Query<UserEntity>()
-                .Select(u => u.Id.Count());
+                .Select(u => u.Id.Count())
+                ;
 
             Assert.That(counts, Is.Not.Empty);
+
             foreach (var count in counts)
             {
                 Assert.That(count, Is.EqualTo(4));
@@ -48,9 +52,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.ExtensionHelpers
         public void CanAggregateDistinctCount()
         {
             var counts = Query<UserEntity>()
-                .Select(u => u.Setting.Id.CountDistinct());
+                .Select(u => u.Setting.Id.CountDistinct())
+                ;
 
             Assert.That(counts, Is.Not.Empty);
+
             foreach (var count in counts)
             {
                 Assert.That(count, Is.EqualTo(1));
@@ -65,9 +71,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.ExtensionHelpers
                         {
                             Count = u.Id.Count(),
                             Username = u.Username.GroupBy()
-                        });
+                        })
+                        ;
 
             Assert.That(counts, Is.Not.Empty);
+
             foreach (var count in counts)
             {
                 Assert.That(count.Count, Is.EqualTo(1));
@@ -78,9 +86,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.ExtensionHelpers
         public void CanAggregateMax()
         {
             var maxs = Query<UserEntity>()
-                .Select(u => u.Id.Max());
+                .Select(u => u.Id.Max())
+                ;
 
             Assert.That(maxs, Is.Not.Empty);
+
             foreach (var max in maxs)
             {
                 Assert.That(max, Is.EqualTo(4));
@@ -91,9 +101,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.ExtensionHelpers
         public void CanAggregateMin()
         {
             var mins = Query<UserEntity>()
-                .Select(u => u.Id.Min());
+                .Select(u => u.Id.Min())
+                ;
 
             Assert.That(mins, Is.Not.Empty);
+
             foreach (var min in mins)
             {
                 Assert.That(min, Is.EqualTo(1));
@@ -104,9 +116,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.ExtensionHelpers
         public void CanAggregateSum()
         {
             var sums = Query<UserEntity>()
-                .Select(u => u.Id.Sum());
+                .Select(u => u.Id.Sum())
+                ;
 
             Assert.That(sums, Is.Not.Empty);
+
             foreach (var sum in sums)
             {
                 Assert.That(sum, Is.EqualTo(10));
@@ -149,6 +163,6 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.ExtensionHelpers
             Assert.That(() => { "".Sum(); }, Throws.InstanceOf<InvalidOperationException>());
         }
 
-		#endregion Methods 
+        #endregion Methods
     }
 }

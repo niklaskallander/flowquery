@@ -11,7 +11,19 @@ namespace NHibernate.FlowQuery.Test
     [TestFixture]
     public class DetachedCriteriaExtensionTest : BaseTest
     {
-		#region Methods (1) 
+        #region Methods (1)
+
+        //[Test]
+        //public void ObsoleteVersionThrows()
+        //{
+        //    DetachedCriteria criteria = null;
+
+        //    Assert.That(() =>
+        //                {
+        //                    criteria.SubQuery<UserEntity>();
+
+        //                }, Throws.InstanceOf<InvalidOperationException>());
+        //}
 
         [Test]
         public void CanCreateSubQueryFromDetachedCriteria()
@@ -21,13 +33,14 @@ namespace NHibernate.FlowQuery.Test
                 .SetProjection(Projections.Property("Id"));
 
             var users = Query<UserEntity>()
-                .Where(x => x.Id, QIs.In(criteria.SubQuery<UserEntity>()))
-                .Select();
+                .Where(x => x.Id, QIs.In(criteria.DetachedFlowQuery()))
+                .Select()
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(1));
             Assert.That(users.First().Id, Is.EqualTo(2));
         }
 
-		#endregion Methods 
+        #endregion Methods
     }
 }

@@ -3,11 +3,11 @@ using NHibernate.FlowQuery.Core;
 
 namespace NHibernate.FlowQuery.Expressions.SubqueryExpressions
 {
-    public class IsLessThanOrEqualToAllSubqueryExpression<TSource> : SimpleIsExpression
+    public class IsLessThanOrEqualToAllSubqueryExpression : SubqueryIsExpressionBase
     {
         #region Constructors (1)
 
-        public IsLessThanOrEqualToAllSubqueryExpression(ISubFlowQuery<TSource> value)
+        public IsLessThanOrEqualToAllSubqueryExpression(IDetachedImmutableFlowQuery value)
             : base(value)
         { }
 
@@ -17,7 +17,7 @@ namespace NHibernate.FlowQuery.Expressions.SubqueryExpressions
 
         public override ICriterion Compile(string property)
         {
-            return Subqueries.PropertyLeAll(property, (Value as SubFlowQueryImpl<TSource>).Criteria);
+            return Subqueries.PropertyLeAll(property, Query.Criteria);
         }
 
         #endregion Methods

@@ -1,14 +1,14 @@
 using System;
-using System.Linq;
 using System.Linq.Expressions;
 using NHibernate.Criterion;
-using NHibernate.FlowQuery.Core;
 using NHibernate.FlowQuery.Test.Setup.Dtos;
 using NHibernate.FlowQuery.Test.Setup.Entities;
 using NUnit.Framework;
 
 namespace NHibernate.FlowQuery.Test.FlowQuery.Core
 {
+    using System.Linq;
+    using NHibernate.FlowQuery.Core.SelectSetup;
     using Is = NUnit.Framework.Is;
 
     [TestFixture]
@@ -19,7 +19,9 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core
         [Test]
         public void CanConstruct()
         {
-            var setup = new SelectSetup<UserEntity, UserDto>(Query<UserEntity>(), null);
+            var setup = Query<UserEntity>()
+                .Select<UserDto>()
+                    ;
 
             var part = new SelectSetupPart<UserEntity, UserDto>("IsOnline", setup, null);
 
@@ -30,9 +32,10 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core
         public void CanUseExpressionInUseCall()
         {
             var users = Query<UserEntity>()
-                .SelectDistinct<UserDto>()
+                .Distinct().Select<UserDto>()
                     .For(x => x.IsOnline).Use(x => x.IsOnline)
-                    .Select();
+                    .Select()
+                    ;
 
             Assert.That(users.Count(), Is.EqualTo(2));
             Assert.That(users.First().IsOnline, Is.False);
@@ -43,9 +46,10 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core
         public void CanUseProjectionInUseCall()
         {
             var users = Query<UserEntity>()
-                .SelectDistinct<UserDto>()
+                .Distinct().Select<UserDto>()
                     .For(x => x.IsOnline).Use(Projections.Property("IsOnline"))
-                    .Select();
+                    .Select()
+                    ;
 
             Assert.That(users.Count(), Is.EqualTo(2));
             Assert.That(users.First().IsOnline, Is.False);
@@ -56,28 +60,32 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core
         public void ConstructorThrowsIfSetupIsNull()
         {
             Assert.That(() =>
-            {
-                new SelectSetupPart<UserEntity, UserDto>("IsOnline", null, null);
+                        {
+                            new SelectSetupPart<UserEntity, UserDto>("IsOnline", null, null);
 
-            }, Throws.InstanceOf<ArgumentNullException>());
+                        }, Throws.InstanceOf<ArgumentNullException>());
         }
 
         [Test]
         public void ConstructorThrowsIfStringIsEmpty()
         {
-            var setup = new SelectSetup<UserEntity, UserDto>(Query<UserEntity>(), null);
+            var setup = Query<UserEntity>()
+                .Select<UserDto>()
+                    ;
 
             Assert.That(() =>
-            {
-                new SelectSetupPart<UserEntity, UserDto>(string.Empty, setup, null);
+                        {
+                            new SelectSetupPart<UserEntity, UserDto>(string.Empty, setup, null);
 
-            }, Throws.ArgumentException);
+                        }, Throws.ArgumentException);
         }
 
         [Test]
         public void ConstructorThrowsIfStringIsNull()
         {
-            var setup = new SelectSetup<UserEntity, UserDto>(Query<UserEntity>(), null);
+            var setup = Query<UserEntity>()
+                .Select<UserDto>()
+                    ;
 
             Assert.That(() =>
                         {
@@ -90,14 +98,14 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core
         public void UseThrowsIfExpressionIsNull()
         {
             Assert.That(() =>
-            {
-                Expression<Func<UserEntity, object>> e = null;
+                        {
+                            Expression<Func<UserEntity, object>> e = null;
 
-                Query<UserEntity>()
-                    .SelectDistinct<UserDto>()
-                        .For(x => x.IsOnline).Use(e);
+                            Query<UserEntity>()
+                                .Distinct().Select<UserDto>()
+                                    .For(x => x.IsOnline).Use(e);
 
-            }, Throws.InstanceOf<ArgumentNullException>());
+                        }, Throws.InstanceOf<ArgumentNullException>());
         }
 
         [Test]
@@ -108,7 +116,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core
                             IProjection p = null;
 
                             Query<UserEntity>()
-                                .SelectDistinct<UserDto>()
+                                .Distinct().Select<UserDto>()
                                     .For(x => x.IsOnline).Use(p);
 
                         }, Throws.InstanceOf<ArgumentNullException>());

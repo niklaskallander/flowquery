@@ -1,10 +1,10 @@
-using System.Linq;
 using NHibernate.FlowQuery.Test.Setup.Entities;
 using NUnit.Framework;
 
 namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
 {
     using System;
+    using System.Linq;
     using NHibernate.Criterion;
     using NHibernate.FlowQuery.Test.Setup.Dtos;
     using Is = NUnit.Framework.Is;
@@ -18,8 +18,9 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void CanOrderAscending()
         {
             var users = Query<UserEntity>()
-                .OrderBy(u => u.Firstname)
-                .Select();
+                .Order.By(u => u.Firstname)
+                .Select()
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(4));
             Assert.That(users.ElementAt(0).Firstname, Is.EqualTo("Kossan"));
@@ -32,8 +33,9 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void CanOrderAscendingUsingProjection()
         {
             var users = Query<UserEntity>()
-                .OrderBy(Projections.Property("Firstname"))
-                .Select();
+                .Order.By(Projections.Property("Firstname"))
+                .Select()
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(4));
             Assert.That(users.ElementAt(0).Firstname, Is.EqualTo("Kossan"));
@@ -46,8 +48,9 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void CanOrderAscendingUsingString()
         {
             var users = Query<UserEntity>()
-                .OrderBy("Firstname")
-                .Select();
+                .Order.By("Firstname")
+                .Select()
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(4));
             Assert.That(users.ElementAt(0).Firstname, Is.EqualTo("Kossan"));
@@ -60,11 +63,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void CanOrderByProjectionPropertyAscending()
         {
             var users = Query<UserEntity>()
-                .OrderBy<UserDto>(x => x.SomeValue)
+                .Order.By<UserDto>(x => x.SomeValue)
                 .Select(x => new UserDto()
                 {
                     SomeValue = x.Firstname + " " + x.Lastname
-                });
+                })
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(4));
             Assert.That(users.ElementAt(0).SomeValue, Is.EqualTo("Kossan Muu"));
@@ -77,11 +81,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void CanOrderByProjectionPropertyAscendingUsingString()
         {
             var users = Query<UserEntity>()
-                .OrderBy<UserDto>("SomeValue")
+                .Order.By<UserDto>("SomeValue")
                 .Select(x => new UserDto()
                 {
                     SomeValue = x.Firstname
-                });
+                })
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(4));
             Assert.That(users.ElementAt(0).SomeValue, Is.EqualTo("Kossan"));
@@ -94,11 +99,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void CanOrderByProjectionPropertyDescending()
         {
             var users = Query<UserEntity>()
-                .OrderByDescending<UserDto>(x => x.SomeValue)
+                .Order.ByDescending<UserDto>(x => x.SomeValue)
                 .Select(x => new UserDto()
                 {
                     SomeValue = x.Firstname
-                });
+                })
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(4));
             Assert.That(users.ElementAt(0).SomeValue, Is.EqualTo("Niklas"));
@@ -111,11 +117,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void CanOrderByProjectionPropertyDescendingUsingString()
         {
             var users = Query<UserEntity>()
-                .OrderByDescending<UserDto>("SomeValue")
+                .Order.ByDescending<UserDto>("SomeValue")
                 .Select(x => new UserDto()
                 {
                     SomeValue = x.Firstname
-                });
+                })
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(4));
             Assert.That(users.ElementAt(0).SomeValue, Is.EqualTo("Niklas"));
@@ -128,8 +135,9 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void CanOrderDescending()
         {
             var users = Query<UserEntity>()
-                .OrderByDescending(u => u.Firstname)
-                .Select();
+                .Order.ByDescending(u => u.Firstname)
+                .Select()
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(4));
             Assert.That(users.ElementAt(0).Firstname, Is.EqualTo("Niklas"));
@@ -142,8 +150,9 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void CanOrderDescendingUsingProjection()
         {
             var users = Query<UserEntity>()
-                .OrderByDescending(Projections.Property("Firstname"))
-                .Select();
+                .Order.ByDescending(Projections.Property("Firstname"))
+                .Select()
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(4));
             Assert.That(users.ElementAt(0).Firstname, Is.EqualTo("Niklas"));
@@ -156,8 +165,9 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void CanOrderDescendingUsingString()
         {
             var users = Query<UserEntity>()
-                .OrderByDescending("Firstname")
-                .Select();
+                .Order.ByDescending("Firstname")
+                .Select()
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(4));
             Assert.That(users.ElementAt(0).Firstname, Is.EqualTo("Niklas"));
@@ -172,11 +182,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
             Assert.That(() =>
                         {
                             Query<UserEntity>()
-                                .OrderBy<UserDto>(x => x.SomeValue)
+                                .Order.By<UserDto>(x => x.SomeValue)
                                 .Select(x => new UserDto()
                                 {
                                     Username = x.Firstname
-                                });
+                                })
+                                ;
 
                         }, Throws.InstanceOf<InvalidOperationException>());
         }
@@ -185,15 +196,16 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void OrderByProjectionWithoutProjectingToProjectionTypeThrows()
         {
             Assert.That(() =>
-            {
-                Query<UserEntity>()
-                    .OrderBy<UserDto>(x => x.SomeValue)
-                    .Select(x => new UserEntity()
-                    {
-                        Username = x.Firstname
-                    });
+                        {
+                            Query<UserEntity>()
+                                .Order.By<UserDto>(x => x.SomeValue)
+                                .Select(x => new UserEntity()
+                                {
+                                    Username = x.Firstname
+                                })
+                                ;
 
-            }, Throws.InstanceOf<InvalidOperationException>());
+                        }, Throws.InstanceOf<InvalidOperationException>());
         }
 
         #endregion Methods

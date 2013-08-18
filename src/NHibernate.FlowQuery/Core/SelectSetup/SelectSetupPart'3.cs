@@ -4,14 +4,14 @@ using System.Linq.Expressions;
 using NHibernate.Criterion;
 using NHibernate.FlowQuery.Helpers;
 
-namespace NHibernate.FlowQuery.Core
+namespace NHibernate.FlowQuery.Core.SelectSetup
 {
     public class SelectSetupPart<TSource, TReturn> : ISelectSetupPart<TSource, TReturn>
         where TSource : class
     {
         #region Constructors (1)
 
-        public SelectSetupPart(string forProperty, ISelectSetup<TSource, TReturn> setup, Dictionary<string, string> propertyAliases)
+        public SelectSetupPart(string forProperty, ISelectSetup<TSource, TReturn> setup, Dictionary<string, string> aliases)
         {
             if (string.IsNullOrEmpty(forProperty))
             {
@@ -23,7 +23,10 @@ namespace NHibernate.FlowQuery.Core
                 throw new ArgumentNullException("setup");
             }
 
+            Aliases = aliases;
+
             ForProperty = forProperty;
+
             Setup = setup;
         }
 
@@ -33,7 +36,7 @@ namespace NHibernate.FlowQuery.Core
 
         private string ForProperty { get; set; }
 
-        private Dictionary<string, string> PropertyAliases { get; set; }
+        private Dictionary<string, string> Aliases { get; set; }
 
         private ISelectSetup<TSource, TReturn> Setup { get; set; }
 
@@ -75,7 +78,7 @@ namespace NHibernate.FlowQuery.Core
                 throw new ArgumentNullException("expression");
             }
 
-            IProjection projection = ProjectionHelper.GetProjection(expression.Body, expression.Parameters[0].Name, PropertyAliases);
+            IProjection projection = ProjectionHelper.GetProjection(expression.Body, expression.Parameters[0].Name, Aliases);
 
             return Use(projection);
         }
@@ -84,7 +87,7 @@ namespace NHibernate.FlowQuery.Core
 
 
 
-        #region IDistinctSetupPart<TSource,TReturn> Members
+        #region IDistinctSetupPart<TSource, TReturn> Members
 
         ISelectSetup<TSource, TReturn> ISelectSetupPart<TSource, TReturn>.Use(string property)
         {

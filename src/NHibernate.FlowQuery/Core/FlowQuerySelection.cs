@@ -7,13 +7,21 @@ namespace NHibernate.FlowQuery.Core
 {
     public class FlowQuerySelection<TSource> : IEnumerable<TSource>
     {
-        #region Fields (1)
-
         private IEnumerable<TSource> m_Selection;
 
-        #endregion Fields
+        private readonly Func<IEnumerable<TSource>> m_DelayedSelection;
 
-        #region Constructors (1)
+        public FlowQuerySelection(Func<IEnumerable<TSource>> delayedSelection)
+        {
+            if (delayedSelection == null)
+            {
+                throw new ArgumentNullException("delayedSelection");
+            }
+
+            m_DelayedSelection = delayedSelection;
+
+            IsDelayed = true;
+        }
 
         public FlowQuerySelection(IEnumerable<TSource> selection)
         {
@@ -23,25 +31,46 @@ namespace NHibernate.FlowQuery.Core
             }
 
             m_Selection = selection;
+
+            IsDelayed = false;
         }
 
-        #endregion Constructors
+        public virtual bool IsDelayed { get; private set; }
 
-        #region Methods (2)
+        protected virtual IEnumerable<TSource> Selection
+        {
+            get
+            {
+                if (m_Selection == null)
+                {
+                    if (IsDelayed && m_DelayedSelection != null)
+                    {
+                        m_Selection = m_DelayedSelection();
+                    }
+                }
+
+                return m_Selection;
+            }
+        }
 
         public virtual FlowQuerySelection<TReturn> ToMap<TReturn>()
             where TReturn : new()
         {
-            IEnumerable<TReturn> mapped = from item
-                                          in m_Selection
-                                          select Mapping.Map<TSource, TReturn>(item);
+            IEnumerable<TSource> currentSelection = Selection;
 
-            return new FlowQuerySelection<TReturn>(mapped);
+            IEnumerable<TReturn> delayedSelection = new FlowQuerySelection<TReturn>(() =>
+
+                from item
+                in currentSelection
+                select Mapping.Map<TSource, TReturn>(item)
+            );
+
+            return new FlowQuerySelection<TReturn>(delayedSelection);
         }
 
         protected virtual IEnumerator<TSource> GetEnumerator()
         {
-            return m_Selection.GetEnumerator();
+            return Selection.GetEnumerator();
         }
 
         public static implicit operator List<TSource>(FlowQuerySelection<TSource> selection)
@@ -51,29 +80,27 @@ namespace NHibernate.FlowQuery.Core
                 return null;
             }
 
-            return new List<TSource>(selection.m_Selection);
+            return new List<TSource>(selection.Selection);
         }
-
-        #endregion Methods
 
         public static implicit operator TSource(FlowQuerySelection<TSource> selection)
         {
-            if (selection == null || selection.m_Selection == null || selection.m_Selection.Count() == 0)
+            if (selection == null || selection.Selection == null)
             {
                 return default(TSource);
             }
 
-            return selection.m_Selection.First();
+            return selection.Selection.FirstOrDefault();
         }
 
         public static implicit operator TSource[](FlowQuerySelection<TSource> selection)
         {
-            if (selection == null || selection.m_Selection == null)
+            if (selection == null || selection.Selection == null)
             {
                 return null;
             }
 
-            return selection.m_Selection.ToArray();
+            return selection.Selection.ToArray();
         }
 
         #region IEnumerable<TSource> Members

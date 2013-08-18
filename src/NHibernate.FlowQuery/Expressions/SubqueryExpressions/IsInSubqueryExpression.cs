@@ -3,11 +3,11 @@ using NHibernate.FlowQuery.Core;
 
 namespace NHibernate.FlowQuery.Expressions.SubqueryExpressions
 {
-    public class IsInSubqueryExpression<TSource> : SimpleIsExpression
+    public class IsInSubqueryExpression : SubqueryIsExpressionBase
     {
         #region Constructors (1)
 
-        public IsInSubqueryExpression(ISubFlowQuery<TSource> value)
+        public IsInSubqueryExpression(IDetachedImmutableFlowQuery value)
             : base(value)
         { }
 
@@ -17,7 +17,7 @@ namespace NHibernate.FlowQuery.Expressions.SubqueryExpressions
 
         public override ICriterion Compile(string property)
         {
-            return Subqueries.PropertyIn(property, (Value as SubFlowQueryImpl<TSource>).Criteria);
+            return Subqueries.PropertyIn(property, Query.Criteria);
         }
 
         #endregion Methods

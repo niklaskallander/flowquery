@@ -14,8 +14,9 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public virtual void CanSelectToDictionary()
         {
             Dictionary<long, string> userDictionary = Query<UserEntity>()
-                .OrderBy(x => x.Id)
-                .SelectDictionary(x => x.Id, x => x.Username);
+                .Order.By(x => x.Id)
+                .SelectDictionary(x => x.Id, x => x.Username)
+                ;
 
             Assert.That(userDictionary.Count, Is.EqualTo(4));
             Assert.That(userDictionary.ElementAt(0).Key, Is.EqualTo(1));

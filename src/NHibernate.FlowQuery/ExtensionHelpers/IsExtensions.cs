@@ -6,7 +6,7 @@ namespace NHibernate.FlowQuery.ExtensionHelpers
 {
     public static class IsExtensions
     {
-		#region Methods (13) 
+        #region Methods (13)
 
         private static InvalidOperationException Exception()
         {
@@ -33,7 +33,7 @@ namespace NHibernate.FlowQuery.ExtensionHelpers
             throw Exception();
         }
 
-        public static bool IsIn<TSource, TProperty>(this TProperty property, ISubFlowQuery<TSource> query)
+        public static bool IsIn<TProperty>(this TProperty property, IDetachedImmutableFlowQuery query)
         {
             throw Exception();
         }
@@ -43,8 +43,7 @@ namespace NHibernate.FlowQuery.ExtensionHelpers
             throw Exception();
         }
 
-        public static bool IsIn<TProperty, TEnumerable>(this TProperty property, TEnumerable value)
-            where TEnumerable : IEnumerable
+        public static bool IsIn<TProperty>(this TProperty property, IEnumerable value)
         {
             throw Exception();
         }
@@ -74,6 +73,6 @@ namespace NHibernate.FlowQuery.ExtensionHelpers
             throw Exception();
         }
 
-		#endregion Methods 
+        #endregion Methods
     }
 }

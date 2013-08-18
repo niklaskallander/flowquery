@@ -187,22 +187,22 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
             Expression<Func<UserDto, object>> expression = null;
 
             Assert.That(() =>
-            {
-                ExpressionHelper.IsRooted(expression, "x", null);
+                        {
+                            ExpressionHelper.IsRooted(expression, "x", null);
 
-            }, Throws.InstanceOf<ArgumentNullException>());
+                        }, Throws.InstanceOf<ArgumentNullException>());
         }
 
         [Test]
-        public void IsRootedThrowsIfExpectedRootIsNull()
+        public void IsRootedDoesNotThrowIfExpectedRootIsNull()
         {
             Expression<Func<UserDto, object>> expression = x => x.Id;
 
             Assert.That(() =>
-            {
-                ExpressionHelper.IsRooted(expression, null, null);
+                        {
+                            ExpressionHelper.IsRooted(expression, null, null);
 
-            }, Throws.ArgumentException);
+                        }, Throws.Nothing);
         }
 
         [Test]
@@ -215,48 +215,48 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
             object value = 1;
 
             Assert.That(() =>
-            {
-                value = ExpressionHelper.GetValue(expression.Body);
+                        {
+                            value = ExpressionHelper.GetValue(expression.Body);
 
-            }, Throws.Nothing);
+                        }, Throws.Nothing);
 
             Assert.That(value, Is.Null);
         }
 
         [Test]
-        public void IsRootedThrowsIfExpectedRootIsEmpty()
+        public void IsRootedDoesNotThrowIfExpectedRootIsEmpty()
         {
             Expression<Func<UserDto, object>> expression = x => x.Id;
 
             Assert.That(() =>
-            {
-                ExpressionHelper.IsRooted(expression, string.Empty, null);
+                        {
+                            ExpressionHelper.IsRooted(expression, string.Empty, null);
 
-            }, Throws.ArgumentException);
+                        }, Throws.Nothing);
         }
 
         [Test]
-        public void GetPropertyNameFromExpressionAndExpectedRootThrowsWhenExpectedIsEmpty()
+        public void GetPropertyNameFromExpressionAndExpectedRootDoesNotThrowWhenExpectedIsEmpty()
         {
             Expression<Func<UserDto, object>> expression = u => u.Username;
 
             Assert.That(() =>
-            {
-                ExpressionHelper.GetPropertyName(expression.Body, string.Empty);
+                        {
+                            ExpressionHelper.GetPropertyName(expression.Body, string.Empty);
 
-            }, Throws.ArgumentException);
+                        }, Throws.Nothing);
         }
 
         [Test]
-        public void GetPropertyNameFromExpressionAndExpectedRootThrowsWhenExpectedIsNull()
+        public void GetPropertyNameFromExpressionAndExpectedRootDoesNotThrowWhenExpectedIsNull()
         {
             Expression<Func<UserDto, object>> expression = u => u.Username;
 
             Assert.That(() =>
-            {
-                ExpressionHelper.GetPropertyName(expression.Body, null);
+                        {
+                            ExpressionHelper.GetPropertyName(expression.Body, null);
 
-            }, Throws.ArgumentException);
+                        }, Throws.Nothing);
         }
 
         [Test]

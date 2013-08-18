@@ -4,8 +4,6 @@ namespace NHibernate.FlowQuery
 {
     public static class Aggregate
     {
-        #region Methods (15)
-
         public static decimal Average<TReturn>(TReturn property)
         {
             throw Exception();
@@ -87,7 +85,5 @@ namespace NHibernate.FlowQuery
         {
             throw Exception();
         }
-
-        #endregion Methods
     }
 }

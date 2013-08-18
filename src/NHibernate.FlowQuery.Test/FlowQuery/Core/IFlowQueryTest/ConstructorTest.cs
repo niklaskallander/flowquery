@@ -1,9 +1,10 @@
-using System;
 using NHibernate.FlowQuery.Test.Setup.Entities;
 using NUnit.Framework;
 
 namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
 {
+    using NHibernate.FlowQuery.Core;
+    using NHibernate.FlowQuery.Helpers;
     using Is = NUnit.Framework.Is;
 
     [TestFixture]
@@ -39,7 +40,9 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
 
             Assert.That(q, Is.Not.Null);
 
-            Assert.That(q.Criteria.GetRootEntityTypeIfAvailable(), Is.EqualTo(typeof(UserEntity)));
+            ICriteria criteria = CriteriaHelper.BuildCriteria<UserEntity, UserEntity>(QuerySelection.Create(q as IQueryableFlowQuery));
+
+            Assert.That(criteria.GetRootEntityTypeIfAvailable(), Is.EqualTo(typeof(UserEntity)));
         }
 
         [Test]
@@ -53,19 +56,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         }
 
         [Test]
-        public void ThrowsWhenOptionsIsNull()
+        public void DoesNotThrowWhenOptionsIsNull()
         {
-            FlowQueryOptions o = null;
+            FlowQueryOptions options = null;
 
-            Assert.That(() => { Session.FlowQuery<UserEntity>(o); }, Throws.InstanceOf<ArgumentNullException>());
-        }
-
-        [Test]
-        public void ThrowsWhenSessionIsNull()
-        {
-            ISession s = null;
-
-            Assert.That(() => { s.FlowQuery<UserEntity>(); }, Throws.InstanceOf<ArgumentNullException>());
+            Assert.That(() => { Session.FlowQuery<UserEntity>(options); }, Throws.Nothing);
         }
 
         #endregion Methods

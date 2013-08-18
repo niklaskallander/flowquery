@@ -6,35 +6,24 @@ namespace NHibernate.FlowQuery.Test
 {
     public class BaseTest
     {
-        #region Fields (6)
-
         protected string[] Firstnames;
         protected string[] Fullnames;
         protected long[] Ids;
         protected string[] Lastnames;
         protected string[] Usernames;
 
-        #endregion Fields
-
-        #region Constructors (1)
-
         static BaseTest()
         {
             NHibernateConfigurer.Configure();
+
             NHibernateConfigurer.AddData();
         }
 
-        #endregion Constructors
-
-        #region Properties (1)
-
         public ISession Session { get; private set; }
 
-        #endregion Properties
+        public IStatelessSession StatelessSession { get; private set; }
 
-        #region Methods (3)
-
-        public IFlowQuery<T> Query<T>() where T : class
+        public IImmediateFlowQuery<T> Query<T>() where T : class
         {
             return Session.FlowQuery<T>();
         }
@@ -49,6 +38,7 @@ namespace NHibernate.FlowQuery.Test
             Ids = new long[] { 1, 2, 3, 4 };
 
             Session = NHibernateConfigurer.GetSessionFactory().OpenSession();
+            StatelessSession = NHibernateConfigurer.GetSessionFactory().OpenStatelessSession();
         }
 
         [TearDown]
@@ -56,8 +46,9 @@ namespace NHibernate.FlowQuery.Test
         {
             Session.Dispose();
             Session = null;
-        }
 
-        #endregion Methods
+            StatelessSession.Dispose();
+            StatelessSession = null;
+        }
     }
 }

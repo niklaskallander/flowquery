@@ -22,6 +22,7 @@ namespace NHibernate.FlowQuery.Helpers
                 IsExpression isExpression = ExpressionHelper.GetValue<IsExpression>(expression.Arguments[1]);
 
                 ICriterion criterion = isExpression.Compile(property);
+
                 if (isExpression.Negate)
                 {
                     criterion = Restrictions.Not(criterion);
@@ -143,12 +144,12 @@ namespace NHibernate.FlowQuery.Helpers
                                 );
                             }
 
-                            if (value is SubFlowQuery)
+                            if (value is IDetachedImmutableFlowQuery)
                             {
                                 return Subqueries.PropertyIn
                                 (
                                     ExpressionHelper.GetPropertyName(expression, root),
-                                    (value as SubFlowQuery).Criteria
+                                    (value as IDetachedImmutableFlowQuery).Criteria
                                 );
                             }
                         }

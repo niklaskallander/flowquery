@@ -1,12 +1,13 @@
 ﻿using NHibernate.Criterion;
 using NHibernate.FlowQuery.Core;
+
 namespace NHibernate.FlowQuery.Expressions.SubqueryExpressions
 {
-    public class IsEqualToSubqueryExpression<TSource> : SimpleIsExpression
+    public class IsEqualToSubqueryExpression : SubqueryIsExpressionBase
     {
         #region Constructors (1)
 
-        public IsEqualToSubqueryExpression(ISubFlowQuery<TSource> value)
+        public IsEqualToSubqueryExpression(IDetachedImmutableFlowQuery value)
             : base(value)
         { }
 
@@ -16,7 +17,7 @@ namespace NHibernate.FlowQuery.Expressions.SubqueryExpressions
 
         public override ICriterion Compile(string property)
         {
-            return Subqueries.PropertyEq(property, (Value as SubFlowQueryImpl<TSource>).Criteria);
+            return Subqueries.PropertyEq(property, Query.Criteria);
         }
 
         #endregion Methods

@@ -1,11 +1,11 @@
 using System;
+using System.Linq;
 using NHibernate.FlowQuery.ExtensionHelpers;
 using NHibernate.FlowQuery.Test.Setup.Entities;
 using NUnit.Framework;
 
 namespace NHibernate.FlowQuery.Test.FlowQuery.ExtensionHelpers
 {
-    using System.Collections.Generic;
     using Is = NUnit.Framework.Is;
 
     [TestFixture]
@@ -16,22 +16,25 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.ExtensionHelpers
         [Test]
         public void CanExposePropertyUsingAs()
         {
-            List<long> ids = Query<UserEntity>()
+            var ids = Query<UserEntity>()
                 .Where(u => "u.Username".As<string>() == "Wimpy")
-                .Select(u => u.Id);
+                .Select(u => u.Id)
+                ;
 
-            Assert.That(ids.Count, Is.EqualTo(1));
-            Assert.That(ids[0], Is.EqualTo(1));
+            Assert.That(ids.ToArray().Length, Is.EqualTo(1));
+            Assert.That(ids.First(), Is.EqualTo(1));
         }
 
         [Test]
         public void CanExposePropertyUsingAsAndPerformIsHelperExtensionOnResult()
         {
-            List<string> names = Query<UserEntity>()
+            var names = Query<UserEntity>()
                 .Where(u => "u.Username".As<string>().IsLike("%m%"))
-                .Select(u => u.Username);
+                .Select(u => u.Username)
+                ;
 
-            Assert.That(names.Count, Is.EqualTo(3));
+            Assert.That(names.ToArray().Length, Is.EqualTo(3));
+
             foreach (var name in names)
             {
                 Assert.That(name.Contains("m"));

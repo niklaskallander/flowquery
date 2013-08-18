@@ -1,17 +1,14 @@
 using NHibernate.Criterion;
 using NHibernate.FlowQuery.Core;
+using NHibernate.FlowQuery.Core.Implementors;
 
 namespace NHibernate.FlowQuery
 {
     public static class DetachedCriteriaExtensions
     {
-		#region Methods (1) 
-
-        public static ISubFlowQuery<TSource> SubQuery<TSource>(this DetachedCriteria criteria)
+        public static IDetachedImmutableFlowQuery DetachedFlowQuery(this DetachedCriteria criteria)
         {
-            return new SubFlowQueryImpl<TSource>(criteria);
+            return new DetachedImmutableFlowQueryImplementor(criteria);
         }
-
-		#endregion Methods 
     }
 }

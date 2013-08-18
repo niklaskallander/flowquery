@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using NHibernate.Criterion;
 
-namespace NHibernate.FlowQuery.Core
+namespace NHibernate.FlowQuery.Core.SelectSetup
 {
     public interface ISelectSetup<TSource, TReturn>
+        where TSource : class
     {
         #region Data Members (2)
 

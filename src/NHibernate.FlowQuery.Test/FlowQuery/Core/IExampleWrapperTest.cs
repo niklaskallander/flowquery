@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Linq.Expressions;
 using NHibernate.Criterion;
 using NHibernate.FlowQuery.Core;
@@ -8,12 +7,13 @@ using NUnit.Framework;
 
 namespace NHibernate.FlowQuery.Test.FlowQuery.Core
 {
+    using System.Linq;
     using Is = NUnit.Framework.Is;
 
     [TestFixture]
     public class IExampleWrapperTest : BaseTest
     {
-		#region Methods (9) 
+        #region Methods (9)
 
         [Test]
         public void CanConstruct()
@@ -27,7 +27,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core
         public void CanEnableLike()
         {
             var users = Query<UserEntity>()
-                .RestrictWithExample(new UserEntity()
+                .RestrictByExample(new UserEntity()
                                      {
                                          Username = "%m%"
 
@@ -37,9 +37,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core
                                               .ExcludeProperty(u => u.CreatedStamp)
                                               .ExcludeProperty(u => u.Role)
                                               .ExcludeProperty(u => u.IsOnline))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(3));
+
             foreach (var u in users)
             {
                 Assert.That(u.Username.Contains("m"));
@@ -50,7 +52,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core
         public void CanEnableLikeWithMatchMode()
         {
             var users = Query<UserEntity>()
-                .RestrictWithExample(new UserEntity()
+                .RestrictByExample(new UserEntity()
                                      {
                                          Username = "m"
 
@@ -60,9 +62,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core
                                               .ExcludeProperty(u => u.CreatedStamp)
                                               .ExcludeProperty(u => u.Role)
                                               .ExcludeProperty(u => u.IsOnline))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(3));
+
             foreach (var u in users)
             {
                 Assert.That(u.Username.Contains("m"));
@@ -73,7 +77,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core
         public void CanExcludePropertyUsingString()
         {
             var users = Query<UserEntity>()
-                .RestrictWithExample(new UserEntity()
+                .RestrictByExample(new UserEntity()
                                      {
                                          IsOnline = true
 
@@ -81,7 +85,8 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core
                                               .ExcludeNulls()
                                               .ExcludeProperty("CreatedStamp")
                                               .ExcludeProperty(u => u.Role))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(3));
         }
@@ -90,7 +95,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core
         public void CanExcludeZeroesNullsAndSpecificProperties()
         {
             var users = Query<UserEntity>()
-                .RestrictWithExample(new UserEntity()
+                .RestrictByExample(new UserEntity()
                                      {
                                          IsOnline = true
 
@@ -98,7 +103,8 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core
                                               .ExcludeNulls()
                                               .ExcludeProperty(u => u.CreatedStamp)
                                               .ExcludeProperty(u => u.Role))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(3));
         }
@@ -155,6 +161,6 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core
                         }, Throws.ArgumentException);
         }
 
-		#endregion Methods 
+        #endregion Methods
     }
 }

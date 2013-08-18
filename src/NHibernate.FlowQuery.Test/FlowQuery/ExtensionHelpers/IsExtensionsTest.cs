@@ -18,11 +18,13 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.ExtensionHelpers
         [Test]
         public void CanPerformIsBetween()
         {
-            List<long> ids = Query<UserEntity>()
+            var ids = Query<UserEntity>()
                 .Where(u => u.Id.IsBetween(2, 3))
-                .Select(u => u.Id);
+                .Select(u => u.Id)
+                ;
 
-            Assert.That(ids.Count, Is.EqualTo(2));
+            Assert.That(ids.ToArray().Length, Is.EqualTo(2));
+
             foreach (var id in ids)
             {
                 Assert.That(id >= 2 && id <= 3);
@@ -32,22 +34,25 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.ExtensionHelpers
         [Test]
         public void CanPerformIsEqualTo()
         {
-            List<long> ids = Query<UserEntity>()
+            var ids = Query<UserEntity>()
                 .Where(u => u.Id.IsEqualTo(3))
-                .Select(u => u.Id);
+                .Select(u => u.Id)
+                ;
 
-            Assert.That(ids.Count, Is.EqualTo(1));
-            Assert.That(ids[0], Is.EqualTo(3));
+            Assert.That(ids.ToArray().Length, Is.EqualTo(1));
+            Assert.That(ids.First(), Is.EqualTo(3));
         }
 
         [Test]
         public void CanPerformIsGreaterThan()
         {
-            List<long> ids = Query<UserEntity>()
+            var ids = Query<UserEntity>()
                 .Where(u => u.Id.IsGreaterThan(3))
-                .Select(u => u.Id);
+                .Select(u => u.Id)
+                ;
 
-            Assert.That(ids.Count, Is.EqualTo(1));
+            Assert.That(ids.ToArray().Length, Is.EqualTo(1));
+
             foreach (var id in ids)
             {
                 Assert.That(id, Is.GreaterThan(3));
@@ -57,11 +62,13 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.ExtensionHelpers
         [Test]
         public void CanPerformIsGreaterThanOrEqualTo()
         {
-            List<long> ids = Query<UserEntity>()
+            var ids = Query<UserEntity>()
                 .Where(u => u.Id.IsGreaterThanOrEqualTo(3))
-                .Select(u => u.Id);
+                .Select(u => u.Id)
+                ;
 
-            Assert.That(ids.Count, Is.EqualTo(2));
+            Assert.That(ids.ToArray().Length, Is.EqualTo(2));
+
             foreach (var id in ids)
             {
                 Assert.That(id, Is.GreaterThanOrEqualTo(3));
@@ -71,11 +78,13 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.ExtensionHelpers
         [Test]
         public void CanPerformIsInWithCollection()
         {
-            List<long> ids = Query<UserEntity>()
+            var ids = Query<UserEntity>()
                 .Where(u => u.Id.IsIn(1, 4))
-                .Select(u => u.Id);
+                .Select(u => u.Id)
+                ;
 
-            Assert.That(ids.Count, Is.EqualTo(2));
+            Assert.That(ids.ToArray().Length, Is.EqualTo(2));
+
             foreach (var id in ids)
             {
                 Assert.That(id == 1 || id == 4);
@@ -85,11 +94,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.ExtensionHelpers
         [Test]
         public void CanPerformIsInWithStrictEnumerable()
         {
-            List<UserEntity> users = Query<UserEntity>()
+            var users = Query<UserEntity>()
                 .Where(x => x.Id.IsIn(new TestEnumerable(3, 1, 4)))
-                .Select();
+                .Select()
+                ;
 
-            Assert.That(users.Count, Is.EqualTo(3));
+            Assert.That(users.ToArray().Length, Is.EqualTo(3));
             Assert.That(users.ElementAt(0).Id, Is.EqualTo(1));
             Assert.That(users.ElementAt(1).Id, Is.EqualTo(3));
             Assert.That(users.ElementAt(2).Id, Is.EqualTo(4));
@@ -98,21 +108,25 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.ExtensionHelpers
         [Test]
         public void CanPerformIsInWithSubQuery()
         {
-            List<long> ids = Query<UserEntity>()
-                .Where(u => u.Id.IsIn(SubQuery.For<UserEntity>().Where(x => x.Id == 3).Select(x => x.Id)))
-                .Select(u => u.Id);
-            Assert.That(ids.Count, Is.EqualTo(1));
-            Assert.That(ids[0], Is.EqualTo(3));
+            var ids = Query<UserEntity>()
+                .Where(u => u.Id.IsIn(Query<UserEntity>().Detached().Where(x => x.Id == 3).Select(x => x.Id)))
+                .Select(u => u.Id)
+                ;
+
+            Assert.That(ids.ToArray().Length, Is.EqualTo(1));
+            Assert.That(ids.First(), Is.EqualTo(3));
         }
 
         [Test]
         public void CanPerformIsLessThan()
         {
-            List<long> ids = Query<UserEntity>()
+            var ids = Query<UserEntity>()
                 .Where(u => u.Id.IsLessThan(3))
-                .Select(u => u.Id);
+                .Select(u => u.Id)
+                ;
 
-            Assert.That(ids.Count, Is.EqualTo(2));
+            Assert.That(ids.ToArray().Length, Is.EqualTo(2));
+
             foreach (var id in ids)
             {
                 Assert.That(id, Is.LessThan(3));
@@ -122,11 +136,13 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.ExtensionHelpers
         [Test]
         public void CanPerformIsLessThanOrEqualTo()
         {
-            List<long> ids = Query<UserEntity>()
+            var ids = Query<UserEntity>()
                 .Where(u => u.Id.IsLessThanOrEqualTo(3))
-                .Select(u => u.Id);
+                .Select(u => u.Id)
+                ;
 
-            Assert.That(ids.Count, Is.EqualTo(3));
+            Assert.That(ids.ToArray().Length, Is.EqualTo(3));
+
             foreach (var id in ids)
             {
                 Assert.That(id, Is.LessThanOrEqualTo(3));
@@ -136,11 +152,13 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.ExtensionHelpers
         [Test]
         public void CanPerformIsLike()
         {
-            List<string> usernames = Query<UserEntity>()
+            var usernames = Query<UserEntity>()
                 .Where(u => u.Username.IsLike("%m%"))
-                .Select(u => u.Username);
+                .Select(u => u.Username)
+                ;
 
-            Assert.That(usernames.Count, Is.EqualTo(3));
+            Assert.That(usernames.ToArray().Length, Is.EqualTo(3));
+
             foreach (var username in usernames)
             {
                 Assert.That(username.Contains("m"));
@@ -150,22 +168,24 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.ExtensionHelpers
         [Test]
         public void CanPerformIsNotNull()
         {
-            List<UserEntity> users = Query<UserEntity>()
+            var users = Query<UserEntity>()
                 .Where(u => u.LastLoggedInStamp.IsNotNull())
-                .Select();
+                .Select()
+                ;
 
-            Assert.That(users.Count, Is.EqualTo(3));
-            Assert.That(users[0].LastLoggedInStamp, Is.Not.Null);
+            Assert.That(users.ToArray().Length, Is.EqualTo(3));
+            Assert.That(users.First().LastLoggedInStamp, Is.Not.Null);
         }
 
         [Test]
         public void CanPerformIsNull()
         {
-            List<UserEntity> users = Query<UserEntity>()
+            var users = Query<UserEntity>()
                 .Where(u => u.LastLoggedInStamp.IsNull())
-                .Select();
+                .Select()
+                ;
 
-            Assert.That(users.Count, Is.EqualTo(1));
+            Assert.That(users.ToArray().Length, Is.EqualTo(1));
             Assert.That(users.First().LastLoggedInStamp, Is.Null);
         }
 
@@ -198,7 +218,8 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.ExtensionHelpers
         {
             Assert.That(() => { "".IsIn(""); }, Throws.InstanceOf<InvalidOperationException>());
             Assert.That(() => { 2.IsIn(1, 2, 3); }, Throws.InstanceOf<InvalidOperationException>());
-            Assert.That(() => { "".IsIn(SubQuery.For<UserEntity>()); }, Throws.InstanceOf<InvalidOperationException>());
+            Assert.That(() => { 2.IsIn(new List<int>()); }, Throws.InstanceOf<InvalidOperationException>());
+            Assert.That(() => { "".IsIn(Query<UserEntity>().Detached()); }, Throws.InstanceOf<InvalidOperationException>());
         }
 
         [Test]

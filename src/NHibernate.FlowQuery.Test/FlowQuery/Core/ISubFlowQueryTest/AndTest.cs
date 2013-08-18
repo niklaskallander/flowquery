@@ -11,20 +11,23 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
     [TestFixture]
     public class AndTest : BaseTest
     {
-		#region Methods (30) 
+        #region Methods (30)
 
         [Test]
         public void And()
         {
-            var query = SubQuery.For<UserEntity>()
+            var query = Query<UserEntity>()
+                .Detached()
                 .And(u => u.IsOnline)
                 .Select(u => u.Id);
 
             var users = Query<UserEntity>()
                 .Where(u => u.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(3));
+
             foreach (var user in users)
             {
                 Assert.That(user.IsOnline, Is.True);
@@ -34,15 +37,17 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void AndBetweenWithIsHelper()
         {
-            var query = SubQuery.For<UserEntity>()
+            var query = Query<UserEntity>().Detached()
                 .And(u => u.Id, FlowQueryIs.Between(2, 3))
                 .Select(u => u.Id);
 
             var users = Query<UserEntity>()
                 .Where(u => u.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(2));
+
             foreach (var user in users)
             {
                 Assert.That(user.Id, Is.InRange(2, 3));
@@ -52,13 +57,14 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void AndConstantFalseFetchesNone()
         {
-            var query = SubQuery.For<UserEntity>()
+            var query = Query<UserEntity>().Detached()
                 .And(u => false)
                 .Select(u => u.Id);
 
             var users = Query<UserEntity>()
                 .Where(u => u.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(0));
         }
@@ -66,13 +72,14 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void AndConstantTrueFetchesAll()
         {
-            var query = SubQuery.For<UserEntity>()
+            var query = Query<UserEntity>().Detached()
                 .And(u => true)
                 .Select(u => u.Id);
 
             var users = Query<UserEntity>()
                 .Where(u => u.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(4));
         }
@@ -80,13 +87,14 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void AndEqualTo()
         {
-            var query = SubQuery.For<UserEntity>()
+            var query = Query<UserEntity>().Detached()
                 .And(u => u.Id == 2)
                 .Select(u => u.Id);
 
             var users = Query<UserEntity>()
                 .Where(u => u.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(1));
             Assert.That(users.First().Id, Is.EqualTo(2));
@@ -95,15 +103,17 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void AndGreaterThan()
         {
-            var query = SubQuery.For<UserEntity>()
+            var query = Query<UserEntity>().Detached()
                 .And(u => u.Id > 1)
                 .Select(u => u.Id);
 
             var users = Query<UserEntity>()
                 .Where(u => u.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(3));
+
             foreach (var user in users)
             {
                 Assert.That(user.Id, Is.GreaterThan(1));
@@ -113,15 +123,17 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void AndGreaterThanOrEqualTo()
         {
-            var query = SubQuery.For<UserEntity>()
+            var query = Query<UserEntity>().Detached()
                 .And(u => u.Id >= 1)
                 .Select(u => u.Id);
 
             var users = Query<UserEntity>()
                 .Where(u => u.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(4));
+
             foreach (var user in users)
             {
                 Assert.That(user.Id, Is.GreaterThanOrEqualTo(1));
@@ -131,10 +143,10 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void AndInSubqueryWithIsHelper()
         {
-            var query = SubQuery.For<UserEntity>()
+            var query = Query<UserEntity>().Detached()
                 .And(u => u.Id, FlowQueryIs.In
                                   (
-                                      SubQuery.For<UserEntity>()
+                                      Query<UserEntity>().Detached()
                                           .Where(x => x.Id == 1 || x.Id == 4)
                                           .Select(x => x.Id)
                                   )
@@ -143,9 +155,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
 
             var users = Query<UserEntity>()
                 .Where(u => u.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(2));
+
             foreach (var user in users)
             {
                 Assert.That(new long[] { 1, 4 }, Contains.Item(user.Id));
@@ -155,15 +169,17 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void AndInWithIsHelper()
         {
-            var query = SubQuery.For<UserEntity>()
+            var query = Query<UserEntity>().Detached()
                 .And(u => u.Id, FlowQueryIs.In(1, 3))
                 .Select(u => u.Id);
 
             var users = Query<UserEntity>()
                 .Where(u => u.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(2));
+
             foreach (var user in users)
             {
                 Assert.That(new long[] { 1, 3 }, Contains.Item(user.Id));
@@ -173,15 +189,17 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void AndLessThan()
         {
-            var query = SubQuery.For<UserEntity>()
+            var query = Query<UserEntity>().Detached()
                 .And(u => u.Id < 4)
                 .Select(u => u.Id);
 
             var users = Query<UserEntity>()
                 .Where(u => u.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(3));
+
             foreach (var user in users)
             {
                 Assert.That(user.Id, Is.LessThan(4));
@@ -191,15 +209,17 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void AndLessThanOrEqualTo()
         {
-            var query = SubQuery.For<UserEntity>()
+            var query = Query<UserEntity>().Detached()
                 .And(u => u.Id <= 4)
                 .Select(u => u.Id);
 
             var users = Query<UserEntity>()
                 .Where(u => u.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(4));
+
             foreach (var user in users)
             {
                 Assert.That(user.Id, Is.LessThanOrEqualTo(4));
@@ -209,13 +229,14 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void AndLikeWithIsHelper()
         {
-            var query = SubQuery.For<UserEntity>()
+            var query = Query<UserEntity>().Detached()
                 .And(u => u.Firstname, FlowQueryIs.Like("Nik%"))
                 .Select(u => u.Id);
 
             var users = Query<UserEntity>()
                 .Where(u => u.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(1));
             Assert.That(users.First().Firstname.StartsWith("Nik"));
@@ -224,13 +245,14 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void AndNot()
         {
-            var query = SubQuery.For<UserEntity>()
+            var query = Query<UserEntity>().Detached()
                 .And(u => !u.IsOnline)
                 .Select(u => u.Id);
 
             var users = Query<UserEntity>()
                 .Where(u => u.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(1));
             Assert.That(users.First().IsOnline, Is.False);
@@ -239,13 +261,14 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void AndNotEqualTo()
         {
-            var query = SubQuery.For<UserEntity>()
+            var query = Query<UserEntity>().Detached()
                 .And(u => u.Id != 2)
                 .Select(u => u.Id);
 
             var users = Query<UserEntity>()
                 .Where(u => u.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(3));
             Assert.That(users.First().Id, Is.Not.EqualTo(2));
@@ -254,13 +277,14 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void AndWithArithmeticOperations()
         {
-            var query = SubQuery.For<UserEntity>()
+            var query = Query<UserEntity>().Detached()
                 .And(u => (u.Id * 2 + 8) + 10 / 5 - 1 == 11) // Id == 1
                 .Select(u => u.Id);
 
             var users = Query<UserEntity>()
                 .Where(u => u.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(1));
             Assert.That((users.First().Id * 2 + 8) + 10 / 5 - 1, Is.EqualTo(11));
@@ -269,13 +293,14 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void AndWithConcatenation()
         {
-            var query = SubQuery.For<UserEntity>()
+            var query = Query<UserEntity>().Detached()
                 .And(u => u.Firstname + " " + u.Lastname == "Niklas Källander")
                 .Select(u => u.Id);
 
             var users = Query<UserEntity>()
                 .Where(u => u.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(1));
             Assert.That(users.First().Firstname + " " + users.First().Lastname, Is.EqualTo("Niklas Källander"));
@@ -284,13 +309,14 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void AndWithCriterions()
         {
-            var query = SubQuery.For<UserEntity>()
+            var query = Query<UserEntity>().Detached()
                 .And(Restrictions.Eq("IsOnline", true), Restrictions.Like("Firstname", "%kl%"))
                 .Select(u => u.Id);
 
             var users = Query<UserEntity>()
                 .Where(u => u.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(1));
             Assert.That(users.Single().IsOnline);
@@ -300,15 +326,17 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void AndWithDoubleNegation()
         {
-            var query = SubQuery.For<UserEntity>()
+            var query = Query<UserEntity>().Detached()
                 .And(u => !!(u.IsOnline == true))
                 .Select(u => u.Id);
 
             var users = Query<UserEntity>()
                 .Where(u => u.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(3));
+
             foreach (var user in users)
             {
                 Assert.That(user.IsOnline, Is.True);
@@ -318,15 +346,17 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void AndWithIsHelper()
         {
-            var query = SubQuery.For<UserEntity>()
+            var query = Query<UserEntity>().Detached()
                 .And(u => u.IsOnline, FlowQueryIs.EqualTo(true))
                 .Select(u => u.Id);
 
             var users = Query<UserEntity>()
                 .Where(u => u.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(3));
+
             foreach (var u in users)
             {
                 Assert.That(u.IsOnline);
@@ -336,15 +366,17 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void AndWithMultipleBinaryExpressions()
         {
-            var query = SubQuery.For<UserEntity>()
+            var query = Query<UserEntity>().Detached()
                 .And(u => u.Id == 1 || u.Id > 3 && u.IsOnline == true)
                 .Select(u => u.Id);
 
             var users = Query<UserEntity>()
                 .Where(u => u.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(1));
+
             foreach (var user in users)
             {
                 Assert.That(user.Id == 1 || user.Id > 3 && user.IsOnline == true);
@@ -354,13 +386,14 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void AndWithNegation()
         {
-            var query = SubQuery.For<UserEntity>()
+            var query = Query<UserEntity>().Detached()
                 .And(u => !(u.IsOnline == true))
                 .Select(u => u.Id);
 
             var users = Query<UserEntity>()
                 .Where(u => u.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(1));
             Assert.That(users.First().IsOnline, Is.False);
@@ -369,15 +402,17 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void AndWithNotNullCheck()
         {
-            var query = SubQuery.For<UserEntity>()
+            var query = Query<UserEntity>().Detached()
                 .And(u => u.LastLoggedInStamp != null)
                 .Select(u => u.Id);
 
             var users = Query<UserEntity>()
                 .Where(u => u.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(3));
+
             foreach (var user in users)
             {
                 Assert.That(user.LastLoggedInStamp, Is.Not.Null);
@@ -387,13 +422,14 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void AndWithNullCheck()
         {
-            var query = SubQuery.For<UserEntity>()
+            var query = Query<UserEntity>().Detached()
                 .And(u => u.LastLoggedInStamp == null)
                 .Select(u => u.Id);
 
             var users = Query<UserEntity>()
                 .Where(u => u.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(1));
             Assert.That(users.First().LastLoggedInStamp, Is.Null);
@@ -402,15 +438,17 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void AndWithStringAndIsHelper()
         {
-            var query = SubQuery.For<UserEntity>()
+            var query = Query<UserEntity>().Detached()
                 .And("IsOnline", FlowQueryIs.EqualTo(true))
                 .Select(u => u.Id);
 
             var users = Query<UserEntity>()
                 .Where(u => u.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(3));
+
             foreach (var u in users)
             {
                 Assert.That(u.IsOnline);
@@ -420,13 +458,14 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void AndWithStringContains()
         {
-            var query = SubQuery.For<UserEntity>()
+            var query = Query<UserEntity>().Detached()
                 .And(u => u.Firstname.Contains("kl"))
                 .Select(u => u.Id);
 
             var users = Query<UserEntity>()
                 .Where(u => u.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(1));
             Assert.That(users.First().Firstname.Contains("kl"));
@@ -435,13 +474,14 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void AndWithStringEndsWith()
         {
-            var query = SubQuery.For<UserEntity>()
+            var query = Query<UserEntity>().Detached()
                 .And(u => u.Firstname.EndsWith("las"))
                 .Select(u => u.Id);
 
             var users = Query<UserEntity>()
                 .Where(u => u.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(1));
             Assert.That(users.First().Firstname.EndsWith("las"));
@@ -450,13 +490,14 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void AndWithStringStartsWith()
         {
-            var query = SubQuery.For<UserEntity>()
+            var query = Query<UserEntity>().Detached()
                 .And(u => u.Firstname.StartsWith("Nik"))
                 .Select(u => u.Id);
 
             var users = Query<UserEntity>()
                 .Where(u => u.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(1));
             Assert.That(users.First().Firstname.StartsWith("Nik"));
@@ -465,14 +506,15 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void CanCombineMultipleAndCalls()
         {
-            var query = SubQuery.For<UserEntity>()
+            var query = Query<UserEntity>().Detached()
                 .And(u => u.Firstname.Contains("kl")) // Matches one
                 .And(u => !u.IsOnline) // In combination with above, matches zero, otherwise 1
                 .Select(u => u.Id);
 
             var users = Query<UserEntity>()
                 .Where(u => u.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(0));
         }
@@ -480,13 +522,14 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void LogicalAndWithConstantFalseFetchesNone()
         {
-            var query = SubQuery.For<UserEntity>()
+            var query = Query<UserEntity>().Detached()
                 .And(u => u.Id > 0 && false)
                 .Select(u => u.Id);
 
             var users = Query<UserEntity>()
                 .Where(u => u.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(0));
         }
@@ -494,17 +537,18 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void LogicalOrWithConstantTrueFetchesAll()
         {
-            var query = SubQuery.For<UserEntity>()
+            var query = Query<UserEntity>().Detached()
                 .And(u => u.Id > 6 || true)
                 .Select(u => u.Id);
 
             var users = Query<UserEntity>()
                 .Where(u => u.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(users.Count(), Is.EqualTo(4));
         }
 
-		#endregion Methods 
+        #endregion Methods
     }
 }

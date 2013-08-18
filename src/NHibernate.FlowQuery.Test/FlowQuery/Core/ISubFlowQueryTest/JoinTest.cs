@@ -1,11 +1,11 @@
 using System;
-using System.Linq;
 using NHibernate.FlowQuery.Revealing.Conventions;
 using NHibernate.FlowQuery.Test.Setup.Entities;
 using NUnit.Framework;
 
 namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
 {
+    using System.Linq;
     using FlowQueryIs = NHibernate.FlowQuery.Is;
     using Is = NUnit.Framework.Is;
 
@@ -19,13 +19,14 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         {
             UserGroupLinkEntity link = null;
 
-            var query = SubQuery.For<UserEntity>()
-                .FullJoin(u => u.Groups, () => link)
+            var query = Query<UserEntity>().Detached()
+                .Full.Join(u => u.Groups, () => link)
                 .Select(u => link.Group.Id);
 
             var groups = Query<GroupEntity>()
                 .Where(g => g.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(groups.Count(), Is.EqualTo(2));
         }
@@ -36,24 +37,26 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
             UserGroupLinkEntity link = null;
             GroupEntity group = null;
 
-            var query = SubQuery.For<UserEntity>()
-                .FullJoin(u => u.Groups, () => link, x => x.Id == null)
-                .FullJoin(() => link.Group, () => group, x => x.Id == null)
+            var query = Query<UserEntity>().Detached()
+                .Full.Join(u => u.Groups, () => link, () => link.Id == null)
+                .Full.Join(() => link.Group, () => group, () => group.Id == null)
                 .Select(u => link.Group.Id);
 
             var groups = Query<GroupEntity>()
                 .Where(g => g.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(groups.Count(), Is.EqualTo(2));
 
-            var query2 = SubQuery.For<UserEntity>()
-                .FullJoin("Groups", () => link, x => x.Id == null)
+            var query2 = Query<UserEntity>().Detached()
+                .Full.Join("Groups", () => link, () => link.Id == null)
                 .Select(u => link.Group.Id);
 
             var groups2 = Query<GroupEntity>()
                 .Where(g => g.Id, FlowQueryIs.In(query2))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(groups2.Count(), Is.EqualTo(2));
         }
@@ -63,13 +66,14 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         {
             UserGroupLinkEntity link = null;
 
-            var query = SubQuery.For<UserEntity>()
-                .FullJoin("Groups", () => link)
-                .SelectDistinct(u => link.Group.Id);
+            var query = Query<UserEntity>().Detached()
+                .Full.Join("Groups", () => link)
+                .Distinct().Select(u => link.Group.Id);
 
             var groups = Query<GroupEntity>()
                 .Where(g => g.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(groups.Count(), Is.EqualTo(2));
         }
@@ -79,13 +83,14 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         {
             Setting setting = null;
 
-            var query = SubQuery.For<UserEntity>()
-                .FullJoin(x => x.Setting, () => setting)
+            var query = Query<UserEntity>().Detached()
+                .Full.Join(x => x.Setting, () => setting)
                 .Select(u => setting.Id);
 
             var settings = Query<Setting>()
                 .Where(s => s.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(settings.Count(), Is.EqualTo(6));
         }
@@ -95,13 +100,14 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         {
             UserGroupLinkEntity link = null;
 
-            var query = SubQuery.For<UserEntity>()
-                .InnerJoin(u => u.Groups, () => link)
-                .SelectDistinct(u => link.Group.Id);
+            var query = Query<UserEntity>().Detached()
+                .Inner.Join(u => u.Groups, () => link)
+                .Distinct().Select(u => link.Group.Id);
 
             var groups = Query<GroupEntity>()
                 .Where(g => g.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(groups.Count(), Is.EqualTo(2));
         }
@@ -112,24 +118,26 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
             UserGroupLinkEntity link = null;
             GroupEntity group = null;
 
-            var query = SubQuery.For<UserEntity>()
-                .InnerJoin(u => u.Groups, () => link, x => x.Id == 2)
-                .InnerJoin(() => link.Group, () => group, x => x.Id == 2)
-                .SelectDistinct(u => link.Group.Id);
+            var query = Query<UserEntity>().Detached()
+                .Inner.Join(u => u.Groups, () => link, () => link.Id == 2)
+                .Inner.Join(() => link.Group, () => group, () => group.Id == 2)
+                .Distinct().Select(u => link.Group.Id);
 
             var groups = Query<GroupEntity>()
                 .Where(g => g.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(groups.Count(), Is.EqualTo(1));
 
-            var query2 = SubQuery.For<UserEntity>()
-                .InnerJoin("Groups", () => link, x => x.Id == 2)
-                .SelectDistinct(u => link.Group.Id);
+            var query2 = Query<UserEntity>().Detached()
+                .Inner.Join("Groups", () => link, () => link.Id == 2)
+                .Distinct().Select(u => link.Group.Id);
 
             var groups2 = Query<GroupEntity>()
                 .Where(g => g.Id, FlowQueryIs.In(query2))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(groups2.Count(), Is.EqualTo(1));
         }
@@ -140,24 +148,26 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
             UserGroupLinkEntity link = null;
             GroupEntity group = null;
 
-            var query = SubQuery.For<UserEntity>()
-                .Join(u => u.Groups, () => link, x => x.Id == 2)
-                .Join(() => link.Group, () => group, x => x.Id == 2)
-                .SelectDistinct(u => link.Group.Id);
+            var query = Query<UserEntity>().Detached()
+                .Inner.Join(u => u.Groups, () => link, () => link.Id == 2)
+                .Inner.Join(() => link.Group, () => group, () => group.Id == 2)
+                .Distinct().Select(u => link.Group.Id);
 
             var groups = Query<GroupEntity>()
                 .Where(g => g.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(groups.Count(), Is.EqualTo(1));
 
-            var query2 = SubQuery.For<UserEntity>()
-                .Join("Groups", () => link, x => x.Id == 2)
-                .SelectDistinct(u => link.Group.Id);
+            var query2 = Query<UserEntity>().Detached()
+                .Inner.Join("Groups", () => link, () => link.Id == 2)
+                .Distinct().Select(u => link.Group.Id);
 
             var groups2 = Query<GroupEntity>()
                 .Where(g => g.Id, FlowQueryIs.In(query2))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(groups2.Count(), Is.EqualTo(1));
         }
@@ -169,13 +179,14 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
 
             var r = Reveal.CreateRevealer<UserEntity>(new CustomConvention(s => s));
 
-            var query = SubQuery.For<UserEntity>()
-                .InnerJoin(r.Reveal(x => x.Groups), () => link)
-                .SelectDistinct(u => link.Group.Id);
+            var query = Query<UserEntity>().Detached()
+                .Inner.Join(r.Reveal(x => x.Groups), () => link)
+                .Distinct().Select(u => link.Group.Id);
 
             var groups = Query<GroupEntity>()
                 .Where(g => g.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(groups.Count(), Is.EqualTo(2));
         }
@@ -186,14 +197,15 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
             UserGroupLinkEntity link = null;
             GroupEntity group = null;
 
-            var query = SubQuery.For<UserEntity>()
-                .InnerJoin(u => u.Groups, () => link)
-                .InnerJoin(u => link.Group, () => group)
-                .SelectDistinct(u => group.Name);
+            var query = Query<UserEntity>().Detached()
+                .Inner.Join(u => u.Groups, () => link)
+                .Inner.Join(u => link.Group, () => group)
+                .Distinct().Select(u => group.Name);
 
             var groups = Query<GroupEntity>()
                 .Where(g => g.Name, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(groups.Count(), Is.EqualTo(2));
         }
@@ -204,14 +216,15 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
             UserGroupLinkEntity link = null;
             GroupEntity group = null;
 
-            var query = SubQuery.For<UserEntity>()
-                .InnerJoin("Groups", () => link)
-                .InnerJoin("link.Group", () => group)
-                .SelectDistinct(u => group.Name);
+            var query = Query<UserEntity>().Detached()
+                .Inner.Join("Groups", () => link)
+                .Inner.Join("link.Group", () => group)
+                .Distinct().Select(u => group.Name);
 
             var groups = Query<GroupEntity>()
                 .Where(g => g.Name, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(groups.Count(), Is.EqualTo(2));
         }
@@ -222,14 +235,15 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
             UserGroupLinkEntity link = null;
             GroupEntity group = null;
 
-            var query = SubQuery.For<UserEntity>()
-                .Join(u => u.Groups, () => link)
-                .Join(u => link.Group, () => group)
-                .SelectDistinct(u => group.Name);
+            var query = Query<UserEntity>().Detached()
+                .Inner.Join(u => u.Groups, () => link)
+                .Inner.Join(u => link.Group, () => group)
+                .Distinct().Select(u => group.Name);
 
             var groups = Query<GroupEntity>()
                 .Where(g => g.Name, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(groups.Count(), Is.EqualTo(2));
         }
@@ -240,14 +254,15 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
             UserGroupLinkEntity link = null;
             GroupEntity group = null;
 
-            var query = SubQuery.For<UserEntity>()
-                .Join("Groups", () => link)
-                .Join("link.Group", () => group)
-                .SelectDistinct(u => group.Name);
+            var query = Query<UserEntity>().Detached()
+                .Inner.Join("Groups", () => link)
+                .Inner.Join("link.Group", () => group)
+                .Distinct().Select(u => group.Name);
 
             var groups = Query<GroupEntity>()
                 .Where(g => g.Name, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(groups.Count(), Is.EqualTo(2));
         }
@@ -257,13 +272,14 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         {
             UserGroupLinkEntity link = null;
 
-            var query = SubQuery.For<UserEntity>()
-                .InnerJoin("Groups", () => link)
-                .SelectDistinct(u => link.Group.Id);
+            var query = Query<UserEntity>().Detached()
+                .Inner.Join("Groups", () => link)
+                .Distinct().Select(u => link.Group.Id);
 
             var groups = Query<GroupEntity>()
                 .Where(g => g.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(groups.Count(), Is.EqualTo(2));
         }
@@ -273,13 +289,14 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         {
             UserGroupLinkEntity link = null;
 
-            var query = SubQuery.For<UserEntity>()
-                .Join(u => u.Groups, () => link)
-                .SelectDistinct(u => link.Group.Id);
+            var query = Query<UserEntity>().Detached()
+                .Inner.Join(u => u.Groups, () => link)
+                .Distinct().Select(u => link.Group.Id);
 
             var groups = Query<GroupEntity>()
                 .Where(g => g.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(groups.Count(), Is.EqualTo(2));
         }
@@ -291,13 +308,14 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
 
             var r = Reveal.CreateRevealer<UserEntity>(new CustomConvention(s => s));
 
-            var query = SubQuery.For<UserEntity>()
-                .Join(r.Reveal(x => x.Groups), () => link)
-                .SelectDistinct(u => link.Group.Id);
+            var query = Query<UserEntity>().Detached()
+                .Inner.Join(r.Reveal(x => x.Groups), () => link)
+                .Distinct().Select(u => link.Group.Id);
 
             var groups = Query<GroupEntity>()
                 .Where(g => g.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(groups.Count(), Is.EqualTo(2));
         }
@@ -307,13 +325,14 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         {
             UserGroupLinkEntity link = null;
 
-            var query = SubQuery.For<UserEntity>()
-                .Join("Groups", () => link)
-                .SelectDistinct(u => link.Group.Id);
+            var query = Query<UserEntity>().Detached()
+                .Inner.Join("Groups", () => link)
+                .Distinct().Select(u => link.Group.Id);
 
             var groups = Query<GroupEntity>()
                 .Where(g => g.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(groups.Count(), Is.EqualTo(2));
         }
@@ -323,13 +342,14 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         {
             UserGroupLinkEntity link = null;
 
-            var query = SubQuery.For<UserEntity>()
-                .LeftOuterJoin(u => u.Groups, () => link)
+            var query = Query<UserEntity>().Detached()
+                .LeftOuter.Join(u => u.Groups, () => link)
                 .Select(u => link.Group.Id);
 
             var groups = Query<GroupEntity>()
                 .Where(g => g.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(groups.Count(), Is.EqualTo(2));
         }
@@ -340,24 +360,26 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
             UserGroupLinkEntity link = null;
             GroupEntity group = null;
 
-            var query = SubQuery.For<UserEntity>()
-                .LeftOuterJoin(u => u.Groups, () => link, x => x.Id == 2)
-                .LeftOuterJoin(() => link.Group, () => group, x => x.Id == 1)
+            var query = Query<UserEntity>().Detached()
+                .LeftOuter.Join(u => u.Groups, () => link, () => link.Id == 2)
+                .LeftOuter.Join(() => link.Group, () => group, () => group.Id == 1)
                 .Select(u => link.Group.Id);
 
             var groups = Query<GroupEntity>()
                 .Where(g => g.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(groups.Count(), Is.EqualTo(1));
 
-            var query2 = SubQuery.For<UserEntity>()
-                .LeftOuterJoin("Groups", () => link, x => x.Id == 2)
+            var query2 = Query<UserEntity>().Detached()
+                .LeftOuter.Join("Groups", () => link, () => link.Id == 2)
                 .Select(u => link.Group.Id);
 
             var groups2 = Query<GroupEntity>()
                 .Where(g => g.Id, FlowQueryIs.In(query2))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(groups2.Count(), Is.EqualTo(1));
         }
@@ -367,13 +389,14 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         {
             UserGroupLinkEntity link = null;
 
-            var query = SubQuery.For<UserEntity>()
-                .LeftOuterJoin("Groups", () => link)
+            var query = Query<UserEntity>().Detached()
+                .LeftOuter.Join("Groups", () => link)
                 .Select(u => link.Group.Id);
 
             var groups = Query<GroupEntity>()
                 .Where(g => g.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(groups.Count(), Is.EqualTo(2));
         }
@@ -384,13 +407,14 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         {
             Setting setting = null;
 
-            var query = SubQuery.For<UserEntity>()
-                .LeftOuterJoin(x => x.Setting, () => setting)
+            var query = Query<UserEntity>().Detached()
+                .LeftOuter.Join(x => x.Setting, () => setting)
                 .Select(u => setting.Id);
 
             var settings = Query<Setting>()
                 .Where(s => s.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(settings.Count(), Is.EqualTo(1));
         }
@@ -400,13 +424,14 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         {
             UserGroupLinkEntity link = null;
 
-            var query = SubQuery.For<UserEntity>()
-                .RightOuterJoin(u => u.Groups, () => link)
+            var query = Query<UserEntity>().Detached()
+                .RightOuter.Join(u => u.Groups, () => link)
                 .Select(u => link.Group.Id);
 
             var groups = Query<GroupEntity>()
                 .Where(g => g.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(groups.Count(), Is.EqualTo(2));
         }
@@ -417,24 +442,26 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
             UserGroupLinkEntity link = null;
             GroupEntity group = null;
 
-            var query = SubQuery.For<UserEntity>()
-                .RightOuterJoin(u => u.Groups, () => link, x => x.Id == 2)
-                .RightOuterJoin(() => link.Group, () => group, x => x.Id == 2)
+            var query = Query<UserEntity>().Detached()
+                .RightOuter.Join(u => u.Groups, () => link, () => link.Id == 2)
+                .RightOuter.Join(() => link.Group, () => group, () => group.Id == 2)
                 .Select(u => link.Group.Id);
 
             var groups = Query<GroupEntity>()
                 .Where(g => g.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(groups.Count(), Is.EqualTo(1));
 
-            var query2 = SubQuery.For<UserEntity>()
-                .RightOuterJoin("Groups", () => link, x => x.Id == 2)
+            var query2 = Query<UserEntity>().Detached()
+                .RightOuter.Join("Groups", () => link, () => link.Id == 2)
                 .Select(u => link.Group.Id);
 
             var groups2 = Query<GroupEntity>()
                 .Where(g => g.Id, FlowQueryIs.In(query2))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(groups2.Count(), Is.EqualTo(2));
         }
@@ -444,13 +471,14 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         {
             UserGroupLinkEntity link = null;
 
-            var query = SubQuery.For<UserEntity>()
-                .RightOuterJoin("Groups", () => link)
+            var query = Query<UserEntity>().Detached()
+                .RightOuter.Join("Groups", () => link)
                 .Select(u => link.Group.Id);
 
             var groups = Query<GroupEntity>()
                 .Where(g => g.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(groups.Count(), Is.EqualTo(2));
         }
@@ -460,13 +488,15 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         {
             Setting setting = null;
 
-            var query = SubQuery.For<UserEntity>()
-                .RightOuterJoin(x => x.Setting, () => setting)
+            var query = Query<UserEntity>()
+                .Detached()
+                .RightOuter.Join(x => x.Setting, () => setting)
                 .Select(u => setting.Id);
 
             var settings = Query<Setting>()
                 .Where(s => s.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(settings.Count(), Is.EqualTo(6));
         }
@@ -478,9 +508,10 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
 
             Assert.That(() =>
             {
-                SubQuery.For<UserEntity>()
-                    .InnerJoin(x => x.Groups, () => link)
-                    .InnerJoin(x => x.Groups, () => link)
+                Query<UserEntity>()
+                    .Detached()
+                    .Inner.Join(x => x.Groups, () => link)
+                    .Inner.Join(x => x.Groups, () => link)
                     .Select();
 
             }, Throws.Nothing);
@@ -493,9 +524,9 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
 
             Assert.That(() =>
                         {
-                            SubQuery.For<UserEntity>()
-                                .InnerJoin(x => x.Groups, () => link)
-                                .InnerJoin(x => x.Groups, () => link2)
+                            Query<UserEntity>().Detached()
+                                .Inner.Join(x => x.Groups, () => link)
+                                .Inner.Join(x => x.Groups, () => link2)
                                 .Select();
 
                         }, Throws.InstanceOf<InvalidOperationException>());
@@ -508,9 +539,9 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
 
             Assert.That(() =>
                         {
-                            SubQuery.For<UserEntity>()
-                                .InnerJoin("Groups", () => link)
-                                .InnerJoin("Setting", () => link)
+                            Query<UserEntity>().Detached()
+                                .Inner.Join("Groups", () => link)
+                                .Inner.Join("Setting", () => link)
                                 .Select();
 
                         }, Throws.InstanceOf<InvalidOperationException>());
@@ -524,14 +555,15 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
             UserGroupLinkEntity link = null;
             GroupEntity group = null;
 
-            var query = SubQuery.For<UserEntity>()
-                .InnerJoin(u => u.Groups, () => link)
-                .InnerJoin(() => link.Group, () => group)
-                .SelectDistinct(u => group.Id);
+            var query = Query<UserEntity>().Detached()
+                .Inner.Join(u => u.Groups, () => link)
+                .Inner.Join(() => link.Group, () => group)
+                .Distinct().Select(u => group.Id);
 
             var groups = Query<GroupEntity>()
                 .Where(g => g.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(groups.Count(), Is.EqualTo(2));
 
@@ -544,14 +576,15 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
             UserGroupLinkEntity link = null;
             GroupEntity group = null;
 
-            var query = SubQuery.For<UserEntity>()
-                .InnerJoin(u => u.Groups, () => link)
-                .InnerJoin(() => link.Group, () => group, new CustomConvention(x => x))
-                .SelectDistinct(u => group.Id);
+            var query = Query<UserEntity>().Detached()
+                .Inner.Join(u => u.Groups, () => link)
+                .Inner.Join(() => link.Group, () => group, new CustomConvention(x => x))
+                .Distinct().Select(u => group.Id);
 
             var groups = Query<GroupEntity>()
                 .Where(g => g.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(groups.Count(), Is.EqualTo(2));
         }
@@ -564,14 +597,15 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
             UserGroupLinkEntity link = null;
             GroupEntity group = null;
 
-            var query = SubQuery.For<UserEntity>()
-                .Join(u => u.Groups, () => link)
-                .Join(() => link.Group, () => group)
-                .SelectDistinct(u => group.Id);
+            var query = Query<UserEntity>().Detached()
+                .Inner.Join(u => u.Groups, () => link)
+                .Inner.Join(() => link.Group, () => group)
+                .Distinct().Select(u => group.Id);
 
             var groups = Query<GroupEntity>()
                 .Where(g => g.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(groups.Count(), Is.EqualTo(2));
 
@@ -584,14 +618,15 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
             UserGroupLinkEntity link = null;
             GroupEntity group = null;
 
-            var query = SubQuery.For<UserEntity>()
-                .Join(u => u.Groups, () => link)
-                .Join(() => link.Group, () => group, new CustomConvention(x => x))
-                .SelectDistinct(u => group.Id);
+            var query = Query<UserEntity>().Detached()
+                .Inner.Join(u => u.Groups, () => link)
+                .Inner.Join(() => link.Group, () => group, new CustomConvention(x => x))
+                .Distinct().Select(u => group.Id);
 
             var groups = Query<GroupEntity>()
                 .Where(g => g.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(groups.Count(), Is.EqualTo(2));
         }
@@ -604,14 +639,15 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
             UserGroupLinkEntity link = null;
             GroupEntity group = null;
 
-            var query = SubQuery.For<UserEntity>()
-                .FullJoin(u => u.Groups, () => link)
-                .FullJoin(() => link.Group, () => group)
+            var query = Query<UserEntity>().Detached()
+                .Full.Join(u => u.Groups, () => link)
+                .Full.Join(() => link.Group, () => group)
                 .Select(u => group.Id);
 
             var groups = Query<GroupEntity>()
                 .Where(g => g.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(groups.Count(), Is.EqualTo(2));
 
@@ -624,14 +660,15 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
             UserGroupLinkEntity link = null;
             GroupEntity group = null;
 
-            var query = SubQuery.For<UserEntity>()
-                .FullJoin(u => u.Groups, () => link)
-                .FullJoin(() => link.Group, () => group, new CustomConvention(x => x))
+            var query = Query<UserEntity>().Detached()
+                .Full.Join(u => u.Groups, () => link)
+                .Full.Join(() => link.Group, () => group, new CustomConvention(x => x))
                 .Select(u => group.Id);
 
             var groups = Query<GroupEntity>()
                 .Where(g => g.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(groups.Count(), Is.EqualTo(2));
         }
@@ -644,14 +681,15 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
             UserGroupLinkEntity link = null;
             GroupEntity group = null;
 
-            var query = SubQuery.For<UserEntity>()
-                .LeftOuterJoin(u => u.Groups, () => link)
-                .LeftOuterJoin(() => link.Group, () => group)
+            var query = Query<UserEntity>().Detached()
+                .LeftOuter.Join(u => u.Groups, () => link)
+                .LeftOuter.Join(() => link.Group, () => group)
                 .Select(u => group.Id);
 
             var groups = Query<GroupEntity>()
                 .Where(g => g.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(groups.Count(), Is.EqualTo(2));
 
@@ -664,14 +702,15 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
             UserGroupLinkEntity link = null;
             GroupEntity group = null;
 
-            var query = SubQuery.For<UserEntity>()
-                .LeftOuterJoin(u => u.Groups, () => link)
-                .LeftOuterJoin(() => link.Group, () => group, new CustomConvention(x => x))
+            var query = Query<UserEntity>().Detached()
+                .LeftOuter.Join(u => u.Groups, () => link)
+                .LeftOuter.Join(() => link.Group, () => group, new CustomConvention(x => x))
                 .Select(u => group.Id);
 
             var groups = Query<GroupEntity>()
                 .Where(g => g.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(groups.Count(), Is.EqualTo(2));
         }
@@ -684,14 +723,15 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
             UserGroupLinkEntity link = null;
             GroupEntity group = null;
 
-            var query = SubQuery.For<UserEntity>()
-                .RightOuterJoin(u => u.Groups, () => link)
-                .RightOuterJoin(() => link.Group, () => group)
+            var query = Query<UserEntity>().Detached()
+                .RightOuter.Join(u => u.Groups, () => link)
+                .RightOuter.Join(() => link.Group, () => group)
                 .Select(u => group.Id);
 
             var groups = Query<GroupEntity>()
                 .Where(g => g.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(groups.Count(), Is.EqualTo(2));
 
@@ -704,14 +744,15 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
             UserGroupLinkEntity link = null;
             GroupEntity group = null;
 
-            var query = SubQuery.For<UserEntity>()
-                .RightOuterJoin(u => u.Groups, () => link)
-                .RightOuterJoin(() => link.Group, () => group, new CustomConvention(x => x))
+            var query = Query<UserEntity>().Detached()
+                .RightOuter.Join(u => u.Groups, () => link)
+                .RightOuter.Join(() => link.Group, () => group, new CustomConvention(x => x))
                 .Select(u => group.Id);
 
             var groups = Query<GroupEntity>()
                 .Where(g => g.Id, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(groups.Count(), Is.EqualTo(2));
         }
@@ -724,41 +765,41 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
 
             Assert.That(() =>
                         {
-                            SubQuery.For<UserEntity>()
-                                .InnerJoin(u => u.Groups, () => link)
-                                .InnerJoin(() => link.Group, () => group, (IRevealConvention)null);
+                            Query<UserEntity>().Detached()
+                                .Inner.Join(u => u.Groups, () => link)
+                                .Inner.Join(() => link.Group, () => group, (IRevealConvention)null);
 
                         }, Throws.Nothing);
 
             Assert.That(() =>
                         {
-                            SubQuery.For<UserEntity>()
-                                .Join(u => u.Groups, () => link)
-                                .Join(() => link.Group, () => group, (IRevealConvention)null);
+                            Query<UserEntity>().Detached()
+                                .Inner.Join(u => u.Groups, () => link)
+                                .Inner.Join(() => link.Group, () => group, (IRevealConvention)null);
 
                         }, Throws.Nothing);
 
             Assert.That(() =>
                         {
-                            SubQuery.For<UserEntity>()
-                                .FullJoin(u => u.Groups, () => link)
-                                .FullJoin(() => link.Group, () => group, (IRevealConvention)null);
+                            Query<UserEntity>().Detached()
+                                .Full.Join(u => u.Groups, () => link)
+                                .Full.Join(() => link.Group, () => group, (IRevealConvention)null);
 
                         }, Throws.Nothing);
 
             Assert.That(() =>
                         {
-                            SubQuery.For<UserEntity>()
-                                .RightOuterJoin(u => u.Groups, () => link)
-                                .RightOuterJoin(() => link.Group, () => group, (IRevealConvention)null);
+                            Query<UserEntity>().Detached()
+                                .RightOuter.Join(u => u.Groups, () => link)
+                                .RightOuter.Join(() => link.Group, () => group, (IRevealConvention)null);
 
                         }, Throws.Nothing);
 
             Assert.That(() =>
                         {
-                            SubQuery.For<UserEntity>()
-                                .LeftOuterJoin(u => u.Groups, () => link)
-                                .LeftOuterJoin(() => link.Group, () => group, (IRevealConvention)null);
+                            Query<UserEntity>().Detached()
+                                .LeftOuter.Join(u => u.Groups, () => link)
+                                .LeftOuter.Join(() => link.Group, () => group, (IRevealConvention)null);
 
                         }, Throws.Nothing);
         }
@@ -773,29 +814,31 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
             CustomerGroupLinkEntity customerLink = null;
             CustomerEntity customer = null;
 
-            var query = SubQuery.For<UserEntity>()
-                .InnerJoin(u => u.Groups, () => link)
-                .InnerJoin(() => link.Group, () => group)
-                .InnerJoin(() => group.Customers, () => customerLink)
-                .InnerJoin(() => customerLink.Customer, () => customer)
-                .SelectDistinct(u => customer.Name);
+            var query = Query<UserEntity>().Detached()
+                .Inner.Join(u => u.Groups, () => link)
+                .Inner.Join(() => link.Group, () => group)
+                .Inner.Join(() => group.Customers, () => customerLink)
+                .Inner.Join(() => customerLink.Customer, () => customer)
+                .Distinct().Select(u => customer.Name);
 
             var customers = Query<CustomerEntity>()
                 .Where(g => g.Name, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(customers.Count(), Is.EqualTo(4));
 
-            var query2 = SubQuery.For<UserEntity>()
-                .InnerJoin(u => u.Groups, () => link, x => x.Id == null)
-                .InnerJoin(x => link.Group, () => group, x => x.Id == null)
-                .InnerJoin(() => group.Customers, () => customerLink, x => x.Id == null, null)
-                .InnerJoin(() => customerLink.Customer, () => customer, x => x.Id == null)
-                .SelectDistinct(u => customer.Name);
+            var query2 = Query<UserEntity>().Detached()
+                .Inner.Join(u => u.Groups, () => link, () => link.Id == null)
+                .Inner.Join(x => link.Group, () => group, () => group.Id == null)
+                .Inner.Join(() => group.Customers, () => customerLink, () => customerLink.Id == null, null)
+                .Inner.Join(() => customerLink.Customer, () => customer, () => customer.Id == null)
+                .Distinct().Select(u => customer.Name);
 
             var customers2 = Query<CustomerEntity>()
                 .Where(g => g.Name, FlowQueryIs.In(query2))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(customers2.Count(), Is.EqualTo(0));
 
@@ -812,29 +855,31 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
             CustomerGroupLinkEntity customerLink = null;
             CustomerEntity customer = null;
 
-            var query = SubQuery.For<UserEntity>()
-                .FullJoin(u => u.Groups, () => link)
-                .FullJoin(() => link.Group, () => group)
-                .FullJoin(() => group.Customers, () => customerLink)
-                .FullJoin(() => customerLink.Customer, () => customer)
-                .SelectDistinct(u => customer.Name);
+            var query = Query<UserEntity>().Detached()
+                .Full.Join(u => u.Groups, () => link)
+                .Full.Join(() => link.Group, () => group)
+                .Full.Join(() => group.Customers, () => customerLink)
+                .Full.Join(() => customerLink.Customer, () => customer)
+                .Distinct().Select(u => customer.Name);
 
             var customers = Query<CustomerEntity>()
                 .Where(g => g.Name, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(customers.Count(), Is.EqualTo(4));
 
-            var query2 = SubQuery.For<UserEntity>()
-                .FullJoin(u => u.Groups, () => link, x => x.Id == null)
-                .FullJoin(x => link.Group, () => group, x => x.Id == null)
-                .FullJoin(() => group.Customers, () => customerLink, x => x.Id == null, null)
-                .FullJoin(() => customerLink.Customer, () => customer, x => x.Id == null)
-                .SelectDistinct(u => customer.Name);
+            var query2 = Query<UserEntity>().Detached()
+                .Full.Join(u => u.Groups, () => link, () => link.Id == null)
+                .Full.Join(x => link.Group, () => group, () => group.Id == null)
+                .Full.Join(() => group.Customers, () => customerLink, () => customerLink.Id == null, null)
+                .Full.Join(() => customerLink.Customer, () => customer, () => customer.Id == null)
+                .Distinct().Select(u => customer.Name);
 
             var customers2 = Query<CustomerEntity>()
                 .Where(g => g.Name, FlowQueryIs.In(query2))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(customers.Count(), Is.EqualTo(4));
 
@@ -851,29 +896,31 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
             CustomerGroupLinkEntity customerLink = null;
             CustomerEntity customer = null;
 
-            var query = SubQuery.For<UserEntity>()
-                .Join(u => u.Groups, () => link)
-                .Join(() => link.Group, () => group)
-                .Join(() => group.Customers, () => customerLink)
-                .Join(() => customerLink.Customer, () => customer)
-                .SelectDistinct(u => customer.Name);
+            var query = Query<UserEntity>().Detached()
+                .Inner.Join(u => u.Groups, () => link)
+                .Inner.Join(() => link.Group, () => group)
+                .Inner.Join(() => group.Customers, () => customerLink)
+                .Inner.Join(() => customerLink.Customer, () => customer)
+                .Distinct().Select(u => customer.Name);
 
             var customers = Query<CustomerEntity>()
                 .Where(g => g.Name, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(customers.Count(), Is.EqualTo(4));
 
-            var query2 = SubQuery.For<UserEntity>()
-                .Join(u => u.Groups, () => link, x => x.Id == null)
-                .Join(x => link.Group, () => group, x => x.Id == null)
-                .Join(() => group.Customers, () => customerLink, x => x.Id == null, null)
-                .Join(() => customerLink.Customer, () => customer, x => x.Id == null)
-                .SelectDistinct(u => customer.Name);
+            var query2 = Query<UserEntity>().Detached()
+                .Inner.Join(u => u.Groups, () => link, () => link.Id == null)
+                .Inner.Join(x => link.Group, () => group, () => group.Id == null)
+                .Inner.Join(() => group.Customers, () => customerLink, () => customerLink.Id == null, null)
+                .Inner.Join(() => customerLink.Customer, () => customer, () => customer.Id == null)
+                .Distinct().Select(u => customer.Name);
 
             var customers2 = Query<CustomerEntity>()
                 .Where(g => g.Name, FlowQueryIs.In(query2))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(customers.Count(), Is.EqualTo(4));
 
@@ -890,29 +937,31 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
             CustomerGroupLinkEntity customerLink = null;
             CustomerEntity customer = null;
 
-            var query = SubQuery.For<UserEntity>()
-                .LeftOuterJoin(u => u.Groups, () => link)
-                .LeftOuterJoin(() => link.Group, () => group)
-                .LeftOuterJoin(() => group.Customers, () => customerLink)
-                .LeftOuterJoin(() => customerLink.Customer, () => customer)
-                .SelectDistinct(u => customer.Name);
+            var query = Query<UserEntity>().Detached()
+                .LeftOuter.Join(u => u.Groups, () => link)
+                .LeftOuter.Join(() => link.Group, () => group)
+                .LeftOuter.Join(() => group.Customers, () => customerLink)
+                .LeftOuter.Join(() => customerLink.Customer, () => customer)
+                .Distinct().Select(u => customer.Name);
 
             var customers = Query<CustomerEntity>()
                 .Where(g => g.Name, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(customers.Count(), Is.EqualTo(4));
 
-            var query2 = SubQuery.For<UserEntity>()
-                .LeftOuterJoin(u => u.Groups, () => link, x => x.Id == null)
-                .LeftOuterJoin(x => link.Group, () => group, x => x.Id == null)
-                .LeftOuterJoin(() => group.Customers, () => customerLink, x => x.Id == null, null)
-                .LeftOuterJoin(() => customerLink.Customer, () => customer, x => x.Id == null)
-                .SelectDistinct(u => customer.Name);
+            var query2 = Query<UserEntity>().Detached()
+                .LeftOuter.Join(u => u.Groups, () => link, () => link.Id == null)
+                .LeftOuter.Join(x => link.Group, () => group, () => group.Id == null)
+                .LeftOuter.Join(() => group.Customers, () => customerLink, () => customerLink.Id == null, null)
+                .LeftOuter.Join(() => customerLink.Customer, () => customer, () => customer.Id == null)
+                .Distinct().Select(u => customer.Name);
 
             var customers2 = Query<CustomerEntity>()
                 .Where(g => g.Name, FlowQueryIs.In(query2))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(customers.Count(), Is.EqualTo(4));
 
@@ -929,29 +978,31 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
             CustomerGroupLinkEntity customerLink = null;
             CustomerEntity customer = null;
 
-            var query = SubQuery.For<UserEntity>()
-                .RightOuterJoin(u => u.Groups, () => link)
-                .RightOuterJoin(() => link.Group, () => group)
-                .RightOuterJoin(() => group.Customers, () => customerLink)
-                .RightOuterJoin(() => customerLink.Customer, () => customer)
-                .SelectDistinct(u => customer.Name);
+            var query = Query<UserEntity>().Detached()
+                .RightOuter.Join(u => u.Groups, () => link)
+                .RightOuter.Join(() => link.Group, () => group)
+                .RightOuter.Join(() => group.Customers, () => customerLink)
+                .RightOuter.Join(() => customerLink.Customer, () => customer)
+                .Distinct().Select(u => customer.Name);
 
             var customers = Query<CustomerEntity>()
                 .Where(g => g.Name, FlowQueryIs.In(query))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(customers.Count(), Is.EqualTo(4));
 
-            var query2 = SubQuery.For<UserEntity>()
-                .RightOuterJoin(u => u.Groups, () => link, x => x.Id == null)
-                .RightOuterJoin(x => link.Group, () => group, x => x.Id == null)
-                .RightOuterJoin(() => group.Customers, () => customerLink, x => x.Id == null, null)
-                .RightOuterJoin(() => customerLink.Customer, () => customer, x => x.Id == null)
-                .SelectDistinct(u => customer.Name);
+            var query2 = Query<UserEntity>().Detached()
+                .RightOuter.Join(u => u.Groups, () => link, () => link.Id == null)
+                .RightOuter.Join(x => link.Group, () => group, () => group.Id == null)
+                .RightOuter.Join(() => group.Customers, () => customerLink, () => customerLink.Id == null, null)
+                .RightOuter.Join(() => customerLink.Customer, () => customer, () => customer.Id == null)
+                .Distinct().Select(u => customer.Name);
 
             var customers2 = Query<CustomerEntity>()
                 .Where(g => g.Name, FlowQueryIs.In(query2))
-                .Select();
+                .Select()
+                ;
 
             Assert.That(customers.Count(), Is.EqualTo(4));
 
