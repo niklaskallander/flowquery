@@ -1,0 +1,9 @@
+PROJECT/COMMUNITY:
+ - Find a great online service for documentation (+ write documentation)
+ - Find a great online service for issue tracking
+
+FEATURES/IMPROVEMENTS:
+ - Add possibility to project things that is executed after select. e.g. Query().Select(x => new { x.Id.GetHashCode() } (should only fetch Id and execute GetHashCode() afterwards).
+
+TESTING:
+ - Write more and better unit tests
