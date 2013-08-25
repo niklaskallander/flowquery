@@ -94,21 +94,14 @@ namespace NHibernate.FlowQuery.Core.Implementors
             return SelectList<TSource>();
         }
 
-        public virtual FlowQuerySelection<object> Select(PropertyProjection projection)
+        public virtual FlowQuerySelection<TDestination> Select<TDestination>(params string[] properties)
         {
-            Project(projection);
-
-            return SelectList<object>();
-        }
-
-        public virtual FlowQuerySelection<TDestination> Select<TDestination>(IProjection projection)
-        {
-            Project<TDestination>(projection);
+            Project<TDestination>(properties);
 
             return SelectList<TDestination>();
         }
 
-        public virtual FlowQuerySelection<TDestination> Select<TDestination>(PropertyProjection projection)
+        public virtual FlowQuerySelection<TDestination> Select<TDestination>(IProjection projection)
         {
             Project<TDestination>(projection);
 

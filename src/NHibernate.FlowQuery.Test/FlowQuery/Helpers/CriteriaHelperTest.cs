@@ -198,16 +198,6 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
             get { throw new NotImplementedException(); }
         }
 
-        public new NHibernate.FlowQuery.Core.Orders.IOrderBuilder<UserEntity, IDummyQuery3> Order
-        {
-            get { throw new NotImplementedException(); }
-        }
-
-        public new NHibernate.FlowQuery.Core.Orders.IOrderBuilder<UserEntity, IDummyQuery3> Then
-        {
-            get { throw new NotImplementedException(); }
-        }
-
         public new IDummyQuery3 Limit(int limit)
         {
             throw new NotImplementedException();
@@ -224,6 +214,73 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
         }
 
         public new IDummyQuery3 Take(int take)
+        {
+            throw new NotImplementedException();
+        }
+
+
+        public new IDummyQuery3 ClearOrders()
+        {
+            throw new NotImplementedException();
+        }
+
+        public new IDummyQuery3 ClearJoins()
+        {
+            throw new NotImplementedException();
+        }
+
+        public new IDummyQuery3 ClearLimit()
+        {
+            throw new NotImplementedException();
+        }
+
+
+        public new IDummyQuery3 OrderBy(string property, bool ascending = true)
+        {
+            throw new NotImplementedException();
+        }
+
+        IDummyQuery3 IFlowQuery<UserEntity, IDummyQuery3>.OrderBy(Criterion.IProjection projection, bool ascending)
+        {
+            throw new NotImplementedException();
+        }
+
+        IDummyQuery3 IFlowQuery<UserEntity, IDummyQuery3>.OrderBy(Expression<Func<UserEntity, object>> property, bool ascending)
+        {
+            throw new NotImplementedException();
+        }
+
+        public new IDummyQuery3 OrderBy<TProjection>(Expression<Func<TProjection, object>> projectionProperty, bool ascending)
+        {
+            throw new NotImplementedException();
+        }
+
+        IDummyQuery3 IFlowQuery<UserEntity, IDummyQuery3>.OrderBy<TProjection>(string property, bool ascending)
+        {
+            throw new NotImplementedException();
+        }
+
+        public new IDummyQuery3 OrderByDescending(string property)
+        {
+            throw new NotImplementedException();
+        }
+
+        IDummyQuery3 IFlowQuery<UserEntity, IDummyQuery3>.OrderByDescending(Criterion.IProjection projection)
+        {
+            throw new NotImplementedException();
+        }
+
+        IDummyQuery3 IFlowQuery<UserEntity, IDummyQuery3>.OrderByDescending(Expression<Func<UserEntity, object>> property)
+        {
+            throw new NotImplementedException();
+        }
+
+        public new IDummyQuery3 OrderByDescending<TProjection>(Expression<Func<TProjection, object>> projectionProperty)
+        {
+            throw new NotImplementedException();
+        }
+
+        IDummyQuery3 IFlowQuery<UserEntity, IDummyQuery3>.OrderByDescending<TProjection>(string property)
         {
             throw new NotImplementedException();
         }
@@ -385,16 +442,6 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
             get { throw new NotImplementedException(); }
         }
 
-        public NHibernate.FlowQuery.Core.Orders.IOrderBuilder<UserEntity, IDetachedFlowQuery<UserEntity>> Order
-        {
-            get { throw new NotImplementedException(); }
-        }
-
-        public NHibernate.FlowQuery.Core.Orders.IOrderBuilder<UserEntity, IDetachedFlowQuery<UserEntity>> Then
-        {
-            get { throw new NotImplementedException(); }
-        }
-
         public IDetachedFlowQuery<UserEntity> Limit(int limit)
         {
             throw new NotImplementedException();
@@ -418,6 +465,73 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
         public Criterion.DetachedCriteria Criteria
         {
             get { throw new NotImplementedException(); }
+        }
+
+
+        public IDetachedFlowQuery<UserEntity> ClearOrders()
+        {
+            throw new NotImplementedException();
+        }
+
+        public IDetachedFlowQuery<UserEntity> ClearJoins()
+        {
+            throw new NotImplementedException();
+        }
+
+        public IDetachedFlowQuery<UserEntity> ClearLimit()
+        {
+            throw new NotImplementedException();
+        }
+
+
+        public IDetachedFlowQuery<UserEntity> OrderBy(string property, bool ascending = true)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IDetachedFlowQuery<UserEntity> OrderBy(Criterion.IProjection projection, bool ascending = true)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IDetachedFlowQuery<UserEntity> OrderBy(Expression<Func<UserEntity, object>> property, bool ascending = true)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IDetachedFlowQuery<UserEntity> OrderBy<TProjection>(Expression<Func<TProjection, object>> projectionProperty, bool ascending = true)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IDetachedFlowQuery<UserEntity> OrderBy<TProjection>(string property, bool ascending = true)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IDetachedFlowQuery<UserEntity> OrderByDescending(string property)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IDetachedFlowQuery<UserEntity> OrderByDescending(Criterion.IProjection projection)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IDetachedFlowQuery<UserEntity> OrderByDescending(Expression<Func<UserEntity, object>> property)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IDetachedFlowQuery<UserEntity> OrderByDescending<TProjection>(Expression<Func<TProjection, object>> projectionProperty)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IDetachedFlowQuery<UserEntity> OrderByDescending<TProjection>(string property)
+        {
+            throw new NotImplementedException();
         }
     }
 }

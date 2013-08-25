@@ -652,13 +652,14 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         [Test]
         public void CanSelectSubstring()
         {
-            var shortNames = Query<UserEntity>().Select(x => x.Username.Substring(0, 2));
+            var shortNames = Query<UserEntity>().Select(x => x.Username.Substring(0, 1));
 
             Assert.That(shortNames.Count(), Is.EqualTo(4));
 
             foreach (string shortName in shortNames)
             {
-                Assert.That(shortName.Length, Is.EqualTo(1)); // somehow you always get what you want - 1 ( database error or something ).
+                Assert.That(shortName.Length, Is.EqualTo(1));
+                Assert.That(shortName.Trim(), Is.Not.EqualTo(string.Empty));
             }
         }
 
@@ -792,7 +793,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void CanSelectUsingPropertyProjection()
         {
             var names = Query<UserEntity>()
-                .Select(Projections.Property("Firstname"))
+                .Select<string>(Projections.Property("Firstname"))
                 ;
 
             Assert.That(names.Count(), Is.EqualTo(4));

@@ -12,13 +12,7 @@ namespace NHibernate.FlowQuery.Test.Setup
 {
     public static class NHibernateConfigurer
     {
-        #region Fields (2)
-
         private static ISessionFactory m_Factory;
-
-        #endregion Fields
-
-        #region Methods (4)
 
         public static void AddData()
         {
@@ -49,10 +43,10 @@ namespace NHibernate.FlowQuery.Test.Setup
                 session.Save(s5);
                 session.Save(s6);
 
-                var u1 = new UserEntity("Wimpy", "Cool01", "Niklas", "Källander", new DateTime(2001, 9, 11), RoleEnum.Administrator, "1") { LastLoggedInStamp = DateTime.Now, IsOnline = true, Setting = s6 };
-                var u2 = new UserEntity("Izmid", "Cool02", "Lars", "Wilk", new DateTime(2001, 4, 22), RoleEnum.Webmaster, "2") { LastLoggedInStamp = DateTime.Now, IsOnline = true, Setting = s6 };
-                var u3 = new UserEntity("Empor", "Cool03", "Kossan", "Muu", new DateTime(2001, 5, 3), RoleEnum.Administrator, "3") { LastLoggedInStamp = DateTime.Now, IsOnline = true, Setting = s6 };
-                var u4 = new UserEntity("Lajsa", "", "Lotta", "Bråk", DateTime.Now, RoleEnum.Standard, "4") { Setting = s6 };
+                var u1 = new UserEntity("Wimpy", "Cool01", "Niklas", "Källander", new DateTime(2001, 9, 11), RoleEnum.Administrator, "1") { LastLoggedInStamp = DateTime.Now, IsOnline = true, Setting = s6, NumberOfLogOns = 10 };
+                var u2 = new UserEntity("Izmid", "Cool02", "Lars", "Wilk", new DateTime(2001, 4, 22), RoleEnum.Webmaster, "2") { LastLoggedInStamp = DateTime.Now, IsOnline = true, Setting = s6, NumberOfLogOns = 17 };
+                var u3 = new UserEntity("Empor", "Cool03", "Kossan", "Muu", new DateTime(2001, 5, 3), RoleEnum.Administrator, "3") { LastLoggedInStamp = DateTime.Now, IsOnline = true, Setting = s6, NumberOfLogOns = 12 };
+                var u4 = new UserEntity("Lajsa", null, "Lotta", "Bråk", DateTime.Now, RoleEnum.Standard, "4") { Setting = s6, NumberOfLogOns = 4 };
 
                 session.Save(u1);
                 session.Save(u2);
@@ -158,7 +152,5 @@ namespace NHibernate.FlowQuery.Test.Setup
         {
             return m_Factory;
         }
-
-        #endregion Methods
     }
 }

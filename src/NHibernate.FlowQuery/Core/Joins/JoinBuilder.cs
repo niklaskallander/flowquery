@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
 using NHibernate.Criterion;
 using NHibernate.FlowQuery.Core.Implementors;
@@ -43,7 +42,7 @@ namespace NHibernate.FlowQuery.Core.Joins
             Query = query;
         }
 
-        protected virtual TFlowQuery JoinBase<TAlias>(Expression<Func<object>> projection, Expression<Func<TAlias>> alias, Expression<Func<bool>> joinOnClause = null, IRevealConvention revealConvention = null)
+        protected virtual TFlowQuery JoinBaseWithConvention<TAlias>(Expression<Func<TSource, object>> projection, Expression<Func<TAlias>> alias, Expression<Func<bool>> joinOnClause = null, IRevealConvention revealConvention = null)
         {
             if (revealConvention == null)
             {
@@ -110,44 +109,24 @@ namespace NHibernate.FlowQuery.Core.Joins
             return JoinBase(property, alias, joinOnClause);
         }
 
-        public virtual TFlowQuery Join<TAlias>(Expression<Func<TSource, TAlias>> projection, Expression<Func<TAlias>> alias)
+        public virtual TFlowQuery Join<TAlias>(Expression<Func<TSource, object>> projection, Expression<Func<TAlias>> alias)
         {
             return JoinBase(projection, alias);
         }
 
-        public virtual TFlowQuery Join<TAlias>(Expression<Func<TSource, TAlias>> projection, Expression<Func<TAlias>> alias, Expression<Func<bool>> joinOnClause)
+        public virtual TFlowQuery Join<TAlias>(Expression<Func<TSource, object>> projection, Expression<Func<TAlias>> alias, Expression<Func<bool>> joinOnClause)
         {
             return JoinBase(projection, alias, joinOnClause);
         }
 
-        public virtual TFlowQuery Join<TAlias>(Expression<Func<TSource, IEnumerable<TAlias>>> projection, Expression<Func<TAlias>> alias)
+        public virtual TFlowQuery Join<TAlias>(Expression<Func<TSource, object>> projection, Expression<Func<TAlias>> alias, IRevealConvention revealConvention)
         {
-            return JoinBase(projection, alias);
+            return JoinBaseWithConvention(projection, alias, null, revealConvention);
         }
 
-        public virtual TFlowQuery Join<TAlias>(Expression<Func<TSource, IEnumerable<TAlias>>> projection, Expression<Func<TAlias>> alias, Expression<Func<bool>> joinOnClause)
+        public virtual TFlowQuery Join<TAlias>(Expression<Func<TSource, object>> projection, Expression<Func<TAlias>> alias, Expression<Func<bool>> joinOnClause, IRevealConvention revealConvention)
         {
-            return JoinBase(projection, alias, joinOnClause);
-        }
-
-        public virtual TFlowQuery Join<TAlias>(Expression<Func<object>> projection, Expression<Func<TAlias>> alias)
-        {
-            return JoinBase(projection, alias);
-        }
-
-        public virtual TFlowQuery Join<TAlias>(Expression<Func<object>> projection, Expression<Func<TAlias>> alias, Expression<Func<bool>> joinOnClause)
-        {
-            return JoinBase(projection, alias, joinOnClause);
-        }
-
-        public virtual TFlowQuery Join<TAlias>(Expression<Func<object>> projection, Expression<Func<TAlias>> alias, Expression<Func<bool>> joinOnClause, IRevealConvention revealConvention)
-        {
-            return JoinBase(projection, alias, joinOnClause, revealConvention);
-        }
-
-        public virtual TFlowQuery Join<TAlias>(Expression<Func<object>> projection, Expression<Func<TAlias>> alias, IRevealConvention revealConvention)
-        {
-            return JoinBase(projection, alias, null, revealConvention);
+            return JoinBaseWithConvention(projection, alias, joinOnClause, revealConvention);
         }
     }
 }

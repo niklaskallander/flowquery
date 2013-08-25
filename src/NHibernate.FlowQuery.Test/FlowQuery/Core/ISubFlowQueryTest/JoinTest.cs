@@ -39,7 +39,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
 
             var query = Query<UserEntity>().Detached()
                 .Full.Join(u => u.Groups, () => link, () => link.Id == null)
-                .Full.Join(() => link.Group, () => group, () => group.Id == null)
+                .Full.Join(u => link.Group, () => group, () => group.Id == null)
                 .Select(u => link.Group.Id);
 
             var groups = Query<GroupEntity>()
@@ -120,7 +120,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
 
             var query = Query<UserEntity>().Detached()
                 .Inner.Join(u => u.Groups, () => link, () => link.Id == 2)
-                .Inner.Join(() => link.Group, () => group, () => group.Id == 2)
+                .Inner.Join(u => link.Group, () => group, () => group.Id == 2)
                 .Distinct().Select(u => link.Group.Id);
 
             var groups = Query<GroupEntity>()
@@ -150,7 +150,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
 
             var query = Query<UserEntity>().Detached()
                 .Inner.Join(u => u.Groups, () => link, () => link.Id == 2)
-                .Inner.Join(() => link.Group, () => group, () => group.Id == 2)
+                .Inner.Join(u => link.Group, () => group, () => group.Id == 2)
                 .Distinct().Select(u => link.Group.Id);
 
             var groups = Query<GroupEntity>()
@@ -362,7 +362,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
 
             var query = Query<UserEntity>().Detached()
                 .LeftOuter.Join(u => u.Groups, () => link, () => link.Id == 2)
-                .LeftOuter.Join(() => link.Group, () => group, () => group.Id == 1)
+                .LeftOuter.Join(u => link.Group, () => group, () => group.Id == 1)
                 .Select(u => link.Group.Id);
 
             var groups = Query<GroupEntity>()
@@ -444,7 +444,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
 
             var query = Query<UserEntity>().Detached()
                 .RightOuter.Join(u => u.Groups, () => link, () => link.Id == 2)
-                .RightOuter.Join(() => link.Group, () => group, () => group.Id == 2)
+                .RightOuter.Join(u => link.Group, () => group, () => group.Id == 2)
                 .Select(u => link.Group.Id);
 
             var groups = Query<GroupEntity>()
@@ -557,7 +557,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
 
             var query = Query<UserEntity>().Detached()
                 .Inner.Join(u => u.Groups, () => link)
-                .Inner.Join(() => link.Group, () => group)
+                .Inner.Join(u => link.Group, () => group)
                 .Distinct().Select(u => group.Id);
 
             var groups = Query<GroupEntity>()
@@ -578,7 +578,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
 
             var query = Query<UserEntity>().Detached()
                 .Inner.Join(u => u.Groups, () => link)
-                .Inner.Join(() => link.Group, () => group, new CustomConvention(x => x))
+                .Inner.Join(u => link.Group, () => group, new CustomConvention(x => x))
                 .Distinct().Select(u => group.Id);
 
             var groups = Query<GroupEntity>()
@@ -599,7 +599,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
 
             var query = Query<UserEntity>().Detached()
                 .Inner.Join(u => u.Groups, () => link)
-                .Inner.Join(() => link.Group, () => group)
+                .Inner.Join(u => link.Group, () => group)
                 .Distinct().Select(u => group.Id);
 
             var groups = Query<GroupEntity>()
@@ -620,7 +620,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
 
             var query = Query<UserEntity>().Detached()
                 .Inner.Join(u => u.Groups, () => link)
-                .Inner.Join(() => link.Group, () => group, new CustomConvention(x => x))
+                .Inner.Join(u => link.Group, () => group, new CustomConvention(x => x))
                 .Distinct().Select(u => group.Id);
 
             var groups = Query<GroupEntity>()
@@ -641,7 +641,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
 
             var query = Query<UserEntity>().Detached()
                 .Full.Join(u => u.Groups, () => link)
-                .Full.Join(() => link.Group, () => group)
+                .Full.Join(u => link.Group, () => group)
                 .Select(u => group.Id);
 
             var groups = Query<GroupEntity>()
@@ -662,7 +662,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
 
             var query = Query<UserEntity>().Detached()
                 .Full.Join(u => u.Groups, () => link)
-                .Full.Join(() => link.Group, () => group, new CustomConvention(x => x))
+                .Full.Join(u => link.Group, () => group, new CustomConvention(x => x))
                 .Select(u => group.Id);
 
             var groups = Query<GroupEntity>()
@@ -683,7 +683,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
 
             var query = Query<UserEntity>().Detached()
                 .LeftOuter.Join(u => u.Groups, () => link)
-                .LeftOuter.Join(() => link.Group, () => group)
+                .LeftOuter.Join(u => link.Group, () => group)
                 .Select(u => group.Id);
 
             var groups = Query<GroupEntity>()
@@ -704,7 +704,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
 
             var query = Query<UserEntity>().Detached()
                 .LeftOuter.Join(u => u.Groups, () => link)
-                .LeftOuter.Join(() => link.Group, () => group, new CustomConvention(x => x))
+                .LeftOuter.Join(u => link.Group, () => group, new CustomConvention(x => x))
                 .Select(u => group.Id);
 
             var groups = Query<GroupEntity>()
@@ -725,7 +725,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
 
             var query = Query<UserEntity>().Detached()
                 .RightOuter.Join(u => u.Groups, () => link)
-                .RightOuter.Join(() => link.Group, () => group)
+                .RightOuter.Join(u => link.Group, () => group)
                 .Select(u => group.Id);
 
             var groups = Query<GroupEntity>()
@@ -746,7 +746,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
 
             var query = Query<UserEntity>().Detached()
                 .RightOuter.Join(u => u.Groups, () => link)
-                .RightOuter.Join(() => link.Group, () => group, new CustomConvention(x => x))
+                .RightOuter.Join(u => link.Group, () => group, new CustomConvention(x => x))
                 .Select(u => group.Id);
 
             var groups = Query<GroupEntity>()
@@ -767,7 +767,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
                         {
                             Query<UserEntity>().Detached()
                                 .Inner.Join(u => u.Groups, () => link)
-                                .Inner.Join(() => link.Group, () => group, (IRevealConvention)null);
+                                .Inner.Join(u => link.Group, () => group, (IRevealConvention)null);
 
                         }, Throws.Nothing);
 
@@ -775,7 +775,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
                         {
                             Query<UserEntity>().Detached()
                                 .Inner.Join(u => u.Groups, () => link)
-                                .Inner.Join(() => link.Group, () => group, (IRevealConvention)null);
+                                .Inner.Join(u => link.Group, () => group, (IRevealConvention)null);
 
                         }, Throws.Nothing);
 
@@ -783,7 +783,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
                         {
                             Query<UserEntity>().Detached()
                                 .Full.Join(u => u.Groups, () => link)
-                                .Full.Join(() => link.Group, () => group, (IRevealConvention)null);
+                                .Full.Join(u => link.Group, () => group, (IRevealConvention)null);
 
                         }, Throws.Nothing);
 
@@ -791,7 +791,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
                         {
                             Query<UserEntity>().Detached()
                                 .RightOuter.Join(u => u.Groups, () => link)
-                                .RightOuter.Join(() => link.Group, () => group, (IRevealConvention)null);
+                                .RightOuter.Join(u => link.Group, () => group, (IRevealConvention)null);
 
                         }, Throws.Nothing);
 
@@ -799,7 +799,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
                         {
                             Query<UserEntity>().Detached()
                                 .LeftOuter.Join(u => u.Groups, () => link)
-                                .LeftOuter.Join(() => link.Group, () => group, (IRevealConvention)null);
+                                .LeftOuter.Join(u => link.Group, () => group, (IRevealConvention)null);
 
                         }, Throws.Nothing);
         }
@@ -816,9 +816,9 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
 
             var query = Query<UserEntity>().Detached()
                 .Inner.Join(u => u.Groups, () => link)
-                .Inner.Join(() => link.Group, () => group)
-                .Inner.Join(() => group.Customers, () => customerLink)
-                .Inner.Join(() => customerLink.Customer, () => customer)
+                .Inner.Join(u => link.Group, () => group)
+                .Inner.Join(u => group.Customers, () => customerLink)
+                .Inner.Join(u => customerLink.Customer, () => customer)
                 .Distinct().Select(u => customer.Name);
 
             var customers = Query<CustomerEntity>()
@@ -830,9 +830,9 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
 
             var query2 = Query<UserEntity>().Detached()
                 .Inner.Join(u => u.Groups, () => link, () => link.Id == null)
-                .Inner.Join(x => link.Group, () => group, () => group.Id == null)
-                .Inner.Join(() => group.Customers, () => customerLink, () => customerLink.Id == null, null)
-                .Inner.Join(() => customerLink.Customer, () => customer, () => customer.Id == null)
+                .Inner.Join(u => link.Group, () => group, () => group.Id == null)
+                .Inner.Join(u => group.Customers, () => customerLink, () => customerLink.Id == null, null)
+                .Inner.Join(u => customerLink.Customer, () => customer, () => customer.Id == null)
                 .Distinct().Select(u => customer.Name);
 
             var customers2 = Query<CustomerEntity>()
@@ -857,9 +857,9 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
 
             var query = Query<UserEntity>().Detached()
                 .Full.Join(u => u.Groups, () => link)
-                .Full.Join(() => link.Group, () => group)
-                .Full.Join(() => group.Customers, () => customerLink)
-                .Full.Join(() => customerLink.Customer, () => customer)
+                .Full.Join(u => link.Group, () => group)
+                .Full.Join(u => group.Customers, () => customerLink)
+                .Full.Join(u => customerLink.Customer, () => customer)
                 .Distinct().Select(u => customer.Name);
 
             var customers = Query<CustomerEntity>()
@@ -872,8 +872,8 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
             var query2 = Query<UserEntity>().Detached()
                 .Full.Join(u => u.Groups, () => link, () => link.Id == null)
                 .Full.Join(x => link.Group, () => group, () => group.Id == null)
-                .Full.Join(() => group.Customers, () => customerLink, () => customerLink.Id == null, null)
-                .Full.Join(() => customerLink.Customer, () => customer, () => customer.Id == null)
+                .Full.Join(u => group.Customers, () => customerLink, () => customerLink.Id == null, null)
+                .Full.Join(u => customerLink.Customer, () => customer, () => customer.Id == null)
                 .Distinct().Select(u => customer.Name);
 
             var customers2 = Query<CustomerEntity>()
@@ -898,9 +898,9 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
 
             var query = Query<UserEntity>().Detached()
                 .Inner.Join(u => u.Groups, () => link)
-                .Inner.Join(() => link.Group, () => group)
-                .Inner.Join(() => group.Customers, () => customerLink)
-                .Inner.Join(() => customerLink.Customer, () => customer)
+                .Inner.Join(u => link.Group, () => group)
+                .Inner.Join(u => group.Customers, () => customerLink)
+                .Inner.Join(u => customerLink.Customer, () => customer)
                 .Distinct().Select(u => customer.Name);
 
             var customers = Query<CustomerEntity>()
@@ -913,8 +913,8 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
             var query2 = Query<UserEntity>().Detached()
                 .Inner.Join(u => u.Groups, () => link, () => link.Id == null)
                 .Inner.Join(x => link.Group, () => group, () => group.Id == null)
-                .Inner.Join(() => group.Customers, () => customerLink, () => customerLink.Id == null, null)
-                .Inner.Join(() => customerLink.Customer, () => customer, () => customer.Id == null)
+                .Inner.Join(u => group.Customers, () => customerLink, () => customerLink.Id == null, null)
+                .Inner.Join(u => customerLink.Customer, () => customer, () => customer.Id == null)
                 .Distinct().Select(u => customer.Name);
 
             var customers2 = Query<CustomerEntity>()
@@ -939,9 +939,9 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
 
             var query = Query<UserEntity>().Detached()
                 .LeftOuter.Join(u => u.Groups, () => link)
-                .LeftOuter.Join(() => link.Group, () => group)
-                .LeftOuter.Join(() => group.Customers, () => customerLink)
-                .LeftOuter.Join(() => customerLink.Customer, () => customer)
+                .LeftOuter.Join(u => link.Group, () => group)
+                .LeftOuter.Join(u => group.Customers, () => customerLink)
+                .LeftOuter.Join(u => customerLink.Customer, () => customer)
                 .Distinct().Select(u => customer.Name);
 
             var customers = Query<CustomerEntity>()
@@ -954,8 +954,8 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
             var query2 = Query<UserEntity>().Detached()
                 .LeftOuter.Join(u => u.Groups, () => link, () => link.Id == null)
                 .LeftOuter.Join(x => link.Group, () => group, () => group.Id == null)
-                .LeftOuter.Join(() => group.Customers, () => customerLink, () => customerLink.Id == null, null)
-                .LeftOuter.Join(() => customerLink.Customer, () => customer, () => customer.Id == null)
+                .LeftOuter.Join(u => group.Customers, () => customerLink, () => customerLink.Id == null, null)
+                .LeftOuter.Join(u => customerLink.Customer, () => customer, () => customer.Id == null)
                 .Distinct().Select(u => customer.Name);
 
             var customers2 = Query<CustomerEntity>()
@@ -980,9 +980,9 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
 
             var query = Query<UserEntity>().Detached()
                 .RightOuter.Join(u => u.Groups, () => link)
-                .RightOuter.Join(() => link.Group, () => group)
-                .RightOuter.Join(() => group.Customers, () => customerLink)
-                .RightOuter.Join(() => customerLink.Customer, () => customer)
+                .RightOuter.Join(u => link.Group, () => group)
+                .RightOuter.Join(u => group.Customers, () => customerLink)
+                .RightOuter.Join(u => customerLink.Customer, () => customer)
                 .Distinct().Select(u => customer.Name);
 
             var customers = Query<CustomerEntity>()
@@ -995,8 +995,8 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
             var query2 = Query<UserEntity>().Detached()
                 .RightOuter.Join(u => u.Groups, () => link, () => link.Id == null)
                 .RightOuter.Join(x => link.Group, () => group, () => group.Id == null)
-                .RightOuter.Join(() => group.Customers, () => customerLink, () => customerLink.Id == null, null)
-                .RightOuter.Join(() => customerLink.Customer, () => customer, () => customer.Id == null)
+                .RightOuter.Join(u => group.Customers, () => customerLink, () => customerLink.Id == null, null)
+                .RightOuter.Join(u => customerLink.Customer, () => customer, () => customer.Id == null)
                 .Distinct().Select(u => customer.Name);
 
             var customers2 = Query<CustomerEntity>()

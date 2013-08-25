@@ -18,7 +18,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         {
             var detached = Query<UserEntity>()
                 .Detached()
-                .Order.By(x => x.IsOnline)
+                .OrderBy(x => x.IsOnline)
                 .Select(x => x.Id);
 
             Assert.That(() =>
@@ -38,7 +38,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
             var detached = Query<UserEntity>()
                 .Detached()
                 .Skip(1)
-                .Order.By(x => x.IsOnline)
+                .OrderBy(x => x.IsOnline)
                 .Select(x => x.Id);
 
             Assert.That(() =>
@@ -59,7 +59,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
             var detached = Query<UserEntity>()
                 .Detached()
                 .Take(1)
-                .Order.By(x => x.IsOnline)
+                .OrderBy(x => x.IsOnline)
                 .Select(x => x.Id);
 
             Assert.That(() =>
@@ -80,7 +80,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
             var detached = Query<UserEntity>()
                 .Detached()
                 .Limit(2, 2)
-                .Order.ByDescending(x => x.IsOnline)
+                .OrderByDescending(x => x.IsOnline)
                 .Select(x => x.Id);
 
             Assert.That(() =>
@@ -99,7 +99,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         public void CanOrderAscending()
         {
             var id = Query<UserEntity>().Detached()
-                .Order.By(x => x.Firstname)
+                .OrderBy(x => x.Firstname)
                 .Take(1)
                 .Skip(1)
                 .Select(x => x.Id);
@@ -118,7 +118,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         {
             var id = Query<UserEntity>()
                 .Detached()
-                .Order.By(Projections.Property("Firstname"))
+                .OrderBy(Projections.Property("Firstname"))
                 .Take(1)
                 .Skip(1)
                 .Select(x => x.Id);
@@ -136,7 +136,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         public void CanOrderAscendingUsingString()
         {
             var id = Query<UserEntity>().Detached()
-                .Order.By("Firstname")
+                .OrderBy("Firstname")
                 .Take(1)
                 .Skip(1)
                 .Select(x => x.Id);
@@ -154,7 +154,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         public void CanOrderDescending()
         {
             var id = Query<UserEntity>().Detached()
-                .Order.ByDescending(u => u.Firstname)
+                .OrderByDescending(u => u.Firstname)
                 .Take(1)
                 .Skip(1)
                 .Select(x => x.Id);
@@ -172,7 +172,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         public void CanOrderDescendingUsingProjection()
         {
             var id = Query<UserEntity>().Detached()
-                .Order.ByDescending(Projections.Property("Firstname"))
+                .OrderByDescending(Projections.Property("Firstname"))
                 .Take(1)
                 .Skip(1)
                 .Select(x => x.Id);
@@ -190,7 +190,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         public void CanOrderDescendingUsingString()
         {
             var id = Query<UserEntity>().Detached()
-                .Order.ByDescending("Firstname")
+                .OrderByDescending("Firstname")
                 .Take(1)
                 .Skip(1)
                 .Select(x => x.Id);

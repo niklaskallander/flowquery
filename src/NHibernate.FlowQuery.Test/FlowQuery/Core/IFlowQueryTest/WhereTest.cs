@@ -34,6 +34,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                 {
                     x.ExcludeProperty(u => u.CreatedStamp);
                     x.ExcludeProperty(u => u.IsOnline);
+                    x.ExcludeProperty(u => u.NumberOfLogOns);
                     x.ExcludeZeroes();
                     x.ExcludeNulls();
                 })
@@ -583,7 +584,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void WhereProjectionEqualToProjectionLeftNotMember()
         {
             var users = Query<UserEntity>()
-                .Where(x => x.Username.Substring(0, 2) == x.Firstname)
+                .Where(x => x.Username.Substring(0, 1) == x.Firstname)
                 .Select()
                 ;
 
@@ -594,7 +595,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void WhereProjectionEqualToProjectionNoMembers()
         {
             var users = Query<UserEntity>()
-                .Where(x => x.Username.Substring(0, 2) == x.Firstname.Substring(0, 2))
+                .Where(x => x.Username.Substring(0, 1) == x.Firstname.Substring(0, 1))
                 .Select()
                 ;
 
@@ -616,7 +617,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void WhereProjectionEqualToProjectionRightNotMember()
         {
             var users = Query<UserEntity>()
-                .Where(x => x.Username == x.Firstname.Substring(0, 2))
+                .Where(x => x.Username == x.Firstname.Substring(0, 1))
                 .Select()
                 ;
 
@@ -803,7 +804,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void WhereProjectionNotEqualToProjectionLeftNotMember()
         {
             var users = Query<UserEntity>()
-                .Where(x => x.Username.Substring(0, 2) != x.Firstname)
+                .Where(x => x.Username.Substring(0, 1) != x.Firstname)
                 .Select()
                 ;
 
@@ -814,7 +815,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void WhereProjectionNotEqualToProjectionNoMembers()
         {
             var users = Query<UserEntity>()
-                .Where(x => x.Username.Substring(0, 2) != x.Firstname.Substring(0, 2))
+                .Where(x => x.Username.Substring(0, 1) != x.Firstname.Substring(0, 1))
                 .Select()
                 ;
 
@@ -836,7 +837,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void WhereProjectionNotEqualToProjectionRightNotMember()
         {
             var users = Query<UserEntity>()
-                .Where(x => x.Username != x.Firstname.Substring(0, 2))
+                .Where(x => x.Username != x.Firstname.Substring(0, 1))
                 .Select()
                 ;
 

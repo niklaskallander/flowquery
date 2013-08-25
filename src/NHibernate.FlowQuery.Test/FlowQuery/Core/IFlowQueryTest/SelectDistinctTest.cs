@@ -206,19 +206,6 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         }
 
         [Test]
-        public void CanSelectDistinctUsingPropertyProjectionUntyped()
-        {
-            var bools = Query<UserEntity>()
-                .Distinct()
-                .Select(Projections.Property("IsOnline"))
-                ;
-
-            Assert.That(bools.Count(), Is.EqualTo(2));
-            Assert.That(bools.ElementAt(0), Is.False);
-            Assert.That(bools.ElementAt(1), Is.True);
-        }
-
-        [Test]
         public void CanSelectDistinctUsingSelectSetup()
         {
             var users = Query<UserEntity>()
@@ -275,7 +262,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void CanSelectDistinctUsingBasicProjection()
         {
             var users = Query<UserEntity>()
-                .Order.By("Id")
+                .OrderBy("Id")
                 .Distinct().Select
                 (
                     Projections

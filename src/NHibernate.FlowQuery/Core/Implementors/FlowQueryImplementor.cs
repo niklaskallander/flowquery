@@ -4,7 +4,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using NHibernate.Criterion;
 using NHibernate.FlowQuery.Core.Joins;
-using NHibernate.FlowQuery.Core.Orders;
 using NHibernate.FlowQuery.Expressions;
 using NHibernate.FlowQuery.Helpers;
 using NHibernate.SqlCommand;
@@ -62,9 +61,6 @@ namespace NHibernate.FlowQuery.Core.Implementors
             LeftOuter = new JoinBuilder<TSource, TFlowQuery>(this, Query, JoinType.LeftOuterJoin);
             RightOuter = new JoinBuilder<TSource, TFlowQuery>(this, Query, JoinType.RightOuterJoin);
             Full = new JoinBuilder<TSource, TFlowQuery>(this, Query, JoinType.FullJoin);
-
-            Order = new OrderBuilder<TSource, TFlowQuery>(this, Query);
-            Then = new OrderBuilder<TSource, TFlowQuery>(this, Query);
         }
 
         public virtual string Alias { get; private set; }
@@ -178,11 +174,81 @@ namespace NHibernate.FlowQuery.Core.Implementors
 
         public virtual List<Join> Joins { get; private set; }
 
-        public virtual IOrderBuilder<TSource, TFlowQuery> Order { get; private set; }
-
-        public virtual IOrderBuilder<TSource, TFlowQuery> Then { get; private set; }
-
         public virtual List<OrderByStatement> Orders { get; private set; }
+
+        public virtual TFlowQuery OrderBy(string property, bool ascending = true)
+        {
+            Orders.Add(new OrderByStatement()
+            {
+                IsBasedOnSource = true,
+                Order = ascending
+                    ? Order.Asc(property)
+                    : Order.Desc(property)
+            });
+
+            return Query;
+        }
+
+        public virtual TFlowQuery OrderByDescending(string property)
+        {
+            return OrderBy(property, false);
+        }
+
+        public virtual TFlowQuery OrderBy(IProjection projection, bool ascending = true)
+        {
+            Orders.Add(new OrderByStatement()
+            {
+                IsBasedOnSource = true,
+                Order = ascending
+                    ? Order.Asc(projection)
+                    : Order.Desc(projection)
+            });
+
+            return Query;
+        }
+
+        public virtual TFlowQuery OrderByDescending(IProjection projection)
+        {
+            return OrderBy(projection, false);
+        }
+
+        public virtual TFlowQuery OrderBy(Expression<Func<TSource, object>> property, bool ascending = true)
+        {
+            return OrderBy(ExpressionHelper.GetPropertyName(property.Body, property.Parameters[0].Name), ascending);
+        }
+
+        public virtual TFlowQuery OrderByDescending(Expression<Func<TSource, object>> property)
+        {
+            return OrderBy(property, false);
+        }
+
+        public virtual TFlowQuery OrderBy<TProjection>(string property, bool ascending = true)
+        {
+            Orders.Add(new OrderByStatement()
+            {
+                IsBasedOnSource = false,
+                OrderAscending = ascending,
+                ProjectionSourceType = typeof(TProjection),
+                Property = property
+            });
+
+            return Query;
+        }
+
+        public virtual TFlowQuery OrderByDescending<TProjection>(string property)
+        {
+            return OrderBy<TProjection>(property, false);
+        }
+
+        public virtual TFlowQuery OrderBy<TProjection>(Expression<Func<TProjection, object>> projection, bool ascending = true)
+        {
+            return OrderBy<TProjection>(ExpressionHelper.GetPropertyName(projection.Body, projection.Parameters[0].Name), ascending);
+        }
+
+        public virtual TFlowQuery OrderByDescending<TProjection>(Expression<Func<TProjection, object>> projection)
+        {
+            return OrderBy<TProjection>(projection, false);
+        }
 
         public virtual TFlowQuery Limit(int limit)
         {
@@ -211,5 +277,27 @@ namespace NHibernate.FlowQuery.Core.Implementors
         public virtual int? ResultsToSkip { get; private set; }
 
         public virtual int? ResultsToTake { get; private set; }
+
+        public virtual TFlowQuery ClearOrders()
+        {
+            Orders.Clear();
+
+            return Query;
+        }
+
+        public virtual TFlowQuery ClearJoins()
+        {
+            Joins.Clear();
+
+            return Query;
+        }
+
+        public virtual TFlowQuery ClearLimit()
+        {
+            ResultsToSkip = null;
+            ResultsToTake = null;
+
+            return Query;
+        }
     }
 }
