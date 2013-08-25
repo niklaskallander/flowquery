@@ -94,17 +94,7 @@ namespace NHibernate.FlowQuery.Core.Implementors
 
         public virtual TFlowQuery Project(params string[] properties)
         {
-            if (properties == null)
-            {
-                throw new ArgumentNullException("properties");
-            }
-
-            return Project
-            (
-                Projections
-                    .ProjectionList()
-                        .AddProperties(properties)
-            );
+            return Project<TSource>(properties);
         }
 
         public virtual TFlowQuery Project(IProjection projection)
@@ -112,9 +102,19 @@ namespace NHibernate.FlowQuery.Core.Implementors
             return Project<TSource>(projection);
         }
 
-        protected virtual TFlowQuery Project(PropertyProjection projection)
+        protected virtual TFlowQuery Project<TDestination>(params string[] properties)
         {
-            return Project<object>(projection);
+            if (properties == null)
+            {
+                throw new ArgumentNullException("properties");
+            }
+
+            return Project<TDestination>
+            (
+                Projections
+                    .ProjectionList()
+                        .AddProperties(properties)
+            );
         }
 
         protected virtual TFlowQuery Project<TDestination>(IProjection projection)
@@ -124,17 +124,9 @@ namespace NHibernate.FlowQuery.Core.Implementors
                 throw new ArgumentNullException("projecton");
             }
 
-            return ProjectionBase<TDestination>(projection);
-        }
+            System.Type type = typeof(TDestination);
 
-        protected virtual TFlowQuery Project<TDestination>(PropertyProjection projection)
-        {
-            if (projection == null)
-            {
-                throw new ArgumentNullException("projection");
-            }
-
-            return ProjectionBase<TDestination>(projection, setResultTransformer: false);
+            return ProjectionBase<TDestination>(projection, setResultTransformer: !(type.IsValueType || type == typeof(string)));
         }
 
         public virtual TFlowQuery Project(params Expression<Func<TSource, object>>[] properties)

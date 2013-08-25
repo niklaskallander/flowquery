@@ -18,7 +18,7 @@ namespace NHibernate.FlowQuery.Helpers
             {
                 object instance;
 
-                Invoke(expression, o as object[] ?? new object[] { o }, out instance);
+                Invoke(expression, o as object[] ?? new[] { o }, out instance);
 
                 temp.Add((TDestination)instance);
             }
@@ -34,7 +34,7 @@ namespace NHibernate.FlowQuery.Helpers
             {
                 object instance;
 
-                Invoke(expression, o as object[] ?? new object[] { o }, out instance);
+                Invoke(expression, o as object[] ?? new[] { o }, out instance);
 
                 temp.Add((TDestination)instance);
             }

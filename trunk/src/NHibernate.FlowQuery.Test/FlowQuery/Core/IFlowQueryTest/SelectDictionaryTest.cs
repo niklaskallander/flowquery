@@ -14,7 +14,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public virtual void CanSelectToDictionary()
         {
             Dictionary<long, string> userDictionary = Query<UserEntity>()
-                .Order.By(x => x.Id)
+                .OrderBy(x => x.Id)
                 .SelectDictionary(x => x.Id, x => x.Username)
                 ;
 

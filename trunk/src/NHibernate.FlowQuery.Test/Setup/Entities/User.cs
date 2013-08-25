@@ -5,8 +5,6 @@ namespace NHibernate.FlowQuery.Test.Setup.Entities
 {
     public interface IUserEntity
     {
-        #region Data Members (9)
-
         DateTime CreatedStamp { get; set; }
 
         string Firstname { get; set; }
@@ -24,14 +22,10 @@ namespace NHibernate.FlowQuery.Test.Setup.Entities
         RoleEnum Role { get; set; }
 
         string Username { get; set; }
-
-        #endregion Data Members
     }
 
     public class UserEntity : IUserEntity
     {
-        #region Constructors (2)
-
         public UserEntity(string username, string password, string firstname, string lastname, DateTime createdStamp, RoleEnum role, string testvalue)
             : this()
         {
@@ -49,9 +43,7 @@ namespace NHibernate.FlowQuery.Test.Setup.Entities
             Groups = new List<UserGroupLinkEntity>();
         }
 
-        #endregion Constructors
-
-        #region Properties (11)
+        public virtual int NumberOfLogOns { get; set; }
 
         public virtual DateTime CreatedStamp { get; set; }
 
@@ -76,7 +68,5 @@ namespace NHibernate.FlowQuery.Test.Setup.Entities
         public virtual string Username { get; set; }
 
         protected string m_TestValue;
-
-        #endregion Properties
     }
 }

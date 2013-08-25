@@ -46,6 +46,8 @@ namespace NHibernate.FlowQuery.Core
                     if (IsDelayed && m_DelayedSelection != null)
                     {
                         m_Selection = m_DelayedSelection();
+
+                        IsDelayed = false;
                     }
                 }
 

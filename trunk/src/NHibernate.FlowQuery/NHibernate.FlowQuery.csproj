@@ -44,7 +44,7 @@
       <HintPath>..\packages\Iesi.Collections.3.2.0.4000\lib\Net35\Iesi.Collections.dll</HintPath>
     </Reference>
     <Reference Include="NHibernate, Version=3.3.1.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
-      <HintPath>..\packages\NHibernate.3.3.2.4000\lib\Net35\NHibernate.dll</HintPath>
+      <HintPath>..\packages\NHibernate.3.3.3.4001\lib\Net35\NHibernate.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
@@ -74,15 +74,13 @@
     <Compile Include="Core\Joins\Join.cs" />
     <Compile Include="Core\Joins\IJoinBuilder.cs" />
     <Compile Include="Core\Joins\JoinBuilder.cs" />
-    <Compile Include="Core\Orders\OrderBuilder.cs" />
-    <Compile Include="Core\Orders\IOrderBuilder.cs" />
     <Compile Include="Core\Selection\PartialSelectionBuilder%272.cs" />
     <Compile Include="Core\Selection\PartialSelection%272.cs" />
-    <Compile Include="Core\Selection\ISelectSetup%273.cs" />
-    <Compile Include="Core\Selection\ISelectSetupPart%273.cs" />
+    <Compile Include="Core\Selection\ISelectSetup%272.cs" />
+    <Compile Include="Core\Selection\ISelectSetupPart%272.cs" />
     <Compile Include="Core\Selection\SelectionBuilder%272.cs" />
-    <Compile Include="Core\Selection\SelectSetup%273.cs" />
-    <Compile Include="Core\Selection\SelectSetupPart%273.cs" />
+    <Compile Include="Core\Selection\SelectSetup%272.cs" />
+    <Compile Include="Core\Selection\SelectSetupPart%272.cs" />
     <Compile Include="Core\OrderByStatement.cs" />
     <Compile Include="Core\Pair.cs" />
     <Compile Include="Core\ExampleWrapper.cs" />

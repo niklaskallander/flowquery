@@ -36,7 +36,9 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core
                                               .EnableLike()
                                               .ExcludeProperty(u => u.CreatedStamp)
                                               .ExcludeProperty(u => u.Role)
-                                              .ExcludeProperty(u => u.IsOnline))
+                                              .ExcludeProperty(u => u.IsOnline)
+                                              .ExcludeProperty(u => u.NumberOfLogOns))
+
                 .Select()
                 ;
 
@@ -61,7 +63,8 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core
                                               .EnableLike(MatchMode.Anywhere)
                                               .ExcludeProperty(u => u.CreatedStamp)
                                               .ExcludeProperty(u => u.Role)
-                                              .ExcludeProperty(u => u.IsOnline))
+                                              .ExcludeProperty(u => u.IsOnline)
+                                              .ExcludeProperty(u => u.NumberOfLogOns))
                 .Select()
                 ;
 
@@ -84,7 +87,8 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core
                                      }, x => x.ExcludeZeroes()
                                               .ExcludeNulls()
                                               .ExcludeProperty("CreatedStamp")
-                                              .ExcludeProperty(u => u.Role))
+                                              .ExcludeProperty(u => u.Role)
+                                              .ExcludeProperty(u => u.NumberOfLogOns))
                 .Select()
                 ;
 
@@ -102,7 +106,8 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core
                                      }, x => x.ExcludeZeroes()
                                               .ExcludeNulls()
                                               .ExcludeProperty(u => u.CreatedStamp)
-                                              .ExcludeProperty(u => u.Role))
+                                              .ExcludeProperty(u => u.Role)
+                                              .ExcludeProperty(u => u.NumberOfLogOns))
                 .Select()
                 ;
 

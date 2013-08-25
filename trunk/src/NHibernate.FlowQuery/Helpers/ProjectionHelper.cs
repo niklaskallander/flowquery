@@ -144,20 +144,20 @@ namespace NHibernate.FlowQuery.Helpers
             return new SqlFunctionProjection("concat", NHibernateUtil.String, projections.ToArray());
         }
 
-        private static IProjection GetConditionalProjection(ConditionalExpression expression, string rootName, Dictionary<string, string> aliases)
+        private static IProjection GetConditionalProjection(ConditionalExpression expression, string root, Dictionary<string, string> aliases)
         {
             return Projections.Conditional
             (
-                RestrictionHelper.GetCriterion(expression.Test, rootName, aliases),
-                GetProjection(expression.IfTrue, rootName, aliases),
-                GetProjection(expression.IfFalse, rootName, aliases)
+                RestrictionHelper.GetCriterion(expression.Test, root, aliases),
+                GetProjection(expression.IfTrue, root, aliases),
+                GetProjection(expression.IfFalse, root, aliases)
             );
         }
 
-        private static IProjection GetMethodCallProjection(MethodCallExpression expression, string rootName, Dictionary<string, string> aliases)
+        private static IProjection GetMethodCallProjection(MethodCallExpression expression, string root, Dictionary<string, string> aliases)
         {
             Expression subExpression = expression.Object ?? expression.Arguments[0];
-            IProjection projection = GetProjection(subExpression, rootName, aliases);
+            IProjection projection = GetProjection(subExpression, root, aliases);
 
             switch (expression.Method.Name)
             {
@@ -180,19 +180,38 @@ namespace NHibernate.FlowQuery.Helpers
                     return Projections.Count(projection);
 
                 case "CountDistinct":
-                    return Projections.CountDistinct(ExpressionHelper.GetPropertyName(subExpression, rootName));
+                    return Projections.CountDistinct(ExpressionHelper.GetPropertyName(subExpression, root));
 
                 case "As":
-                    return Projections.Property(ExpressionHelper.GetPropertyName(subExpression, rootName));
+                    return Projections.Property(ExpressionHelper.GetPropertyName(subExpression, root));
 
                 case "Substring":
+
+                    int start = ExpressionHelper.GetValue<int>(expression.Arguments[0]) + 1;
+
+                    int length = expression.Arguments.Count > 1
+                        ? ExpressionHelper.GetValue<int>(expression.Arguments[1])
+                        : int.MaxValue;
+
                     return new SqlFunctionProjection
                     (
                         "substring",
                         NHibernateUtil.String,
                         projection,
-                        Projections.Constant(ExpressionHelper.GetValue(expression.Arguments[0])),
-                        Projections.Constant(ExpressionHelper.GetValue(expression.Arguments[1]))
+                        Projections.Constant(start),
+                        Projections.Constant(length)
+                    );
+
+                case "StartsWith":
+                case "EndsWith":
+                case "Contains":
+                    ICriterion criterion = RestrictionHelper.GetCriterionForMethodCall(expression, root, aliases);
+
+                    return Projections.Conditional
+                    (
+                        criterion,
+                        Projections.Constant(true, NHibernateUtil.Boolean),
+                        Projections.Constant(false, NHibernateUtil.Boolean)
                     );
 
                 default:
@@ -239,6 +258,9 @@ namespace NHibernate.FlowQuery.Helpers
                 case ExpressionType.Convert:
                     return GetProjection((expression as UnaryExpression).Operand, root, aliases);
 
+                case ExpressionType.Coalesce:
+                    return GetCoalesceProjection((expression as BinaryExpression), root, aliases);
+
                 case ExpressionType.Constant:
                 default:
 
@@ -246,6 +268,19 @@ namespace NHibernate.FlowQuery.Helpers
 
                     return Projections.Constant(value, TypeHelper.GuessType(expression.Type));
             }
+        }
+
+        private static IProjection GetCoalesceProjection(BinaryExpression binaryExpression, string root, Dictionary<string, string> aliases)
+        {
+            IProjection original = GetProjection(binaryExpression.Left, root, aliases);
+            IProjection fallback = GetProjection(binaryExpression.Right, root, aliases);
+
+            return Projections.Conditional
+            (
+                Restrictions.IsNull(original),
+                fallback,
+                original
+            );
         }
 
         public static ProjectionList GetProjectionListForExpression(Expression expression, string root, Dictionary<string, string> aliases, ref Dictionary<string, IProjection> mappings)

@@ -2,7 +2,6 @@
 using System.Linq.Expressions;
 using NHibernate.Criterion;
 using NHibernate.FlowQuery.Core.Joins;
-using NHibernate.FlowQuery.Core.Orders;
 using NHibernate.FlowQuery.Expressions;
 
 namespace NHibernate.FlowQuery.Core
@@ -11,16 +10,6 @@ namespace NHibernate.FlowQuery.Core
         where TSource : class
         where TFlowQuery : class, IFlowQuery<TSource, TFlowQuery>
     {
-        TFlowQuery Where(params ICriterion[] criterions);
-
-        TFlowQuery Where(string property, IsExpression expression);
-
-        TFlowQuery Where(Expression<Func<TSource, bool>> expression);
-
-        TFlowQuery Where(Expression<Func<TSource, object>> property, IsExpression expression);
-
-        TFlowQuery Where(Expression<Func<TSource, WhereDelegate, bool>> expression);
-
         TFlowQuery And(params ICriterion[] criterions);
 
         TFlowQuery And(string property, IsExpression expression);
@@ -30,6 +19,22 @@ namespace NHibernate.FlowQuery.Core
         TFlowQuery And(Expression<Func<TSource, object>> property, IsExpression expression);
 
         TFlowQuery And(Expression<Func<TSource, WhereDelegate, bool>> expression);
+
+        TFlowQuery ClearOrders();
+
+        TFlowQuery ClearJoins();
+
+        TFlowQuery ClearLimit();
+
+        TFlowQuery Where(params ICriterion[] criterions);
+
+        TFlowQuery Where(string property, IsExpression expression);
+
+        TFlowQuery Where(Expression<Func<TSource, bool>> expression);
+
+        TFlowQuery Where(Expression<Func<TSource, object>> property, IsExpression expression);
+
+        TFlowQuery Where(Expression<Func<TSource, WhereDelegate, bool>> expression);
 
         /// <summary>
         /// If you haven't set any values to non-nullable datatypes or non-zero-based datatypes you
@@ -45,9 +50,37 @@ namespace NHibernate.FlowQuery.Core
 
         IJoinBuilder<TSource, TFlowQuery> Full { get; }
 
-        IOrderBuilder<TSource, TFlowQuery> Order { get; }
+        TFlowQuery OrderBy(string property, bool ascending = true);
 
-        IOrderBuilder<TSource, TFlowQuery> Then { get; }
+        TFlowQuery OrderBy(IProjection projection, bool ascending = true);
+
+        TFlowQuery OrderBy(Expression<Func<TSource, object>> property, bool ascending = true);
+
+        /// <summary>
+        /// OrderBy an alias in your projections. NOTE: Only works when projecting with MemberInitializers ( standalone and in new expressions ) and SelectSetup.
+        /// </summary>
+        TFlowQuery OrderBy<TProjection>(Expression<Func<TProjection, object>> projectionProperty, bool ascending = true);
+
+        /// <summary>
+        /// OrderBy an alias in your projections. NOTE: Only works when projecting with MemberInitializers ( standalone and in new expressions ) and SelectSetup.
+        /// </summary>
+        TFlowQuery OrderBy<TProjection>(string property, bool ascending = true);
+
+        TFlowQuery OrderByDescending(string property);
+
+        TFlowQuery OrderByDescending(IProjection projection);
+
+        TFlowQuery OrderByDescending(Expression<Func<TSource, object>> property);
+
+        /// <summary>
+        /// OrderBy an alias in your projections. NOTE: Only works when projecting with MemberInitializers ( standalone and in new exressions ) and SelectSetup.
+        /// </summary>
+        TFlowQuery OrderByDescending<TProjection>(Expression<Func<TProjection, object>> projectionProperty);
+
+        /// <summary>
+        /// OrderBy an alias in your projections. NOTE: Only works when projecting with MemberInitializers ( standalone and in new exressions ) and SelectSetup.
+        /// </summary>
+        TFlowQuery OrderByDescending<TProjection>(string property);
 
         TFlowQuery Limit(int limit);
 

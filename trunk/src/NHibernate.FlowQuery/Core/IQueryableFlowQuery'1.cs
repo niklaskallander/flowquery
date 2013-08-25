@@ -16,11 +16,9 @@ namespace NHibernate.FlowQuery.Core
 
         FlowQuerySelection<TSource> Select(IProjection projection);
 
-        FlowQuerySelection<object> Select(PropertyProjection projection);
+        FlowQuerySelection<TDestination> Select<TDestination>(params string[] properties);
 
         FlowQuerySelection<TDestination> Select<TDestination>(IProjection projection);
-
-        FlowQuerySelection<TDestination> Select<TDestination>(PropertyProjection projection);
 
         FlowQuerySelection<TSource> Select(params Expression<Func<TSource, object>>[] properties);
 

@@ -34,10 +34,5 @@ namespace NHibernate.FlowQuery
                 m_Options(criteria);
             }
         }
-
-        /// <summary>
-        /// Should futures be used by default?
-        /// </summary>
-        public static bool DelayByDefault { get; set; }
     }
 }
