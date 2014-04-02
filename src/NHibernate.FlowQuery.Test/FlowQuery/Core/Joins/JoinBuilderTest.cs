@@ -6,65 +6,43 @@ using NHibernate.FlowQuery.Test.Setup.Entities;
 using NHibernate.SqlCommand;
 using NUnit.Framework;
 
+// ReSharper disable ExpressionIsAlwaysNull
+// ReSharper disable SuspiciousTypeConversion.Global
 namespace NHibernate.FlowQuery.Test.FlowQuery.Core.Joins
 {
-    using Is = NUnit.Framework.Is;
-
     [TestFixture]
     public class JoinBuilderTest : BaseTest
     {
         [Test]
         public void JoinBuilderThrowsIfQueryIsNull()
         {
-            var implementor = Query<UserEntity>() as FlowQueryImplementor<UserEntity, IImmediateFlowQuery<UserEntity>>;
+            var implementor = (FlowQueryImplementor<UserEntity, IImmediateFlowQuery<UserEntity>>)DummyQuery<UserEntity>();
 
-            Assert.That(implementor, Is.Not.Null);
-
-            Assert.That(() =>
-                        {
-                            new DummyBuilder(implementor, null);
-
-                        }, Throws.InstanceOf<ArgumentNullException>());
+            Assert.That(() => new DummyBuilder(implementor, null), Throws.InstanceOf<ArgumentNullException>());
         }
 
         [Test]
         public void JoinBuilderThrowsIfImplementorIsNull()
         {
-            Assert.That(() =>
-                        {
-                            new DummyBuilder(null, Query<UserEntity>());
-
-                        }, Throws.InstanceOf<ArgumentNullException>());
+            Assert.That(() => new DummyBuilder(null, DummyQuery<UserEntity>()), Throws.InstanceOf<ArgumentNullException>());
         }
 
         [Test]
         public void JoinBuilderThrowsIfImplementorAndQueryIsNotSameReference()
         {
-            var implementor = Query<UserEntity>() as FlowQueryImplementor<UserEntity, IImmediateFlowQuery<UserEntity>>;
+            var implementor = (FlowQueryImplementor<UserEntity, IImmediateFlowQuery<UserEntity>>)DummyQuery<UserEntity>();
 
-            Assert.That(implementor, Is.Not.Null);
-
-            Assert.That(() =>
-                        {
-                            new DummyBuilder(implementor, Query<UserEntity>());
-
-                        }, Throws.ArgumentException);
+            Assert.That(() => new DummyBuilder(implementor, DummyQuery<UserEntity>()), Throws.ArgumentException);
         }
 
         [Test]
         public void JoinBuilderThrowsNothingWhenNeitherQueryNorImplementorIsNullAndBothAreTheSameReference()
         {
-            var query = Query<UserEntity>();
+            var query = DummyQuery<UserEntity>();
 
-            var implementor = query as FlowQueryImplementor<UserEntity, IImmediateFlowQuery<UserEntity>>;
+            var implementor = (FlowQueryImplementor<UserEntity, IImmediateFlowQuery<UserEntity>>)query;
 
-            Assert.That(implementor, Is.Not.Null);
-
-            Assert.That(() =>
-                        {
-                            new DummyBuilder(implementor, query);
-
-                        }, Throws.Nothing);
+            Assert.That(() => new DummyBuilder(implementor, query), Throws.Nothing);
         }
     }
 

@@ -5,23 +5,21 @@ using NUnit.Framework;
 
 namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
 {
-    using FlowQueryIs = NHibernate.FlowQuery.Is;
+    using FqIs = Is;
     using Is = NUnit.Framework.Is;
 
     [TestFixture]
     public class SelectDistinctTest : BaseTest
     {
-        #region Methods (3)
-
         [Test]
         public void CanSelectDistinctUsingExpression()
         {
-            var query = Query<UserEntity>().Detached()
+            var query = DetachedQuery<UserEntity>()
                 .Where(x => x.IsOnline)
                 .Distinct().Select(x => x.Id);
 
             var users = Query<UserEntity>()
-                .Where(x => x.Id, FlowQueryIs.In(query))
+                .Where(x => x.Id, FqIs.In(query))
                 .Select()
                 ;
 
@@ -31,12 +29,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void CanSelectDistinctUsingProjection()
         {
-            var query = Query<UserEntity>().Detached()
+            var query = DetachedQuery<UserEntity>()
                 .Where(x => x.IsOnline)
                 .Distinct().Select(Projections.Property("Id"));
 
             var users = Query<UserEntity>()
-                .Where(x => x.Id, FlowQueryIs.In(query))
+                .Where(x => x.Id, FqIs.In(query))
                 .Select()
                 ;
 
@@ -46,18 +44,16 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void CanSelectDistinctUsingString()
         {
-            var query = Query<UserEntity>().Detached()
+            var query = DetachedQuery<UserEntity>()
                 .Where(x => x.IsOnline)
-                .Distinct().Select("Id");
+                .Distinct().Select(new[] { "Id" });
 
             var users = Query<UserEntity>()
-                .Where(x => x.Id, FlowQueryIs.In(query))
+                .Where(x => x.Id, FqIs.In(query))
                 .Select()
                 ;
 
             Assert.That(users.Count(), Is.EqualTo(3));
         }
-
-        #endregion Methods
     }
 }

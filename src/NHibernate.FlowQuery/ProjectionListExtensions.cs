@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
 using NHibernate.Criterion;
 using NHibernate.FlowQuery.Helpers;
@@ -23,16 +22,16 @@ namespace NHibernate.FlowQuery
             return list;
         }
 
-        public static ProjectionList AddProperties<TSource>(this ProjectionList list, Dictionary<string, string> aliases, params Expression<Func<TSource, object>>[] properties)
+        public static ProjectionList AddProperties<TSource>(this ProjectionList list, QueryHelperData data, params Expression<Func<TSource, object>>[] properties)
         {
             foreach (var property in properties)
             {
                 if (property == null)
                 {
-                    throw new ArgumentNullException("property");
+                    throw new ArgumentException("Properties contains null value", "properties");
                 }
 
-                list.AddProperty(property, aliases);
+                list.AddProperty(property, data);
             }
 
             return list;
@@ -48,13 +47,13 @@ namespace NHibernate.FlowQuery
             return list.Add(Projections.Property(property), alias);
         }
 
-        public static ProjectionList AddProperty<TSource, TProperty>(this ProjectionList list, Expression<Func<TSource, TProperty>> property, Dictionary<string, string> aliases)
+        public static ProjectionList AddProperty<TSource, TProperty>(this ProjectionList list, Expression<Func<TSource, TProperty>> property, QueryHelperData data)
         {
-            IProjection projection = ProjectionHelper.GetProjection(property.Body, property.Parameters[0].Name, aliases);
+            IProjection projection = ProjectionHelper.GetProjection(property.Body, property.Parameters[0].Name, data);
 
             string alias = null;
 
-            IPropertyProjection propertyProjection = projection as IPropertyProjection;
+            var propertyProjection = projection as IPropertyProjection;
 
             if (propertyProjection != null)
             {

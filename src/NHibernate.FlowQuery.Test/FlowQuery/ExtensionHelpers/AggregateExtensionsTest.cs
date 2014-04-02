@@ -10,26 +10,24 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.ExtensionHelpers
     [TestFixture]
     public class AggregateExtensionsTest : BaseTest
     {
-        #region Methods (14)
-
         [Test]
         public void AverageThrowsWhenCalledOutsideLambdaExpression()
         {
-            Assert.That(() => { "".Average(); }, Throws.InstanceOf<InvalidOperationException>());
+            Assert.That(() => "".Average(), Throws.InstanceOf<InvalidOperationException>());
         }
 
         [Test]
         public void CanAggregateAverage()
         {
             var avgs = Query<UserEntity>()
-                .Select(u => u.Id.Average())
+                .Select(u => (int)u.Id.Average())
                 ;
 
             Assert.That(avgs, Is.Not.Empty);
 
             foreach (var avg in avgs)
             {
-                Assert.That(avg, Is.EqualTo(2.5M));
+                Assert.That(avg, Is.EqualTo(2));
             }
         }
 
@@ -68,11 +66,10 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.ExtensionHelpers
         {
             var counts = Query<UserEntity>()
                 .Select(u => new
-                        {
-                            Count = u.Id.Count(),
-                            Username = u.Username.GroupBy()
-                        })
-                        ;
+                {
+                    Count = u.Id.Count(),
+                    Username = u.Username.GroupBy()
+                });
 
             Assert.That(counts, Is.Not.Empty);
 
@@ -130,39 +127,37 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.ExtensionHelpers
         [Test]
         public void CountDistinctThrowsWhenCalledOutsideLambdaExpression()
         {
-            Assert.That(() => { "".CountDistinct(); }, Throws.InstanceOf<InvalidOperationException>());
+            Assert.That(() => "".CountDistinct(), Throws.InstanceOf<InvalidOperationException>());
         }
 
         [Test]
         public void CountThrowsWhenCalledOutsideLambdaExpression()
         {
-            Assert.That(() => { "".Count(); }, Throws.InstanceOf<InvalidOperationException>());
+            Assert.That(() => "".Count(), Throws.InstanceOf<InvalidOperationException>());
         }
 
         [Test]
         public void GroupByThrowsWhenCalledOutsideLambdaExpression()
         {
-            Assert.That(() => { "".GroupBy(); }, Throws.InstanceOf<InvalidOperationException>());
+            Assert.That(() => "".GroupBy(), Throws.InstanceOf<InvalidOperationException>());
         }
 
         [Test]
         public void MaxThrowsWhenCalledOutsideLambdaExpression()
         {
-            Assert.That(() => { "".Max(); }, Throws.InstanceOf<InvalidOperationException>());
+            Assert.That(() => "".Max(), Throws.InstanceOf<InvalidOperationException>());
         }
 
         [Test]
         public void MinThrowsWhenCalledOutsideLambdaExpression()
         {
-            Assert.That(() => { "".Min(); }, Throws.InstanceOf<InvalidOperationException>());
+            Assert.That(() => "".Min(), Throws.InstanceOf<InvalidOperationException>());
         }
 
         [Test]
         public void SumThrowsWhenCalledOutsideLambdaExpression()
         {
-            Assert.That(() => { "".Sum(); }, Throws.InstanceOf<InvalidOperationException>());
+            Assert.That(() => "".Sum(), Throws.InstanceOf<InvalidOperationException>());
         }
-
-        #endregion Methods
     }
 }

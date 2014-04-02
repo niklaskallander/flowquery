@@ -12,7 +12,7 @@ namespace NHibernate.FlowQuery.Expressions
             m_High = high;
         }
 
-        public override ICriterion Compile(string property)
+        protected override ICriterion CompileCore(string property)
         {
             return Restrictions.Between(Projections.Property(property), m_Low, m_High);
         }

@@ -9,14 +9,14 @@ namespace NHibernate.FlowQuery.Core.Selection
     public class SelectSetup<TSource, TDestination> : ISelectSetup<TSource, TDestination>
         where TSource : class
     {
-        public SelectSetup(SelectionBuilder<TSource, TDestination> selectionBuilder, Dictionary<string, string> aliases)
+        public SelectSetup(SelectionBuilder<TSource, TDestination> selectionBuilder, QueryHelperData data)
         {
             if (selectionBuilder == null)
             {
                 throw new ArgumentNullException("selectionBuilder");
             }
 
-            Aliases = aliases;
+            Data = data;
 
             Mappings = new Dictionary<string, IProjection>();
 
@@ -25,25 +25,25 @@ namespace NHibernate.FlowQuery.Core.Selection
             SelectionBuilder = selectionBuilder;
         }
 
-        protected virtual Dictionary<string, string> Aliases { get; set; }
+        protected QueryHelperData Data { get; private set; }
 
-        protected virtual Dictionary<string, IProjection> Mappings { get; set; }
+        public Dictionary<string, IProjection> Mappings { get; private set; }
 
-        protected virtual ProjectionList ProjectionList { get; private set; }
+        public ProjectionList ProjectionList { get; private set; }
 
-        protected virtual SelectionBuilder<TSource, TDestination> SelectionBuilder { get; set; }
+        protected SelectionBuilder<TSource, TDestination> SelectionBuilder { get; private set; }
 
-        protected virtual ISelectSetupPart<TSource, TDestination> For(string property)
+        public virtual ISelectSetupPart<TSource, TDestination> For(string property)
         {
             if (string.IsNullOrEmpty(property))
             {
                 throw new ArgumentException("property");
             }
 
-            return new SelectSetupPart<TSource, TDestination>(property, this, Aliases);
+            return new SelectSetupPart<TSource, TDestination>(property, this, Data);
         }
 
-        protected virtual ISelectSetupPart<TSource, TDestination> For(Expression<Func<TDestination, object>> expression)
+        public virtual ISelectSetupPart<TSource, TDestination> For(Expression<Func<TDestination, object>> expression)
         {
             if (expression == null)
             {
@@ -55,7 +55,7 @@ namespace NHibernate.FlowQuery.Core.Selection
             return For(property);
         }
 
-        protected virtual FlowQuerySelection<TDestination> Select()
+        public virtual FlowQuerySelection<TDestination> Select()
         {
             if (ProjectionList.Length == 0)
             {
@@ -64,36 +64,5 @@ namespace NHibernate.FlowQuery.Core.Selection
 
             return SelectionBuilder(this);
         }
-
-
-
-        #region ISelectSetup<TSource, TDestination> Members
-
-        Dictionary<string, IProjection> ISelectSetup<TSource, TDestination>.Mappings
-        {
-            get { return Mappings; }
-        }
-
-        ProjectionList ISelectSetup<TSource, TDestination>.ProjectionList
-        {
-            get { return ProjectionList; }
-        }
-
-        ISelectSetupPart<TSource, TDestination> ISelectSetup<TSource, TDestination>.For(string property)
-        {
-            return For(property);
-        }
-
-        ISelectSetupPart<TSource, TDestination> ISelectSetup<TSource, TDestination>.For(Expression<Func<TDestination, object>> expression)
-        {
-            return For(expression);
-        }
-
-        FlowQuerySelection<TDestination> ISelectSetup<TSource, TDestination>.Select()
-        {
-            return Select();
-        }
-
-        #endregion
     }
 }

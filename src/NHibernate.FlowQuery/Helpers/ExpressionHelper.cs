@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using NHibernate.FlowQuery.Core.Joins;
 
 namespace NHibernate.FlowQuery.Helpers
 {
@@ -22,13 +23,13 @@ namespace NHibernate.FlowQuery.Helpers
 
             Expression first = expressions[0].Body;
 
-            NewExpression constructor = null;
+            NewExpression constructor;
 
-            List<MemberBinding> bindings = new List<MemberBinding>();
+            var bindings = new List<MemberBinding>();
 
             if (first.NodeType == ExpressionType.MemberInit)
             {
-                MemberInitExpression initializer = first as MemberInitExpression;
+                var initializer = (MemberInitExpression)first;
 
                 constructor = initializer.NewExpression;
 
@@ -36,7 +37,7 @@ namespace NHibernate.FlowQuery.Helpers
             }
             else if (first.NodeType == ExpressionType.New)
             {
-                constructor = first as NewExpression;
+                constructor = (NewExpression)first;
             }
             else
             {
@@ -52,17 +53,20 @@ namespace NHibernate.FlowQuery.Helpers
                     continue;
                 }
 
-                MemberInitExpression initializer = expressions[i].Body as MemberInitExpression;
+                var initializer = (MemberInitExpression)expressions[i].Body;
 
-                ParameterReplaceVisitor replace = new ParameterReplaceVisitor(expressions[i].Parameters[0], parameter);
+                var replace = new ParameterReplaceVisitor(expressions[i].Parameters[0], parameter);
 
                 foreach (MemberAssignment binding in initializer.Bindings.OfType<MemberAssignment>())
                 {
                     Expression converted = replace.VisitAndConvert(binding.Expression, "Combine");
 
-                    MemberAssignment assignment = Expression.Bind(binding.Member, converted);
+                    if (converted != null)
+                    {
+                        MemberAssignment assignment = Expression.Bind(binding.Member, converted);
 
-                    bindings.Add(assignment);
+                        bindings.Add(assignment);
+                    }
                 }
             }
 
@@ -78,16 +82,19 @@ namespace NHibernate.FlowQuery.Helpers
                 switch (expression.NodeType)
                 {
                     case ExpressionType.Call:
-                        return GetConstantRootString((expression as MethodCallExpression).Object ?? (expression as MethodCallExpression).Arguments[0]);
+
+                        var methodCall = (MethodCallExpression)expression;
+
+                        return GetConstantRootString(methodCall.Object ?? methodCall.Arguments[0]);
 
                     case ExpressionType.Convert:
-                        return GetConstantRootString((expression as UnaryExpression).Operand);
+                        return GetConstantRootString(((UnaryExpression)expression).Operand);
 
                     case ExpressionType.Lambda:
-                        return GetConstantRootString((expression as LambdaExpression).Body);
+                        return GetConstantRootString(((LambdaExpression)expression).Body);
 
                     case ExpressionType.MemberAccess:
-                        return GetConstantRootString((expression as MemberExpression).Expression);
+                        return GetConstantRootString(((MemberExpression)expression).Expression);
 
                     case ExpressionType.Constant:
                         return expression.ToString();
@@ -129,13 +136,15 @@ namespace NHibernate.FlowQuery.Helpers
             switch (expression.NodeType)
             {
                 case ExpressionType.Call:
-                    return GetPropertyName((expression as MethodCallExpression).Object ?? (expression as MethodCallExpression).Arguments[0]);
+                    var methodCall = (MethodCallExpression)expression;
+
+                    return GetPropertyName(methodCall.Object ?? methodCall.Arguments[0]);
 
                 case ExpressionType.Convert:
-                    return GetPropertyName((expression as UnaryExpression).Operand);
+                    return GetPropertyName(((UnaryExpression)expression).Operand);
 
                 case ExpressionType.Lambda:
-                    return GetPropertyName((expression as LambdaExpression).Body);
+                    return GetPropertyName(((LambdaExpression)expression).Body);
 
                 case ExpressionType.MemberAccess:
                     return GetPropertyName(expression as MemberExpression);
@@ -152,7 +161,7 @@ namespace NHibernate.FlowQuery.Helpers
             throw new NotSupportedException("The expression contains unsupported features please revise your code");
         }
 
-        public static bool IsRooted(Expression expression, string expectedRoot, Dictionary<string, string> aliases)
+        public static bool IsRooted(Expression expression, string expectedRoot, QueryHelperData data)
         {
             if (expression == null)
             {
@@ -163,7 +172,14 @@ namespace NHibernate.FlowQuery.Helpers
 
             string[] splits = property.Split('.');
 
-            return splits.Length != 1 && (splits[0] == expectedRoot || (aliases != null && aliases.ContainsValue(splits[0])));
+            if (splits.Length <= 1)
+            {
+                return false;
+            }
+
+            return splits[0] == expectedRoot 
+                || data.Aliases
+                    .ContainsValue(splits[0]);
         }
 
         public static string GetPropertyName(Expression expression, string expectedRoot)
@@ -179,7 +195,7 @@ namespace NHibernate.FlowQuery.Helpers
 
             if (splits[0] == expectedRoot)
             {
-                string[] parts = new string[splits.Length - 1];
+                var parts = new string[splits.Length - 1];
 
                 for (int i = 1; i < splits.Length; i++)
                 {
@@ -202,13 +218,15 @@ namespace NHibernate.FlowQuery.Helpers
             switch (expression.NodeType)
             {
                 case ExpressionType.Call:
-                    return GetRoot((expression as MethodCallExpression).Object ?? (expression as MethodCallExpression).Arguments[0]); // original method ?? extension method
+                    var methodCall = (MethodCallExpression)expression;
+
+                    return GetRoot(methodCall.Object ?? methodCall.Arguments[0]); // original method ?? extension method
 
                 case ExpressionType.Convert:
-                    return GetRoot((expression as UnaryExpression).Operand);
+                    return GetRoot(((UnaryExpression)expression).Operand);
 
                 case ExpressionType.Lambda:
-                    return GetRoot((expression as LambdaExpression).Body);
+                    return GetRoot(((LambdaExpression)expression).Body);
 
                 case ExpressionType.MemberAccess:
                     return GetPropertyName(expression as MemberExpression).Split('.')[0];
@@ -267,16 +285,18 @@ namespace NHibernate.FlowQuery.Helpers
                 switch (expression.NodeType)
                 {
                     case ExpressionType.Call:
-                        return HasConstantRoot((expression as MethodCallExpression).Object ?? (expression as MethodCallExpression).Arguments[0]);
+                        var methodCall = (MethodCallExpression)expression;
+
+                        return HasConstantRoot(methodCall.Object ?? methodCall.Arguments[0]);
 
                     case ExpressionType.Convert:
-                        return HasConstantRoot((expression as UnaryExpression).Operand);
+                        return HasConstantRoot(((UnaryExpression)expression).Operand);
 
                     case ExpressionType.Lambda:
-                        return HasConstantRoot((expression as LambdaExpression).Body);
+                        return HasConstantRoot(((LambdaExpression)expression).Body);
 
                     case ExpressionType.MemberAccess:
-                        return HasConstantRoot((expression as MemberExpression).Expression);
+                        return HasConstantRoot(((MemberExpression)expression).Expression);
 
                     case ExpressionType.Constant:
                         return true;

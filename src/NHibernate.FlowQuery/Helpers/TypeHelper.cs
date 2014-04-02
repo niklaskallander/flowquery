@@ -27,7 +27,7 @@ namespace NHibernate.FlowQuery.Helpers
             }
         }
 
-        public static IType GuessType(System.Type type)
+        public static IType GuessType(System.Type type, bool isCastType = false)
         {
             if (type.IsGenericType && typeof(Nullable<>).Equals(type.GetGenericTypeDefinition()))
             {
@@ -42,6 +42,11 @@ namespace NHibernate.FlowQuery.Helpers
             if (flag)
             {
                 return iType;
+            }
+
+            if (isCastType)
+            {
+                return null;
             }
 
             return NHibernateUtil.GuessType(type);

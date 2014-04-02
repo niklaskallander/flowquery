@@ -1,11 +1,17 @@
 ﻿using System;
 using System.Linq.Expressions;
+using NHibernate.Criterion;
 using NHibernate.FlowQuery.Core;
+using NHibernate.FlowQuery.Core.Fetches;
 using NHibernate.FlowQuery.Core.Implementors;
+using NHibernate.FlowQuery.Core.Locks;
 using NHibernate.FlowQuery.Helpers;
+using NHibernate.FlowQuery.Revealing.Conventions;
 using NHibernate.FlowQuery.Test.Setup.Dtos;
 using NHibernate.FlowQuery.Test.Setup.Entities;
+using NHibernate.Metadata;
 using NUnit.Framework;
+using IsEmptyExpression = NHibernate.FlowQuery.Expressions.IsEmptyExpression;
 
 namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
 {
@@ -17,21 +23,13 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
         [Test]
         public void QuerySelectionThrowsIfQueryIsNull()
         {
-            Assert.That(() =>
-                        {
-                            QuerySelection.Create(null);
-
-                        }, Throws.InstanceOf<ArgumentNullException>());
+            Assert.That(() => QuerySelection.Create(null), Throws.InstanceOf<ArgumentNullException>());
         }
 
         [Test]
         public void BuildCriteriaThrowsIfQuerySelectionIsNull()
         {
-            Assert.That(() =>
-                        {
-                            CriteriaHelper.BuildCriteria<UserEntity, UserEntity>(null);
-
-                        }, Throws.InstanceOf<ArgumentNullException>());
+            Assert.That(() => CriteriaHelper.BuildCriteria<UserEntity, UserEntity>(null), Throws.InstanceOf<ArgumentNullException>());
         }
 
         [Test]
@@ -45,29 +43,21 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
         [Test]
         public void FlowQueryImplementorThrowsIfCriteriaFactoryIsNull()
         {
-            Assert.That(() =>
-                        {
-                            new DummyQuery2(null);
-
-                        }, Throws.InstanceOf<ArgumentNullException>());
+            Assert.That(() => new DummyQuery2(null, null), Throws.InstanceOf<ArgumentNullException>());
         }
 
         [Test]
         public void FlowQueryImplementorThrowsIfQueryTypeMismatch()
         {
-            Assert.That(() =>
-                        {
-                            new DummyQuery3((t, a) => Session.CreateCriteria(t, a));
-
-                        }, Throws.ArgumentException);
+            Assert.That(() => new DummyQuery3(Session.CreateCriteria, Session.SessionFactory.GetClassMetadata), Throws.ArgumentException);
         }
 
         [Test]
         public void MorphableQueryImplementorPopulatesMappingsIfSet()
         {
-            var query = new DummyQuery2((t, a) => Session.CreateCriteria(t, a));
+            var query = new DummyQuery2(Session.CreateCriteria, Session.SessionFactory.GetClassMetadata);
 
-            query.XProject<UserDto>(x => new UserDto()
+            query.XProject(x => new UserDto
             {
                 Fullname = x.Firstname + " " + x.Lastname,
                 Id = x.Id
@@ -78,9 +68,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
 
             IImmediateFlowQuery<UserEntity> immediate = query.Immediate();
 
-            IMorphableFlowQuery morphable = immediate as IMorphableFlowQuery;
+            var morphable = immediate as IMorphableFlowQuery;
 
             Assert.That(morphable, Is.Not.Null);
+
+            // ReSharper disable once PossibleNullReferenceException
             Assert.That(morphable.Mappings, Is.Not.Null);
 
             Assert.That(morphable.Mappings.Count, Is.EqualTo(2));
@@ -89,9 +81,9 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
         [Test]
         public void FlowQueryImplementorCreatesNewReferencesForUsedCollectionsWhenMorphing()
         {
-            var query = new DummyQuery2((t, a) => Session.CreateCriteria(t, a));
+            var query = new DummyQuery2(Session.CreateCriteria, Session.SessionFactory.GetClassMetadata);
 
-            query.XProject<UserDto>(x => new UserDto()
+            query.XProject(x => new UserDto
             {
                 Fullname = x.Firstname + " " + x.Lastname,
                 Id = x.Id
@@ -102,15 +94,19 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
 
             IImmediateFlowQuery<UserEntity> immediate = query.Immediate();
 
-            IMorphableFlowQuery morphable = immediate as IMorphableFlowQuery;
+            var morphable = immediate as IMorphableFlowQuery;
 
             Assert.That(morphable, Is.Not.Null);
+
+            // ReSharper disable once PossibleNullReferenceException
             Assert.That(morphable.Mappings, Is.Not.Null);
 
-            Assert.That(!object.ReferenceEquals(morphable.Mappings, query.Mappings));
-            Assert.That(!object.ReferenceEquals(morphable.Orders, query.Orders));
-            Assert.That(!object.ReferenceEquals(morphable.Joins, query.Joins));
-            Assert.That(!object.ReferenceEquals(morphable.Aliases, query.Aliases));
+            Assert.That(!ReferenceEquals(morphable.Mappings, query.Mappings));
+            Assert.That(!ReferenceEquals(morphable.Orders, query.Orders));
+            Assert.That(!ReferenceEquals(morphable.GroupBys, query.GroupBys));
+            Assert.That(!ReferenceEquals(morphable.Joins, query.Joins));
+            Assert.That(!ReferenceEquals(morphable.Locks, query.Locks));
+            Assert.That(!ReferenceEquals(morphable.Aliases, query.Aliases));
         }
     }
 
@@ -119,11 +115,56 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
 
     internal class DummyQuery3 : MorphableFlowQueryImplementorBase<UserEntity, IDummyQuery2>, IDummyQuery3
     {
-        protected internal DummyQuery3(Func<System.Type, string, ICriteria> criteriaFactory, string alias = null, FlowQueryOptions options = null, IMorphableFlowQuery query = null)
-            : base(criteriaFactory, alias, options, query)
+        protected internal DummyQuery3(Func<System.Type, string, ICriteria> criteriaFactory, Func<System.Type, IClassMetadata> metaDataFactory, string alias = null, FlowQueryOptions options = null, IMorphableFlowQuery query = null)
+            : base(criteriaFactory, metaDataFactory, alias, options, query)
         { }
 
-        public new IDummyQuery3 Where(params Criterion.ICriterion[] criterions)
+        public new IDummyQuery3 ClearRestrictions()
+        {
+            throw new NotImplementedException();
+        }
+
+        public new IDummyQuery3 ClearFetches()
+        {
+            throw new NotImplementedException();
+        }
+
+        public new IDummyQuery3 ClearGroupBys()
+        {
+            throw new NotImplementedException();
+        }
+
+        public new IFetchBuilder<UserEntity, IDummyQuery3> Fetch(string path)
+        {
+            throw new NotImplementedException();
+        }
+
+        public new IFetchBuilder<UserEntity, IDummyQuery3> Fetch(Expression<Func<UserEntity, object>> expression, Expression<Func<object>> alias = null, IRevealConvention revealConvention = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public new IDummyQuery3 GroupBy(Expression<Func<UserEntity, object>> property)
+        {
+            throw new NotImplementedException();
+        }
+
+        public new ILockBuilder<UserEntity, IDummyQuery3> Lock(Expression<Func<object>> alias)
+        {
+            throw new NotImplementedException();
+        }
+
+        public new ILockBuilder<UserEntity, IDummyQuery3> Lock(string alias)
+        {
+            throw new NotImplementedException();
+        }
+
+        public new ILockBuilder<UserEntity, IDummyQuery3> Lock()
+        {
+            throw new NotImplementedException();
+        }
+
+        public new IDummyQuery3 Where(params ICriterion[] criterions)
         {
             throw new NotImplementedException();
         }
@@ -133,22 +174,32 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
             throw new NotImplementedException();
         }
 
-        IDummyQuery3 IFlowQuery<UserEntity, IDummyQuery3>.Where(System.Linq.Expressions.Expression<Func<UserEntity, bool>> expression)
+        IDummyQuery3 IFlowQuery<UserEntity, IDummyQuery3>.Where(Expression<Func<UserEntity, bool>> expression)
         {
             throw new NotImplementedException();
         }
 
-        IDummyQuery3 IFlowQuery<UserEntity, IDummyQuery3>.Where(System.Linq.Expressions.Expression<Func<UserEntity, object>> property, Expressions.IsExpression expression)
+        IDummyQuery3 IFlowQuery<UserEntity, IDummyQuery3>.Where(Expression<Func<UserEntity, object>> property, Expressions.IsExpression expression)
         {
             throw new NotImplementedException();
         }
 
-        IDummyQuery3 IFlowQuery<UserEntity, IDummyQuery3>.Where(System.Linq.Expressions.Expression<Func<UserEntity, NHibernate.FlowQuery.Core.WhereDelegate, bool>> expression)
+        IDummyQuery3 IFlowQuery<UserEntity, IDummyQuery3>.Where(Expression<Func<UserEntity, WhereDelegate, bool>> expression)
         {
             throw new NotImplementedException();
         }
 
-        public new IDummyQuery3 And(params Criterion.ICriterion[] criterions)
+        public new IDummyQuery3 Where(IDetachedImmutableFlowQuery subquery, IsEmptyExpression expresson)
+        {
+            throw new NotImplementedException();
+        }
+
+        public new IDummyQuery3 Where(DetachedCriteria subquery, IsEmptyExpression expresson)
+        {
+            throw new NotImplementedException();
+        }
+
+        public new IDummyQuery3 And(params ICriterion[] criterions)
         {
             throw new NotImplementedException();
         }
@@ -158,22 +209,52 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
             throw new NotImplementedException();
         }
 
-        IDummyQuery3 IFlowQuery<UserEntity, IDummyQuery3>.And(System.Linq.Expressions.Expression<Func<UserEntity, bool>> expression)
+        IDummyQuery3 IFlowQuery<UserEntity, IDummyQuery3>.And(Expression<Func<UserEntity, bool>> expression)
         {
             throw new NotImplementedException();
         }
 
-        IDummyQuery3 IFlowQuery<UserEntity, IDummyQuery3>.And(System.Linq.Expressions.Expression<Func<UserEntity, object>> property, Expressions.IsExpression expression)
+        IDummyQuery3 IFlowQuery<UserEntity, IDummyQuery3>.And(Expression<Func<UserEntity, object>> property, Expressions.IsExpression expression)
         {
             throw new NotImplementedException();
         }
 
-        IDummyQuery3 IFlowQuery<UserEntity, IDummyQuery3>.And(System.Linq.Expressions.Expression<Func<UserEntity, NHibernate.FlowQuery.Core.WhereDelegate, bool>> expression)
+        IDummyQuery3 IFlowQuery<UserEntity, IDummyQuery3>.And(Expression<Func<UserEntity, WhereDelegate, bool>> expression)
         {
             throw new NotImplementedException();
         }
 
-        public new IDummyQuery3 RestrictByExample(UserEntity exampleInstance, Action<NHibernate.FlowQuery.Core.IExampleWrapper<UserEntity>> example)
+        public new IDummyQuery3 And(IDetachedImmutableFlowQuery subquery, IsEmptyExpression expresson)
+        {
+            throw new NotImplementedException();
+        }
+
+        public new IDummyQuery3 And(DetachedCriteria subquery, IsEmptyExpression expresson)
+        {
+            throw new NotImplementedException();
+        }
+
+        public new IDummyQuery3 Cacheable(bool b = true)
+        {
+            throw new NotImplementedException();
+        }
+
+        public new IDummyQuery3 Cacheable(string region)
+        {
+            throw new NotImplementedException();
+        }
+
+        public new IDummyQuery3 Cacheable(string region, CacheMode cacheMode)
+        {
+            throw new NotImplementedException();
+        }
+
+        public new IDummyQuery3 Cacheable(CacheMode cacheMode)
+        {
+            throw new NotImplementedException();
+        }
+
+        public new IDummyQuery3 RestrictByExample(UserEntity exampleInstance, Action<IExampleWrapper<UserEntity>> example)
         {
             throw new NotImplementedException();
         }
@@ -218,6 +299,10 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
             throw new NotImplementedException();
         }
 
+        public new IDummyQuery3 ClearLocks()
+        {
+            throw new NotImplementedException();
+        }
 
         public new IDummyQuery3 ClearOrders()
         {
@@ -240,7 +325,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
             throw new NotImplementedException();
         }
 
-        IDummyQuery3 IFlowQuery<UserEntity, IDummyQuery3>.OrderBy(Criterion.IProjection projection, bool ascending)
+        IDummyQuery3 IFlowQuery<UserEntity, IDummyQuery3>.OrderBy(IProjection projection, bool ascending)
         {
             throw new NotImplementedException();
         }
@@ -265,7 +350,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
             throw new NotImplementedException();
         }
 
-        IDummyQuery3 IFlowQuery<UserEntity, IDummyQuery3>.OrderByDescending(Criterion.IProjection projection)
+        IDummyQuery3 IFlowQuery<UserEntity, IDummyQuery3>.OrderByDescending(IProjection projection)
         {
             throw new NotImplementedException();
         }
@@ -290,13 +375,13 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
     {
         internal virtual DummyQuery2 XProject<TDestination>(Expression<Func<UserEntity, TDestination>> expression)
         {
-            base.ProjectWithConstruction<TDestination>(expression);
+            base.ProjectWithConstruction(expression);
 
             return this;
         }
 
-        protected internal DummyQuery2(Func<System.Type, string, ICriteria> criteriaFactory, string alias = null, FlowQueryOptions options = null, IMorphableFlowQuery query = null)
-            : base(criteriaFactory, alias, options, query)
+        protected internal DummyQuery2(Func<System.Type, string, ICriteria> criteriaFactory, Func<System.Type, IClassMetadata> metaDataFactory, string alias = null, FlowQueryOptions options = null, IMorphableFlowQuery query = null)
+            : base(criteriaFactory, metaDataFactory, alias, options, query)
         { }
     }
 
@@ -312,17 +397,22 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
             throw new NotImplementedException();
         }
 
-        public IDetachedFlowQuery<UserEntity> Count(Criterion.IProjection projection)
+        public IDetachedFlowQuery<UserEntity> Count(IProjection projection)
         {
             throw new NotImplementedException();
         }
 
-        public IDetachedFlowQuery<UserEntity> Count(System.Linq.Expressions.Expression<Func<UserEntity, object>> property)
+        public IDetachedFlowQuery<UserEntity> Count(Expression<Func<UserEntity, object>> property)
         {
             throw new NotImplementedException();
         }
 
         public IDetachedFlowQuery<UserEntity> CountLong()
+        {
+            throw new NotImplementedException();
+        }
+
+        public IDetachedFlowQuery<UserEntity> Copy()
         {
             throw new NotImplementedException();
         }
@@ -347,27 +437,77 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
             throw new NotImplementedException();
         }
 
-        public IDetachedFlowQuery<UserEntity> Select(params string[] properties)
+        public IDetachedFlowQuery<UserEntity> Select(string[] properties)
         {
             throw new NotImplementedException();
         }
 
-        public IDetachedFlowQuery<UserEntity> Select(Criterion.IProjection projection)
+        public IDetachedFlowQuery<UserEntity> Select(IProjection projection)
         {
             throw new NotImplementedException();
         }
 
-        public IDetachedFlowQuery<UserEntity> Select(params System.Linq.Expressions.Expression<Func<UserEntity, object>>[] expressions)
+        public IDetachedFlowQuery<UserEntity> Select(params Expression<Func<UserEntity, object>>[] expressions)
         {
             throw new NotImplementedException();
         }
 
-        public IDetachedFlowQuery<UserEntity> SetRootAlias<TAlias>(System.Linq.Expressions.Expression<Func<TAlias>> alias) where TAlias : class
+        public IDetachedFlowQuery<UserEntity> SetRootAlias<TAlias>(Expression<Func<TAlias>> alias) where TAlias : class
         {
             throw new NotImplementedException();
         }
 
-        public IDetachedFlowQuery<UserEntity> Where(params Criterion.ICriterion[] criterions)
+        public IDetachedFlowQuery<UserEntity> ClearRestrictions()
+        {
+            throw new NotImplementedException();
+        }
+
+        public IDetachedFlowQuery<UserEntity> ClearFetches()
+        {
+            throw new NotImplementedException();
+        }
+
+        public IDetachedFlowQuery<UserEntity> ClearGroupBys()
+        {
+            throw new NotImplementedException();
+        }
+
+        public IDetachedFlowQuery<UserEntity> ClearTimeout()
+        {
+            throw new NotImplementedException();
+        }
+
+        public IFetchBuilder<UserEntity, IDetachedFlowQuery<UserEntity>> Fetch(string path)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IFetchBuilder<UserEntity, IDetachedFlowQuery<UserEntity>> Fetch(Expression<Func<UserEntity, object>> expression, Expression<Func<object>> alias = null, IRevealConvention revealConvention = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IDetachedFlowQuery<UserEntity> GroupBy(Expression<Func<UserEntity, object>> property)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ILockBuilder<UserEntity, IDetachedFlowQuery<UserEntity>> Lock(Expression<Func<object>> alias)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ILockBuilder<UserEntity, IDetachedFlowQuery<UserEntity>> Lock(string alias)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ILockBuilder<UserEntity, IDetachedFlowQuery<UserEntity>> Lock()
+        {
+            throw new NotImplementedException();
+        }
+
+        public IDetachedFlowQuery<UserEntity> Where(params ICriterion[] criterions)
         {
             throw new NotImplementedException();
         }
@@ -377,22 +517,32 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
             throw new NotImplementedException();
         }
 
-        public IDetachedFlowQuery<UserEntity> Where(System.Linq.Expressions.Expression<Func<UserEntity, bool>> expression)
+        public IDetachedFlowQuery<UserEntity> Where(Expression<Func<UserEntity, bool>> expression)
         {
             throw new NotImplementedException();
         }
 
-        public IDetachedFlowQuery<UserEntity> Where(System.Linq.Expressions.Expression<Func<UserEntity, object>> property, Expressions.IsExpression expression)
+        public IDetachedFlowQuery<UserEntity> Where(Expression<Func<UserEntity, object>> property, Expressions.IsExpression expression)
         {
             throw new NotImplementedException();
         }
 
-        public IDetachedFlowQuery<UserEntity> Where(System.Linq.Expressions.Expression<Func<UserEntity, NHibernate.FlowQuery.Core.WhereDelegate, bool>> expression)
+        public IDetachedFlowQuery<UserEntity> Where(Expression<Func<UserEntity, WhereDelegate, bool>> expression)
         {
             throw new NotImplementedException();
         }
 
-        public IDetachedFlowQuery<UserEntity> And(params Criterion.ICriterion[] criterions)
+        public IDetachedFlowQuery<UserEntity> Where(IDetachedImmutableFlowQuery subquery, IsEmptyExpression expresson)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IDetachedFlowQuery<UserEntity> Where(DetachedCriteria subquery, IsEmptyExpression expresson)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IDetachedFlowQuery<UserEntity> And(params ICriterion[] criterions)
         {
             throw new NotImplementedException();
         }
@@ -402,22 +552,52 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
             throw new NotImplementedException();
         }
 
-        public IDetachedFlowQuery<UserEntity> And(System.Linq.Expressions.Expression<Func<UserEntity, bool>> expression)
+        public IDetachedFlowQuery<UserEntity> And(Expression<Func<UserEntity, bool>> expression)
         {
             throw new NotImplementedException();
         }
 
-        public IDetachedFlowQuery<UserEntity> And(System.Linq.Expressions.Expression<Func<UserEntity, object>> property, Expressions.IsExpression expression)
+        public IDetachedFlowQuery<UserEntity> And(Expression<Func<UserEntity, object>> property, Expressions.IsExpression expression)
         {
             throw new NotImplementedException();
         }
 
-        public IDetachedFlowQuery<UserEntity> And(System.Linq.Expressions.Expression<Func<UserEntity, NHibernate.FlowQuery.Core.WhereDelegate, bool>> expression)
+        public IDetachedFlowQuery<UserEntity> And(Expression<Func<UserEntity, WhereDelegate, bool>> expression)
         {
             throw new NotImplementedException();
         }
 
-        public IDetachedFlowQuery<UserEntity> RestrictByExample(UserEntity exampleInstance, Action<NHibernate.FlowQuery.Core.IExampleWrapper<UserEntity>> example)
+        public IDetachedFlowQuery<UserEntity> And(IDetachedImmutableFlowQuery subquery, IsEmptyExpression expresson)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IDetachedFlowQuery<UserEntity> And(DetachedCriteria subquery, IsEmptyExpression expresson)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IDetachedFlowQuery<UserEntity> Cacheable(bool b = true)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IDetachedFlowQuery<UserEntity> Cacheable(string region)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IDetachedFlowQuery<UserEntity> Cacheable(string region, CacheMode cacheMode)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IDetachedFlowQuery<UserEntity> Cacheable(CacheMode cacheMode)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IDetachedFlowQuery<UserEntity> RestrictByExample(UserEntity exampleInstance, Action<IExampleWrapper<UserEntity>> example)
         {
             throw new NotImplementedException();
         }
@@ -462,11 +642,20 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
             throw new NotImplementedException();
         }
 
-        public Criterion.DetachedCriteria Criteria
+        public IDetachedFlowQuery<UserEntity> Timeout(int seconds)
+        {
+            throw new NotImplementedException();
+        }
+
+        public DetachedCriteria Criteria
         {
             get { throw new NotImplementedException(); }
         }
 
+        public IDetachedFlowQuery<UserEntity> ClearLocks()
+        {
+            throw new NotImplementedException();
+        }
 
         public IDetachedFlowQuery<UserEntity> ClearOrders()
         {
@@ -489,7 +678,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
             throw new NotImplementedException();
         }
 
-        public IDetachedFlowQuery<UserEntity> OrderBy(Criterion.IProjection projection, bool ascending = true)
+        public IDetachedFlowQuery<UserEntity> OrderBy(IProjection projection, bool ascending = true)
         {
             throw new NotImplementedException();
         }
@@ -514,7 +703,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
             throw new NotImplementedException();
         }
 
-        public IDetachedFlowQuery<UserEntity> OrderByDescending(Criterion.IProjection projection)
+        public IDetachedFlowQuery<UserEntity> OrderByDescending(IProjection projection)
         {
             throw new NotImplementedException();
         }

@@ -1,13 +1,13 @@
-﻿using NHibernate.Engine;
+﻿using System.Linq;
+using AutoMapper;
+using NHibernate.Engine;
+using NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest.Mappers;
 using NHibernate.FlowQuery.Test.Setup.Dtos;
 using NHibernate.FlowQuery.Test.Setup.Entities;
 using NUnit.Framework;
 
 namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
 {
-    using System.Linq;
-    using AutoMapper;
-    using NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest.Mappers;
     using Is = NUnit.Framework.Is;
 
     [TestFixture]
@@ -27,18 +27,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                 .Select()
                 ;
 
-            ISessionImplementor sessionImpl = Session as ISessionImplementor;
-
-            Assert.That(sessionImpl, Is.Not.Null);
+            var sessionImpl = (ISessionImplementor)Session;
 
             int count = 0;
 
-            Assert.That(() =>
-                        {
-                            count = sessionImpl.FutureCriteriaBatch.Results.Count;
-                        },
-
-                        Throws.Nothing);
+            Assert.That(() => count = sessionImpl.FutureCriteriaBatch.Results.Count, Throws.Nothing);
 
             Assert.That(count, Is.EqualTo(2));
 
@@ -63,21 +56,14 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                 .Count()
                 ;
 
-            ISessionImplementor sessionImpl = Session as ISessionImplementor;
-
-            Assert.That(sessionImpl, Is.Not.Null);
+            var sessionImpl = (ISessionImplementor)Session;
 
             int count = 0;
 
-            Assert.That(() =>
-                        {
-                            count = sessionImpl.FutureCriteriaBatch.Results.Count;
-                        },
-
-                        Throws.Nothing);
+            Assert.That(() => count = sessionImpl.FutureCriteriaBatch.Results.Count, Throws.Nothing);
 
             Assert.That(count, Is.EqualTo(2));
-            Assert.That(users.Count(), Is.EqualTo(4));
+            Assert.That(userCount.Value, Is.EqualTo(4));
 
             foreach (var item in users)
             {
@@ -97,7 +83,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                 .Select(x => new
                 {
                     Name = x.Firstname + " " + x.Lastname,
-                    Dto = new UserDto()
+                    Dto = new UserDto
                     {
                         Id = x.Id,
                         IsOnline = x.IsOnline
@@ -115,18 +101,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                 })
                 ;
 
-            ISessionImplementor sessionImpl = Session as ISessionImplementor;
-
-            Assert.That(sessionImpl, Is.Not.Null);
+            var sessionImpl = (ISessionImplementor)Session;
 
             int count = 0;
 
-            Assert.That(() =>
-                        {
-                            count = sessionImpl.FutureCriteriaBatch.Results.Count;
-                        },
-
-                        Throws.Nothing);
+            Assert.That(() => count = sessionImpl.FutureCriteriaBatch.Results.Count, Throws.Nothing);
 
             Assert.That(count, Is.EqualTo(2));
 
@@ -147,18 +126,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                 .Count()
                 ;
 
-            ISessionImplementor sessionImpl = Session as ISessionImplementor;
-
-            Assert.That(sessionImpl, Is.Not.Null);
+            var sessionImpl = (ISessionImplementor)Session;
 
             int count = 0;
 
-            Assert.That(() =>
-                        {
-                            count = sessionImpl.FutureCriteriaBatch.Results.Count;
-                        },
-
-                        Throws.Nothing);
+            Assert.That(() => count = sessionImpl.FutureCriteriaBatch.Results.Count, Throws.Nothing);
 
             Assert.That(count, Is.EqualTo(2));
 
@@ -181,18 +153,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                 .Count()
                 ;
 
-            ISessionImplementor sessionImpl = Session as ISessionImplementor;
-
-            Assert.That(sessionImpl, Is.Not.Null);
+            var sessionImpl = (ISessionImplementor)Session;
 
             int count = 0;
 
-            Assert.That(() =>
-                        {
-                            count = sessionImpl.FutureCriteriaBatch.Results.Count;
-                        },
-
-                        Throws.Nothing);
+            Assert.That(() => count = sessionImpl.FutureCriteriaBatch.Results.Count, Throws.Nothing);
 
             Assert.That(count, Is.EqualTo(2));
 
@@ -213,18 +178,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                 .Count()
                 ;
 
-            ISessionImplementor sessionImpl = Session as ISessionImplementor;
-
-            Assert.That(sessionImpl, Is.Not.Null);
+            var sessionImpl = (ISessionImplementor)Session;
 
             int count = 0;
 
-            Assert.That(() =>
-                        {
-                            count = sessionImpl.FutureCriteriaBatch.Results.Count;
-                        },
-
-                        Throws.Nothing);
+            Assert.That(() => count = sessionImpl.FutureCriteriaBatch.Results.Count, Throws.Nothing);
 
             Assert.That(count, Is.EqualTo(2));
 
@@ -235,33 +193,23 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         [Test]
         public virtual void VerifyDelayedQueryUsesMultiCriteria()
         {
-            var firstnames = Query<UserEntity>()
+            Query<UserEntity>()
                 .Delayed()
-                .Select(x => x.Firstname)
-                ;
+                .Select(x => x.Firstname);
 
             // intentionally not a future query
-            var lastnames = Query<UserEntity>()
-                .Select(x => x.Lastname)
-                ;
+            Query<UserEntity>()
+                .Select(x => x.Lastname);
 
-            var passwords = Query<UserEntity>()
+            Query<UserEntity>()
                 .Delayed()
-                .Select(x => x.Password)
-                ;
+                .Select(x => x.Password);
 
-            ISessionImplementor sessionImpl = Session as ISessionImplementor;
-
-            Assert.That(sessionImpl, Is.Not.Null);
+            var sessionImpl = (ISessionImplementor)Session;
 
             int count = 0;
 
-            Assert.That(() =>
-                        {
-                            count = sessionImpl.FutureCriteriaBatch.Results.Count;
-                        },
-
-                        Throws.Nothing);
+            Assert.That(() => count = sessionImpl.FutureCriteriaBatch.Results.Count, Throws.Nothing);
 
             Assert.That(count, Is.EqualTo(2));
         }

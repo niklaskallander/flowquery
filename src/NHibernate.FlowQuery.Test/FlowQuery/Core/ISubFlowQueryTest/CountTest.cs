@@ -4,24 +4,21 @@ using NUnit.Framework;
 
 namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
 {
-    using FlowQueryIs = NHibernate.FlowQuery.Is;
+    using FqIs = Is;
     using Is = NUnit.Framework.Is;
 
     [TestFixture]
     public class CountTest : BaseTest
     {
-        #region Methods (7)
-
         [Test]
         public void CanCountDistinctOnProperty()
         {
-            var query = Query<UserEntity>()
-                .Detached()
+            var query = DetachedQuery<UserEntity>()
                 .Distinct()
                 .Count(x => x.Id);
 
             var users = Query<UserEntity>()
-                .Where(x => x.Id, FlowQueryIs.EqualTo(query));
+                .Where(x => x.Id, FqIs.EqualTo(query));
 
             Assert.That(users.Count(), Is.EqualTo(1));
         }
@@ -29,13 +26,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void CanCountDistinctOnPropertyUsingString()
         {
-            var query = Query<UserEntity>()
-                .Detached()
+            var query = DetachedQuery<UserEntity>()
                 .Distinct()
                 .Count("Id");
 
             var users = Query<UserEntity>()
-                .Where(x => x.Id, FlowQueryIs.EqualTo(query));
+                .Where(x => x.Id, FqIs.EqualTo(query));
 
             Assert.That(users.Count(), Is.EqualTo(1));
         }
@@ -43,12 +39,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void CanCountLongOnStar()
         {
-            var query = Query<UserEntity>()
-                .Detached()
+            var query = DetachedQuery<UserEntity>()
                 .CountLong();
 
             var users = Query<UserEntity>()
-                .Where(x => x.Id, FlowQueryIs.EqualTo(query));
+                .Where(x => x.Id, FqIs.EqualTo(query));
 
             Assert.That(users.Count(), Is.EqualTo(1));
         }
@@ -56,12 +51,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void CanCountOnProjection()
         {
-            var query = Query<UserEntity>()
-                .Detached()
+            var query = DetachedQuery<UserEntity>()
                 .Count(Projections.Distinct(Projections.Property("Id")));
 
             var users = Query<UserEntity>()
-                .Where(x => x.Id, FlowQueryIs.EqualTo(query));
+                .Where(x => x.Id, FqIs.EqualTo(query));
 
             Assert.That(users.Count(), Is.EqualTo(1));
         }
@@ -69,12 +63,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void CanCountOnProperty()
         {
-            var query = Query<UserEntity>()
-                .Detached()
+            var query = DetachedQuery<UserEntity>()
                 .Count(x => x.Id);
 
             var users = Query<UserEntity>()
-                .Where(x => x.Id, FlowQueryIs.EqualTo(query));
+                .Where(x => x.Id, FqIs.EqualTo(query));
 
             Assert.That(users.Count(), Is.EqualTo(1));
         }
@@ -82,12 +75,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void CanCountOnPropertyUsingString()
         {
-            var query = Query<UserEntity>()
-                .Detached()
+            var query = DetachedQuery<UserEntity>()
                 .Count("Id");
 
             var users = Query<UserEntity>()
-                .Where(x => x.Id, FlowQueryIs.EqualTo(query));
+                .Where(x => x.Id, FqIs.EqualTo(query));
 
             Assert.That(users.Count(), Is.EqualTo(1));
         }
@@ -95,16 +87,13 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void CanCountOnStar()
         {
-            var query = Query<UserEntity>()
-                .Detached()
+            var query = DetachedQuery<UserEntity>()
                 .Count();
 
             var users = Query<UserEntity>()
-                .Where(x => x.Id, FlowQueryIs.EqualTo(query));
+                .Where(x => x.Id, FqIs.EqualTo(query));
 
             Assert.That(users.Count(), Is.EqualTo(1));
         }
-
-        #endregion Methods
     }
 }

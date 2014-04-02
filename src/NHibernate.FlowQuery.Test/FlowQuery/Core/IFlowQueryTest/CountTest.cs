@@ -9,8 +9,6 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
     [TestFixture]
     public class CountTest : BaseTest
     {
-        #region Methods (7)
-
         [Test]
         public void CanCountDistinctOnProperty()
         {
@@ -82,7 +80,5 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
 
             Assert.That(count, Is.EqualTo(4));
         }
-
-        #endregion Methods
     }
 }

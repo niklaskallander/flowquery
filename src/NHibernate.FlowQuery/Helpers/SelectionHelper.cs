@@ -54,7 +54,7 @@ namespace NHibernate.FlowQuery.Helpers
                 return () => value.Value;
             }
 
-            return () => criteria.UniqueResult<TDestination>();
+            return criteria.UniqueResult<TDestination>;
         }
     }
 }

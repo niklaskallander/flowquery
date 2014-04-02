@@ -11,8 +11,6 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.ExtensionHelpers
     [TestFixture]
     public class PropertyExtensionsTest : BaseTest
     {
-        #region Methods (3)
-
         [Test]
         public void CanExposePropertyUsingAs()
         {
@@ -44,9 +42,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.ExtensionHelpers
         [Test]
         public void ThrowsWhenCalledOutsideOfLambdaExpression()
         {
-            Assert.That(() => { "".As<string>(); }, Throws.InstanceOf<InvalidOperationException>());
+            Assert.That(() => "".As<string>(), Throws.InstanceOf<InvalidOperationException>());
         }
-
-        #endregion Methods
     }
 }

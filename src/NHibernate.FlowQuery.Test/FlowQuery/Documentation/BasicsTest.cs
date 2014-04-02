@@ -3,7 +3,7 @@ using NUnit.Framework;
 
 namespace NHibernate.FlowQuery.Test.FlowQuery.Documentation
 {
-    using xIs = NUnit.Framework.Is;
+    using Is = NUnit.Framework.Is;
 
     [TestFixture]
     public class BasicsTest : BaseTest
@@ -12,53 +12,45 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Documentation
         [Test]
         public virtual void ConstructionExample1()
         {
-            ISession session = Session;
+            var query = Session.FlowQuery<UserEntity>();
 
-            var query = session.FlowQuery<UserEntity>();
-
-            Assert.That(query, xIs.Not.Null);
+            Assert.That(query, Is.Not.Null);
         }
 
         [Test]
         public virtual void ConstructionExample2WithAlias()
         {
-            ISession session = Session;
-
             UserEntity alias = null;
 
-            var query = session.FlowQuery<UserEntity>(() => alias);
+            var query = Session.FlowQuery(() => alias);
 
-            Assert.That(query, xIs.Not.Null);
+            Assert.That(query, Is.Not.Null);
         }
 
         [Test]
         public virtual void ConstructionExample3WithOptions()
         {
-            ISession session = Session;
-
             var options = new FlowQueryOptions();
 
             options.Add(criteria => criteria.SetCacheMode(CacheMode.Refresh));
 
-            var query = session.FlowQuery<UserEntity>(options);
+            var query = Session.FlowQuery<UserEntity>(options);
 
-            Assert.That(query, xIs.Not.Null);
+            Assert.That(query, Is.Not.Null);
         }
 
         [Test]
         public virtual void ConstructionExample4WithAliasAndOptions()
         {
-            ISession session = Session;
-
             UserEntity alias = null;
 
             var options = new FlowQueryOptions();
 
             options.Add(criteria => criteria.SetCacheMode(CacheMode.Refresh));
 
-            var query = session.FlowQuery<UserEntity>(() => alias, options);
+            var query = Session.FlowQuery(() => alias, options);
 
-            Assert.That(query, xIs.Not.Null);
+            Assert.That(query, Is.Not.Null);
         }
     }
 }

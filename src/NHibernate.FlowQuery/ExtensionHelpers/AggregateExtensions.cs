@@ -4,7 +4,7 @@ namespace NHibernate.FlowQuery.ExtensionHelpers
 {
     public static class AggregateExtensions
     {
-        public static decimal Average<TDestination>(this TDestination property)
+        public static double Average<TDestination>(this TDestination property)
         {
             throw Exception();
         }

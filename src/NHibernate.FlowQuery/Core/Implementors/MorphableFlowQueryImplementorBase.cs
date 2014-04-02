@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using NHibernate.Criterion;
 using NHibernate.FlowQuery.Core.Selection;
 using NHibernate.FlowQuery.Helpers;
+using NHibernate.Metadata;
 using NHibernate.Transform;
 
 namespace NHibernate.FlowQuery.Core.Implementors
@@ -13,14 +14,19 @@ namespace NHibernate.FlowQuery.Core.Implementors
         where TSource : class
         where TFlowQuery : class, IFlowQuery<TSource, TFlowQuery>
     {
-        protected internal MorphableFlowQueryImplementorBase(Func<System.Type, string, ICriteria> criteriaFactory, string alias = null, FlowQueryOptions options = null, IMorphableFlowQuery query = null)
-            : base(criteriaFactory, alias, options, query)
+        protected internal MorphableFlowQueryImplementorBase(Func<System.Type, string, ICriteria> criteriaFactory, Func<System.Type, IClassMetadata> metaDataFactory, string alias = null, FlowQueryOptions options = null, IMorphableFlowQuery query = null)
+            : base(criteriaFactory, metaDataFactory, alias, options, query)
         {
             if (query != null)
             {
+                CommentValue = query.CommentValue;
+               
                 Constructor = query.Constructor;
 
+                FetchSizeValue = query.FetchSizeValue;
+
                 IsDistinct = query.IsDistinct;
+                IsReadOnly = query.IsReadOnly;
 
                 if (query.Mappings != null)
                 {
@@ -30,6 +36,8 @@ namespace NHibernate.FlowQuery.Core.Implementors
                 Projection = query.Projection;
 
                 ResultTransformer = query.ResultTransformer;
+
+                TimeoutValue = query.TimeoutValue;
             }
         }
 
@@ -40,9 +48,9 @@ namespace NHibernate.FlowQuery.Core.Implementors
                 throw new ArgumentNullException("expression");
             }
 
-            Dictionary<string, IProjection> mappings = new Dictionary<string, IProjection>();
+            var mappings = new Dictionary<string, IProjection>();
 
-            var list = ProjectionHelper.GetProjectionListForExpression(expression.Body, expression.Parameters[0].Name, Aliases, ref mappings);
+            var list = ProjectionHelper.GetProjectionListForExpression(expression.Body, expression.Parameters[0].Name, Data, ref mappings);
 
             if (list == null || list.Length == 0)
             {
@@ -121,7 +129,7 @@ namespace NHibernate.FlowQuery.Core.Implementors
         {
             if (projection == null)
             {
-                throw new ArgumentNullException("projecton");
+                throw new ArgumentNullException("projection");
             }
 
             System.Type type = typeof(TDestination);
@@ -140,7 +148,7 @@ namespace NHibernate.FlowQuery.Core.Implementors
             (
                 Projections
                     .ProjectionList()
-                        .AddProperties(Aliases, properties)
+                        .AddProperties(Data, properties)
             );
         }
 
@@ -149,29 +157,37 @@ namespace NHibernate.FlowQuery.Core.Implementors
             return ProjectWithConstruction(expression);
         }
 
-        public virtual LambdaExpression Constructor { get; protected set; }
+        public string CommentValue { get; protected set; }
 
-        public virtual bool IsDistinct { get; protected set; }
+        public LambdaExpression Constructor { get; protected set; }
 
-        public virtual Dictionary<string, IProjection> Mappings { get; protected set; }
+        public int FetchSizeValue { get; protected set; }
 
-        public virtual IProjection Projection { get; protected set; }
+        public bool IsDistinct { get; protected set; }
 
-        public virtual IResultTransformer ResultTransformer { get; protected set; }
+        public bool? IsReadOnly { get; protected set; }
+
+        public Dictionary<string, IProjection> Mappings { get; protected set; }
+
+        public IProjection Projection { get; protected set; }
+
+        public IResultTransformer ResultTransformer { get; protected set; }
+
+        public int? TimeoutValue { get; protected set; }
 
         public virtual IDelayedFlowQuery<TSource> Delayed()
         {
-            return new DelayedFlowQueryImplementor<TSource>(CriteriaFactory, Alias, Options, this);
+            return new DelayedFlowQueryImplementor<TSource>(CriteriaFactory, MetaDataFactory, Alias, Options, this);
         }
 
         public virtual IDetachedFlowQuery<TSource> Detached()
         {
-            return new DetachedFlowQueryImplementor<TSource>(CriteriaFactory, Alias, Options, this);
+            return new DetachedFlowQueryImplementor<TSource>(CriteriaFactory, MetaDataFactory, Alias, Options, this);
         }
 
         public virtual IImmediateFlowQuery<TSource> Immediate()
         {
-            return new ImmediateFlowQueryImplementor<TSource>(CriteriaFactory, Alias, Options, this);
+            return new ImmediateFlowQueryImplementor<TSource>(CriteriaFactory, MetaDataFactory, Alias, Options, this);
         }
     }
 }

@@ -3,6 +3,7 @@ using NHibernate.Criterion;
 using NHibernate.FlowQuery.Test.Setup.Entities;
 using NUnit.Framework;
 
+// ReSharper disable ExpressionIsAlwaysNull
 namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
 {
     using Is = NUnit.Framework.Is;
@@ -10,12 +11,10 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
     [TestFixture]
     public class ConstructorTest : BaseTest
     {
-        #region Methods (3)
-
         [Test]
         public void CanConstruct()
         {
-            var query = Query<UserEntity>().Detached();
+            var query = DetachedDummyQuery<UserEntity>();
 
             Assert.That(query, Is.Not.Null);
         }
@@ -34,19 +33,13 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         {
             DetachedCriteria criteria = null;
 
-            Assert.That(() => { criteria.DetachedFlowQuery(); }, Throws.InstanceOf<ArgumentNullException>());
+            Assert.That(() => criteria.DetachedFlowQuery(), Throws.InstanceOf<ArgumentNullException>());
         }
 
         [Test]
         public void SetRootAliasThrowsIfExpressionIsNull()
         {
-            Assert.That(() =>
-                        {
-                            Query<UserEntity>().Detached().SetRootAlias<UserEntity>(null);
-
-                        }, Throws.InstanceOf<ArgumentNullException>());
+            Assert.That(() => DetachedDummyQuery<UserEntity>().SetRootAlias<UserEntity>(null), Throws.InstanceOf<ArgumentNullException>());
         }
-
-        #endregion Methods
     }
 }

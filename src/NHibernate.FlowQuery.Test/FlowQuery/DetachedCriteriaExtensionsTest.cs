@@ -3,44 +3,28 @@ using NHibernate.Criterion;
 using NHibernate.FlowQuery.Test.Setup.Entities;
 using NUnit.Framework;
 
-namespace NHibernate.FlowQuery.Test
+namespace NHibernate.FlowQuery.Test.FlowQuery
 {
+    using FqIs = Is;
     using Is = NUnit.Framework.Is;
-    using QIs = NHibernate.FlowQuery.Is;
 
     [TestFixture]
     public class DetachedCriteriaExtensionTest : BaseTest
     {
-        #region Methods (1)
-
-        //[Test]
-        //public void ObsoleteVersionThrows()
-        //{
-        //    DetachedCriteria criteria = null;
-
-        //    Assert.That(() =>
-        //                {
-        //                    criteria.SubQuery<UserEntity>();
-
-        //                }, Throws.InstanceOf<InvalidOperationException>());
-        //}
-
         [Test]
-        public void CanCreateSubQueryFromDetachedCriteria()
+        public void CanCreateSubqueryFromDetachedCriteria()
         {
             var criteria = DetachedCriteria.For<UserEntity>()
                 .Add(Restrictions.Eq("Id", (long)2))
                 .SetProjection(Projections.Property("Id"));
 
             var users = Query<UserEntity>()
-                .Where(x => x.Id, QIs.In(criteria.DetachedFlowQuery()))
+                .Where(x => x.Id, FqIs.In(criteria.DetachedFlowQuery()))
                 .Select()
                 ;
 
             Assert.That(users.Count(), Is.EqualTo(1));
             Assert.That(users.First().Id, Is.EqualTo(2));
         }
-
-        #endregion Methods
     }
 }

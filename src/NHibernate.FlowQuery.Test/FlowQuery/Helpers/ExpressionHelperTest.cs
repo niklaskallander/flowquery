@@ -1,24 +1,26 @@
 using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Linq.Expressions;
+using NHibernate.FlowQuery.Core.Joins;
 using NHibernate.FlowQuery.Helpers;
 using NHibernate.FlowQuery.Test.Setup.Dtos;
+using NHibernate.FlowQuery.Test.Setup.Entities;
 using NUnit.Framework;
 
 namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
 {
-    using NHibernate.FlowQuery.Test.Setup.Entities;
     using Is = NUnit.Framework.Is;
 
     [TestFixture]
     public class ExpressionHelperTest
     {
-        #region Methods (28)
-
         [Test]
         public void CanGetConstantRootStringForReferenceType()
         {
             Expression<Func<object>> expression = () => bool.FalseString; // Non constant root
 
+            // ReSharper disable once AccessToModifiedClosure
             expression = () => expression.Body; // Creating a constant root
 
             Assert.That(ExpressionHelper.GetConstantRootString(expression), Is.Not.Null);
@@ -29,6 +31,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
         {
             Expression<Func<object>> expression = () => bool.FalseString; // Non constant root
 
+            // ReSharper disable once AccessToModifiedClosure
             expression = () => expression.ToString().Length; // Creating a constant root
 
             Assert.That(ExpressionHelper.GetConstantRootString(expression), Is.Not.Null);
@@ -73,6 +76,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
         {
             Expression<Func<UserDto, object>> x = u => u.Username;
 
+            // ReSharper disable once AccessToModifiedClosure
             x = u => x.Body;
 
             Assert.That(ExpressionHelper.GetPropertyName(x.Body as MemberExpression), Is.EqualTo("x.Body"));
@@ -101,7 +105,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
         {
             UserDto u = null;
 
-            Expression<Func<object>> expression = () => u.Username.Length.ToString().Length;
+            Expression<Func<object>> expression = () => u.Username.Length.ToString(CultureInfo.InvariantCulture).Length;
 
             Assert.That(ExpressionHelper.GetRoot(expression), Is.EqualTo("u"));
         }
@@ -167,6 +171,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
 
             Assert.That(ExpressionHelper.HasConstantRoot(expression), Is.False);
 
+            // ReSharper disable once AccessToModifiedClosure
             expression = () => expression.Body.ToString().Length; // Creating a constant root
 
             Assert.That(ExpressionHelper.HasConstantRoot(expression), Is.True);
@@ -183,15 +188,26 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
         }
 
         [Test]
+        public void GetConstantRootStringUsingBoolExpressionWithConstantDoesNotReturnNullSinceExpressionIsPreEvaluated()
+        {
+            const long x = 22;
+
+            Expression<Func<bool>> expression = () => x == 23;
+
+            Assert.That(ExpressionHelper.GetConstantRootString(expression), Is.Not.Null);
+        }
+
+        [Test]
         public void IsRootedThrowsIfExpressionIsNull()
         {
             Expression<Func<UserDto, object>> expression = null;
 
             Assert.That(() =>
-                        {
-                            ExpressionHelper.IsRooted(expression, "x", null);
+            {
+                // ReSharper disable once ExpressionIsAlwaysNull
+                ExpressionHelper.IsRooted(expression, "x", null);
 
-                        }, Throws.InstanceOf<ArgumentNullException>());
+            }, Throws.InstanceOf<ArgumentNullException>());
         }
 
         [Test]
@@ -200,10 +216,10 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
             Expression<Func<UserDto, object>> expression = x => x.Id;
 
             Assert.That(() =>
-                        {
-                            ExpressionHelper.IsRooted(expression, null, null);
+            {
+                ExpressionHelper.IsRooted(expression, null, new QueryHelperData(new Dictionary<string, string>(), new List<Join>(), null));
 
-                        }, Throws.Nothing);
+            }, Throws.Nothing);
         }
 
         [Test]
@@ -216,10 +232,10 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
             object value = 1;
 
             Assert.That(() =>
-                        {
-                            value = ExpressionHelper.GetValue(expression.Body);
+            {
+                value = ExpressionHelper.GetValue(expression.Body);
 
-                        }, Throws.Nothing);
+            }, Throws.Nothing);
 
             Assert.That(value, Is.Null);
         }
@@ -230,10 +246,10 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
             Expression<Func<UserDto, object>> expression = x => x.Id;
 
             Assert.That(() =>
-                        {
-                            ExpressionHelper.IsRooted(expression, string.Empty, null);
+            {
+                ExpressionHelper.IsRooted(expression, string.Empty, new QueryHelperData(new Dictionary<string, string>(), new List<Join>(), null));
 
-                        }, Throws.Nothing);
+            }, Throws.Nothing);
         }
 
         [Test]
@@ -242,10 +258,10 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
             Expression<Func<UserDto, object>> expression = u => u.Username;
 
             Assert.That(() =>
-                        {
-                            ExpressionHelper.GetPropertyName(expression.Body, string.Empty);
+            {
+                ExpressionHelper.GetPropertyName(expression.Body, string.Empty);
 
-                        }, Throws.Nothing);
+            }, Throws.Nothing);
         }
 
         [Test]
@@ -254,20 +270,20 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
             Expression<Func<UserDto, object>> expression = u => u.Username;
 
             Assert.That(() =>
-                        {
-                            ExpressionHelper.GetPropertyName(expression.Body, null);
+            {
+                ExpressionHelper.GetPropertyName(expression.Body, null);
 
-                        }, Throws.Nothing);
+            }, Throws.Nothing);
         }
 
         [Test]
         public void GetPropertyNameFromExpressionAndExpectedRootThrowsWhenExpressionIsNull()
         {
             Assert.That(() =>
-                        {
-                            ExpressionHelper.GetPropertyName(null, "u");
+            {
+                ExpressionHelper.GetPropertyName(null, "u");
 
-                        }, Throws.InstanceOf<ArgumentNullException>());
+            }, Throws.InstanceOf<ArgumentNullException>());
         }
 
         [Test]
@@ -283,6 +299,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
         {
             Expression<Func<UserDto, object>> x = null;
 
+            // ReSharper disable once ExpressionIsAlwaysNull
             Assert.That(() => { ExpressionHelper.GetPropertyName(x); }, Throws.InstanceOf<ArgumentNullException>());
         }
 
@@ -291,6 +308,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
         {
             MemberExpression x = null;
 
+            // ReSharper disable once ExpressionIsAlwaysNull
             Assert.That(() => { ExpressionHelper.GetPropertyName(x); }, Throws.InstanceOf<ArgumentNullException>());
         }
 
@@ -325,32 +343,32 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
         public void CombineThrowsIfExpressionsIsNull()
         {
             Assert.That(() =>
-                        {
-                            ExpressionHelper.Combine<UserEntity, UserDto>(null);
+            {
+                ExpressionHelper.Combine<UserEntity, UserDto>(null);
 
-                        }, Throws.InstanceOf<ArgumentNullException>());
+            }, Throws.InstanceOf<ArgumentNullException>());
         }
 
         [Test]
         public void CombineThrowsNothingIfExpressionsContainsNull()
         {
             Assert.That(() =>
-                        {
-                            ExpressionHelper.Combine<UserEntity, UserDto>(x => new UserDto() { Id = x.Id }, null, x => new UserDto() { Username = x.Username });
+            {
+                ExpressionHelper.Combine<UserEntity, UserDto>(x => new UserDto { Id = x.Id }, null, x => new UserDto { Username = x.Username });
 
-                        }, Throws.Nothing);
+            }, Throws.Nothing);
         }
 
         [Test]
         public void CombineThrowsIfExpressionsContainsNonMemberInitExpression()
         {
             Assert.That(() =>
-                        {
-                            UserDto dto = new UserDto();
+            {
+                var dto = new UserDto();
 
-                            ExpressionHelper.Combine<UserEntity, UserDto>(x => new UserDto() { Id = x.Id }, x => dto, x => new UserDto() { Username = x.Username });
+                ExpressionHelper.Combine<UserEntity, UserDto>(x => new UserDto { Id = x.Id }, x => dto, x => new UserDto { Username = x.Username });
 
-                        }, Throws.ArgumentException);
+            }, Throws.ArgumentException);
         }
 
         [Test]
@@ -358,13 +376,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
         {
             Assert.That(() =>
             {
-                UserDto dto = new UserDto();
+                var dto = new UserDto();
 
-                ExpressionHelper.Combine<UserEntity, UserDto>(x => dto, x => new UserDto() { Username = x.Username });
+                ExpressionHelper.Combine<UserEntity, UserDto>(x => dto, x => new UserDto { Username = x.Username });
 
             }, Throws.ArgumentException);
         }
-
-        #endregion Methods
     }
 }

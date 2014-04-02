@@ -1,0 +1,53 @@
+>----------------
+> BUILD 2.1.0.0
+>----------------
+	
+	(a "!" in the left margin indicates a potential breaking change)
+
+>--	BUG FIXES
+	- OrderBy<TProjection>(..) cause query to have same sql projection twice instead of using alias, which cause a crash when also using Distinct()
+	- OrderBy(..) cause a crash when used with more complex projections (ternary operations/expressions etc.)
+
+>-- IMPROVEMENTS
+	- Should sign assembly with a strong name key
+	- Should mark assembly with AllowPartiallyTrustedCallersAttribute
+	- Should mark assembly with CLSCompliantAttribute
+!	- Aggregate.Average should return Double instead of Decimal to avoid multiple type casts in sql
+	- Is.In(TEnumerable enumerable) where TEnumerable : IEnumerable should just be Is.In(IEnumerabe enumerable)
+
+>-- NEW FEATURES
+	- Should support ICriteria.SetFetchMode features (e.g. query.Fetch(x => x.Association).WithJoin())
+	- Should support ICriteria.SetCacheable/SetCacheRegion/SetCacheMode features (e.g. query.Cacheable([string], [CacheMode]))
+	- Should support ICriteria.SetTimeout features (e.g. query.Timeout(int) and query.TimeoutAfter(int).Seconds())
+	- Should support ICriteria.SetLockMode features (e.g. query.Lock([alias]).[LockMode]())
+	- Should support ICriteria.SetReadOnly features (e.g. query.ReadOnly([bool]))
+	- Should support ICriteria.SetComment features (e.g. query.Comment(string))
+	- Should support ICriteria.SetFetchSize features (e.g. query.FetchSize(int))
+	- Should support Restrictions.IsEmpty/IsNotEmpty and Subqueries.Exists/NotExists features (e.g. Is.Empty(..) and Is.Not.Empty(..))
+	- Should support Projections.SubQuery features (e.g. Aggregate.Subquery<T>(..))
+	- Should support projections with simple type casting (e.g. (int)x.MyProperty)
+	- Should infer GroupBy columns from other projections (aggregations, explicit GroupBy)
+	- Should be able to GroupBy without projecting value (e.g. query.GroupBy(..))
+	- Should be able to copy/clone a FlowQuery reference (e.g. query.Copy())
+	- Should be able to clear all restrictions (e.g. query.ClearRestrictions())
+	- Should be able to clear time out (e.g. query.ClearTimeout())
+	- Should be able to clear group bys (e.g. query.ClearGroupBys())
+	- Should be able to clear fetches (e.g. query.ClearFetches())
+	- Should be able to clear locks (e.g. query.ClearLocks())
+	- Is.In(..) should have overload accepting a DetachedCriteria
+	- SessionExtensions should provide methods for getting Detached/Delayed (+ explicit Immediate) FlowQuery alterations directly
+
+>-- TASKS
+	- Add license file (e.g. "License.txt")
+	- Add release notes file (e.g. "Release Notes.txt")
+	- Add read me file (e.g. "Read Me.txt")
+	- Add NuGet support
+
+>-- TEST SUITE CHANGES
+	- Change usage from Query to DummyQuery for unit tests not requiring a session to work (to speed up test runs)
+	- Add mechanism for caching Configuration (to speed up test runs)
+	- Add mechanism for skipping rebuild of, and adding data to, test DB (to speed up test runs)
+	- Add tests for new features in version 2.1
+
+>-- DOCUMENTATION
+	- Update documentation to cover changes and new features in version 2.1

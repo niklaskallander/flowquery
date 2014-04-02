@@ -9,7 +9,7 @@ namespace NHibernate.FlowQuery.Expressions.SubqueryExpressions
             : base(value)
         { }
 
-        public override ICriterion Compile(string property)
+        protected override ICriterion CompileCore(string property)
         {
             return Subqueries.PropertyGtSome(property, Query.Criteria);
         }

@@ -5,7 +5,7 @@ using NUnit.Framework;
 
 namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
 {
-    using FlowQueryIs = NHibernate.FlowQuery.Is;
+    using FqIs = Is;
     using Is = NUnit.Framework.Is;
 
     [TestFixture]
@@ -47,7 +47,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                 ;
 
             var query = Query<UserEntity>()
-                .Where(x => x.Id, FlowQueryIs.In(detachedCount))
+                .Where(x => x.Id, FqIs.In(detachedCount))
                 .Select();
 
             Assert.That(query.Count(), Is.EqualTo(1));

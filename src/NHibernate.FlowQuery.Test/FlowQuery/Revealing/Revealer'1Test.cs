@@ -5,20 +5,14 @@ using NHibernate.FlowQuery.Revealing.Conventions;
 using NHibernate.FlowQuery.Test.Setup.Entities;
 using NUnit.Framework;
 
-namespace NHibernate.FlowQuery.Test
+namespace NHibernate.FlowQuery.Test.FlowQuery.Revealing
 {
     using Is = NUnit.Framework.Is;
 
     [TestFixture]
     public class Revealer1Test
     {
-        #region Properties (1)
-
         private IRevealer<UserEntity> Revealer { get; set; }
-
-        #endregion Properties
-
-        #region Methods (20)
 
         [Test]
         public void CanProvideConventionAtInstantiation()
@@ -127,13 +121,13 @@ namespace NHibernate.FlowQuery.Test
         [Test]
         public void RevealThrowsWhenProvidingExpressionNotPointingToAMemberExpression()
         {
-            Assert.That(() => { Revealer.Reveal(() => ""); }, Throws.InstanceOf<ArgumentException>());
+            Assert.That(() => Revealer.Reveal(() => ""), Throws.InstanceOf<ArgumentException>());
         }
 
         [Test]
         public void RevealThrowsWhenProvidingNullAsAliasExpression()
         {
-            Assert.That(() => { Revealer.Reveal(null, x => x.Password); }, Throws.InstanceOf<ArgumentNullException>());
+            Assert.That(() => Revealer.Reveal(null, x => x.Password), Throws.InstanceOf<ArgumentNullException>());
         }
 
         [Test]
@@ -141,27 +135,27 @@ namespace NHibernate.FlowQuery.Test
         {
             UserEntity u = null;
 
-            Assert.That(() => { Revealer.Reveal(() => u.Password, null); }, Throws.InstanceOf<ArgumentNullException>());
+            Assert.That(() => Revealer.Reveal(() => u.Password, null), Throws.InstanceOf<ArgumentNullException>());
 
-            Assert.That(() => { Revealer.Reveal(x => x.Password, null); }, Throws.InstanceOf<ArgumentNullException>());
+            Assert.That(() => Revealer.Reveal(x => x.Password, null), Throws.InstanceOf<ArgumentNullException>());
 
-            Assert.That(() => { Revealer.Reveal(() => u, x => x.Password, null); }, Throws.InstanceOf<ArgumentNullException>());
+            Assert.That(() => Revealer.Reveal(() => u, x => x.Password, null), Throws.InstanceOf<ArgumentNullException>());
         }
 
         [Test]
         public void RevealThrowsWhenProvidingNullAsExpression()
         {
             Expression<Func<object>> expression1 = null;
-
-            Assert.That(() => { Revealer.Reveal(expression1); }, Throws.InstanceOf<ArgumentNullException>());
-
             Expression<Func<UserEntity, object>> expression2 = null;
 
-            Assert.That(() => { Revealer.Reveal(expression2); }, Throws.InstanceOf<ArgumentNullException>());
+            // ReSharper disable ExpressionIsAlwaysNull
+            Assert.That(() => Revealer.Reveal(expression1), Throws.InstanceOf<ArgumentNullException>());
+            Assert.That(() => Revealer.Reveal(expression2), Throws.InstanceOf<ArgumentNullException>());
+            // ReSharper restore ExpressionIsAlwaysNull
 
             UserEntity u = null;
 
-            Assert.That(() => { Revealer.Reveal(() => u, null); }, Throws.InstanceOf<ArgumentNullException>());
+            Assert.That(() => Revealer.Reveal(() => u, null), Throws.InstanceOf<ArgumentNullException>());
         }
 
         [SetUp]
@@ -173,9 +167,7 @@ namespace NHibernate.FlowQuery.Test
         [Test]
         public void ThrowsWhenAttemptingInstantiationWithNullAsConvention()
         {
-            Assert.That(() => { new Revealer(null); }, Throws.InstanceOf<ArgumentNullException>());
+            Assert.That(() => new Revealer(null), Throws.InstanceOf<ArgumentNullException>());
         }
-
-        #endregion Methods
     }
 }

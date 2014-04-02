@@ -5,8 +5,9 @@ using NHibernate.FlowQuery.Core.Selection;
 
 namespace NHibernate.FlowQuery.Core
 {
-    public interface IQueryableFlowQuery<TSource>
+    public interface IQueryableFlowQuery<TSource, TQuery> : IFlowQuery<TSource, TQuery>
         where TSource : class
+        where TQuery : class, IQueryableFlowQuery<TSource, TQuery>
     {
         FlowQuerySelection<TSource> Select();
 
@@ -29,5 +30,15 @@ namespace NHibernate.FlowQuery.Core
         FlowQuerySelection<TDestination> Select<TDestination>(PartialSelection<TSource, TDestination> combiner);
 
         PartialSelection<TSource, TDestination> PartialSelect<TDestination>(Expression<Func<TSource, TDestination>> expression = null);
+
+        TQuery ClearTimeout();
+
+        TQuery Comment(string comment);
+
+        TQuery FetchSize(int size);
+
+        TQuery ReadOnly(bool isReadOnly = true);
+
+        TQuery Timeout(int seconds);
     }
 }

@@ -5,7 +5,7 @@ using NUnit.Framework;
 
 namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
 {
-    using FlowQueryIs = NHibernate.FlowQuery.Is;
+    using FqIs = Is;
     using Is = NUnit.Framework.Is;
 
     [TestFixture]
@@ -138,7 +138,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         }
 
         [Test]
-        public virtual void TestReuseAsSubQueryForRootQuery()
+        public virtual void TestReuseAsSubqueryForRootQuery()
         {
             var query = Query<UserEntity>()
                 .Where(x => x.IsOnline);
@@ -148,11 +148,83 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                 .Where(x => x.Lastname.StartsWith("K"))
                 .Select(x => x.Id);
 
-            query.Where(x => x.Id, FlowQueryIs.In(detached));
+            query.Where(x => x.Id, FqIs.In(detached));
 
             var users = query.Select();
 
             Assert.That(users.Count(), Is.EqualTo(1));
+        }
+
+        [Test]
+        public virtual void TestImmediateCopy()
+        {
+            var query1 = Query<UserEntity>();
+
+            var query2 = query1.Copy()
+                .Where(x => x.IsOnline);
+
+            var users1 = query1.Select();
+
+            var users2 = query2.Select();
+
+            Assert.That(users1.Count(), Is.EqualTo(4));
+            Assert.That(users2.Count(), Is.EqualTo(3));
+        }
+
+        [Test]
+        public virtual void TestDelayedCopy()
+        {
+            var query1 = Query<UserEntity>()
+                .Delayed();
+
+            var query2 = query1.Copy()
+                .Where(x => x.IsOnline);
+
+            var users1 = query1.Select();
+
+            var users2 = query2.Select();
+
+            Assert.That(users1.Count(), Is.EqualTo(4));
+            Assert.That(users2.Count(), Is.EqualTo(3));
+        }
+
+        [Test]
+        public virtual void TestDetachedCopy()
+        {
+            var subquery1 = Query<UserEntity>()
+                .Detached()
+                .Select(x => x.Id);
+
+            var subquery2 = subquery1.Copy()
+                .Where(x => x.IsOnline);
+
+            var users1 = Query<UserEntity>()
+                .Where(x => x.Id, FqIs.In(subquery1))
+                .Select();
+
+            var users2 = Query<UserEntity>()
+                .Where(x => x.Id, FqIs.In(subquery2))
+                .Select();
+
+            Assert.That(users1.Count(), Is.EqualTo(4));
+            Assert.That(users2.Count(), Is.EqualTo(3));
+        }
+
+        [Test]
+        public virtual void TestClearRestrictions()
+        {
+            var query1 = Query<UserEntity>()
+                .Where(x => x.IsOnline);
+
+            var query2 = query1.Copy()
+                .ClearRestrictions();
+
+            var users1 = query1.Select();
+
+            var users2 = query2.Select();
+
+            Assert.That(users1.Count(), Is.EqualTo(3));
+            Assert.That(users2.Count(), Is.EqualTo(4));
         }
     }
 }

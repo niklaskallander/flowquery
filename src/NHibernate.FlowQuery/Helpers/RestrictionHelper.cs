@@ -11,30 +11,23 @@ namespace NHibernate.FlowQuery.Helpers
 {
     public static class RestrictionHelper
     {
-        public static ICriterion GetCriterionForInvoke(InvocationExpression expression, string root, Dictionary<string, string> aliases)
+        public static ICriterion GetCriterionForInvoke(InvocationExpression expression, string root, QueryHelperData data)
         {
             if (expression.Expression.Type == typeof(WhereDelegate))
             {
                 string property = ExpressionHelper.GetPropertyName(expression.Arguments[0], root);
 
-                IsExpression isExpression = ExpressionHelper.GetValue<IsExpression>(expression.Arguments[1]);
+                var isExpression = ExpressionHelper.GetValue<IsExpression>(expression.Arguments[1]);
 
                 ICriterion criterion = isExpression.Compile(property);
 
-                if (isExpression.Negate)
-                {
-                    criterion = Restrictions.Not(criterion);
-                }
-
                 return criterion;
             }
-            else
-            {
-                return Restrictions.Eq(Projections.Constant(ExpressionHelper.GetValue<bool>(expression)), true);
-            }
+            
+            return Restrictions.Eq(Projections.Constant(ExpressionHelper.GetValue<bool>(expression)), true);
         }
 
-        public static ICriterion GetCriterion(Expression expression, string root, Dictionary<string, string> aliases)
+        public static ICriterion GetCriterion(Expression expression, string root, QueryHelperData data)
         {
             switch (expression.NodeType)
             {
@@ -47,88 +40,85 @@ namespace NHibernate.FlowQuery.Helpers
                 case ExpressionType.GreaterThanOrEqual:
                 case ExpressionType.LessThan:
                 case ExpressionType.LessThanOrEqual:
-                    return GetCriterionForBinary(expression as BinaryExpression, root, aliases);
+                    return GetCriterionForBinary(expression as BinaryExpression, root, data);
 
                 case ExpressionType.Call:
-                    return GetCriterionForMethodCall(expression as MethodCallExpression, root, aliases);
+                    return GetCriterionForMethodCall(expression as MethodCallExpression, root, data);
 
                 case ExpressionType.Lambda:
-                    return GetCriterion((expression as LambdaExpression).Body, root, aliases);
+                    return GetCriterion(((LambdaExpression)expression).Body, root, data);
 
                 case ExpressionType.Not:
-                    return Restrictions.Not(GetCriterion((expression as UnaryExpression).Operand, root, aliases));
+                    return Restrictions.Not(GetCriterion(((UnaryExpression)expression).Operand, root, data));
 
                 case ExpressionType.MemberAccess:
                     return Restrictions.Eq(ExpressionHelper.GetPropertyName(expression, root), true);
 
                 case ExpressionType.Invoke:
-                    return GetCriterionForInvoke(expression as InvocationExpression, root, aliases);
+                    return GetCriterionForInvoke(expression as InvocationExpression, root, data);
 
-                case ExpressionType.Constant:
                 default:
                     return Restrictions.Eq(Projections.Constant(ExpressionHelper.GetValue<bool>(expression)), true);
             }
         }
 
-        public static ICriterion GetCriterionForBinary(BinaryExpression expression, string root, Dictionary<string, string> aliases)
+        public static ICriterion GetCriterionForBinary(BinaryExpression expression, string root, QueryHelperData data)
         {
-            return GetCriterionForBinary(expression.Left, expression.Right, expression.NodeType, root, aliases);
+            return GetCriterionForBinary(expression.Left, expression.Right, expression.NodeType, root, data);
         }
 
-        public static ICriterion GetCriterionForBinary(Expression a, Expression b, ExpressionType type, string root, Dictionary<string, string> aliases)
+        public static ICriterion GetCriterionForBinary(Expression a, Expression b, ExpressionType type, string root, QueryHelperData data)
         {
             if (a.NodeType == ExpressionType.Convert)
             {
-                return GetCriterionForBinary((a as UnaryExpression).Operand, b, type, root, aliases);
+                return GetCriterionForBinary(((UnaryExpression)a).Operand, b, type, root, data);
             }
 
             if (b.NodeType == ExpressionType.Convert)
             {
-                return GetCriterionForBinary(a, (b as UnaryExpression).Operand, type, root, aliases);
+                return GetCriterionForBinary(a, ((UnaryExpression)b).Operand, type, root, data);
             }
 
             switch (type)
             {
                 case ExpressionType.AndAlso:
-                    return Restrictions.And(GetCriterion(a, root, aliases), GetCriterion(b, root, aliases));
+                    return Restrictions.And(GetCriterion(a, root, data), GetCriterion(b, root, data));
 
                 case ExpressionType.OrElse:
-                    return Restrictions.Or(GetCriterion(a, root, aliases), GetCriterion(b, root, aliases));
+                    return Restrictions.Or(GetCriterion(a, root, data), GetCriterion(b, root, data));
 
                 case ExpressionType.ExclusiveOr:
-                    ICriterion criterionA = GetCriterion(a, root, aliases);
-                    ICriterion criterionB = GetCriterion(b, root, aliases);
+                    ICriterion criterionA = GetCriterion(a, root, data);
+                    ICriterion criterionB = GetCriterion(b, root, data);
 
                     return Restrictions.Or
                     (
                         Restrictions.And(criterionA, Restrictions.Not(criterionB)),
                         Restrictions.And(criterionB, Restrictions.Not(criterionA))
                     );
-
-                default:
-                    break;
             }
 
-            bool aIsProjected = IsProjected(a, root, aliases);
-            bool bIsProjected = IsProjected(b, root, aliases);
+            bool aIsProjected = IsProjected(a, root, data);
+            bool bIsProjected = IsProjected(b, root, data);
 
             if (aIsProjected && bIsProjected) // Projection Projection
             {
-                return GetProjectionProjectionCriterion(ProjectionHelper.GetProjection(a, root, aliases), ProjectionHelper.GetProjection(b, root, aliases), type);
+                return GetProjectionProjectionCriterion(ProjectionHelper.GetProjection(a, root, data), ProjectionHelper.GetProjection(b, root, data), type);
             }
-            else if ((aIsProjected && !bIsProjected) || (!aIsProjected && !bIsProjected))
+            
+            if (aIsProjected || !bIsProjected)
             {
-                return GetProjectionValueCriterion(a, ExpressionHelper.GetValue(b), type, root, aliases, false);
+                return GetProjectionValueCriterion(a, ExpressionHelper.GetValue(b), type, root, data, false);
             }
 
-            return GetProjectionValueCriterion(b, ExpressionHelper.GetValue(a), type, root, aliases, true);
+            return GetProjectionValueCriterion(b, ExpressionHelper.GetValue(a), type, root, data, true);
         }
 
-        public static ICriterion GetCriterionForMethodCall(MethodCallExpression expression, string root, Dictionary<string, string> aliases)
+        public static ICriterion GetCriterionForMethodCall(MethodCallExpression expression, string root, QueryHelperData data)
         {
-            if (IsProjected(expression, root, aliases)) // Not a value expression
+            if (IsProjected(expression, root, data)) // Not a value expression
             {
-                IProjection projection = ProjectionHelper.GetProjection(expression.Object ?? expression.Arguments[0], root, aliases);
+                IProjection projection = ProjectionHelper.GetProjection(expression.Object ?? expression.Arguments[0], root, data);
 
                 int i = expression.Object == null ? 1 : 0;
 
@@ -142,7 +132,7 @@ namespace NHibernate.FlowQuery.Helpers
                         {
                             if (value is IEnumerable)
                             {
-                                List<object> objs = new List<object>();
+                                var objs = new List<object>();
 
                                 foreach (var obj in value as IEnumerable)
                                 {
@@ -218,10 +208,8 @@ namespace NHibernate.FlowQuery.Helpers
 
                 throw new NotSupportedException("The expression contains unsupported features, please revise your code");
             }
-            else
-            {
-                return Restrictions.Eq(Projections.Constant(ExpressionHelper.GetValue<bool>(expression)), true);
-            }
+            
+            return Restrictions.Eq(Projections.Constant(ExpressionHelper.GetValue<bool>(expression)), true);
         }
 
         public static ICriterion GetLikeCriterion(IProjection projection, Expression value, MatchMode matchMode)
@@ -231,120 +219,81 @@ namespace NHibernate.FlowQuery.Helpers
 
         public static ICriterion GetProjectionProjectionCriterion(IProjection projectionA, IProjection projectionB, ExpressionType type)
         {
-            PropertyProjection a = projectionA as PropertyProjection;
-            PropertyProjection b = projectionB as PropertyProjection;
+            Func<string, string, ICriterion> case1;
+            Func<string, IProjection, ICriterion> case2;
+            Func<IProjection, string, ICriterion> case3;
+            Func<IProjection, IProjection, ICriterion> case4;
 
-            if (type == ExpressionType.Equal)
+            switch (type)
             {
-                if (a != null && b != null)
-                {
-                    return Restrictions.EqProperty(a.PropertyName, b.PropertyName);
-                }
-                else if (a != null)
-                {
-                    return Restrictions.EqProperty(a.PropertyName, projectionB);
-                }
-                else if (b != null)
-                {
-                    return Restrictions.EqProperty(projectionA, b.PropertyName);
-                }
+                case ExpressionType.Equal:
+                    case1 = Restrictions.EqProperty;
+                    case2 = Restrictions.EqProperty;
+                    case3 = Restrictions.EqProperty;
+                    case4 = Restrictions.EqProperty;
+                    break;
 
-                return Restrictions.EqProperty(projectionA, projectionB);
+                case ExpressionType.GreaterThan:
+                    case1 = Restrictions.GtProperty;
+                    case2 = Restrictions.GtProperty;
+                    case3 = Restrictions.GtProperty;
+                    case4 = Restrictions.GtProperty;
+                    break;
+
+                case ExpressionType.GreaterThanOrEqual:
+                    case1 = Restrictions.GeProperty;
+                    case2 = Restrictions.GeProperty;
+                    case3 = Restrictions.GeProperty;
+                    case4 = Restrictions.GeProperty;
+                    break;
+
+                case ExpressionType.LessThan:
+                    case1 = Restrictions.LtProperty;
+                    case2 = Restrictions.LtProperty;
+                    case3 = Restrictions.LtProperty;
+                    case4 = Restrictions.LtProperty;
+                    break;
+
+                case ExpressionType.LessThanOrEqual:
+                    case1 = Restrictions.LeProperty;
+                    case2 = Restrictions.LeProperty;
+                    case3 = Restrictions.LeProperty;
+                    case4 = Restrictions.LeProperty;
+                    break;
+
+                case ExpressionType.NotEqual:
+                    case1 = Restrictions.NotEqProperty;
+                    case2 = Restrictions.NotEqProperty;
+                    case3 = Restrictions.NotEqProperty;
+                    case4 = Restrictions.NotEqProperty;
+                    break;
+
+                default:
+                    throw new NotSupportedException("The expression contains unsupported features, please revise your code");
             }
-            else if (type == ExpressionType.GreaterThan)
+
+            var a = projectionA as PropertyProjection;
+            var b = projectionB as PropertyProjection;
+
+            if (a != null && b != null)
             {
-                if (a != null && b != null)
-                {
-                    return Restrictions.GtProperty(a.PropertyName, b.PropertyName);
-                }
-                else if (a != null)
-                {
-                    return Restrictions.GtProperty(a.PropertyName, projectionB);
-                }
-                else if (b != null)
-                {
-                    return Restrictions.GtProperty(projectionA, b.PropertyName);
-                }
-
-                return Restrictions.GtProperty(projectionA, projectionB);
+                return case1(a.PropertyName, b.PropertyName);
             }
-            else if (type == ExpressionType.GreaterThanOrEqual)
+
+            if (a != null)
             {
-                if (a != null && b != null)
-                {
-                    return Restrictions.GeProperty(a.PropertyName, b.PropertyName);
-                }
-                else if (a != null)
-                {
-                    return Restrictions.GeProperty(a.PropertyName, projectionB);
-                }
-                else if (b != null)
-                {
-                    return Restrictions.GeProperty(projectionA, b.PropertyName);
-                }
-
-                return Restrictions.GeProperty(projectionA, projectionB);
+                return case2(a.PropertyName, projectionB);
             }
-            else if (type == ExpressionType.LessThan)
+
+            if (b != null)
             {
-                if (a != null && b != null)
-                {
-                    return Restrictions.LtProperty(a.PropertyName, b.PropertyName);
-                }
-                else if (a != null)
-                {
-                    return Restrictions.LtProperty(a.PropertyName, projectionB);
-                }
-                else if (b != null)
-                {
-                    return Restrictions.LtProperty(projectionA, b.PropertyName);
-                }
-
-                return Restrictions.LtProperty(projectionA, projectionB);
+                return case3(projectionA, b.PropertyName);
             }
-            else if (type == ExpressionType.LessThanOrEqual)
-            {
-                if (a != null && b != null)
-                {
-                    return Restrictions.LeProperty(a.PropertyName, b.PropertyName);
-                }
-                else if (a != null)
-                {
-                    return Restrictions.LeProperty(a.PropertyName, projectionB);
-                }
-                else if (b != null)
-                {
-                    return Restrictions.LeProperty(projectionA, b.PropertyName);
-                }
 
-                return Restrictions.LeProperty(projectionA, projectionB);
-            }
-            else
-            {
-                ICriterion criterion = null;
-
-                if (a != null && b != null)
-                {
-                    criterion = Restrictions.EqProperty(a.PropertyName, b.PropertyName);
-                }
-                else if (a != null)
-                {
-                    criterion = Restrictions.EqProperty(a.PropertyName, projectionB);
-                }
-                else if (b != null)
-                {
-                    criterion = Restrictions.EqProperty(projectionA, b.PropertyName);
-                }
-                else
-                {
-                    criterion = Restrictions.EqProperty(projectionA, projectionB);
-                }
-
-                return Restrictions.Not(criterion);
-            }
+            return case4(projectionA, projectionB);
         }
 
-        public static ICriterion GetProjectionValueCriterion(Expression expression, object value, ExpressionType type, string root, Dictionary<string, string> aliases, bool overTurned)
+        public static ICriterion GetProjectionValueCriterion(Expression expression, object value, ExpressionType type, string root, QueryHelperData data, bool overTurned)
         {
             if (overTurned)
             {
@@ -368,7 +317,7 @@ namespace NHibernate.FlowQuery.Helpers
                 }
             }
 
-            IProjection projection = ProjectionHelper.GetProjection(expression, root, aliases);
+            IProjection projection = ProjectionHelper.GetProjection(expression, root, data);
 
             switch (type)
             {
@@ -377,9 +326,10 @@ namespace NHibernate.FlowQuery.Helpers
                     {
                         return Restrictions.IsNull(projection);
                     }
-                    else if (value is bool)
+                    
+                    if (value is bool)
                     {
-                        return GetCriterion((bool)value ? expression : Expression.Not(expression), root, aliases);
+                        return GetCriterion((bool)value ? expression : Expression.Not(expression), root, data);
                     }
 
                     return Restrictions.Eq(projection, value);
@@ -389,9 +339,10 @@ namespace NHibernate.FlowQuery.Helpers
                     {
                         return Restrictions.IsNotNull(projection);
                     }
-                    else if (value is bool)
+                    
+                    if (value is bool)
                     {
-                        return GetCriterion(!(bool)value ? expression : Expression.Not(expression), root, aliases);
+                        return GetCriterion(!(bool)value ? expression : Expression.Not(expression), root, data);
                     }
 
                     return Restrictions.Not(Restrictions.Eq(projection, value));
@@ -413,11 +364,11 @@ namespace NHibernate.FlowQuery.Helpers
             }
         }
 
-        public static bool IsProjected(Expression expression, string root, Dictionary<string, string> aliases)
+        public static bool IsProjected(Expression expression, string root, QueryHelperData data)
         {
             string expressionRoot = ExpressionHelper.GetRoot(expression);
 
-            return expression is BinaryExpression || (expressionRoot != null && (expressionRoot == root || aliases.ContainsValue(expressionRoot)));
+            return expression is BinaryExpression || (expressionRoot != null && (expressionRoot == root || data.Aliases.ContainsValue(expressionRoot)));
         }
     }
 }

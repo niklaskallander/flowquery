@@ -4,14 +4,15 @@ using System.Linq.Expressions;
 using NHibernate.Criterion;
 using NHibernate.FlowQuery.Expressions;
 using NHibernate.FlowQuery.Helpers;
+using NHibernate.Metadata;
 
 namespace NHibernate.FlowQuery.Core.Implementors
 {
-    public class DelayedFlowQueryImplementor<TSource> : QueryableFlowQueryImplementor<TSource, IDelayedFlowQuery<TSource>>, IDelayedFlowQuery<TSource>, IQueryableFlowQuery
+    public class DelayedFlowQueryImplementor<TSource> : QueryableFlowQueryImplementor<TSource, IDelayedFlowQuery<TSource>>, IDelayedFlowQuery<TSource>
         where TSource : class
     {
-        protected internal DelayedFlowQueryImplementor(Func<System.Type, string, ICriteria> criteriaFactory, string alias = null, FlowQueryOptions options = null, IMorphableFlowQuery query = null)
-            : base(criteriaFactory, alias, options, query)
+        protected internal DelayedFlowQueryImplementor(Func<System.Type, string, ICriteria> criteriaFactory, Func<System.Type, IClassMetadata> metaDataFactory, string alias = null, FlowQueryOptions options = null, IMorphableFlowQuery query = null)
+            : base(criteriaFactory, metaDataFactory, alias, options, query)
         { }
 
         public virtual Lazy<bool> Any()
@@ -115,6 +116,11 @@ namespace NHibernate.FlowQuery.Core.Implementors
             Project(setup);
 
             return SelectDelayedDictionary<TKey, TValue>();
+        }
+
+        IDelayedFlowQuery<TSource> IDelayedFlowQuery<TSource>.Copy()
+        {
+            return new DelayedFlowQueryImplementor<TSource>(CriteriaFactory, MetaDataFactory, Alias, Options, this);
         }
 
         IDetachedFlowQuery<TSource> IDelayedFlowQuery<TSource>.Detached()

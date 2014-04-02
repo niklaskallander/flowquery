@@ -4,14 +4,15 @@ using System.Linq.Expressions;
 using NHibernate.Criterion;
 using NHibernate.FlowQuery.Expressions;
 using NHibernate.FlowQuery.Helpers;
+using NHibernate.Metadata;
 
 namespace NHibernate.FlowQuery.Core.Implementors
 {
-    public class ImmediateFlowQueryImplementor<TSource> : QueryableFlowQueryImplementor<TSource, IImmediateFlowQuery<TSource>>, IImmediateFlowQuery<TSource>, IQueryableFlowQuery
+    public class ImmediateFlowQueryImplementor<TSource> : QueryableFlowQueryImplementor<TSource, IImmediateFlowQuery<TSource>>, IImmediateFlowQuery<TSource>
         where TSource : class
     {
-        protected internal ImmediateFlowQueryImplementor(Func<System.Type, string, ICriteria> criteriaFactory, string alias = null, FlowQueryOptions options = null, IMorphableFlowQuery query = null)
-            : base(criteriaFactory, alias, options, query)
+        protected internal ImmediateFlowQueryImplementor(Func<System.Type, string, ICriteria> criteriaFactory, Func<System.Type, IClassMetadata> metaDataFactory, string alias = null, FlowQueryOptions options = null, IMorphableFlowQuery query = null)
+            : base(criteriaFactory, metaDataFactory, alias, options, query)
         { }
 
         public virtual bool Any()
@@ -115,6 +116,11 @@ namespace NHibernate.FlowQuery.Core.Implementors
             Project(setup);
 
             return SelectImmediateDictionary<TKey, TValue>();
+        }
+
+        IImmediateFlowQuery<TSource> IImmediateFlowQuery<TSource>.Copy()
+        {
+            return new ImmediateFlowQueryImplementor<TSource>(CriteriaFactory, MetaDataFactory, Alias, Options, this);
         }
 
         IDelayedFlowQuery<TSource> IImmediateFlowQuery<TSource>.Delayed()

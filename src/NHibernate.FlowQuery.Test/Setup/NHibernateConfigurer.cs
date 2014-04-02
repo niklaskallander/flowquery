@@ -1,22 +1,27 @@
 ﻿using System;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 using FluentNHibernate.Automapping;
 using FluentNHibernate.Cfg;
 using FluentNHibernate.Cfg.Db;
-using HibernatingRhinos.Profiler.Appender.NHibernate;
-//using HibernatingRhinos.Profiler.Appender.NHibernate;
+using NHibernate.Cache;
 using NHibernate.Cfg;
 using NHibernate.FlowQuery.Test.Setup.Entities;
+using NHibernate.Mapping;
 using NHibernate.Tool.hbm2ddl;
+using NHibernate.Type;
 
 namespace NHibernate.FlowQuery.Test.Setup
 {
     public static class NHibernateConfigurer
     {
-        private static ISessionFactory m_Factory;
+        private const string ConfigurationCacheFile = "nh.cfg";
 
-        public static void AddData()
+        private static ISessionFactory _factory;
+
+        private static void AddData()
         {
-            using (var session = m_Factory.OpenSession())
+            using (var session = _factory.OpenSession())
             using (var transaction = session.BeginTransaction())
             {
                 var c1 = new CustomerEntity("Pelle Svensson", new DateTime(2001, 9, 11));
@@ -115,42 +120,111 @@ namespace NHibernate.FlowQuery.Test.Setup
             }
         }
 
+        private static void SetCaching(Configuration configuration)
+        {
+            configuration
+                .Cache(x => x.UseQueryCache = true)
+                .SessionFactory()
+                .Caching.Through<HashtableCacheProvider>()
+                .WithDefaultExpiration(60);
+
+            foreach (PersistentClass persistentClass in configuration.ClassMappings)
+            {
+                if (persistentClass.IsInherited)
+                {
+                    continue;
+                }
+
+                configuration.SetCacheConcurrencyStrategy(persistentClass.EntityName, "nonstrict-read-write");
+            }
+
+            foreach (var coll in configuration.CollectionMappings)
+            {
+                configuration.SetCollectionCacheConcurrencyStrategy(coll.Role, "nonstrict-read-write");
+            }
+        }
+
         private static void BuildSchema(Configuration configuration)
         {
-            SchemaExport schemaExport = new SchemaExport(configuration);
+            var schemaExport = new SchemaExport(configuration);
+
             schemaExport.Create(false, true);
         }
 
         public static void Configure()
         {
-            NHibernateProfiler.Initialize();
+            //HibernatingRhinos.Profiler.Appender.NHibernate.NHibernateProfiler.Initialize();
 
-            m_Factory = Fluently.Configure()
-                .Database(MsSqlConfiguration.MsSql2008.ConnectionString(@"Data Source=.\sqlexpress; Initial Catalog=FlowQueryTestDB; Integrated Security=SSPI;"))
-                .Mappings
-                (
-                    m => m.AutoMappings
-                        .Add
-                        (
-                            AutoMap
-                                .AssemblyOf<UserEntity>()
-                                .Where
-                                (
-                                    (t) => t.Namespace == typeof(UserEntity).Namespace
-                                )
-                                .Override<UserEntity>(x => x.Map(FluentNHibernate.Reveal.Member<UserEntity>("m_TestValue")).Access.Field())
-                        )
-                )
-                .ExposeConfiguration(c =>
-                {
-                    BuildSchema(c);
-                })
+            Configuration configuration = LoadFromFile();
+
+            bool shouldAddData = false;
+
+            if (configuration == null)
+            {
+                shouldAddData = true;
+
+                configuration = Fluently.Configure()
+                    .Database(MsSqlConfiguration.MsSql2008.ConnectionString(@"Data Source=.; Initial Catalog=flowquery; Integrated Security=SSPI;"))
+                    .Mappings
+                    (
+                        m => m.AutoMappings
+                            .Add
+                            (
+                                AutoMap
+                                    .AssemblyOf<UserEntity>()
+                                    .Where
+                                    (
+                                        t => t.Namespace == typeof(UserEntity).Namespace
+                                    )
+                                    .Override<UserEntity>(x => x.Map(FluentNHibernate.Reveal.Member<UserEntity>("m_TestValue")).Access.Field())
+                            )
+                    )
+                    .BuildConfiguration();
+
+                BuildSchema(configuration);
+
+                SetCaching(configuration);
+
+                SaveToFile(configuration);
+            }
+
+            _factory = configuration
                 .BuildSessionFactory();
+
+            if (shouldAddData)
+            {
+                AddData();
+            }
+        }
+
+        private static void SaveToFile(Configuration configuration)
+        {
+            using (var file = File.Open(ConfigurationCacheFile, FileMode.Create))
+            {
+                var bf = new BinaryFormatter();
+
+                bf.Serialize(file, configuration);
+            }
+        }
+
+        private static Configuration LoadFromFile()
+        {
+            if (!File.Exists(ConfigurationCacheFile))
+            {
+                return null;
+            }
+
+            using (var file = File.Open(ConfigurationCacheFile, FileMode.Open, FileAccess.Read))
+            {
+                var bf = new BinaryFormatter();
+
+                return bf.Deserialize(file) as Configuration;
+            }
         }
 
         public static ISessionFactory GetSessionFactory()
         {
-            return m_Factory;
+            return _factory;
         }
     }
 }

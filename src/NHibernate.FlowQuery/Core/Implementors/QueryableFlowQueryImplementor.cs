@@ -4,16 +4,23 @@ using System.Linq.Expressions;
 using NHibernate.Criterion;
 using NHibernate.FlowQuery.Core.Selection;
 using NHibernate.FlowQuery.Helpers;
+using NHibernate.Metadata;
 
 namespace NHibernate.FlowQuery.Core.Implementors
 {
-    public abstract class QueryableFlowQueryImplementor<TSource, TFlowQuery> : MorphableFlowQueryImplementorBase<TSource, TFlowQuery>, IQueryableFlowQuery<TSource>, IQueryableFlowQuery
+    public abstract class QueryableFlowQueryImplementor<TSource, TQuery> : MorphableFlowQueryImplementorBase<TSource, TQuery>, IQueryableFlowQuery<TSource, TQuery>, IQueryableFlowQuery
         where TSource : class
-        where TFlowQuery : class, IFlowQuery<TSource, TFlowQuery>
+        where TQuery : class, IQueryableFlowQuery<TSource, TQuery>
     {
-        protected internal QueryableFlowQueryImplementor(Func<System.Type, string, ICriteria> criteriaFactory, string alias = null, FlowQueryOptions options = null, IMorphableFlowQuery query = null)
-            : base(criteriaFactory, alias, options, query)
-        { }
+        protected internal QueryableFlowQueryImplementor(
+            Func<System.Type, string, ICriteria> criteriaFactory,
+            Func<System.Type, IClassMetadata> metaDataFactory,
+            string alias = null,
+            FlowQueryOptions options = null,
+            IMorphableFlowQuery query = null)
+            : base(criteriaFactory, metaDataFactory, alias, options, query)
+        {
+        }
 
         protected virtual FlowQuerySelection<TDestination> SelectList<TDestination>()
         {
@@ -70,12 +77,12 @@ namespace NHibernate.FlowQuery.Core.Implementors
 
         public virtual ISelectSetup<TSource, TDestination> Select<TDestination>()
         {
-            return new SelectSetup<TSource, TDestination>(Select<TDestination>, Aliases);
+            return new SelectSetup<TSource, TDestination>(Select, Data);
         }
 
         public virtual FlowQuerySelection<TDestination> Select<TDestination>(ISelectSetup<TSource, TDestination> setup)
         {
-            Project<TDestination>(setup);
+            Project(setup);
 
             return SelectList<TDestination>();
         }
@@ -117,7 +124,7 @@ namespace NHibernate.FlowQuery.Core.Implementors
 
         public virtual FlowQuerySelection<TDestination> Select<TDestination>(Expression<Func<TSource, TDestination>> expression)
         {
-            Project<TDestination>(expression);
+            Project(expression);
 
             return SelectList<TDestination>();
         }
@@ -136,7 +143,7 @@ namespace NHibernate.FlowQuery.Core.Implementors
 
             Expression<Func<TSource, TDestination>> expression = combiner.Compile();
 
-            return Select<TDestination>(expression);
+            return Select(expression);
         }
 
         public virtual PartialSelection<TSource, TDestination> PartialSelect<TDestination>(Expression<Func<TSource, TDestination>> expression = null)
@@ -144,6 +151,41 @@ namespace NHibernate.FlowQuery.Core.Implementors
             return new PartialSelection<TSource, TDestination>(Select).Add(expression);
         }
 
+        public virtual TQuery Comment(string comment)
+        {
+            CommentValue = comment;
+
+            return Query;
+        }
+
+        public virtual TQuery FetchSize(int size)
+        {
+            FetchSizeValue = size;
+
+            return Query;
+        }
+
+        public virtual TQuery ReadOnly(bool isReadOnly = true)
+        {
+            IsReadOnly = isReadOnly;
+
+            return Query;
+        }
+
         public abstract bool IsDelayed { get; }
+
+        public virtual TQuery Timeout(int seconds)
+        {
+            TimeoutValue = seconds;
+
+            return Query;
+        }
+
+        public virtual TQuery ClearTimeout()
+        {
+            TimeoutValue = null;
+
+            return Query;
+        }
     }
 }

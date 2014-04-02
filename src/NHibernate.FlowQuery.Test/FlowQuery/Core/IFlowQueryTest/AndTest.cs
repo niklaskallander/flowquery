@@ -1,17 +1,116 @@
+using System.Linq;
 using NHibernate.Criterion;
+using NHibernate.FlowQuery.Core;
 using NHibernate.FlowQuery.Test.Setup.Entities;
 using NUnit.Framework;
 
 namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
 {
-    using System.Linq;
-    using FlowQueryIs = NHibernate.FlowQuery.Is;
+    using FqIs = Is;
     using Is = NUnit.Framework.Is;
 
     [TestFixture]
     public class AndTest : BaseTest
     {
-        #region Methods (33)
+        [Test]
+        public void CanRestrictOnExistsGreedily()
+        {
+            var subquery = DetachedQuery<UserEntity>()
+                .And(x => x.IsOnline)
+                .Select(x => x.Id);
+
+            var users = Query<UserEntity>()
+                .And(subquery, FqIs.Not.Empty())
+                .Select();
+
+            Assert.That(users.Count(), Is.EqualTo(4));
+        }
+
+        [Test]
+        public void CanRestrictOnNotExistsGreedily()
+        {
+            IDetachedImmutableFlowQuery subquery = DetachedQuery<UserEntity>()
+                .And(x => x.IsOnline)
+                .Select(x => x.Id);
+
+            var users = Query<UserEntity>()
+                .And(subquery, FqIs.Empty())
+                .Select();
+
+            Assert.That(users.Count(), Is.EqualTo(0));
+        }
+
+        [Test]
+        public void CanRestrictOnExistsNonGreedily()
+        {
+            UserEntity user = null;
+
+            var subquery = DetachedQuery<UserEntity>()
+                .SetRootAlias(() => user)
+                .And(x => x.IsOnline && x.Id == user.Id)
+                .Select(x => x.Id);
+
+            var users = Session.FlowQuery(() => user)
+                .And(subquery, FqIs.Not.Empty())
+                .Select();
+
+            Assert.That(users.Count(), Is.EqualTo(3));
+        }
+
+        [Test]
+        public void CanRestrictOnNotExistsNonGreedily()
+        {
+            UserEntity user = null;
+
+            var subquery = DetachedQuery<UserEntity>()
+                .SetRootAlias(() => user)
+                .And(x => x.IsOnline && x.Id == user.Id)
+                .Select(x => x.Id);
+
+            var users = Session.FlowQuery(() => user)
+                .And(subquery, FqIs.Empty())
+                .Select();
+
+            Assert.That(users.Count(), Is.EqualTo(1));
+        }
+
+        [Test]
+        public void CanRestrictOnNotExistsNonGreedilyUsingDetachedCriteria()
+        {
+            UserEntity user = null;
+
+            DetachedCriteria subquery = DetachedQuery<UserEntity>()
+                .SetRootAlias(() => user)
+                .And(x => x.IsOnline && x.Id == user.Id)
+                .Select(x => x.Id)
+                .Criteria;
+
+            var users = Session.FlowQuery(() => user)
+                .And(subquery, FqIs.Empty())
+                .Select();
+
+            Assert.That(users.Count(), Is.EqualTo(1));
+        }
+
+        [Test]
+        public void CanRestrictEmptyCollection()
+        {
+            var count = Query<UserEntity>()
+                .And(x => x.Groups, FqIs.Empty())
+                .Count();
+
+            Assert.That(count, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void CanRestrictNotEmptyCollection()
+        {
+            var count = Query<UserEntity>()
+                .And(x => x.Groups, FqIs.Not.Empty())
+                .Count();
+
+            Assert.That(count, Is.EqualTo(3));
+        }
 
         [Test]
         public void And()
@@ -32,7 +131,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void AndBetweenWithIsHelper()
         {
             var users = Query<UserEntity>()
-                .And(u => u.Id, FlowQueryIs.Between(2, 3))
+                .And(u => u.Id, FqIs.Between(2, 3))
                 .Select()
                 ;
 
@@ -111,9 +210,9 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void AndInSubqueryWithIsHelper()
         {
             var users = Query<UserEntity>()
-                .And(u => u.Id, FlowQueryIs.In
+                .And(u => u.Id, FqIs.In
                                   (
-                                      Query<UserEntity>().Detached()
+                                      DetachedQuery<UserEntity>()
                                           .Where(x => x.Id == 1 || x.Id == 4)
                                           .Select(x => x.Id)
                                   )
@@ -132,7 +231,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void AndInWithIsHelper()
         {
             var users = Query<UserEntity>()
-                .And(u => u.Id, FlowQueryIs.In(1, 3))
+                .And(u => u.Id, FqIs.In(1, 3))
                 .Select()
                 ;
 
@@ -177,7 +276,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void AndLikeWithIsHelper()
         {
             var users = Query<UserEntity>()
-                .And(u => u.Firstname, FlowQueryIs.Like("Nik%"))
+                .And(u => u.Firstname, FqIs.Like("Nik%"))
                 .Select()
                 ;
 
@@ -249,6 +348,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         [Test]
         public void AndWithDoubleNegation()
         {
+            // ReSharper disable once NegativeEqualityExpression, DoubleNegationOperator, RedundantBoolCompare
             var users = Query<UserEntity>()
                 .And(u => !!(u.IsOnline == true))
                 .Select()
@@ -266,8 +366,8 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         {
             var users = Query<UserEntity>()
                 .And((u, where) => u.Firstname == "Niklas"
-                                  && (where(u.Lastname, FlowQueryIs.In(new string[] { "Nilsson", "Källander" }))
-                                  || where(u.IsOnline, FlowQueryIs.Not.EqualTo(true))))
+                                  && (where(u.Lastname, FqIs.In(new object[] { "Nilsson", "Källander" }))
+                                  || where(u.IsOnline, FqIs.Not.EqualTo(true))))
                 .Select()
                 ;
 
@@ -278,7 +378,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void AndWithIsHelper()
         {
             var users = Query<UserEntity>()
-                .And(u => u.IsOnline, FlowQueryIs.EqualTo(true))
+                .And(u => u.IsOnline, FqIs.EqualTo(true))
                 .Select()
                 ;
 
@@ -307,6 +407,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         [Test]
         public void AndWithMultipleBinaryExpressions()
         {
+            // ReSharper disable once RedundantBoolCompare
             var users = Query<UserEntity>()
                 .And(u => u.Id == 1 || u.Id > 3 && u.IsOnline == true)
                 .Select()
@@ -315,13 +416,14 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
             Assert.That(users.Count(), Is.EqualTo(1));
             foreach (var user in users)
             {
-                Assert.That(user.Id == 1 || user.Id > 3 && user.IsOnline == true);
+                Assert.That(user.Id == 1 || user.Id > 3 && user.IsOnline);
             }
         }
 
         [Test]
         public void AndWithNegation()
         {
+            // ReSharper disable once NegativeEqualityExpression, RedundantBoolCompare
             var users = Query<UserEntity>()
                 .And(u => !(u.IsOnline == true))
                 .Select()
@@ -362,7 +464,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void AndWithStringAndIsHelper()
         {
             var users = Query<UserEntity>()
-                .And("IsOnline", FlowQueryIs.EqualTo(true))
+                .And("IsOnline", FqIs.EqualTo(true))
                 .Select()
                 ;
 
@@ -442,7 +544,5 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
 
             Assert.That(users.Count(), Is.EqualTo(4));
         }
-
-        #endregion Methods
     }
 }

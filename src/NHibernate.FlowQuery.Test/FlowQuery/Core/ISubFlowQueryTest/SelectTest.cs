@@ -1,29 +1,27 @@
+using System.Collections.Generic;
+using System.Linq;
+using NHibernate.Criterion;
 using NHibernate.FlowQuery.Test.Setup.Entities;
 using NUnit.Framework;
 
 namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
 {
-    using System.Collections.Generic;
-    using System.Linq;
-    using NHibernate.Criterion;
-    using FlowQueryIs = NHibernate.FlowQuery.Is;
+    using FqIs = Is;
     using Is = NUnit.Framework.Is;
 
     [TestFixture]
     public class SelectTest : BaseTest
     {
-        #region Methods (3)
-
         [Test]
         public void CanSelectAggregationUsingAggregateHelper()
         {
             //avg
 
-            var aggregation = Query<UserEntity>().Detached()
+            var aggregation = DetachedQuery<UserEntity>()
                 .Select(u => Aggregate.Average(u.Id));
 
             IEnumerable<UserEntity> users = Query<UserEntity>()
-                .Where(x => x.Id, FlowQueryIs.GreaterThan(aggregation))
+                .Where(x => x.Id, FqIs.GreaterThan(aggregation))
                 .Select()
                 ;
 
@@ -31,11 +29,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
 
             //sum
 
-            aggregation = Query<UserEntity>().Detached()
+            aggregation = DetachedQuery<UserEntity>()
                 .Select(u => Aggregate.Sum(u.Id));
 
             users = Query<UserEntity>()
-                .Where(x => x.Id, FlowQueryIs.LessThan(aggregation))
+                .Where(x => x.Id, FqIs.LessThan(aggregation))
                 .Select()
                 ;
 
@@ -43,11 +41,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
 
             //min
 
-            aggregation = Query<UserEntity>().Detached()
+            aggregation = DetachedQuery<UserEntity>()
                 .Select(u => Aggregate.Min(u.Id));
 
             users = Query<UserEntity>()
-                .Where(x => x.Id, FlowQueryIs.EqualTo(aggregation))
+                .Where(x => x.Id, FqIs.EqualTo(aggregation))
                 .Select()
                 ;
 
@@ -56,11 +54,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
 
             //max
 
-            aggregation = Query<UserEntity>().Detached()
+            aggregation = DetachedQuery<UserEntity>()
                 .Select(u => Aggregate.Max(u.Id));
 
             users = Query<UserEntity>()
-                .Where(x => x.Id, FlowQueryIs.EqualTo(aggregation))
+                .Where(x => x.Id, FqIs.EqualTo(aggregation))
                 .Select()
                 ;
 
@@ -69,11 +67,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
 
             //count
 
-            aggregation = Query<UserEntity>().Detached()
+            aggregation = DetachedQuery<UserEntity>()
                 .Select(u => Aggregate.Count(u.Id));
 
             users = Query<UserEntity>()
-                .Where(x => x.Id, FlowQueryIs.EqualTo(aggregation))
+                .Where(x => x.Id, FqIs.EqualTo(aggregation))
                 .Select()
                 ;
 
@@ -82,11 +80,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
 
             //count distinct
 
-            aggregation = Query<UserEntity>().Detached()
+            aggregation = DetachedQuery<UserEntity>()
                 .Select(u => Aggregate.CountDistinct(u.Id));
 
             users = Query<UserEntity>()
-                .Where(x => x.Id, FlowQueryIs.EqualTo(aggregation))
+                .Where(x => x.Id, FqIs.EqualTo(aggregation))
                 .Select()
                 ;
 
@@ -95,11 +93,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
 
             //group by
 
-            aggregation = Query<UserEntity>().Detached()
+            aggregation = DetachedQuery<UserEntity>()
                 .Select(x => Aggregate.GroupBy(x.Id));
 
             users = Query<UserEntity>()
-                .Where(x => x.Id, FlowQueryIs.In(aggregation))
+                .Where(x => x.Id, FqIs.In(aggregation))
                 .Select()
                 ;
 
@@ -109,12 +107,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void CanSelectUsingExpression()
         {
-            var query = Query<UserEntity>().Detached()
+            var query = DetachedQuery<UserEntity>()
                 .Where(x => x.IsOnline)
                 .Select(x => x.Id);
 
             var users = Query<UserEntity>()
-                .Where(x => x.Id, FlowQueryIs.In(query))
+                .Where(x => x.Id, FqIs.In(query))
                 .Select()
                 ;
 
@@ -124,12 +122,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void CanSelectUsingProjection()
         {
-            var query = Query<UserEntity>().Detached()
+            var query = DetachedQuery<UserEntity>()
                 .Where(x => x.IsOnline)
                 .Select(Projections.Property("Id"));
 
             var users = Query<UserEntity>()
-                .Where(x => x.Id, FlowQueryIs.In(query))
+                .Where(x => x.Id, FqIs.In(query))
                 .Select()
                 ;
 
@@ -139,18 +137,16 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void CanSelectUsingString()
         {
-            var query = Query<UserEntity>().Detached()
+            var query = DetachedQuery<UserEntity>()
                 .Where(x => x.IsOnline)
-                .Select("Id");
+                .Select(new[] { "Id" });
 
             var users = Query<UserEntity>()
-                .Where(x => x.Id, FlowQueryIs.In(query))
+                .Where(x => x.Id, FqIs.In(query))
                 .Select()
                 ;
 
             Assert.That(users.Count(), Is.EqualTo(3));
         }
-
-        #endregion Methods
     }
 }
