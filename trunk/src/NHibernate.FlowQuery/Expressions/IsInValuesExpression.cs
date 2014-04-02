@@ -10,18 +10,25 @@ namespace NHibernate.FlowQuery.Expressions
             : base(value)
         { }
 
-        public override ICriterion Compile(string property)
+        protected override ICriterion CompileCore(string property)
         {
-            if (!(Value is ICollection))
+            var collection = Value as ICollection;
+
+            if (collection == null)
             {
-                List<object> objs = new List<object>();
-                foreach (var obj in Value as IEnumerable)
+                var enumerable = (IEnumerable)Value;
+
+                var items = new List<object>();
+
+                foreach (var item in enumerable)
                 {
-                    objs.Add(obj);
+                    items.Add(item);
                 }
-                return Restrictions.In(Projections.Property(property), objs.ToArray());
+
+                return Restrictions.In(Projections.Property(property), items.ToArray());
             }
-            return Restrictions.In(Projections.Property(property), Value as ICollection);
+
+            return Restrictions.In(Projections.Property(property), collection);
         }
     }
 }

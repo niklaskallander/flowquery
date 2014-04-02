@@ -4,8 +4,20 @@ namespace NHibernate.FlowQuery.Expressions
 {
     public abstract class IsExpression
     {
-        public virtual bool Negate { get; set; }
+        public virtual bool Negated { get; set; }
 
-        public abstract ICriterion Compile(string property);
+        protected abstract ICriterion CompileCore(string property);
+
+        public virtual ICriterion Compile(string property)
+        {
+            ICriterion compiled = CompileCore(property);
+
+            if (Negated)
+            {
+                return Restrictions.Not(compiled);
+            }
+
+            return compiled;
+        }
     }
 }

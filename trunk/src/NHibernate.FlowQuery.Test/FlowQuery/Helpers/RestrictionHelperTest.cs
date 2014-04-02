@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using NHibernate.FlowQuery.Core.Joins;
 using NHibernate.FlowQuery.Helpers;
 using NUnit.Framework;
 
@@ -9,18 +10,33 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
     [TestFixture]
     public class RestrictionHelperTest
     {
-        #region Methods (1)
-
         [Test]
         public void GetProjectionValueCriterionThrowsIfNodeTypeIsInvalid()
         {
             Assert.That(() =>
-                        {
-                            RestrictionHelper.GetProjectionValueCriterion(Expression.Equal(Expression.Constant(true), Expression.Constant(true)), true, ExpressionType.ListInit, null, new Dictionary<string, string>(), false);
+            {
+                RestrictionHelper
+                    .GetProjectionValueCriterion
+                    (
+                        Expression.Equal(Expression.Constant(true), Expression.Constant(true)), 
+                        true, 
+                        ExpressionType.ListInit, 
+                        null, 
+                        new QueryHelperData(new Dictionary<string, string>(), new List<Join>(), null), 
+                        false
+                    );
 
-                        }, Throws.InstanceOf<NotSupportedException>());
+            }, Throws.InstanceOf<NotSupportedException>());
         }
 
-        #endregion Methods
+        [Test]
+        public void GetProjectionProjectionCriterionThrowsIfNodeTypeIsInvalid()
+        {
+            Assert.That(() =>
+            {
+                RestrictionHelper.GetProjectionProjectionCriterion(null, null, ExpressionType.Block);
+
+            }, Throws.InstanceOf<NotSupportedException>());
+        }
     }
 }

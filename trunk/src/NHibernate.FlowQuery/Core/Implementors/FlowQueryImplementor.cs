@@ -3,24 +3,29 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using NHibernate.Criterion;
+using NHibernate.FlowQuery.Core.CustomProjections;
+using NHibernate.FlowQuery.Core.Fetches;
 using NHibernate.FlowQuery.Core.Joins;
+using NHibernate.FlowQuery.Core.Locks;
 using NHibernate.FlowQuery.Expressions;
 using NHibernate.FlowQuery.Helpers;
+using NHibernate.FlowQuery.Revealing.Conventions;
+using NHibernate.Metadata;
 using NHibernate.SqlCommand;
 
 namespace NHibernate.FlowQuery.Core.Implementors
 {
-    public abstract class FlowQueryImplementor<TSource, TFlowQuery> : IFlowQuery<TSource, TFlowQuery>, IFlowQuery
+    public abstract class FlowQueryImplementor<TSource, TQuery> : IFlowQuery<TSource, TQuery>, IFlowQuery
         where TSource : class
-        where TFlowQuery : class, IFlowQuery<TSource, TFlowQuery>
+        where TQuery : class, IFlowQuery<TSource, TQuery>
     {
-        protected internal FlowQueryImplementor(Func<System.Type, string, ICriteria> criteriaFactory, string alias = null, FlowQueryOptions options = null, IFlowQuery query = null)
+        protected internal FlowQueryImplementor(Func<System.Type, string, ICriteria> criteriaFactory, Func<System.Type, IClassMetadata> metaDataFactory, string alias = null, FlowQueryOptions options = null, IFlowQuery query = null)
         {
-            Query = this as TFlowQuery;
+            Query = this as TQuery;
 
             if (Query == null)
             {
-                throw new ArgumentException("The provided TFlowQuery must the type of this instance", "TFlowQuery");
+                throw new ArgumentException("The provided TFlowQuery must the type of this instance");
             }
 
             if (criteriaFactory == null)
@@ -28,11 +33,22 @@ namespace NHibernate.FlowQuery.Core.Implementors
                 throw new ArgumentNullException("criteriaFactory");
             }
 
+            if (metaDataFactory == null)
+            {
+                throw new ArgumentNullException("metaDataFactory");
+            }
+
             if (query != null)
             {
                 Aliases = query.Aliases.ToDictionary(x => x.Key, x => x.Value);
+                CacheMode = query.CacheMode;
+                CacheRegion = query.CacheRegion;
                 Criterions = query.Criterions.ToList();
+                IsCacheable = query.IsCacheable;
+                Fetches = query.Fetches.ToList();
+                GroupBys = query.GroupBys.ToList();
                 Joins = query.Joins.ToList();
+                Locks = query.Locks.ToList();
                 Orders = query.Orders.ToList();
 
                 ResultsToSkip = query.ResultsToSkip;
@@ -42,7 +58,10 @@ namespace NHibernate.FlowQuery.Core.Implementors
             {
                 Aliases = new Dictionary<string, string>();
                 Criterions = new List<ICriterion>();
+                Fetches = new List<Fetch>();
+                GroupBys = new List<FqGroupByProjection>();
                 Joins = new List<Join>();
+                Locks = new List<Lock>();
                 Orders = new List<OrderByStatement>();
 
                 if (alias != null)
@@ -54,24 +73,123 @@ namespace NHibernate.FlowQuery.Core.Implementors
             Alias = alias;
 
             CriteriaFactory = criteriaFactory;
+            MetaDataFactory = metaDataFactory;
+
+            Data = new QueryHelperData(Aliases, Joins, MetaDataFactory);
 
             Options = options;
 
-            Inner = new JoinBuilder<TSource, TFlowQuery>(this, Query, JoinType.InnerJoin);
-            LeftOuter = new JoinBuilder<TSource, TFlowQuery>(this, Query, JoinType.LeftOuterJoin);
-            RightOuter = new JoinBuilder<TSource, TFlowQuery>(this, Query, JoinType.RightOuterJoin);
-            Full = new JoinBuilder<TSource, TFlowQuery>(this, Query, JoinType.FullJoin);
+            Inner = new JoinBuilder<TSource, TQuery>(this, Query, JoinType.InnerJoin);
+            LeftOuter = new JoinBuilder<TSource, TQuery>(this, Query, JoinType.LeftOuterJoin);
+            RightOuter = new JoinBuilder<TSource, TQuery>(this, Query, JoinType.RightOuterJoin);
+            Full = new JoinBuilder<TSource, TQuery>(this, Query, JoinType.FullJoin);
         }
 
-        public virtual string Alias { get; private set; }
+        public string Alias { get; private set; }
 
-        public virtual FlowQueryOptions Options { get; private set; }
+        public bool IsCacheable { get; private set; }
 
-        public virtual Func<System.Type, string, ICriteria> CriteriaFactory { get; private set; }
+        public string CacheRegion { get; private set; }
 
-        protected internal virtual TFlowQuery Query { get; private set; }
+        public CacheMode? CacheMode { get; private set; }
 
-        public virtual TFlowQuery Where(params ICriterion[] criterions)
+        public QueryHelperData Data { get; private set; }
+
+        public FlowQueryOptions Options { get; private set; }
+
+        public Func<System.Type, string, ICriteria> CriteriaFactory { get; private set; }
+
+        public Func<System.Type, IClassMetadata> MetaDataFactory { get; private set; }
+
+        protected internal TQuery Query { get; private set; }
+
+        protected virtual IFetchBuilder<TSource, TQuery> FetchCore(string path, string alias)
+        {
+            if (Fetches.Count > 0 && Fetches.Any(x => x.HasAlias))
+            {
+                string[] steps = path.Split('.');
+
+                if (steps.Length > 1)
+                {
+                    for (int i = 0; i < steps.Length; i++)
+                    {
+                        Fetch fetch = Fetches
+                            .SingleOrDefault(x => x.HasAlias && x.Alias == steps[i]);
+
+                        if (fetch != null)
+                        {
+                            steps[i] = fetch.Path;
+                        }
+                    }
+
+                    path = string.Join(".", steps);
+                }
+            }
+
+            return new FetchBuilder<TSource, TQuery>(this, Query, path, alias);
+        }
+
+        public virtual IFetchBuilder<TSource, TQuery> Fetch(string path)
+        {
+            return FetchCore(path, path);
+        }
+
+        public virtual IFetchBuilder<TSource, TQuery> Fetch(Expression<Func<TSource, object>> expression, Expression<Func<object>> aliasProjection = null, IRevealConvention revealConvention = null)
+        {
+            if (revealConvention == null)
+            {
+                revealConvention = Reveal.DefaultConvention ?? new CustomConvention(x => x);
+            }
+
+            string path = Reveal.ByConvention(expression, revealConvention);
+
+            string alias = aliasProjection != null
+                ? ExpressionHelper.GetPropertyName(aliasProjection)
+                : path;
+
+            return FetchCore(path, alias);
+        }
+
+        public virtual TQuery GroupBy(Expression<Func<TSource, object>> property)
+        {
+            if (property != null)
+            {
+                IProjection projection = ProjectionHelper.GetProjection(
+                    property.Body,
+                    property.Parameters[0].Name,
+                    Data);
+
+                if (projection != null)
+                {
+                    if (projection.IsGrouped || projection.IsAggregate)
+                    {
+                        throw new InvalidOperationException(
+                            "Cannot use an aggregate or grouped projection with GroupBy");
+                    }
+
+                    GroupBys.Add(new FqGroupByProjection(projection, false));
+                }
+            }
+
+            return Query;
+        }
+
+        public virtual ILockBuilder<TSource, TQuery> Lock()
+        {
+            return Lock(null as string);
+        }
+
+        public virtual ILockBuilder<TSource, TQuery> Lock(Expression<Func<object>> alias)
+        {
+            return Lock(ExpressionHelper.GetPropertyName(alias));
+        }
+
+        public virtual ILockBuilder<TSource, TQuery> Lock(string alias)
+        {
+            return new LockBuilder<TSource, TQuery>(this, Query, alias);
+        }
+
+        public virtual TQuery Where(params ICriterion[] criterions)
         {
             if (criterions == null)
             {
@@ -89,59 +207,106 @@ namespace NHibernate.FlowQuery.Core.Implementors
             return Query;
         }
 
-        public virtual TFlowQuery Where(string property, IsExpression expression)
+        public virtual TQuery Where(string property, IsExpression expression)
         {
             ICriterion criterion = expression.Compile(property);
-
-            if (expression.Negate)
-            {
-                criterion = Restrictions.Not(criterion);
-            }
 
             return Where(criterion);
         }
 
-        public virtual TFlowQuery Where(Expression<Func<TSource, bool>> expression)
+        public virtual TQuery Where(Expression<Func<TSource, bool>> expression)
         {
-            return Where(RestrictionHelper.GetCriterion(expression, expression.Parameters[0].Name, Aliases));
+            return Where(RestrictionHelper.GetCriterion(expression, expression.Parameters[0].Name, Data));
         }
 
-        public virtual TFlowQuery Where(Expression<Func<TSource, object>> property, IsExpression expression)
+        public virtual TQuery Where(Expression<Func<TSource, object>> property, IsExpression expression)
         {
             return Where(ExpressionHelper.GetPropertyName(property.Body, property.Parameters[0].Name), expression);
         }
 
-        public virtual TFlowQuery Where(Expression<Func<TSource, WhereDelegate, bool>> expression)
+        public virtual TQuery Where(Expression<Func<TSource, WhereDelegate, bool>> expression)
         {
-            return Where(RestrictionHelper.GetCriterion(expression, expression.Parameters[0].Name, Aliases));
+            return Where(RestrictionHelper.GetCriterion(expression, expression.Parameters[0].Name, Data));
         }
 
-        public virtual TFlowQuery And(params ICriterion[] criterions)
+        public virtual TQuery Where(IDetachedImmutableFlowQuery subquery, Expressions.IsEmptyExpression expression)
+        {
+            return Where(subquery.Criteria, expression);
+        }
+
+        public virtual TQuery Where(DetachedCriteria subquery, Expressions.IsEmptyExpression expression)
+        {
+            ICriterion criterion = expression.Compile(subquery);
+
+            return Where(criterion);
+        }
+
+        public virtual TQuery And(IDetachedImmutableFlowQuery subquery, Expressions.IsEmptyExpression expression)
+        {
+            return Where(subquery, expression);
+        }
+
+        public virtual TQuery And(DetachedCriteria subquery, Expressions.IsEmptyExpression expression)
+        {
+            return Where(subquery, expression);
+        }
+
+        protected virtual TQuery Cacheable(bool isCacheable, CacheMode? cacheMode, string cacheRegion)
+        {
+            IsCacheable = isCacheable;
+
+            CacheMode = cacheMode;
+            CacheRegion = cacheRegion;
+
+            return Query;
+        }
+
+        public virtual TQuery Cacheable(bool isCacheable = true)
+        {
+            return Cacheable(isCacheable, null, null);
+        }
+
+        public virtual TQuery Cacheable(string cacheRegion)
+        {
+            return Cacheable(true, CacheMode, cacheRegion);
+        }
+
+        public virtual TQuery Cacheable(string cacheRegion, CacheMode cacheMode)
+        {
+            return Cacheable(true, cacheMode, cacheRegion);
+        }
+
+        public virtual TQuery Cacheable(CacheMode cacheMode)
+        {
+            return Cacheable(true, cacheMode, CacheRegion);
+        }
+
+        public virtual TQuery And(params ICriterion[] criterions)
         {
             return Where(criterions);
         }
 
-        public virtual TFlowQuery And(string property, IsExpression expression)
+        public virtual TQuery And(string property, IsExpression expression)
         {
             return Where(property, expression);
         }
 
-        public virtual TFlowQuery And(Expression<Func<TSource, bool>> expression)
+        public virtual TQuery And(Expression<Func<TSource, bool>> expression)
         {
             return Where(expression);
         }
 
-        public virtual TFlowQuery And(Expression<Func<TSource, object>> property, IsExpression expression)
+        public virtual TQuery And(Expression<Func<TSource, object>> property, IsExpression expression)
         {
             return Where(property, expression);
         }
 
-        public virtual TFlowQuery And(Expression<Func<TSource, WhereDelegate, bool>> expression)
+        public virtual TQuery And(Expression<Func<TSource, WhereDelegate, bool>> expression)
         {
             return Where(expression);
         }
 
-        public virtual TFlowQuery RestrictByExample(TSource exampleInstance, Action<IExampleWrapper<TSource>> example)
+        public virtual TQuery RestrictByExample(TSource exampleInstance, Action<IExampleWrapper<TSource>> example)
         {
             if (example == null)
             {
@@ -160,25 +325,31 @@ namespace NHibernate.FlowQuery.Core.Implementors
             return Where(wrapper.Example);
         }
 
-        public virtual List<ICriterion> Criterions { get; private set; }
+        public List<ICriterion> Criterions { get; private set; }
 
-        public virtual IJoinBuilder<TSource, TFlowQuery> Inner { get; private set; }
+        public virtual IJoinBuilder<TSource, TQuery> Inner { get; private set; }
 
-        public virtual IJoinBuilder<TSource, TFlowQuery> LeftOuter { get; private set; }
+        public virtual IJoinBuilder<TSource, TQuery> LeftOuter { get; private set; }
 
-        public virtual IJoinBuilder<TSource, TFlowQuery> RightOuter { get; private set; }
+        public virtual IJoinBuilder<TSource, TQuery> RightOuter { get; private set; }
 
-        public virtual IJoinBuilder<TSource, TFlowQuery> Full { get; private set; }
+        public virtual IJoinBuilder<TSource, TQuery> Full { get; private set; }
 
-        public virtual Dictionary<string, string> Aliases { get; private set; }
+        public Dictionary<string, string> Aliases { get; private set; }
 
-        public virtual List<Join> Joins { get; private set; }
+        public List<Fetch> Fetches { get; set; }
 
-        public virtual List<OrderByStatement> Orders { get; private set; }
+        public List<FqGroupByProjection> GroupBys { get; private set; }
 
-        public virtual TFlowQuery OrderBy(string property, bool ascending = true)
+        public List<Join> Joins { get; private set; }
+
+        public List<Lock> Locks { get; private set; }
+
+        public List<OrderByStatement> Orders { get; private set; }
+
+        public virtual TQuery OrderBy(string property, bool ascending = true)
         {
-            Orders.Add(new OrderByStatement()
+            Orders.Add(new OrderByStatement
             {
                 IsBasedOnSource = true,
                 Order = ascending
@@ -189,14 +360,14 @@ namespace NHibernate.FlowQuery.Core.Implementors
             return Query;
         }
 
-        public virtual TFlowQuery OrderByDescending(string property)
+        public virtual TQuery OrderByDescending(string property)
         {
             return OrderBy(property, false);
         }
 
-        public virtual TFlowQuery OrderBy(IProjection projection, bool ascending = true)
+        public virtual TQuery OrderBy(IProjection projection, bool ascending = true)
         {
-            Orders.Add(new OrderByStatement()
+            Orders.Add(new OrderByStatement
             {
                 IsBasedOnSource = true,
                 Order = ascending
@@ -207,24 +378,26 @@ namespace NHibernate.FlowQuery.Core.Implementors
             return Query;
         }
 
-        public virtual TFlowQuery OrderByDescending(IProjection projection)
+        public virtual TQuery OrderByDescending(IProjection projection)
         {
             return OrderBy(projection, false);
         }
 
-        public virtual TFlowQuery OrderBy(Expression<Func<TSource, object>> property, bool ascending = true)
+        public virtual TQuery OrderBy(Expression<Func<TSource, object>> property, bool ascending = true)
         {
-            return OrderBy(ExpressionHelper.GetPropertyName(property.Body, property.Parameters[0].Name), ascending);
+            IProjection projection = ProjectionHelper.GetProjection(property.Body, property.Parameters[0].Name, Data);
+
+            return OrderBy(projection, ascending);
         }
 
-        public virtual TFlowQuery OrderByDescending(Expression<Func<TSource, object>> property)
+        public virtual TQuery OrderByDescending(Expression<Func<TSource, object>> property)
         {
             return OrderBy(property, false);
         }
 
-        public virtual TFlowQuery OrderBy<TProjection>(string property, bool ascending = true)
+        public virtual TQuery OrderBy<TProjection>(string property, bool ascending = true)
         {
-            Orders.Add(new OrderByStatement()
+            Orders.Add(new OrderByStatement
             {
                 IsBasedOnSource = false,
                 OrderAscending = ascending,
@@ -235,39 +408,39 @@ namespace NHibernate.FlowQuery.Core.Implementors
             return Query;
         }
 
-        public virtual TFlowQuery OrderByDescending<TProjection>(string property)
+        public virtual TQuery OrderByDescending<TProjection>(string property)
         {
             return OrderBy<TProjection>(property, false);
         }
 
-        public virtual TFlowQuery OrderBy<TProjection>(Expression<Func<TProjection, object>> projection, bool ascending = true)
+        public virtual TQuery OrderBy<TProjection>(Expression<Func<TProjection, object>> projection, bool ascending = true)
         {
             return OrderBy<TProjection>(ExpressionHelper.GetPropertyName(projection.Body, projection.Parameters[0].Name), ascending);
         }
 
-        public virtual TFlowQuery OrderByDescending<TProjection>(Expression<Func<TProjection, object>> projection)
+        public virtual TQuery OrderByDescending<TProjection>(Expression<Func<TProjection, object>> projection)
         {
-            return OrderBy<TProjection>(projection, false);
+            return OrderBy(projection, false);
         }
 
-        public virtual TFlowQuery Limit(int limit)
+        public virtual TQuery Limit(int limit)
         {
             return Take(limit);
         }
 
-        public virtual TFlowQuery Limit(int limit, int offset)
+        public virtual TQuery Limit(int limit, int offset)
         {
             return Take(limit).Skip(offset);
         }
 
-        public virtual TFlowQuery Skip(int skip)
+        public virtual TQuery Skip(int skip)
         {
             ResultsToSkip = skip;
 
             return Query;
         }
 
-        public virtual TFlowQuery Take(int take)
+        public virtual TQuery Take(int take)
         {
             ResultsToTake = take;
 
@@ -278,24 +451,52 @@ namespace NHibernate.FlowQuery.Core.Implementors
 
         public virtual int? ResultsToTake { get; private set; }
 
-        public virtual TFlowQuery ClearOrders()
+        public virtual TQuery ClearFetches()
         {
-            Orders.Clear();
+            Fetches.Clear();
 
             return Query;
         }
 
-        public virtual TFlowQuery ClearJoins()
+        public virtual TQuery ClearGroupBys()
+        {
+            GroupBys.Clear();
+
+            return Query;
+        }
+
+        public virtual TQuery ClearJoins()
         {
             Joins.Clear();
 
             return Query;
         }
 
-        public virtual TFlowQuery ClearLimit()
+        public virtual TQuery ClearLimit()
         {
             ResultsToSkip = null;
             ResultsToTake = null;
+
+            return Query;
+        }
+
+        public virtual TQuery ClearLocks()
+        {
+            Locks.Clear();
+
+            return Query;
+        }
+
+        public virtual TQuery ClearOrders()
+        {
+            Orders.Clear();
+
+            return Query;
+        }
+
+        public virtual TQuery ClearRestrictions()
+        {
+            Criterions.Clear();
 
             return Query;
         }

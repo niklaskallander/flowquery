@@ -4,6 +4,7 @@ using NHibernate.FlowQuery.Revealing.Conventions;
 using NHibernate.FlowQuery.Test.Setup.Entities;
 using NUnit.Framework;
 
+// ReSharper disable ConditionIsAlwaysTrueOrFalse
 namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
 {
     using Is = NUnit.Framework.Is;
@@ -294,7 +295,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
 
             GroupEntity group = null;
 
-            var groups = Session.FlowQuery<UserEntity>(() => user)
+            var groups = Session.FlowQuery(() => user)
                 .Inner.Join(u => u.Groups, () => link, () => link.Id == user.Id)
                 .Inner.Join(u => link.Group, () => group, () => group.Name == "A1")
                 .Distinct().Select(u => new { link.Group })
@@ -312,7 +313,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
 
             GroupEntity group = null;
 
-            var groups = Session.FlowQuery<UserEntity>(() => user)
+            var groups = Session.FlowQuery(() => user)
                 .Inner.Join(u => u.Groups, () => link)
                 .Inner.Join(u => link.Group, () => group)
                 .Distinct().Select(u => new { link.Group })
@@ -842,44 +843,44 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
             GroupEntity group = null;
 
             Assert.That(() =>
-                        {
-                            Query<UserEntity>()
-                                .Inner.Join(u => u.Groups, () => link)
-                                .Inner.Join(u => link.Group, () => group, (IRevealConvention)null);
+            {
+                DummyQuery<UserEntity>()
+                    .Inner.Join(u => u.Groups, () => link)
+                    .Inner.Join(u => link.Group, () => group, (IRevealConvention)null);
 
-                        }, Throws.Nothing);
-
-            Assert.That(() =>
-                        {
-                            Query<UserEntity>()
-                                .Inner.Join(u => u.Groups, () => link)
-                                .Inner.Join(u => link.Group, () => group, (IRevealConvention)null);
-
-                        }, Throws.Nothing);
+            }, Throws.Nothing);
 
             Assert.That(() =>
-                        {
-                            Query<UserEntity>()
-                                .Full.Join(u => u.Groups, () => link)
-                                .Full.Join(u => link.Group, () => group, (IRevealConvention)null);
+            {
+                DummyQuery<UserEntity>()
+                    .Inner.Join(u => u.Groups, () => link)
+                    .Inner.Join(u => link.Group, () => group, (IRevealConvention)null);
 
-                        }, Throws.Nothing);
-
-            Assert.That(() =>
-                        {
-                            Query<UserEntity>()
-                                .RightOuter.Join(u => u.Groups, () => link)
-                                .RightOuter.Join(u => link.Group, () => group, (IRevealConvention)null);
-
-                        }, Throws.Nothing);
+            }, Throws.Nothing);
 
             Assert.That(() =>
-                        {
-                            Query<UserEntity>()
-                                .LeftOuter.Join(u => u.Groups, () => link)
-                                .LeftOuter.Join(u => link.Group, () => group, (IRevealConvention)null);
+            {
+                DummyQuery<UserEntity>()
+                    .Full.Join(u => u.Groups, () => link)
+                    .Full.Join(u => link.Group, () => group, (IRevealConvention)null);
 
-                        }, Throws.Nothing);
+            }, Throws.Nothing);
+
+            Assert.That(() =>
+            {
+                DummyQuery<UserEntity>()
+                    .RightOuter.Join(u => u.Groups, () => link)
+                    .RightOuter.Join(u => link.Group, () => group, (IRevealConvention)null);
+
+            }, Throws.Nothing);
+
+            Assert.That(() =>
+            {
+                DummyQuery<UserEntity>()
+                    .LeftOuter.Join(u => u.Groups, () => link)
+                    .LeftOuter.Join(u => link.Group, () => group, (IRevealConvention)null);
+
+            }, Throws.Nothing);
         }
 
         [Test]
@@ -888,14 +889,14 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
             UserGroupLinkEntity link = null;
 
             Assert.That(() =>
-                        {
-                            Query<UserEntity>()
-                                .Inner.Join(x => x.Groups, () => link)
-                                .Inner.Join(x => x.Groups, () => link)
-                                .Select()
-                                ;
+            {
+                Query<UserEntity>()
+                    .Inner.Join(x => x.Groups, () => link)
+                    .Inner.Join(x => x.Groups, () => link)
+                    .Select()
+                    ;
 
-                        }, Throws.Nothing);
+            }, Throws.Nothing);
         }
 
         [Test]
@@ -904,14 +905,14 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
             UserGroupLinkEntity link = null, link2 = null;
 
             Assert.That(() =>
-                        {
-                            Query<UserEntity>()
-                                .Inner.Join(x => x.Groups, () => link)
-                                .Inner.Join(x => x.Groups, () => link2)
-                                .Select()
-                                ;
+            {
+                DummyQuery<UserEntity>()
+                    .Inner.Join(x => x.Groups, () => link)
+                    .Inner.Join(x => x.Groups, () => link2)
+                    .Select()
+                    ;
 
-                        }, Throws.InstanceOf<InvalidOperationException>());
+            }, Throws.InstanceOf<InvalidOperationException>());
         }
 
         [Test]
@@ -920,14 +921,14 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
             object link = null;
 
             Assert.That(() =>
-                        {
-                            Query<UserEntity>()
-                                .Inner.Join("Groups", () => link)
-                                .Inner.Join("Setting", () => link)
-                                .Select()
-                                ;
+            {
+                DummyQuery<UserEntity>()
+                    .Inner.Join("Groups", () => link)
+                    .Inner.Join("Setting", () => link)
+                    .Select()
+                    ;
 
-                        }, Throws.InstanceOf<InvalidOperationException>());
+            }, Throws.InstanceOf<InvalidOperationException>());
         }
 
         #endregion

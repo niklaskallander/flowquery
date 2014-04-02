@@ -12,7 +12,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core
         [Test]
         public void CanMorphQueries()
         {
-            IImmediateFlowQuery<UserEntity> immediateQuery = Query<UserEntity>();
+            IImmediateFlowQuery<UserEntity> immediateQuery = DummyQuery<UserEntity>();
 
             Assert.That(immediateQuery, Is.Not.Null);
 

@@ -6,7 +6,7 @@ using NHibernate.FlowQuery.Expressions;
 
 namespace NHibernate.FlowQuery.Core
 {
-    public interface IDelayedFlowQuery<TSource> : IFlowQuery<TSource, IDelayedFlowQuery<TSource>>, IQueryableFlowQuery<TSource>
+    public interface IDelayedFlowQuery<TSource> : IQueryableFlowQuery<TSource, IDelayedFlowQuery<TSource>>
         where TSource : class
     {
         Lazy<bool> Any();
@@ -30,6 +30,8 @@ namespace NHibernate.FlowQuery.Core
         Lazy<int> Count(Expression<Func<TSource, object>> property);
 
         Lazy<long> CountLong();
+
+        IDelayedFlowQuery<TSource> Copy();
 
         IDetachedFlowQuery<TSource> Detached();
 

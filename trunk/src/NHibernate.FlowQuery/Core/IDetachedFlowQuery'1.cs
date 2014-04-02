@@ -17,6 +17,8 @@ namespace NHibernate.FlowQuery.Core
 
         IDetachedFlowQuery<TSource> CountLong();
 
+        IDetachedFlowQuery<TSource> Copy();
+
         IDelayedFlowQuery<TSource> Delayed();
 
         IDetachedFlowQuery<TSource> Distinct();
@@ -25,7 +27,7 @@ namespace NHibernate.FlowQuery.Core
 
         IDetachedFlowQuery<TSource> Indistinct();
 
-        IDetachedFlowQuery<TSource> Select(params string[] properties);
+        IDetachedFlowQuery<TSource> Select(string[] properties);
 
         IDetachedFlowQuery<TSource> Select(IProjection projection);
 

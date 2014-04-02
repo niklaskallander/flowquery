@@ -5,14 +5,12 @@ using NUnit.Framework;
 
 namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
 {
-    using FlowQueryIs = NHibernate.FlowQuery.Is;
+    using FqIs = Is;
     using Is = NUnit.Framework.Is;
 
     [TestFixture]
     public class AnyTest : BaseTest
     {
-        #region Methods (88)
-
         [Test]
         public void CanAnyWithExpressions()
         {
@@ -25,13 +23,13 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         }
 
         [Test]
-        public void CanAnyWithSubQuery()
+        public void CanAnyWithSubquery()
         {
-            var subquery = Query<UserEntity>().Detached()
+            var subquery = DetachedQuery<UserEntity>()
                 .Select(x => x.Id);
 
             var any = Query<UserEntity>()
-                .Any(x => x.Id, FlowQueryIs.In(subquery))
+                .Any(x => x.Id, FqIs.In(subquery))
                 ;
 
             Assert.That(any, Is.True);
@@ -51,7 +49,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void LogicalAndWithStringAndIsHelper()
         {
             var any = Query<UserEntity>()
-                .Any("IsOnline", FlowQueryIs.EqualTo(true))
+                .Any("IsOnline", FqIs.EqualTo(true))
                 ;
 
             Assert.That(any, Is.True);
@@ -72,8 +70,8 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         {
             var any = Query<UserEntity>()
                 .Any((u, where) => u.Firstname == "Niklas"
-                                  && (where(u.Lastname, FlowQueryIs.In(new string[] { "Nilsson", "Källander" }))
-                                  || where(u.IsOnline, FlowQueryIs.Not.EqualTo(true))))
+                                  && (where(u.Lastname, FqIs.In(new object[] { "Nilsson", "Källander" }))
+                                  || where(u.IsOnline, FqIs.Not.EqualTo(true))))
                 ;
 
             Assert.That(any, Is.True);
@@ -88,18 +86,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                        && !u.IsOnline) // In combination with above, matches zero, otherwise 1
                 ;
 
-            ISessionImplementor sessionImpl = Session as ISessionImplementor;
-
-            Assert.That(sessionImpl, Is.Not.Null);
+            var sessionImpl = (ISessionImplementor)Session;
 
             int count = 0;
 
-            Assert.That(() =>
-                        {
-                            count = sessionImpl.FutureCriteriaBatch.Results.Count;
-                        },
-
-                        Throws.Nothing);
+            Assert.That(() => count = sessionImpl.FutureCriteriaBatch.Results.Count, Throws.Nothing);
 
             Assert.That(count, Is.EqualTo(1));
 
@@ -107,28 +98,21 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         }
 
         [Test]
-        public void DelayedCanAnyWithSubQuery()
+        public void DelayedCanAnyWithSubquery()
         {
-            var subquery = Query<UserEntity>().Detached()
+            var subquery = DetachedQuery<UserEntity>()
                 .Select(x => x.Id);
 
             var any = Query<UserEntity>()
                 .Delayed()
-                .Any(x => x.Id, FlowQueryIs.In(subquery))
+                .Any(x => x.Id, FqIs.In(subquery))
                 ;
 
-            ISessionImplementor sessionImpl = Session as ISessionImplementor;
-
-            Assert.That(sessionImpl, Is.Not.Null);
+            var sessionImpl = (ISessionImplementor)Session;
 
             int count = 0;
 
-            Assert.That(() =>
-                        {
-                            count = sessionImpl.FutureCriteriaBatch.Results.Count;
-                        },
-
-                        Throws.Nothing);
+            Assert.That(() => count = sessionImpl.FutureCriteriaBatch.Results.Count, Throws.Nothing);
 
             Assert.That(count, Is.EqualTo(1));
 
@@ -143,18 +127,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                 .Any(u => u.Id > 0 && false)
                 ;
 
-            ISessionImplementor sessionImpl = Session as ISessionImplementor;
-
-            Assert.That(sessionImpl, Is.Not.Null);
+            var sessionImpl = (ISessionImplementor)Session;
 
             int count = 0;
 
-            Assert.That(() =>
-                        {
-                            count = sessionImpl.FutureCriteriaBatch.Results.Count;
-                        },
-
-                        Throws.Nothing);
+            Assert.That(() => count = sessionImpl.FutureCriteriaBatch.Results.Count, Throws.Nothing);
 
             Assert.That(count, Is.EqualTo(1));
 
@@ -166,21 +143,14 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         {
             var any = Query<UserEntity>()
                 .Delayed()
-                .Any("IsOnline", FlowQueryIs.EqualTo(true))
+                .Any("IsOnline", FqIs.EqualTo(true))
                 ;
 
-            ISessionImplementor sessionImpl = Session as ISessionImplementor;
-
-            Assert.That(sessionImpl, Is.Not.Null);
+            var sessionImpl = (ISessionImplementor)Session;
 
             int count = 0;
 
-            Assert.That(() =>
-                        {
-                            count = sessionImpl.FutureCriteriaBatch.Results.Count;
-                        },
-
-                        Throws.Nothing);
+            Assert.That(() => count = sessionImpl.FutureCriteriaBatch.Results.Count, Throws.Nothing);
 
             Assert.That(count, Is.EqualTo(1));
 
@@ -195,18 +165,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                 .Any(Restrictions.Eq("IsOnline", true), Restrictions.Like("Firstname", "%kl%"))
                 ;
 
-            ISessionImplementor sessionImpl = Session as ISessionImplementor;
-
-            Assert.That(sessionImpl, Is.Not.Null);
+            var sessionImpl = (ISessionImplementor)Session;
 
             int count = 0;
 
-            Assert.That(() =>
-                        {
-                            count = sessionImpl.FutureCriteriaBatch.Results.Count;
-                        },
-
-                        Throws.Nothing);
+            Assert.That(() => count = sessionImpl.FutureCriteriaBatch.Results.Count, Throws.Nothing);
 
             Assert.That(count, Is.EqualTo(1));
 
@@ -219,28 +182,19 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
             var any = Query<UserEntity>()
                 .Delayed()
                 .Any((u, where) => u.Firstname == "Niklas"
-                                  && (where(u.Lastname, FlowQueryIs.In(new string[] { "Nilsson", "Källander" }))
-                                  || where(u.IsOnline, FlowQueryIs.Not.EqualTo(true))))
+                                  && (where(u.Lastname, FqIs.In(new object[] { "Nilsson", "Källander" }))
+                                  || where(u.IsOnline, FqIs.Not.EqualTo(true))))
                 ;
 
-            ISessionImplementor sessionImpl = Session as ISessionImplementor;
-
-            Assert.That(sessionImpl, Is.Not.Null);
+            var sessionImpl = (ISessionImplementor)Session;
 
             int count = 0;
 
-            Assert.That(() =>
-                        {
-                            count = sessionImpl.FutureCriteriaBatch.Results.Count;
-                        },
-
-                        Throws.Nothing);
+            Assert.That(() => count = sessionImpl.FutureCriteriaBatch.Results.Count, Throws.Nothing);
 
             Assert.That(count, Is.EqualTo(1));
 
             Assert.That(any.Value, Is.True);
         }
-
-        #endregion Methods
     }
 }

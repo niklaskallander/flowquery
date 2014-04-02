@@ -6,7 +6,7 @@ using NUnit.Framework;
 
 namespace NHibernate.FlowQuery.Test.FlowQuery.Documentation
 {
-    using xIs = NUnit.Framework.Is;
+    using Is = NUnit.Framework.Is;
 
     [TestFixture]
     public class JoinsTest : BaseTest
@@ -16,91 +16,81 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Documentation
         {
             UserGroupLinkEntity linkAlias = null;
 
-            Assert.That(linkAlias, xIs.Null);
+            // ReSharper disable once ExpressionIsAlwaysNull
+            Assert.That(linkAlias, Is.Null);
         }
 
         [Test]
         public void HowToExample2()
         {
-            ISession session = Session;
-
             UserGroupLinkEntity linkAlias = null;
 
-            var users = session.FlowQuery<UserEntity>()
+            var users = Session.FlowQuery<UserEntity>()
                 .Inner.Join(x => x.Groups, () => linkAlias)
                 .Select();
 
-            Assert.That(users.Count(), xIs.EqualTo(5));
+            Assert.That(users.Count(), Is.EqualTo(5));
         }
 
         [Test]
         public void HowToExample3WithOnClaus()
         {
-            ISession session = Session;
-
             UserGroupLinkEntity linkAlias = null;
 
-            var users = session.FlowQuery<UserEntity>()
+            var users = Session.FlowQuery<UserEntity>()
                 .Inner.Join(x => x.Groups, () => linkAlias, () => linkAlias.Group.Id == 1)
                 .Select();
 
-            Assert.That(users.Count(), xIs.EqualTo(2));
+            Assert.That(users.Count(), Is.EqualTo(2));
         }
 
         [Test]
         public void HowToExample4WithOnClauseAndRevealConvention()
         {
-            ISession session = Session;
-
             Assert.That(() =>
-                        {
-                            UserGroupLinkEntity linkAlias = null;
-                            GroupEntity groupAlias = null;
+            {
+                UserGroupLinkEntity linkAlias = null;
+                GroupEntity groupAlias = null;
 
-                            var users = session.FlowQuery<UserEntity>()
-                                .Inner.Join(x => x.Groups, () => linkAlias)
-                                .Inner.Join(x => linkAlias.Group, () => groupAlias, () => groupAlias.Id == 1, new CustomConvention(x => "m_" + x))
-                                .Select();
+                Session.FlowQuery<UserEntity>()
+                    .Inner.Join(x => x.Groups, () => linkAlias)
+                    .Inner.Join(x => linkAlias.Group, () => groupAlias, () => groupAlias.Id == 1, new CustomConvention(x => "m_" + x))
+                    .Select();
 
-                        }, Throws.InstanceOf<QueryException>());
+            }, Throws.InstanceOf<QueryException>());
         }
 
         [Test]
         public void HowToExample4WithOnlyRevealConvention()
         {
-            ISession session = Session;
-
             Assert.That(() =>
-                        {
-                            UserGroupLinkEntity linkAlias = null;
-                            GroupEntity groupAlias = null;
+            {
+                UserGroupLinkEntity linkAlias = null;
+                GroupEntity groupAlias = null;
 
-                            var users = session.FlowQuery<UserEntity>()
-                                .Inner.Join(x => x.Groups, () => linkAlias)
-                                .Inner.Join(x => linkAlias.Group, () => groupAlias, new CustomConvention(x => "m_" + x))
-                                .Select();
+                Session.FlowQuery<UserEntity>()
+                    .Inner.Join(x => x.Groups, () => linkAlias)
+                    .Inner.Join(x => linkAlias.Group, () => groupAlias, new CustomConvention(x => "m_" + x))
+                    .Select();
 
-                        }, Throws.InstanceOf<QueryException>());
+            }, Throws.InstanceOf<QueryException>());
         }
 
         [Test]
         public void HowToExample6ClearJoins()
         {
-            ISession session = Session;
-
             UserGroupLinkEntity linkAlias = null;
 
-            var query = session.FlowQuery<UserEntity>()
+            var query = Session.FlowQuery<UserEntity>()
                 .Inner.Join(x => x.Groups, () => linkAlias, () => linkAlias.Group.Id == 1);
 
-            IMorphableFlowQuery morphable = query as IMorphableFlowQuery;
+            var morphable = (IMorphableFlowQuery)query;
 
-            Assert.That(morphable.Joins.Count, xIs.EqualTo(1));
+            Assert.That(morphable.Joins.Count, Is.EqualTo(1));
 
-            query
-                .ClearJoins();
+            query.ClearJoins();
 
-            Assert.That(morphable.Joins.Count, xIs.EqualTo(0));
+            Assert.That(morphable.Joins.Count, Is.EqualTo(0));
         }
     }
 }

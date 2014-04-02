@@ -4,16 +4,15 @@ using NHibernate.Criterion;
 using NHibernate.FlowQuery.Test.Setup.Entities;
 using NUnit.Framework;
 
+// ReSharper disable ExpressionIsAlwaysNull
 namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
 {
-    using FlowQueryIs = NHibernate.FlowQuery.Is;
+    using FqIs = Is;
     using Is = NUnit.Framework.Is;
 
     [TestFixture]
     public class WhereTest : BaseTest
     {
-        #region Methods (33)
-
         [Test]
         public void CorrelatedSubQueriesWorks()
         {
@@ -25,8 +24,8 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
                 .Where(x => x.Firstname == user.Firstname)
                 .Select(x => x.Id);
 
-            var users = Session.FlowQuery<UserEntity>(() => user)
-                .Where(x => x.Id, FlowQueryIs.In(query))
+            var users = Session.FlowQuery(() => user)
+                .Where(x => x.Id, FqIs.In(query))
                 .Select();
 
             Assert.That(users.Count(), Is.EqualTo(4));
@@ -35,13 +34,13 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void CanCombineMultipleWhereCalls()
         {
-            var query = Query<UserEntity>().Detached()
+            var query = DetachedQuery<UserEntity>()
                 .Where(u => u.Firstname.Contains("kl")) // Matches one
                 .Where(u => !u.IsOnline) // In combination with above, matches zero, otherwise 1
                 .Select(u => u.Id);
 
             var users = Query<UserEntity>()
-                .Where(u => u.Id, FlowQueryIs.In(query))
+                .Where(u => u.Id, FqIs.In(query))
                 .Select()
                 ;
 
@@ -51,12 +50,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void LogicalAndWithConstantFalseFetchesNone()
         {
-            var query = Query<UserEntity>().Detached()
+            var query = DetachedQuery<UserEntity>()
                 .Where(u => u.Id > 0 && false)
                 .Select(u => u.Id);
 
             var users = Query<UserEntity>()
-                .Where(u => u.Id, FlowQueryIs.In(query))
+                .Where(u => u.Id, FqIs.In(query))
                 .Select()
                 ;
 
@@ -66,12 +65,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void LogicalAndWithStringAndIsHelper()
         {
-            var query = Query<UserEntity>().Detached()
-                .Where("IsOnline", FlowQueryIs.EqualTo(true))
+            var query = DetachedQuery<UserEntity>()
+                .Where("IsOnline", FqIs.EqualTo(true))
                 .Select(x => x.Id);
 
             var users = Query<UserEntity>()
-                .Where(x => x.Id, FlowQueryIs.In(query))
+                .Where(x => x.Id, FqIs.In(query))
                 .Select()
                 ;
 
@@ -86,12 +85,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void LogicalOrWithConstantTrueFetchesAll()
         {
-            var query = Query<UserEntity>().Detached()
+            var query = DetachedQuery<UserEntity>()
                 .Where(u => u.Id > 6 || true)
                 .Select(u => u.Id);
 
             var users = Query<UserEntity>()
-                .Where(u => u.Id, FlowQueryIs.In(query))
+                .Where(u => u.Id, FqIs.In(query))
                 .Select()
                 ;
 
@@ -101,12 +100,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void Where()
         {
-            var query = Query<UserEntity>().Detached()
+            var query = DetachedQuery<UserEntity>()
                 .Where(u => u.IsOnline)
                 .Select(u => u.Id);
 
             var users = Query<UserEntity>()
-                .Where(u => u.Id, FlowQueryIs.In(query))
+                .Where(u => u.Id, FqIs.In(query))
                 .Select()
                 ;
 
@@ -121,12 +120,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void WhereBetweenWithIsHelper()
         {
-            var query = Query<UserEntity>().Detached()
-                .Where(x => x.Id, FlowQueryIs.Between(2, 3))
+            var query = DetachedQuery<UserEntity>()
+                .Where(x => x.Id, FqIs.Between(2, 3))
                 .Select(x => x.Id);
 
             var users = Query<UserEntity>()
-                .Where(u => u.Id, FlowQueryIs.In(query))
+                .Where(u => u.Id, FqIs.In(query))
                 .Select()
                 ;
 
@@ -141,12 +140,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void WhereConstantFalseFetchesNone()
         {
-            var query = Query<UserEntity>().Detached()
+            var query = DetachedQuery<UserEntity>()
                 .Where(u => false)
                 .Select(x => x.Id);
 
             var users = Query<UserEntity>()
-                .Where(u => u.Id, FlowQueryIs.In(query))
+                .Where(u => u.Id, FqIs.In(query))
                 .Select()
                 ;
 
@@ -156,12 +155,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void WhereConstantTrueFetchesAll()
         {
-            var query = Query<UserEntity>().Detached()
+            var query = DetachedQuery<UserEntity>()
                 .Where(u => true)
                 .Select(x => x.Id);
 
             var users = Query<UserEntity>()
-                .Where(u => u.Id, FlowQueryIs.In(query))
+                .Where(u => u.Id, FqIs.In(query))
                 .Select()
                 ;
 
@@ -171,12 +170,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void WhereEqualTo()
         {
-            var query = Query<UserEntity>().Detached()
+            var query = DetachedQuery<UserEntity>()
                 .Where(u => u.Id == 2)
                 .Select(x => x.Id);
 
             var users = Query<UserEntity>()
-                .Where(u => u.Id, FlowQueryIs.In(query))
+                .Where(u => u.Id, FqIs.In(query))
                 .Select()
                 ;
 
@@ -187,12 +186,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void WhereGreaterThan()
         {
-            var query = Query<UserEntity>().Detached()
+            var query = DetachedQuery<UserEntity>()
                 .Where(u => u.Id > 1)
                 .Select(x => x.Id);
 
             var users = Query<UserEntity>()
-                .Where(u => u.Id, FlowQueryIs.In(query))
+                .Where(u => u.Id, FqIs.In(query))
                 .Select()
                 ;
 
@@ -207,12 +206,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void WhereGreaterThanOrEqualTo()
         {
-            var query = Query<UserEntity>().Detached()
+            var query = DetachedQuery<UserEntity>()
                 .Where(u => u.Id >= 1)
                 .Select(x => x.Id);
 
             var users = Query<UserEntity>()
-                .Where(u => u.Id, FlowQueryIs.In(query))
+                .Where(u => u.Id, FqIs.In(query))
                 .Select()
                 ;
 
@@ -227,10 +226,10 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void WhereInSubqueryWithIsHelper()
         {
-            var query = Query<UserEntity>().Detached()
-                .Where(u => u.Id, FlowQueryIs.In
+            var query = DetachedQuery<UserEntity>()
+                .Where(u => u.Id, FqIs.In
                                   (
-                                      Query<UserEntity>().Detached()
+                                      DetachedQuery<UserEntity>()
                                           .Where(x => x.Id == 1 || x.Id == 4)
                                           .Select(x => x.Id)
                                   )
@@ -238,7 +237,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
                 .Select(x => x.Id);
 
             var users = Query<UserEntity>()
-                .Where(u => u.Id, FlowQueryIs.In(query))
+                .Where(u => u.Id, FqIs.In(query))
                 .Select()
                 ;
 
@@ -253,12 +252,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void WhereInWithIsHelper()
         {
-            var query = Query<UserEntity>().Detached()
-                .Where(u => u.Id, FlowQueryIs.In(1, 3))
+            var query = DetachedQuery<UserEntity>()
+                .Where(u => u.Id, FqIs.In(1, 3))
                 .Select(x => x.Id);
 
             var users = Query<UserEntity>()
-                .Where(u => u.Id, FlowQueryIs.In(query))
+                .Where(u => u.Id, FqIs.In(query))
                 .Select()
                 ;
 
@@ -273,12 +272,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void WhereLessThan()
         {
-            var query = Query<UserEntity>().Detached()
+            var query = DetachedQuery<UserEntity>()
                 .Where(u => u.Id < 4)
                 .Select(x => x.Id);
 
             var users = Query<UserEntity>()
-                .Where(u => u.Id, FlowQueryIs.In(query))
+                .Where(u => u.Id, FqIs.In(query))
                 .Select()
                 ;
 
@@ -293,12 +292,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void WhereLessThanOrEqualTo()
         {
-            var query = Query<UserEntity>().Detached()
+            var query = DetachedQuery<UserEntity>()
                 .Where(u => u.Id <= 4)
                 .Select(x => x.Id);
 
             var users = Query<UserEntity>()
-                .Where(u => u.Id, FlowQueryIs.In(query))
+                .Where(u => u.Id, FqIs.In(query))
                 .Select()
                 ;
 
@@ -313,12 +312,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void WhereLikeWithIsHelper()
         {
-            var query = Query<UserEntity>().Detached()
-                .Where(u => u.Firstname, FlowQueryIs.Like("Nik%"))
+            var query = DetachedQuery<UserEntity>()
+                .Where(u => u.Firstname, FqIs.Like("Nik%"))
                 .Select(x => x.Id);
 
             var users = Query<UserEntity>()
-                .Where(u => u.Id, FlowQueryIs.In(query))
+                .Where(u => u.Id, FqIs.In(query))
                 .Select()
                 ;
 
@@ -329,12 +328,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void WhereNot()
         {
-            var query = Query<UserEntity>().Detached()
+            var query = DetachedQuery<UserEntity>()
                 .Where(u => !u.IsOnline)
                 .Select(x => x.Id);
 
             var users = Query<UserEntity>()
-                .Where(u => u.Id, FlowQueryIs.In(query))
+                .Where(u => u.Id, FqIs.In(query))
                 .Select()
                 ;
 
@@ -345,12 +344,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void WhereNotEqualTo()
         {
-            var query = Query<UserEntity>().Detached()
+            var query = DetachedQuery<UserEntity>()
                 .Where(u => u.Id != 2)
                 .Select(x => x.Id);
 
             var users = Query<UserEntity>()
-                .Where(u => u.Id, FlowQueryIs.In(query))
+                .Where(u => u.Id, FqIs.In(query))
                 .Select()
                 ;
 
@@ -361,12 +360,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void WhereWithArithmeticOperations()
         {
-            var query = Query<UserEntity>().Detached()
+            var query = DetachedQuery<UserEntity>()
                 .Where(u => (u.Id * 2 + 8) + 10 / 5 - 1 == 11) // Id == 1
                 .Select(x => x.Id);
 
             var users = Query<UserEntity>()
-                .Where(u => u.Id, FlowQueryIs.In(query))
+                .Where(u => u.Id, FqIs.In(query))
                 .Select()
                 ;
 
@@ -377,12 +376,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void WhereWithConcatenation()
         {
-            var query = Query<UserEntity>().Detached()
+            var query = DetachedQuery<UserEntity>()
                 .Where(u => u.Firstname + " " + u.Lastname == "Niklas Källander")
                 .Select(x => x.Id);
 
             var users = Query<UserEntity>()
-                .Where(u => u.Id, FlowQueryIs.In(query))
+                .Where(u => u.Id, FqIs.In(query))
                 .Select()
                 ;
 
@@ -393,12 +392,13 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void WhereWithCriterions()
         {
-            var query = Query<UserEntity>().Detached()
+            var query = Query<UserEntity>()
+                .Detached()
                 .Where(Restrictions.Eq("IsOnline", true), Restrictions.Like("Firstname", "%kl%"))
                 .Select(x => x.Id);
 
             var users = Query<UserEntity>()
-                .Where(u => u.Id, FlowQueryIs.In(query))
+                .Where(u => u.Id, FqIs.In(query))
                 .Select()
                 ;
 
@@ -410,7 +410,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void WhereWithCriterionsThrowsNothingIfArrayContainsNullItem()
         {
-            ICriterion[] c = new ICriterion[]
+            var c = new ICriterion[]
             {
                 Restrictions.Eq("IsOnline", true),
                 null,
@@ -419,7 +419,8 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
 
             Assert.That(() =>
                         {
-                            var query = Query<UserEntity>().Detached()
+                            DummyQuery<UserEntity>()
+                                .Detached()
                                 .Where(c)
                                 .Select(x => x.Id);
 
@@ -432,23 +433,27 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
             ICriterion[] c = null;
 
             Assert.That(() =>
-                        {
-                            var query = Query<UserEntity>().Detached()
-                                .Where(c)
-                                .Select(x => x.Id);
+            {
+                DummyQuery<UserEntity>()
+                    .Detached()
+                    .Where(c)
+                    .Select(x => x.Id);
 
-                        }, Throws.InstanceOf<ArgumentNullException>());
+            }, Throws.InstanceOf<ArgumentNullException>());
         }
 
         [Test]
         public void WhereWithDoubleNegation()
         {
-            var query = Query<UserEntity>().Detached()
+            // ReSharper disable once NegativeEqualityExpression
+            // ReSharper disable once DoubleNegationOperator
+            // ReSharper disable once RedundantBoolCompare
+            var query = DetachedQuery<UserEntity>()
                 .Where(u => !!(u.IsOnline == true))
                 .Select(x => x.Id);
 
             var users = Query<UserEntity>()
-                .Where(u => u.Id, FlowQueryIs.In(query))
+                .Where(u => u.Id, FqIs.In(query))
                 .Select()
                 ;
 
@@ -463,12 +468,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void WhereWithExclusiveOr()
         {
-            var query = Query<UserEntity>().Detached()
+            var query = DetachedQuery<UserEntity>()
                 .Where(u => u.IsOnline ^ (u.Firstname == "Niklas"))
                 .Select(x => x.Id);
 
             var users = Query<UserEntity>()
-                .Where(u => u.Id, FlowQueryIs.In(query))
+                .Where(u => u.Id, FqIs.In(query))
                 .Select()
                 ;
 
@@ -486,12 +491,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void WhereWithIsHelper()
         {
-            var query = Query<UserEntity>().Detached()
-                .Where(u => u.IsOnline, FlowQueryIs.EqualTo(true))
+            var query = DetachedQuery<UserEntity>()
+                .Where(u => u.IsOnline, FqIs.EqualTo(true))
                 .Select(x => x.Id);
 
             var users = Query<UserEntity>()
-                .Where(u => u.Id, FlowQueryIs.In(query))
+                .Where(u => u.Id, FqIs.In(query))
                 .Select()
                 ;
 
@@ -506,12 +511,13 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void WhereWithMultipleBinaryExpressions()
         {
-            var query = Query<UserEntity>().Detached()
+            // ReSharper disable once RedundantBoolCompare
+            var query = DetachedQuery<UserEntity>()
                 .Where(u => u.Id == 1 || u.Id > 3 && u.IsOnline == true)
                 .Select(x => x.Id);
 
             var users = Query<UserEntity>()
-                .Where(u => u.Id, FlowQueryIs.In(query))
+                .Where(u => u.Id, FqIs.In(query))
                 .Select()
                 ;
 
@@ -519,19 +525,21 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
 
             foreach (var user in users)
             {
-                Assert.That(user.Id == 1 || user.Id > 3 && user.IsOnline == true);
+                Assert.That(user.Id == 1 || user.Id > 3 && user.IsOnline);
             }
         }
 
         [Test]
         public void WhereWithNegation()
         {
-            var query = Query<UserEntity>().Detached()
+            // ReSharper disable once RedundantBoolCompare
+            // ReSharper disable once NegativeEqualityExpression
+            var query = DetachedQuery<UserEntity>()
                 .Where(u => !(u.IsOnline == true))
                 .Select(x => x.Id);
 
             var users = Query<UserEntity>()
-                .Where(u => u.Id, FlowQueryIs.In(query))
+                .Where(u => u.Id, FqIs.In(query))
                 .Select()
                 ;
 
@@ -542,12 +550,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void WhereWithNotNullCheck()
         {
-            var query = Query<UserEntity>().Detached()
+            var query = DetachedQuery<UserEntity>()
                 .Where(u => u.LastLoggedInStamp != null)
                 .Select(x => x.Id);
 
             var users = Query<UserEntity>()
-                .Where(u => u.Id, FlowQueryIs.In(query))
+                .Where(u => u.Id, FqIs.In(query))
                 .Select()
                 ;
 
@@ -562,12 +570,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void WhereWithNullCheck()
         {
-            var query = Query<UserEntity>().Detached()
+            var query = DetachedQuery<UserEntity>()
                 .Where(u => u.LastLoggedInStamp == null)
                 .Select(x => x.Id);
 
             var users = Query<UserEntity>()
-                .Where(u => u.Id, FlowQueryIs.In(query))
+                .Where(u => u.Id, FqIs.In(query))
                 .Select()
                 ;
 
@@ -578,12 +586,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void WhereWithStringContains()
         {
-            var query = Query<UserEntity>().Detached()
+            var query = DetachedQuery<UserEntity>()
                 .Where(u => u.Firstname.Contains("kl"))
                 .Select(x => x.Id);
 
             var users = Query<UserEntity>()
-                .Where(u => u.Id, FlowQueryIs.In(query))
+                .Where(u => u.Id, FqIs.In(query))
                 .Select()
                 ;
 
@@ -594,12 +602,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void WhereWithNegatedIsExpression()
         {
-            var query = Query<UserEntity>().Detached()
-                .Where(u => u.Firstname, FlowQueryIs.Not.EqualTo("Niklas"))
+            var query = DetachedQuery<UserEntity>()
+                .Where(u => u.Firstname, FqIs.Not.EqualTo("Niklas"))
                 .Select(x => x.Id);
 
             var users = Query<UserEntity>()
-                .Where(u => u.Id, FlowQueryIs.In(query))
+                .Where(u => u.Id, FqIs.In(query))
                 .Select()
                 ;
 
@@ -614,12 +622,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void WhereWithStringEndsWith()
         {
-            var query = Query<UserEntity>().Detached()
+            var query = DetachedQuery<UserEntity>()
                 .Where(u => u.Firstname.EndsWith("las"))
                 .Select(x => x.Id);
 
             var users = Query<UserEntity>()
-                .Where(u => u.Id, FlowQueryIs.In(query))
+                .Where(u => u.Id, FqIs.In(query))
                 .Select()
                 ;
 
@@ -630,19 +638,17 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void WhereWithStringStartsWith()
         {
-            var query = Query<UserEntity>().Detached()
+            var query = DetachedQuery<UserEntity>()
                 .Where(u => u.Firstname.StartsWith("Nik"))
                 .Select(x => x.Id);
 
             var users = Query<UserEntity>()
-                .Where(u => u.Id, FlowQueryIs.In(query))
+                .Where(u => u.Id, FqIs.In(query))
                 .Select()
                 ;
 
             Assert.That(users.Count(), Is.EqualTo(1));
             Assert.That(users.First().Firstname.StartsWith("Nik"));
         }
-
-        #endregion Methods
     }
 }

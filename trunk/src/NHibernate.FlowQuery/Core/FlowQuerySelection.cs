@@ -7,9 +7,9 @@ namespace NHibernate.FlowQuery.Core
 {
     public class FlowQuerySelection<TSource> : IEnumerable<TSource>
     {
-        private IEnumerable<TSource> m_Selection;
+        private IEnumerable<TSource> _selection;
 
-        private readonly Func<IEnumerable<TSource>> m_DelayedSelection;
+        private readonly Func<IEnumerable<TSource>> _delayedSelection;
 
         public FlowQuerySelection(Func<IEnumerable<TSource>> delayedSelection)
         {
@@ -18,7 +18,7 @@ namespace NHibernate.FlowQuery.Core
                 throw new ArgumentNullException("delayedSelection");
             }
 
-            m_DelayedSelection = delayedSelection;
+            _delayedSelection = delayedSelection;
 
             IsDelayed = true;
         }
@@ -30,7 +30,7 @@ namespace NHibernate.FlowQuery.Core
                 throw new ArgumentNullException("selection");
             }
 
-            m_Selection = selection;
+            _selection = selection;
 
             IsDelayed = false;
         }
@@ -41,17 +41,17 @@ namespace NHibernate.FlowQuery.Core
         {
             get
             {
-                if (m_Selection == null)
+                if (_selection == null)
                 {
-                    if (IsDelayed && m_DelayedSelection != null)
+                    if (IsDelayed && _delayedSelection != null)
                     {
-                        m_Selection = m_DelayedSelection();
+                        _selection = _delayedSelection();
 
                         IsDelayed = false;
                     }
                 }
 
-                return m_Selection;
+                return _selection;
             }
         }
 

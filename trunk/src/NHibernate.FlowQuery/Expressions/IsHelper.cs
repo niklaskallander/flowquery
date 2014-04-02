@@ -13,135 +13,140 @@ namespace NHibernate.FlowQuery.Expressions
 
         protected bool IsNegated { get; private set; }
 
-        public IsExpression Between(object lowValue, object highValue)
+        public virtual IsExpression Between(object lowValue, object highValue)
         {
             return Fix(new IsBetweenExpression(lowValue, highValue));
         }
 
-        public IsExpression EqualTo(object value)
+        public virtual IsEmptyExpression Empty()
+        {
+            return Fix(new IsEmptyExpression());
+        }
+
+        public virtual IsExpression EqualTo(object value)
         {
             return Fix(new IsEqualExpression(value));
         }
 
-        public IsExpression EqualTo(IDetachedImmutableFlowQuery query)
+        public virtual IsExpression EqualTo(IDetachedImmutableFlowQuery query)
         {
             return Fix(new IsEqualToSubqueryExpression(query));
         }
 
-        public IsExpression EqualToAll(IDetachedImmutableFlowQuery query)
+        public virtual IsExpression EqualToAll(IDetachedImmutableFlowQuery query)
         {
             return Fix(new IsEqualToAllSubqueryExpression(query));
         }
 
-        protected virtual IsExpression Fix(IsExpression expression)
+        protected virtual T Fix<T>(T expression)
+            where T : IsExpression
         {
-            expression.Negate = IsNegated;
+            expression.Negated = IsNegated;
 
             return expression;
         }
 
-        public IsExpression GreaterThan(object value)
+        public virtual IsExpression GreaterThan(object value)
         {
             return Fix(new IsGreaterThanExpression(value));
         }
 
-        public IsExpression GreaterThan(IDetachedImmutableFlowQuery query)
+        public virtual IsExpression GreaterThan(IDetachedImmutableFlowQuery query)
         {
             return Fix(new IsGreaterThanSubqueryExpression(query));
         }
 
-        public IsExpression GreaterThanAll(IDetachedImmutableFlowQuery query)
+        public virtual IsExpression GreaterThanAll(IDetachedImmutableFlowQuery query)
         {
             return Fix(new IsGreaterThanAllSubqueryExpression(query));
         }
 
-        public IsExpression GreaterThanOrEqualTo(object value)
+        public virtual IsExpression GreaterThanOrEqualTo(object value)
         {
             return Fix(new IsGreaterThanOrEqualExpression(value));
         }
 
-        public IsExpression GreaterThanOrEqualTo(IDetachedImmutableFlowQuery query)
+        public virtual IsExpression GreaterThanOrEqualTo(IDetachedImmutableFlowQuery query)
         {
             return Fix(new IsGreaterThanOrEqualToSubqueryExpression(query));
         }
 
-        public IsExpression GreaterThanOrEqualToAll(IDetachedImmutableFlowQuery query)
+        public virtual IsExpression GreaterThanOrEqualToAll(IDetachedImmutableFlowQuery query)
         {
             return Fix(new IsGreaterThanOrEqualToAllSubqueryExpression(query));
         }
 
-        public IsExpression GreaterThanOrEqualToSome(IDetachedImmutableFlowQuery query)
+        public virtual IsExpression GreaterThanOrEqualToSome(IDetachedImmutableFlowQuery query)
         {
             return Fix(new IsGreaterThanOrEqualToSomeSubqueryExpression(query));
         }
 
-        public IsExpression GreaterThanSome(IDetachedImmutableFlowQuery query)
+        public virtual IsExpression GreaterThanSome(IDetachedImmutableFlowQuery query)
         {
             return Fix(new IsGreaterThanSomeSubqueryExpression(query));
         }
 
-        public IsExpression In(IDetachedImmutableFlowQuery query)
+        public virtual IsExpression In(IDetachedImmutableFlowQuery query)
         {
             return Fix(new IsInSubqueryExpression(query));
         }
 
-        public IsExpression In(params object[] values)
+        public virtual IsExpression In(params object[] values)
         {
             return Fix(new IsInValuesExpression(values));
         }
 
-        public IsExpression In<TEnumerable>(TEnumerable value)
-            where TEnumerable : IEnumerable
+        public virtual IsExpression In(IEnumerable value)
         {
             return Fix(new IsInValuesExpression(value));
         }
 
-        public IsExpression LessThan(IDetachedImmutableFlowQuery query)
+        public virtual IsExpression LessThan(IDetachedImmutableFlowQuery query)
         {
             return Fix(new IsLessThanSubqueryExpression(query));
         }
 
-        public IsExpression LessThan(object value)
+        public virtual IsExpression LessThan(object value)
         {
             return Fix(new IsLessThanExpression(value));
         }
 
-        public IsExpression LessThanAll(IDetachedImmutableFlowQuery query)
+        public virtual IsExpression LessThanAll(IDetachedImmutableFlowQuery query)
         {
             return Fix(new IsLessThanAllSubqueryExpression(query));
         }
 
-        public IsExpression LessThanOrEqualTo(IDetachedImmutableFlowQuery query)
+        public virtual IsExpression LessThanOrEqualTo(IDetachedImmutableFlowQuery query)
         {
             return Fix(new IsLessThanOrEqualToSubqueryExpression(query));
         }
 
-        public IsExpression LessThanOrEqualTo(object value)
+        public virtual IsExpression LessThanOrEqualTo(object value)
         {
             return Fix(new IsLessThanOrEqualExpression(value));
         }
 
-        public IsExpression LessThanOrEqualToAll(IDetachedImmutableFlowQuery query)
+        public virtual IsExpression LessThanOrEqualToAll(IDetachedImmutableFlowQuery query)
         {
             return Fix(new IsLessThanOrEqualToAllSubqueryExpression(query));
         }
 
-        public IsExpression LessThanOrEqualToSome(IDetachedImmutableFlowQuery query)
+        public virtual IsExpression LessThanOrEqualToSome(IDetachedImmutableFlowQuery query)
         {
             return Fix(new IsLessThanOrEqualToSomeSubqueryExpression(query));
         }
 
-        public IsExpression LessThanSome(IDetachedImmutableFlowQuery query)
+        public virtual IsExpression LessThanSome(IDetachedImmutableFlowQuery query)
         {
             return Fix(new IsLessThanSomeSubqueryExpression(query));
         }
 
-        public IsExpression Like(object value)
+        public virtual IsExpression Like(object value)
         {
             return Fix(new IsLikeExpression(value));
         }
 
-        public IsExpression Null()
+        public virtual IsExpression Null()
         {
             return Fix(new IsNullExpression());
         }

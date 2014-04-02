@@ -4,24 +4,22 @@ using NUnit.Framework;
 
 namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
 {
-    using FlowQueryIs = NHibernate.FlowQuery.Is;
+    using FqIs = Is;
     using Is = NUnit.Framework.Is;
 
     [TestFixture]
     public class LimitTest : BaseTest
     {
-        #region Methods (3)
-
         [Test]
         public void CanConstrainFirstAndMaxResultsWithTakeAndSkip()
         {
-            var query = Query<UserEntity>().Detached()
+            var query = DetachedQuery<UserEntity>()
                 .Take(2)
                 .Skip(1)
                 .Select(u => u.Id);
 
             var users = Query<UserEntity>()
-                .Where(u => u.Id, FlowQueryIs.In(query))
+                .Where(u => u.Id, FqIs.In(query))
                 .Select()
                 ;
 
@@ -32,12 +30,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void CanConstrainFirstResultWithLimit()
         {
-            var query = Query<UserEntity>().Detached()
+            var query = DetachedQuery<UserEntity>()
                 .Limit(2, 1)
                 .Select(u => u.Id);
 
             var users = Query<UserEntity>()
-                .Where(u => u.Id, FlowQueryIs.In(query))
+                .Where(u => u.Id, FqIs.In(query))
                 .Select()
                 ;
 
@@ -48,18 +46,16 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void CanConstrainMaxResultsWithLimit()
         {
-            var query = Query<UserEntity>().Detached()
+            var query = DetachedQuery<UserEntity>()
                 .Limit(2)
                 .Select(u => u.Id);
 
             var users = Query<UserEntity>()
-                .Where(u => u.Id, FlowQueryIs.In(query))
+                .Where(u => u.Id, FqIs.In(query))
                 .Select()
                 ;
 
             Assert.That(users.Count(), Is.EqualTo(2));
         }
-
-        #endregion Methods
     }
 }

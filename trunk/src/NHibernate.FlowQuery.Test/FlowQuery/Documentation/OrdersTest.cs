@@ -7,7 +7,7 @@ using NUnit.Framework;
 
 namespace NHibernate.FlowQuery.Test.FlowQuery.Documentation
 {
-    using xIs = NUnit.Framework.Is;
+    using Is = NUnit.Framework.Is;
 
     [TestFixture]
     public class OrdersTest : BaseTest
@@ -15,40 +15,34 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Documentation
         [Test]
         public void HowToExample1()
         {
-            ISession session = Session;
-
-            var users = session.FlowQuery<UserEntity>()
+            var users = Session.FlowQuery<UserEntity>()
                 .OrderByDescending(x => x.IsOnline)
                 .OrderBy(x => x.Role)
                 .OrderBy(x => x.Username)
                 .Select();
 
-            Assert.That(users.Count(), xIs.EqualTo(4));
+            Assert.That(users.Count(), Is.EqualTo(4));
         }
 
         [Test]
         public void HowToExample2UsingBoolFlag()
         {
-            ISession session = Session;
-
-            var users = session.FlowQuery<UserEntity>()
+            var users = Session.FlowQuery<UserEntity>()
                 .OrderBy(x => x.IsOnline, false)
                 .OrderBy(x => x.Role, true)
                 .OrderBy(x => x.Username, true)
                 .Select();
 
-            Assert.That(users.Count(), xIs.EqualTo(4));
+            Assert.That(users.Count(), Is.EqualTo(4));
         }
 
         [Test]
         public void HowToExample3UsingDto()
         {
-            ISession session = Session;
-
-            var users = session.FlowQuery<UserEntity>()
+            var users = Session.FlowQuery<UserEntity>()
                 .OrderBy(x => x.IsOnline)
                 .OrderBy<UserDto>(x => x.SomeValue)
-                .Select(x => new UserDto()
+                .Select(x => new UserDto
                 {
                     Fullname = x.Firstname + " " + x.Lastname,
                     Username = x.Username,
@@ -56,41 +50,36 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Documentation
                     SomeValue = x.Username.Substring(0, 3) + x.Firstname.Substring(0, 3) + x.Lastname.Substring(0, 3)
                 });
 
-            Assert.That(users.Count(), xIs.EqualTo(4));
+            Assert.That(users.Count(), Is.EqualTo(4));
         }
 
         [Test]
         public void HowToExample4UsingStringsAndIProjection()
         {
-            ISession session = Session;
-
-            var users = session.FlowQuery<UserEntity>()
+            var users = Session.FlowQuery<UserEntity>()
                 .OrderByDescending("IsOnline")
                 .OrderBy(Projections.Property("Role"))
                 .OrderBy("Username")
                 .Select();
 
-            Assert.That(users.Count(), xIs.EqualTo(4));
+            Assert.That(users.Count(), Is.EqualTo(4));
         }
 
         [Test]
         public void HowToExample5ClearOrders()
         {
-            ISession session = Session;
-
-            var query = session.FlowQuery<UserEntity>()
+            var query = Session.FlowQuery<UserEntity>()
                 .OrderBy(x => x.IsOnline, false)
                 .OrderBy(x => x.Role, true)
                 .OrderBy(x => x.Username, true);
 
-            IMorphableFlowQuery morphable = query as IMorphableFlowQuery;
+            var morphable = (IMorphableFlowQuery)query;
 
-            Assert.That(morphable.Orders.Count, xIs.EqualTo(3));
+            Assert.That(morphable.Orders.Count, Is.EqualTo(3));
 
-            query
-                .ClearOrders();
+            query.ClearOrders();
 
-            Assert.That(morphable.Orders.Count, xIs.EqualTo(0));
+            Assert.That(morphable.Orders.Count, Is.EqualTo(0));
         }
     }
 }

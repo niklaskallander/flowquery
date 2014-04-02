@@ -9,8 +9,6 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
     [TestFixture]
     public class LimitTest : BaseTest
     {
-        #region Methods (4)
-
         [Test]
         public void CanConstrainFirstResultWithLimit()
         {
@@ -55,7 +53,5 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
 
             Assert.That(users.Count(), Is.EqualTo(2));
         }
-
-        #endregion Methods
     }
 }

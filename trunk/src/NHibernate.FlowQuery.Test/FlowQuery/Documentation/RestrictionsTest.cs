@@ -1,10 +1,12 @@
 ﻿using System.Linq;
+using NHibernate.Criterion;
 using NHibernate.FlowQuery.Test.Setup.Entities;
 using NUnit.Framework;
 
 namespace NHibernate.FlowQuery.Test.FlowQuery.Documentation
 {
-    using xIs = NUnit.Framework.Is;
+    using FqIs = Is;
+    using Is = NUnit.Framework.Is;
 
     [TestFixture]
     public class RestrictionsTest : BaseTest
@@ -12,125 +14,154 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Documentation
         [Test]
         public void SimpleExample1()
         {
-            ISession session = Session;
-
-            var onlineUsers = session.FlowQuery<UserEntity>()
+            var onlineUsers = Session.FlowQuery<UserEntity>()
                 .Where(x => x.IsOnline)
                 .Select();
 
-            Assert.That(onlineUsers.Count(), xIs.EqualTo(3));
-            Assert.That(onlineUsers.All(x => x.IsOnline), xIs.True);
+            Assert.That(onlineUsers.Count(), Is.EqualTo(3));
+            Assert.That(onlineUsers.All(x => x.IsOnline), Is.True);
         }
 
         [Test]
         public void SimpleExample2And()
         {
-            ISession session = Session;
-
-            var onlineAdministrators = session.FlowQuery<UserEntity>()
+            var onlineAdministrators = Session.FlowQuery<UserEntity>()
                 .Where(x => x.IsOnline && x.Role == RoleEnum.Administrator)
                 .Select();
 
-            Assert.That(onlineAdministrators.Count(), xIs.EqualTo(2));
-            Assert.That(onlineAdministrators.All(x => x.IsOnline), xIs.True);
+            Assert.That(onlineAdministrators.Count(), Is.EqualTo(2));
+            Assert.That(onlineAdministrators.All(x => x.IsOnline), Is.True);
         }
 
         [Test]
         public void SimpleExample3Or()
         {
-            ISession session = Session;
-
-            var onlineOrStandardUsers = session.FlowQuery<UserEntity>()
+            var onlineOrStandardUsers = Session.FlowQuery<UserEntity>()
                 .Where(x => x.IsOnline || x.Role == RoleEnum.Standard)
                 .Select();
 
-            Assert.That(onlineOrStandardUsers.Count(), xIs.EqualTo(4));
-            Assert.That(onlineOrStandardUsers.All(x => x.IsOnline), xIs.False);
+            Assert.That(onlineOrStandardUsers.Count(), Is.EqualTo(4));
+            Assert.That(onlineOrStandardUsers.All(x => x.IsOnline), Is.False);
         }
 
         [Test]
         public void SimpleExample4UsingIsHelperEqualTo()
         {
-            ISession session = Session;
-
-            var administrators = session.FlowQuery<UserEntity>()
-                .Where(x => x.Role, Is.EqualTo(RoleEnum.Administrator))
+            var administrators = Session.FlowQuery<UserEntity>()
+                .Where(x => x.Role, FqIs.EqualTo(RoleEnum.Administrator))
                 .Select();
 
-            Assert.That(administrators.Count(), xIs.EqualTo(2));
+            Assert.That(administrators.Count(), Is.EqualTo(2));
         }
 
         [Test]
         public void SimpleExample5UsingIsHelperIn()
         {
-            ISession session = Session;
-
-            var privilegedUsers = session.FlowQuery<UserEntity>()
-                .Where(x => x.Role, Is.In(RoleEnum.Administrator, RoleEnum.Webmaster))
+            var privilegedUsers = Session.FlowQuery<UserEntity>()
+                .Where(x => x.Role, FqIs.In(RoleEnum.Administrator, RoleEnum.Webmaster))
                 .Select();
 
-            Assert.That(privilegedUsers.Count(), xIs.EqualTo(3));
+            Assert.That(privilegedUsers.Count(), Is.EqualTo(3));
         }
 
         [Test]
-        public void ComplexExample1UsingSubQuery()
+        public void ComplexExample1UsingSubquery()
         {
-            ISession session = Session;
-
-            var subquery = session.FlowQuery<UserEntity>()
+            var subquery = Session.FlowQuery<UserEntity>()
                 .Detached()
                 .Select(x => x.Id);
 
-            var users = session.FlowQuery<UserEntity>()
-                .Where(x => x.Id, Is.In(subquery))
+            var users = Session.FlowQuery<UserEntity>()
+                .Where(x => x.Id, FqIs.In(subquery))
                 .Select();
 
-            Assert.That(users.Count(), xIs.EqualTo(4));
+            Assert.That(users.Count(), Is.EqualTo(4));
         }
 
         [Test]
         public void ComplexExample2UsingWhereDelegate()
         {
-            ISession session = Session;
-
-            var onlineOrPrivilegedUsers = session.FlowQuery<UserEntity>()
-                .Where((x, where) => x.IsOnline || where(x.Role, Is.In(RoleEnum.Administrator, RoleEnum.Webmaster)))
+            var onlineOrPrivilegedUsers = Session.FlowQuery<UserEntity>()
+                .Where((x, where) => x.IsOnline || where(x.Role, FqIs.In(RoleEnum.Administrator, RoleEnum.Webmaster)))
                 .Select();
 
-            Assert.That(onlineOrPrivilegedUsers.Count(), xIs.EqualTo(3));
+            Assert.That(onlineOrPrivilegedUsers.Count(), Is.EqualTo(3));
         }
 
         [Test]
         public void ComplexExample3UsingMiscContains()
         {
-            ISession session = Session;
-
-            var usersHavingOInFistname = session.FlowQuery<UserEntity>()
+            var usersHavingOInFistname = Session.FlowQuery<UserEntity>()
                 .Where(x => x.Firstname.Contains("o"))
                 .Select();
 
-            Assert.That(usersHavingOInFistname.Count(), xIs.EqualTo(2));
+            Assert.That(usersHavingOInFistname.Count(), Is.EqualTo(2));
         }
 
         [Test]
         public void ComplexExample4UsingSubstring()
         {
-            ISession session = Session;
-
-            var usersWithNameStartingOnN = session.FlowQuery<UserEntity>()
+            var usersWithNameStartingOnN = Session.FlowQuery<UserEntity>()
                 .Where(x => x.Firstname.Substring(0, 1) == "N")
                 .Select();
 
-            Assert.That(usersWithNameStartingOnN.Count(), xIs.EqualTo(1));
+            Assert.That(usersWithNameStartingOnN.Count(), Is.EqualTo(1));
+        }
+
+        [Test]
+        public void ComplexExample5UsingDetachedCriteria()
+        {
+            var criteria = DetachedCriteria.For<UserEntity>()
+                .Add(Restrictions.Between("Id", 2, 3))
+                .SetProjection(Projections.Property("Id"));
+
+            var users = Session.FlowQuery<UserEntity>()
+                .Where(x => x.Id, FqIs.In(criteria))
+                .Select();
+
+            Assert.That(users.Count(), Is.EqualTo(2));
+        }
+
+        [Test]
+        public void SimpleExample6EmptyCollection()
+        {
+            var users = Session.FlowQuery<UserEntity>()
+                .Where(x => x.Groups, FqIs.Empty())
+                .Select(x => new
+                {
+                    Username = x.Username
+                });
+
+            Assert.That(users.Count(), Is.EqualTo(1));
+            Assert.That(users.First().Username, Is.EqualTo("Lajsa"));
+        }
+
+        [Test]
+        public void ComplexExample6EmptySubquery()
+        {
+            UserEntity user = null;
+
+            var subquery = Session.DetachedFlowQuery<UserGroupLinkEntity>()
+                .SetRootAlias(() => user)
+                .Where(x => x.User.Id == user.Id)
+                .Select(x => x.Id);
+
+            var users = Session.FlowQuery<UserEntity>(() => user)
+                .Where(subquery, FqIs.Empty())
+                .Select(x => new
+                {
+                    Username = x.Username
+                });
+
+            Assert.That(users.Count(), Is.EqualTo(1));
+            Assert.That(users.First().Username, Is.EqualTo("Lajsa"));
         }
 
         [Test]
         public void MiscExample1RestrictByExample()
         {
-            ISession session = Session;
-
-            var users = session.FlowQuery<UserEntity>()
-                .RestrictByExample(new UserEntity() { Firstname = "Niklas", Role = RoleEnum.Administrator }, x =>
+            var users = Session.FlowQuery<UserEntity>()
+                .RestrictByExample(new UserEntity { Firstname = "Niklas", Role = RoleEnum.Administrator }, x =>
                 {
                     x.ExcludeProperty(u => u.CreatedStamp);
                     x.ExcludeProperty(u => u.IsOnline);
@@ -140,9 +171,9 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Documentation
                 })
                 .Select();
 
-            Assert.That(users.Count(), xIs.EqualTo(1));
-            Assert.That(users.First().Role, xIs.EqualTo(RoleEnum.Administrator));
-            Assert.That(users.First().Firstname, xIs.EqualTo("Niklas"));
+            Assert.That(users.Count(), Is.EqualTo(1));
+            Assert.That(users.First().Role, Is.EqualTo(RoleEnum.Administrator));
+            Assert.That(users.First().Firstname, Is.EqualTo("Niklas"));
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using NHibernate.Criterion;
+﻿using System.Collections.Generic;
+using NHibernate.Criterion;
 
 namespace NHibernate.FlowQuery.Core
 {

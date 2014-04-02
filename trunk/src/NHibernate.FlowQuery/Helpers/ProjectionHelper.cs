@@ -1,8 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using NHibernate.Criterion;
 using NHibernate.Dialect.Function;
+using NHibernate.FlowQuery.Core;
+using NHibernate.FlowQuery.Core.CustomProjections;
+using NHibernate.FlowQuery.Core.Joins;
+using NHibernate.Type;
 using Expression = System.Linq.Expressions.Expression;
 
 namespace NHibernate.FlowQuery.Helpers
@@ -11,7 +16,7 @@ namespace NHibernate.FlowQuery.Helpers
     {
         public static IEnumerable<Expression> FlattenBinaryExpression(BinaryExpression expression)
         {
-            List<Expression> expressions = new List<Expression>();
+            var expressions = new List<Expression>();
 
             if (expression.Left is BinaryExpression)
             {
@@ -34,58 +39,63 @@ namespace NHibernate.FlowQuery.Helpers
             return expressions;
         }
 
-        public static IProjection ForExpression(Expression expression, string rootName, Dictionary<string, string> aliases)
+        public static IProjection ForExpression(Expression expression, string rootName, QueryHelperData data)
         {
-            return GetProjection(expression, rootName, aliases);
+            return GetProjection(expression, rootName, data);
         }
 
-        public static void ForMemberInitExpression(MemberInitExpression expression, string rootName, Dictionary<string, string> aliases, ref ProjectionList list, ref Dictionary<string, IProjection> mappings)
+        public static void ForMemberInitExpression(MemberInitExpression expression, string rootName, QueryHelperData data, ref ProjectionList list, ref Dictionary<string, IProjection> mappings)
         {
-            ForNewExpression(expression.NewExpression, rootName, aliases, ref list, ref mappings);
+            ForNewExpression(expression.NewExpression, rootName, data, ref list, ref mappings);
 
-            foreach (MemberAssignment memberAssigment in expression.Bindings)
+            foreach (var memberBinding in expression.Bindings)
             {
-                switch (memberAssigment.Expression.NodeType)
+                var memberAssigment = memberBinding as MemberAssignment;
+
+                if (memberAssigment != null)
                 {
-                    case ExpressionType.MemberInit:
-                        ForMemberInitExpression(memberAssigment.Expression as MemberInitExpression, rootName, aliases, ref list, ref mappings);
-                        break;
+                    switch (memberAssigment.Expression.NodeType)
+                    {
+                        case ExpressionType.MemberInit:
+                            ForMemberInitExpression(memberAssigment.Expression as MemberInitExpression, rootName, data, ref list, ref mappings);
+                            break;
 
-                    case ExpressionType.New:
-                        ForNewExpression(memberAssigment.Expression as NewExpression, rootName, aliases, ref list, ref mappings);
-                        break;
+                        case ExpressionType.New:
+                            ForNewExpression(memberAssigment.Expression as NewExpression, rootName, data, ref list, ref mappings);
+                            break;
 
-                    default:
-                        IProjection projection = ForExpression(memberAssigment.Expression, rootName, aliases);
+                        default:
+                            IProjection projection = ForExpression(memberAssigment.Expression, rootName, data);
 
-                        list.Add(projection);
+                            list.Add(new FqAliasProjection(projection, memberAssigment.Member.Name));
 
-                        if (!mappings.ContainsKey(memberAssigment.Member.Name))
-                        {
-                            mappings.Add(memberAssigment.Member.Name, projection);
-                        }
+                            if (!mappings.ContainsKey(memberAssigment.Member.Name))
+                            {
+                                mappings.Add(memberAssigment.Member.Name, projection);
+                            }
 
-                        break;
+                            break;
+                    }
                 }
             }
         }
 
-        public static void ForNewExpression(NewExpression expression, string rootName, Dictionary<string, string> aliases, ref ProjectionList list, ref Dictionary<string, IProjection> mappings)
+        public static void ForNewExpression(NewExpression expression, string root, QueryHelperData data, ref ProjectionList list, ref Dictionary<string, IProjection> mappings)
         {
             foreach (Expression argument in expression.Arguments)
             {
                 switch (argument.NodeType)
                 {
                     case ExpressionType.MemberInit:
-                        ForMemberInitExpression(argument as MemberInitExpression, rootName, aliases, ref list, ref mappings);
+                        ForMemberInitExpression(argument as MemberInitExpression, root, data, ref list, ref mappings);
                         break;
 
                     case ExpressionType.New:
-                        ForNewExpression(argument as NewExpression, rootName, aliases, ref list, ref mappings);
+                        ForNewExpression(argument as NewExpression, root, data, ref list, ref mappings);
                         break;
 
                     default:
-                        IProjection projection = ForExpression(argument, rootName, aliases);
+                        IProjection projection = ForExpression(argument, root, data);
 
                         list.Add(projection);
                         break;
@@ -106,17 +116,16 @@ namespace NHibernate.FlowQuery.Helpers
                 case ExpressionType.Subtract:
                     return "-";
 
-                case ExpressionType.Add:
                 default:
                     return "+";
             }
         }
 
-        private static IProjection GetArithmeticProjection(BinaryExpression expression, string root, Dictionary<string, string> aliases)
+        private static IProjection GetArithmeticProjection(BinaryExpression expression, string root, QueryHelperData data)
         {
             if (expression.NodeType == ExpressionType.Add && expression.Type == typeof(string))
             {
-                return GetConcatenationProjection(expression, root, aliases);
+                return GetConcatenationProjection(expression, root, data);
             }
 
             string operation = GetArithmeticOperation(expression.NodeType);
@@ -125,18 +134,18 @@ namespace NHibernate.FlowQuery.Helpers
             (
                 new VarArgsSQLFunction("(", operation, ")"),
                 NHibernateUtil.GuessType(expression.Left.Type),
-                GetProjection(expression.Left, root, aliases),
-                GetProjection(expression.Right, root, aliases)
+                GetProjection(expression.Left, root, data),
+                GetProjection(expression.Right, root, data)
             );
         }
 
-        private static IProjection GetConcatenationProjection(BinaryExpression expression, string root, Dictionary<string, string> aliases)
+        private static IProjection GetConcatenationProjection(BinaryExpression expression, string root, QueryHelperData data)
         {
             var projections = new List<IProjection>();
 
             foreach (var expressionPart in FlattenBinaryExpression(expression))
             {
-                var projection = GetProjection(expressionPart, root, aliases);
+                var projection = GetProjection(expressionPart, root, data);
 
                 projections.Add(projection);
             }
@@ -144,20 +153,20 @@ namespace NHibernate.FlowQuery.Helpers
             return new SqlFunctionProjection("concat", NHibernateUtil.String, projections.ToArray());
         }
 
-        private static IProjection GetConditionalProjection(ConditionalExpression expression, string root, Dictionary<string, string> aliases)
+        private static IProjection GetConditionalProjection(ConditionalExpression expression, string root, QueryHelperData data)
         {
             return Projections.Conditional
             (
-                RestrictionHelper.GetCriterion(expression.Test, root, aliases),
-                GetProjection(expression.IfTrue, root, aliases),
-                GetProjection(expression.IfFalse, root, aliases)
+                RestrictionHelper.GetCriterion(expression.Test, root, data),
+                GetProjection(expression.IfTrue, root, data),
+                GetProjection(expression.IfFalse, root, data)
             );
         }
 
-        private static IProjection GetMethodCallProjection(MethodCallExpression expression, string root, Dictionary<string, string> aliases)
+        private static IProjection GetMethodCallProjection(MethodCallExpression expression, string root, QueryHelperData data)
         {
             Expression subExpression = expression.Object ?? expression.Arguments[0];
-            IProjection projection = GetProjection(subExpression, root, aliases);
+            IProjection projection = GetProjection(subExpression, root, data);
 
             switch (expression.Method.Name)
             {
@@ -174,7 +183,7 @@ namespace NHibernate.FlowQuery.Helpers
                     return Projections.GroupProperty(projection);
 
                 case "Average":
-                    return Projections.Cast(NHibernateUtil.Decimal, Projections.Avg(projection));
+			        return Projections.Avg(projection);
 
                 case "Count":
                     return Projections.Count(projection);
@@ -205,7 +214,7 @@ namespace NHibernate.FlowQuery.Helpers
                 case "StartsWith":
                 case "EndsWith":
                 case "Contains":
-                    ICriterion criterion = RestrictionHelper.GetCriterionForMethodCall(expression, root, aliases);
+                    ICriterion criterion = RestrictionHelper.GetCriterionForMethodCall(expression, root, data);
 
                     return Projections.Conditional
                     (
@@ -214,12 +223,34 @@ namespace NHibernate.FlowQuery.Helpers
                         Projections.Constant(false, NHibernateUtil.Boolean)
                     );
 
-                default:
-                    throw new NotSupportedException("the expression contains unsupported features, please revise your code");
+                case "Subquery":
+
+                    object value = ExpressionHelper.GetValue(expression.Arguments[0]);
+
+                    var criteria = value as DetachedCriteria;
+
+                    if (criteria == null)
+                    {
+                        var query = value as IDetachedImmutableFlowQuery;
+
+                        if (query != null)
+                        {
+                            criteria = query.Criteria;
+                        }
+                    }
+
+                    if (criteria != null)
+                    {
+                        return Projections.SubQuery(criteria);
+                    }
+
+                    break;
             }
+
+            throw new NotSupportedException("the expression contains unsupported features, please revise your code");
         }
 
-        public static IProjection GetProjection(Expression expression, string root, Dictionary<string, string> aliases)
+        public static IProjection GetProjection(Expression expression, string root, QueryHelperData data)
         {
             switch (expression.NodeType)
             {
@@ -231,24 +262,27 @@ namespace NHibernate.FlowQuery.Helpers
                 case ExpressionType.GreaterThanOrEqual:
                 case ExpressionType.LessThan:
                 case ExpressionType.LessThanOrEqual:
-                    return GetConditionalProjection(Expression.Condition(expression, Expression.Constant(true), Expression.Constant(false)), root, aliases);
+                    return GetConditionalProjection(Expression.Condition(expression, Expression.Constant(true), Expression.Constant(false)), root, data);
 
                 case ExpressionType.Add:
                 case ExpressionType.Subtract:
                 case ExpressionType.Divide:
                 case ExpressionType.Multiply:
-                    return GetArithmeticProjection(expression as BinaryExpression, root, aliases);
+                    return GetArithmeticProjection(expression as BinaryExpression, root, data);
 
                 case ExpressionType.Conditional:
-                    return GetConditionalProjection(expression as ConditionalExpression, root, aliases);
+                    return GetConditionalProjection(expression as ConditionalExpression, root, data);
 
                 case ExpressionType.Call:
-                    return GetMethodCallProjection(expression as MethodCallExpression, root, aliases);
+                    return GetMethodCallProjection(expression as MethodCallExpression, root, data);
 
                 case ExpressionType.MemberAccess:
-                    if (ExpressionHelper.IsRooted(expression, root, aliases))
+
+                    if (ExpressionHelper.IsRooted(expression, root, data))
                     {
-                        return Projections.Property(ExpressionHelper.GetPropertyName(expression, root));
+                        string property = ExpressionHelper.GetPropertyName(expression, root);
+
+                        return Projections.Property(property);
                     }
 
                     object value = ExpressionHelper.GetValue(expression);
@@ -256,13 +290,32 @@ namespace NHibernate.FlowQuery.Helpers
                     return Projections.Constant(value, TypeHelper.GuessType(expression.Type));
 
                 case ExpressionType.Convert:
-                    return GetProjection((expression as UnaryExpression).Operand, root, aliases);
+
+                    var unaryExpression = (UnaryExpression)expression;
+
+                    IProjection projection = GetProjection(unaryExpression.Operand, root, data);
+
+                    if (!unaryExpression.IsLiftedToNull)
+                    {
+                        IType type = TypeHelper.GuessType(unaryExpression.Type, true);
+
+                        if (type != null)
+                        {
+                            return new FqCastProjection(type, projection);
+                        }
+                    }
+
+                    return projection;
 
                 case ExpressionType.Coalesce:
-                    return GetCoalesceProjection((expression as BinaryExpression), root, aliases);
+                    return GetCoalesceProjection((expression as BinaryExpression), root, data);
 
-                case ExpressionType.Constant:
                 default:
+
+                    if (expression.NodeType == ExpressionType.Parameter && expression.ToString() == root)
+                    {
+                        throw new NotSupportedException("Unable to select the root entity like 'x => x', select without an expression instead");
+                    }
 
                     value = ExpressionHelper.GetValue(expression);
 
@@ -270,10 +323,10 @@ namespace NHibernate.FlowQuery.Helpers
             }
         }
 
-        private static IProjection GetCoalesceProjection(BinaryExpression binaryExpression, string root, Dictionary<string, string> aliases)
+        private static IProjection GetCoalesceProjection(BinaryExpression binaryExpression, string root, QueryHelperData data)
         {
-            IProjection original = GetProjection(binaryExpression.Left, root, aliases);
-            IProjection fallback = GetProjection(binaryExpression.Right, root, aliases);
+            IProjection original = GetProjection(binaryExpression.Left, root, data);
+            IProjection fallback = GetProjection(binaryExpression.Right, root, data);
 
             return Projections.Conditional
             (
@@ -283,22 +336,22 @@ namespace NHibernate.FlowQuery.Helpers
             );
         }
 
-        public static ProjectionList GetProjectionListForExpression(Expression expression, string root, Dictionary<string, string> aliases, ref Dictionary<string, IProjection> mappings)
+        public static ProjectionList GetProjectionListForExpression(Expression expression, string root, QueryHelperData data, ref Dictionary<string, IProjection> mappings)
         {
             ProjectionList list = Projections.ProjectionList();
 
             switch (expression.NodeType)
             {
                 case ExpressionType.New:
-                    ForNewExpression(expression as NewExpression, root, aliases, ref list, ref mappings);
+                    ForNewExpression(expression as NewExpression, root, data, ref list, ref mappings);
                     break;
 
                 case ExpressionType.MemberInit:
-                    ForMemberInitExpression(expression as MemberInitExpression, root, aliases, ref list, ref mappings);
+                    ForMemberInitExpression(expression as MemberInitExpression, root, data, ref list, ref mappings);
                     break;
 
                 default:
-                    IProjection projection = ForExpression(expression, root, aliases);
+                    IProjection projection = ForExpression(expression, root, data);
 
                     list.Add(projection);
                     break;

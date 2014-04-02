@@ -15,8 +15,6 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
     [TestFixture]
     public class ConstructionHelperTest : BaseTest
     {
-        #region Methods (4)
-
         [Test]
         public void CanGetListByExpression()
         {
@@ -34,27 +32,19 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
         [Test]
         public void GetListByExpressionThrowsWhenExpressionIsNull()
         {
-            Assert.That(() =>
-                        {
-                            ConstructionHelper.GetListByExpression<int>(null, new object[] { });
-
-                        }, Throws.InstanceOf<ArgumentNullException>());
+            Assert.That(() => ConstructionHelper.GetListByExpression<int>(null, new object[] { }), Throws.InstanceOf<ArgumentNullException>());
         }
 
         [Test]
         public void CanHandleThrowsWhenExpressionIsNull()
         {
-            Assert.That(() =>
-                        {
-                            ConstructionHelper.CanHandle(null);
-
-                        }, Throws.InstanceOf<ArgumentNullException>());
+            Assert.That(() => ConstructionHelper.CanHandle(null), Throws.InstanceOf<ArgumentNullException>());
         }
 
         [Test]
         public void CanHandleSortsOutLambdaExpression()
         {
-            Expression<Func<UserEntity, UserDto>> expression = x => new UserDto() { Fullname = x.Firstname + " " + x.Lastname };
+            Expression<Func<UserEntity, UserDto>> expression = x => new UserDto { Fullname = x.Firstname + " " + x.Lastname };
 
             bool canHandle = ConstructionHelper.CanHandle(expression);
 
@@ -87,19 +77,9 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
             Assert.That(list, Is.Null);
         }
 
-        #endregion Methods
-
-        #region Nested Classes (1)
-
         private class Wrapper
         {
-            #region Properties (1)
-
             public bool Value { get; set; }
-
-            #endregion Properties
         }
-
-        #endregion Nested Classes
     }
 }

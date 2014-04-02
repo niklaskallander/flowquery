@@ -8,7 +8,7 @@ namespace NHibernate.FlowQuery.Expressions
             : base(value)
         { }
 
-        public override ICriterion Compile(string property)
+        protected override ICriterion CompileCore(string property)
         {
             return Restrictions.Eq(Projections.Property(property), Value);
         }

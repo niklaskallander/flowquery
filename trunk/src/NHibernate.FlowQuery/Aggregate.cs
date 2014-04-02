@@ -1,15 +1,17 @@
 using System;
+using NHibernate.Criterion;
+using NHibernate.FlowQuery.Core;
 
 namespace NHibernate.FlowQuery
 {
     public static class Aggregate
     {
-        public static decimal Average<TDestination>(TDestination property)
+        public static double Average<TDestination>(TDestination property)
         {
             throw Exception();
         }
 
-        public static decimal Average<TDestination>(TDestination? property)
+        public static double Average<TDestination>(TDestination? property)
             where TDestination : struct
         {
             throw Exception();
@@ -82,6 +84,16 @@ namespace NHibernate.FlowQuery
 
         public static TDestination Sum<TDestination>(TDestination? property)
             where TDestination : struct
+        {
+            throw Exception();
+        }
+
+        public static T Subquery<T>(IDetachedImmutableFlowQuery subquery)
+        {
+            throw Exception();
+        }
+
+        public static T Subquery<T>(DetachedCriteria subquery)
         {
             throw Exception();
         }

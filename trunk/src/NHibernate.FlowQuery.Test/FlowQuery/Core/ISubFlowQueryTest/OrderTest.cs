@@ -1,18 +1,16 @@
+using System.Linq;
 using NHibernate.Criterion;
 using NHibernate.FlowQuery.Test.Setup.Entities;
 using NUnit.Framework;
 
 namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
 {
-    using System.Linq;
-    using FlowQueryIs = NHibernate.FlowQuery.Is;
+    using FqIs = Is;
     using Is = NUnit.Framework.Is;
 
     [TestFixture]
     public class OrderTest : BaseTest
     {
-        #region Methods (12)
-
         [Test]
         public void SkipsOrderByStatementsIfUnnecessaryInSubquery()
         {
@@ -21,15 +19,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
                 .OrderBy(x => x.IsOnline)
                 .Select(x => x.Id);
 
-            Assert.That(() =>
-                        {
-                            var users = Query<UserEntity>()
-                                .Where(x => x.Id, FlowQueryIs.In(detached))
-                                .Select();
+            var users = Query<UserEntity>()
+                .Where(x => x.Id, FqIs.In(detached))
+                .Select();
 
-                            Assert.That(users.Count(), Is.EqualTo(4));
-
-                        }, Throws.Nothing);
+            Assert.That(users.Count(), Is.EqualTo(4));
         }
 
         [Test]
@@ -41,16 +35,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
                 .OrderBy(x => x.IsOnline)
                 .Select(x => x.Id);
 
-            Assert.That(() =>
-                        {
-                            var users = Query<UserEntity>()
-                                .Where(x => x.Id, FlowQueryIs.In(detached))
-                                .Select();
+            var users = Query<UserEntity>()
+                .Where(x => x.Id, FqIs.In(detached))
+                .Select();
 
-                            Assert.That(users.Count(), Is.EqualTo(3));
-                            Assert.That(users.All(x => x.IsOnline));
-
-                        }, Throws.Nothing);
+            Assert.That(users.Count(), Is.EqualTo(3));
+            Assert.That(users.All(x => x.IsOnline));
         }
 
         [Test]
@@ -65,7 +55,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
             Assert.That(() =>
             {
                 var users = Query<UserEntity>()
-                    .Where(x => x.Id, FlowQueryIs.In(detached))
+                    .Where(x => x.Id, FqIs.In(detached))
                     .Select();
 
                 Assert.That(users.Count(), Is.EqualTo(1));
@@ -86,7 +76,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
             Assert.That(() =>
             {
                 var users = Query<UserEntity>()
-                    .Where(x => x.Id, FlowQueryIs.In(detached))
+                    .Where(x => x.Id, FqIs.In(detached))
                     .Select();
 
                 Assert.That(users.Count(), Is.EqualTo(2));
@@ -98,14 +88,14 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void CanOrderAscending()
         {
-            var id = Query<UserEntity>().Detached()
+            var id = DetachedQuery<UserEntity>()
                 .OrderBy(x => x.Firstname)
                 .Take(1)
                 .Skip(1)
                 .Select(x => x.Id);
 
             var users = Query<UserEntity>()
-                .Where(x => x.Id, FlowQueryIs.EqualTo(id))
+                .Where(x => x.Id, FqIs.EqualTo(id))
                 .Select()
                 ;
 
@@ -124,7 +114,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
                 .Select(x => x.Id);
 
             var users = Query<UserEntity>()
-                .Where(x => x.Id, FlowQueryIs.EqualTo(id))
+                .Where(x => x.Id, FqIs.EqualTo(id))
                 .Select()
                 ;
 
@@ -135,14 +125,14 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void CanOrderAscendingUsingString()
         {
-            var id = Query<UserEntity>().Detached()
+            var id = DetachedQuery<UserEntity>()
                 .OrderBy("Firstname")
                 .Take(1)
                 .Skip(1)
                 .Select(x => x.Id);
 
             var users = Query<UserEntity>()
-                .Where(x => x.Id, FlowQueryIs.EqualTo(id))
+                .Where(x => x.Id, FqIs.EqualTo(id))
                 .Select()
                 ;
 
@@ -153,14 +143,14 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void CanOrderDescending()
         {
-            var id = Query<UserEntity>().Detached()
+            var id = DetachedQuery<UserEntity>()
                 .OrderByDescending(u => u.Firstname)
                 .Take(1)
                 .Skip(1)
                 .Select(x => x.Id);
 
             var users = Query<UserEntity>()
-                .Where(x => x.Id, FlowQueryIs.EqualTo(id))
+                .Where(x => x.Id, FqIs.EqualTo(id))
                 .Select()
                 ;
 
@@ -171,14 +161,14 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void CanOrderDescendingUsingProjection()
         {
-            var id = Query<UserEntity>().Detached()
+            var id = DetachedQuery<UserEntity>()
                 .OrderByDescending(Projections.Property("Firstname"))
                 .Take(1)
                 .Skip(1)
                 .Select(x => x.Id);
 
             var users = Query<UserEntity>()
-                .Where(x => x.Id, FlowQueryIs.EqualTo(id))
+                .Where(x => x.Id, FqIs.EqualTo(id))
                 .Select()
                 ;
 
@@ -189,21 +179,19 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void CanOrderDescendingUsingString()
         {
-            var id = Query<UserEntity>().Detached()
+            var id = DetachedQuery<UserEntity>()
                 .OrderByDescending("Firstname")
                 .Take(1)
                 .Skip(1)
                 .Select(x => x.Id);
 
             var users = Query<UserEntity>()
-                .Where(x => x.Id, FlowQueryIs.EqualTo(id))
+                .Where(x => x.Id, FqIs.EqualTo(id))
                 .Select()
                 ;
 
             Assert.That(users.Count(), Is.EqualTo(1));
             Assert.That(users.ElementAt(0).Firstname, Is.EqualTo("Lotta"));
         }
-
-        #endregion Methods
     }
 }

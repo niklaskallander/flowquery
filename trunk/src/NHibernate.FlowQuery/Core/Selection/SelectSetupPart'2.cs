@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
 using NHibernate.Criterion;
 using NHibernate.FlowQuery.Helpers;
@@ -9,7 +8,7 @@ namespace NHibernate.FlowQuery.Core.Selection
     public class SelectSetupPart<TSource, TDestination> : ISelectSetupPart<TSource, TDestination>
         where TSource : class
     {
-        public SelectSetupPart(string forProperty, ISelectSetup<TSource, TDestination> setup, Dictionary<string, string> aliases)
+        public SelectSetupPart(string forProperty, ISelectSetup<TSource, TDestination> setup, QueryHelperData data)
         {
             if (string.IsNullOrEmpty(forProperty))
             {
@@ -21,7 +20,7 @@ namespace NHibernate.FlowQuery.Core.Selection
                 throw new ArgumentNullException("setup");
             }
 
-            Aliases = aliases;
+            Data = data;
 
             ForProperty = forProperty;
 
@@ -30,11 +29,11 @@ namespace NHibernate.FlowQuery.Core.Selection
 
         private string ForProperty { get; set; }
 
-        private Dictionary<string, string> Aliases { get; set; }
+        private QueryHelperData Data { get; set; }
 
         private ISelectSetup<TSource, TDestination> Setup { get; set; }
 
-        protected virtual ISelectSetup<TSource, TDestination> Use(string property)
+        public virtual ISelectSetup<TSource, TDestination> Use(string property)
         {
             if (string.IsNullOrEmpty(property))
             {
@@ -44,7 +43,7 @@ namespace NHibernate.FlowQuery.Core.Selection
             return Use(Projections.Property(property));
         }
 
-        protected virtual ISelectSetup<TSource, TDestination> Use(IProjection projection)
+        public virtual ISelectSetup<TSource, TDestination> Use(IProjection projection)
         {
             if (projection == null)
             {
@@ -61,37 +60,16 @@ namespace NHibernate.FlowQuery.Core.Selection
             return Setup;
         }
 
-        protected virtual ISelectSetup<TSource, TDestination> Use<TProjection>(Expression<Func<TSource, TProjection>> expression)
+        public virtual ISelectSetup<TSource, TDestination> Use<TProjection>(Expression<Func<TSource, TProjection>> expression)
         {
             if (expression == null)
             {
                 throw new ArgumentNullException("expression");
             }
 
-            IProjection projection = ProjectionHelper.GetProjection(expression.Body, expression.Parameters[0].Name, Aliases);
+            IProjection projection = ProjectionHelper.GetProjection(expression.Body, expression.Parameters[0].Name, Data);
 
             return Use(projection);
         }
-
-
-
-        #region IDistinctSetupPart<TSource, TDestination> Members
-
-        ISelectSetup<TSource, TDestination> ISelectSetupPart<TSource, TDestination>.Use(string property)
-        {
-            return Use(property);
-        }
-
-        ISelectSetup<TSource, TDestination> ISelectSetupPart<TSource, TDestination>.Use(IProjection projection)
-        {
-            return Use(projection);
-        }
-
-        ISelectSetup<TSource, TDestination> ISelectSetupPart<TSource, TDestination>.Use<TProjection>(Expression<Func<TSource, TProjection>> expression)
-        {
-            return Use(expression);
-        }
-
-        #endregion
     }
 }

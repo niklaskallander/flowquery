@@ -23,25 +23,36 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\build\debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>
+    </DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\NHibernate.FlowQuery.xml</DocumentationFile>
+    <NoWarn>1591</NoWarn>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\..\build\release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>
+    </DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\NHibernate.FlowQuery.xml</DocumentationFile>
+    <NoWarn>1591</NoWarn>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>NHibernate.FlowQuery.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Iesi.Collections, Version=1.0.1.0, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
-      <HintPath>..\packages\Iesi.Collections.3.2.0.4000\lib\Net35\Iesi.Collections.dll</HintPath>
+    <Reference Include="Iesi.Collections">
+      <HintPath>..\packages\Iesi.Collections.3.2.0.1001\lib\Net35\Iesi.Collections.dll</HintPath>
     </Reference>
     <Reference Include="NHibernate, Version=3.3.1.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
       <HintPath>..\packages\NHibernate.3.3.3.4001\lib\Net35\NHibernate.dll</HintPath>
@@ -55,6 +66,18 @@
     <Compile Include="Aggregate.cs" />
     <Compile Include="AutoMapping\DefaultMapper.cs" />
     <Compile Include="AutoMapping\IMapper.cs" />
+    <Compile Include="Core\Locks\LockBuilder.cs" />
+    <Compile Include="Core\Locks\ILockBuilder.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Core\Locks\Lock.cs" />
+    <Compile Include="Core\CustomProjections\FqAliasProjection.cs" />
+    <Compile Include="Core\CustomProjections\FqCastProjection.cs" />
+    <Compile Include="Core\CustomProjections\FqGroupByProjection.cs" />
+    <Compile Include="Core\CustomProjections\FqProjectionList.cs" />
+    <Compile Include="Core\Fetches\Fetch.cs" />
+    <Compile Include="Core\Fetches\FetchBuilder.cs" />
+    <Compile Include="Core\Fetches\IFetchBuilder.cs" />
     <Compile Include="Core\IDetachedImmutableFlowQuery.cs" />
     <Compile Include="Core\Implementors\DetachedImmutableFlowQueryImplementor.cs" />
     <Compile Include="Core\Implementors\MorphableFlowQueryImplementorBase.cs" />
@@ -90,6 +113,7 @@
     <Compile Include="Core\WhereDelegate.cs" />
     <Compile Include="DetachedCriteriaExtensions.cs" />
     <Compile Include="Expressions\IsHelper.cs" />
+    <Compile Include="Expressions\IsEmptyExpression.cs" />
     <Compile Include="Expressions\SubqueryExpressions\IsEqualToAllSubqueryExpression.cs" />
     <Compile Include="Expressions\SubqueryExpressions\IsEqualToSubqueryExpression.cs" />
     <Compile Include="Expressions\SubqueryExpressions\IsGreaterThanAllSubqueryExpression.cs" />
@@ -114,6 +138,7 @@
     <Compile Include="Helpers\ExpressionHelper.cs" />
     <Compile Include="Helpers\ParameterReplaceVisitor.cs" />
     <Compile Include="Helpers\ProjectionHelper.cs" />
+    <Compile Include="Helpers\QueryHelperData.cs" />
     <Compile Include="Helpers\ReflectionHelper.cs" />
     <Compile Include="Helpers\RestrictionHelper.cs" />
     <Compile Include="Helpers\SelectionHelper.cs" />
@@ -151,15 +176,35 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="NHibernate.FlowQuery.nuspec" />
+    <None Include="NHibernate.FlowQuery.snk" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
+  <Target Name="PostBuildMacros">
+    <GetAssemblyIdentity AssemblyFiles="$(TargetPath)">
+      <Output TaskParameter="Assemblies" ItemName="Targets" />
+    </GetAssemblyIdentity>
   </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+  <PropertyGroup>
+    <PostBuildEventDependsOn>
+    $(PostBuildEventDependsOn);
+    PostBuildMacros;
+  </PostBuildEventDependsOn>
+    <PostBuildEvent>if $(ConfigurationName) == Release (
+
+	IF EXIST "$(SolutionDir)..\builds\@(Targets->'%(Version)')" (
+		del /Q "$(SolutionDir)..\builds\@(Targets->'%(Version)')"
+	)
+	
+    7z a -tzip "$(SolutionDir)..\builds\@(Targets->'%(Version)')\NHibernate.FlowQuery.@(Targets->'%(Version)').bin.zip" "$(TargetFileName)" "$(TargetName).xml" "$(SolutionDir)\License.txt" "$(SolutionDir)\Release Notes.txt"
+    7z a -tzip -r -xr!packages -xr!bin -xr!obj -xr!*.suo -xr!*.user "$(SolutionDir)..\builds\@(Targets->'%(Version)')\NHibernate.FlowQuery.@(Targets->'%(Version)').src.zip" "$(SolutionDir)*.*"
+    
+	cd $(ProjectDir)
+
+    nuget pack $(ProjectFileName) -Prop Configuration=Release
+
+    move "$(TargetName).*.nupkg" "$(SolutionDir)..\builds\@(Targets->'%(Version)')\$(TargetName).@(Targets->'%(Version)').nupkg"
+)</PostBuildEvent>
+  </PropertyGroup>
 </Project>

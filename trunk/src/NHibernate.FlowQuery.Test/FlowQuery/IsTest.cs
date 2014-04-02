@@ -3,21 +3,19 @@ using System.Linq;
 using NHibernate.FlowQuery.Test.Setup.Entities;
 using NUnit.Framework;
 
-namespace NHibernate.FlowQuery.Test
+namespace NHibernate.FlowQuery.Test.FlowQuery
 {
+    using FqIs = Is;
     using Is = NUnit.Framework.Is;
-    using QIs = NHibernate.FlowQuery.Is;
 
     [TestFixture]
     public class IsTest : BaseTest
     {
-        #region Methods (14)
-
         [Test]
         public void CanFilterBetween()
         {
             var users = Query<UserEntity>()
-                .Where(x => x.Id, QIs.Between(2, 4))
+                .Where(x => x.Id, FqIs.Between(2, 4))
                 .Select()
                 ;
 
@@ -33,7 +31,7 @@ namespace NHibernate.FlowQuery.Test
         public void CanFilterEqualTo()
         {
             var users = Query<UserEntity>()
-                .Where(x => x.Id, QIs.EqualTo(2))
+                .Where(x => x.Id, FqIs.EqualTo(2))
                 .Select()
                 ;
 
@@ -45,7 +43,7 @@ namespace NHibernate.FlowQuery.Test
         public void CanFilterGreaterThan()
         {
             var users = Query<UserEntity>()
-                .Where(x => x.Id, QIs.GreaterThan(2))
+                .Where(x => x.Id, FqIs.GreaterThan(2))
                 .Select()
                 ;
 
@@ -58,7 +56,7 @@ namespace NHibernate.FlowQuery.Test
         public void CanFilterGreaterThanOrEqualTo()
         {
             var users = Query<UserEntity>()
-                .Where(x => x.Id, QIs.GreaterThanOrEqualTo(2))
+                .Where(x => x.Id, FqIs.GreaterThanOrEqualTo(2))
                 .Select()
                 ;
 
@@ -72,7 +70,7 @@ namespace NHibernate.FlowQuery.Test
         public void CanFilterInWithEnumerableCollection()
         {
             var users = Query<UserEntity>()
-                .Where(x => x.Id, QIs.In(new long[] { 1, 3 }))
+                .Where(x => x.Id, FqIs.In(new long[] { 1, 3 }))
                 .Select()
                 ;
 
@@ -85,7 +83,7 @@ namespace NHibernate.FlowQuery.Test
         public void CanFilterInWithStrictEnumerable()
         {
             var users = Query<UserEntity>()
-                .Where(x => x.Id, QIs.In(new TestEnumerable(3, 1, 4)))
+                .Where(x => x.Id, FqIs.In(new TestEnumerable(3, 1, 4)))
                 .Select()
                 ;
 
@@ -96,10 +94,10 @@ namespace NHibernate.FlowQuery.Test
         }
 
         [Test]
-        public void CanFilterInWithSubQuery()
+        public void CanFilterInWithSubquery()
         {
             var users = Query<UserEntity>()
-                .Where(x => x.Id, QIs.In(Query<UserEntity>().Detached().Where(x => x.IsOnline).Select(x => x.Id)))
+                .Where(x => x.Id, FqIs.In(DetachedQuery<UserEntity>().Where(x => x.IsOnline).Select(x => x.Id)))
                 .Select()
                 ;
 
@@ -115,7 +113,7 @@ namespace NHibernate.FlowQuery.Test
         public void CanFilterInWithValues()
         {
             var users = Query<UserEntity>()
-                .Where(x => x.Id, QIs.In(2, 4))
+                .Where(x => x.Id, FqIs.In(2, 4))
                 .Select()
                 ;
 
@@ -128,7 +126,7 @@ namespace NHibernate.FlowQuery.Test
         public void CanFilterLessThan()
         {
             var users = Query<UserEntity>()
-                .Where(x => x.Id, QIs.LessThan(2))
+                .Where(x => x.Id, FqIs.LessThan(2))
                 .Select()
                 ;
 
@@ -140,7 +138,7 @@ namespace NHibernate.FlowQuery.Test
         public void CanFilterLessThanOrEqualTo()
         {
             var users = Query<UserEntity>()
-                .Where(x => x.Id, QIs.LessThanOrEqualTo(2))
+                .Where(x => x.Id, FqIs.LessThanOrEqualTo(2))
                 .Select()
                 ;
 
@@ -153,7 +151,7 @@ namespace NHibernate.FlowQuery.Test
         public void CanFilterLike()
         {
             var users = Query<UserEntity>()
-                .Where(x => x.Firstname, QIs.Like("%i%"))
+                .Where(x => x.Firstname, FqIs.Like("%i%"))
                 .Select()
                 ;
 
@@ -165,7 +163,7 @@ namespace NHibernate.FlowQuery.Test
         public void CanFilterNotNull()
         {
             var users = Query<UserEntity>()
-                .Where(x => x.LastLoggedInStamp, QIs.Not.Null())
+                .Where(x => x.LastLoggedInStamp, FqIs.Not.Null())
                 .Select()
                 ;
 
@@ -181,7 +179,7 @@ namespace NHibernate.FlowQuery.Test
         public void CanFilterNull()
         {
             var users = Query<UserEntity>()
-                .Where(x => x.LastLoggedInStamp, QIs.Null())
+                .Where(x => x.LastLoggedInStamp, FqIs.Null())
                 .Select()
                 ;
 
@@ -193,7 +191,7 @@ namespace NHibernate.FlowQuery.Test
         public void CanNegateFilter()
         {
             var users = Query<UserEntity>()
-                .Where(x => x.Id, QIs.Not.EqualTo(2))
+                .Where(x => x.Id, FqIs.Not.EqualTo(2))
                 .Select()
                 ;
 
@@ -205,30 +203,19 @@ namespace NHibernate.FlowQuery.Test
             }
         }
 
-        #endregion Methods
-
-
-
-        #region TestEnumerable
-
         public class TestEnumerable : IEnumerable
         {
-            private object[] m_Values;
+            private readonly object[] _values;
 
             public TestEnumerable(params object[] values)
             {
-                m_Values = values;
+                _values = values;
             }
-
-            #region IEnumerable Members
 
             public IEnumerator GetEnumerator()
             {
-                return m_Values.GetEnumerator();
+                return _values.GetEnumerator();
             }
-
-            #endregion
         }
-        #endregion !TestEnumerable
     }
 }

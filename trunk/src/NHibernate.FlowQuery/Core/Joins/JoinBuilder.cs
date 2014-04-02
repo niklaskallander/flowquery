@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Linq.Expressions;
 using NHibernate.Criterion;
 using NHibernate.FlowQuery.Core.Implementors;
@@ -8,17 +9,20 @@ using NHibernate.SqlCommand;
 
 namespace NHibernate.FlowQuery.Core.Joins
 {
-    public class JoinBuilder<TSource, TFlowQuery> : IJoinBuilder<TSource, TFlowQuery>
+    public class JoinBuilder<TSource, TQuery> : IJoinBuilder<TSource, TQuery>
         where TSource : class
-        where TFlowQuery : class, IFlowQuery<TSource, TFlowQuery>
+        where TQuery : class, IFlowQuery<TSource, TQuery>
     {
-        protected internal virtual FlowQueryImplementor<TSource, TFlowQuery> Implementor { get; set; }
+        // ReSharper disable once StaticFieldInGenericType
+        private static readonly System.Type Enumerable = typeof(IEnumerable);
 
-        protected internal virtual TFlowQuery Query { get; set; }
+        protected internal FlowQueryImplementor<TSource, TQuery> Implementor { get; private set; }
 
-        protected internal virtual JoinType JoinType { get; set; }
+        protected internal TQuery Query { get; private set; }
 
-        protected internal JoinBuilder(FlowQueryImplementor<TSource, TFlowQuery> implementor, TFlowQuery query, JoinType joinType)
+        protected internal JoinType JoinType { get; private set; }
+
+        protected internal JoinBuilder(FlowQueryImplementor<TSource, TQuery> implementor, TQuery query, JoinType joinType)
         {
             if (implementor == null)
             {
@@ -30,7 +34,7 @@ namespace NHibernate.FlowQuery.Core.Joins
                 throw new ArgumentNullException("query");
             }
 
-            if (!object.ReferenceEquals(implementor, query))
+            if (!ReferenceEquals(implementor, query))
             {
                 throw new ArgumentException("implementor and query must be the same refence", "query");
             }
@@ -42,17 +46,17 @@ namespace NHibernate.FlowQuery.Core.Joins
             Query = query;
         }
 
-        protected virtual TFlowQuery JoinBaseWithConvention<TAlias>(Expression<Func<TSource, object>> projection, Expression<Func<TAlias>> alias, Expression<Func<bool>> joinOnClause = null, IRevealConvention revealConvention = null)
+        protected virtual TQuery JoinBaseWithConvention<TAlias>(Expression<Func<TSource, object>> projection, Expression<Func<TAlias>> alias, Expression<Func<bool>> joinOnClause = null, IRevealConvention revealConvention = null)
         {
             if (revealConvention == null)
             {
                 revealConvention = Reveal.DefaultConvention ?? new CustomConvention(x => x);
             }
 
-            return JoinBase(Reveal.ByConvention(projection, revealConvention), alias, joinOnClause);
+            return JoinBase(Reveal.ByConvention(projection, revealConvention), alias, Enumerable.IsAssignableFrom(projection.Body.Type), joinOnClause);
         }
 
-        protected virtual TFlowQuery JoinBase<TAlias>(string property, Expression<Func<TAlias>> aliasProjection, Expression<Func<bool>> joinOnClause = null)
+        protected virtual TQuery JoinBase<TAlias>(string property, Expression<Func<TAlias>> aliasProjection, bool isCollection = true, Expression<Func<bool>> joinOnClause = null)
         {
             string alias = ExpressionHelper.GetPropertyName(aliasProjection);
 
@@ -78,12 +82,13 @@ namespace NHibernate.FlowQuery.Core.Joins
 
             if (joinOnClause != null)
             {
-                withCriterion = RestrictionHelper.GetCriterion(joinOnClause, null, Implementor.Aliases);
+                withCriterion = RestrictionHelper.GetCriterion(joinOnClause, null, Implementor.Data);
             }
 
-            Implementor.Joins.Add(new Join()
+            Implementor.Joins.Add(new Join
             {
                 Alias = alias,
+                IsCollection = isCollection,
                 JoinType = JoinType,
                 Property = property,
                 WithClause = withCriterion
@@ -92,39 +97,39 @@ namespace NHibernate.FlowQuery.Core.Joins
             return Query;
         }
 
-        protected virtual TFlowQuery JoinBase<TAlias>(LambdaExpression projection, Expression<Func<TAlias>> alias, Expression<Func<bool>> joinOnClause = null)
+        protected virtual TQuery JoinBase<TAlias>(LambdaExpression projection, Expression<Func<TAlias>> alias, Expression<Func<bool>> joinOnClause = null)
         {
             string property = ExpressionHelper.GetPropertyName(projection.Body, projection.Parameters[0].Name);
 
-            return JoinBase(property, alias, joinOnClause);
+            return JoinBase(property, alias, Enumerable.IsAssignableFrom(projection.Body.Type), joinOnClause);
         }
 
-        public virtual TFlowQuery Join<TAlias>(string property, Expression<Func<TAlias>> alias)
+        public virtual TQuery Join<TAlias>(string property, Expression<Func<TAlias>> alias)
         {
             return JoinBase(property, alias);
         }
 
-        public virtual TFlowQuery Join<TAlias>(string property, Expression<Func<TAlias>> alias, Expression<Func<bool>> joinOnClause)
+        public virtual TQuery Join<TAlias>(string property, Expression<Func<TAlias>> alias, Expression<Func<bool>> joinOnClause)
         {
-            return JoinBase(property, alias, joinOnClause);
+            return JoinBase(property, alias, true, joinOnClause);
         }
 
-        public virtual TFlowQuery Join<TAlias>(Expression<Func<TSource, object>> projection, Expression<Func<TAlias>> alias)
+        public virtual TQuery Join<TAlias>(Expression<Func<TSource, object>> projection, Expression<Func<TAlias>> alias)
         {
             return JoinBase(projection, alias);
         }
 
-        public virtual TFlowQuery Join<TAlias>(Expression<Func<TSource, object>> projection, Expression<Func<TAlias>> alias, Expression<Func<bool>> joinOnClause)
+        public virtual TQuery Join<TAlias>(Expression<Func<TSource, object>> projection, Expression<Func<TAlias>> alias, Expression<Func<bool>> joinOnClause)
         {
             return JoinBase(projection, alias, joinOnClause);
         }
 
-        public virtual TFlowQuery Join<TAlias>(Expression<Func<TSource, object>> projection, Expression<Func<TAlias>> alias, IRevealConvention revealConvention)
+        public virtual TQuery Join<TAlias>(Expression<Func<TSource, object>> projection, Expression<Func<TAlias>> alias, IRevealConvention revealConvention)
         {
             return JoinBaseWithConvention(projection, alias, null, revealConvention);
         }
 
-        public virtual TFlowQuery Join<TAlias>(Expression<Func<TSource, object>> projection, Expression<Func<TAlias>> alias, Expression<Func<bool>> joinOnClause, IRevealConvention revealConvention)
+        public virtual TQuery Join<TAlias>(Expression<Func<TSource, object>> projection, Expression<Func<TAlias>> alias, Expression<Func<bool>> joinOnClause, IRevealConvention revealConvention)
         {
             return JoinBaseWithConvention(projection, alias, joinOnClause, revealConvention);
         }

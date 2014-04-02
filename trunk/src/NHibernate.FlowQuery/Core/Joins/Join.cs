@@ -5,12 +5,14 @@ namespace NHibernate.FlowQuery.Core.Joins
 {
     public class Join
     {
-        public virtual JoinType JoinType { get; set; }
+        public JoinType JoinType { get; set; }
 
-        public virtual string Property { get; set; }
+        public string Property { get; set; }
 
-        public virtual string Alias { get; set; }
+        public string Alias { get; set; }
 
-        public virtual ICriterion WithClause { get; set; }
+        public ICriterion WithClause { get; set; }
+
+        public bool IsCollection { get; set; }
     }
 }

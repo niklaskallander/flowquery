@@ -2,14 +2,15 @@
 using System.Linq.Expressions;
 using NHibernate.Criterion;
 using NHibernate.FlowQuery.Helpers;
+using NHibernate.Metadata;
 
 namespace NHibernate.FlowQuery.Core.Implementors
 {
     public class DetachedFlowQueryImplementor<TSource> : MorphableFlowQueryImplementorBase<TSource, IDetachedFlowQuery<TSource>>, IDetachedFlowQuery<TSource>
         where TSource : class
     {
-        protected internal DetachedFlowQueryImplementor(Func<System.Type, string, ICriteria> criteriaFactory, string alias = null, FlowQueryOptions options = null, IMorphableFlowQuery query = null)
-            : base(criteriaFactory, alias, options, query)
+        protected internal DetachedFlowQueryImplementor(Func<System.Type, string, ICriteria> criteriaFactory, Func<System.Type, IClassMetadata> metaDataFactory, string alias = null, FlowQueryOptions options = null, IMorphableFlowQuery query = null)
+            : base(criteriaFactory, metaDataFactory, alias, options, query)
         { }
 
         public virtual IDetachedFlowQuery<TSource> Count()
@@ -67,7 +68,7 @@ namespace NHibernate.FlowQuery.Core.Implementors
             return base.Indistinct();
         }
 
-        public virtual IDetachedFlowQuery<TSource> Select(params string[] properties)
+        public virtual IDetachedFlowQuery<TSource> Select(string[] properties)
         {
             return Project(properties);
         }
@@ -84,7 +85,7 @@ namespace NHibernate.FlowQuery.Core.Implementors
 
         public virtual DetachedCriteria Criteria
         {
-            get { return CriteriaHelper.BuildDetachedCriteria<TSource>(this); }
+            get { return CriteriaHelper.BuildDetachedCriteria(this); }
         }
 
         public virtual IDetachedFlowQuery<TSource> SetRootAlias<TAlias>(Expression<Func<TAlias>> alias)
@@ -100,6 +101,11 @@ namespace NHibernate.FlowQuery.Core.Implementors
             Aliases.Add(rootAliasName, rootAliasName);
 
             return this;
+        }
+
+        IDetachedFlowQuery<TSource> IDetachedFlowQuery<TSource>.Copy()
+        {
+            return new DetachedFlowQueryImplementor<TSource>(CriteriaFactory, MetaDataFactory, Alias, Options, this);
         }
 
         IDelayedFlowQuery<TSource> IDetachedFlowQuery<TSource>.Delayed()

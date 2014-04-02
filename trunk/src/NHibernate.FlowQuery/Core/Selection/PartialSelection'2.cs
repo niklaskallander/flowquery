@@ -8,9 +8,9 @@ namespace NHibernate.FlowQuery.Core.Selection
     public class PartialSelection<TSource, TDestination>
         where TSource : class
     {
-        private List<Expression<Func<TSource, TDestination>>> m_Expressions;
+        private readonly List<Expression<Func<TSource, TDestination>>> _expressions;
 
-        private PartialSelectionBuilder<TSource, TDestination> m_Builder;
+        private readonly PartialSelectionBuilder<TSource, TDestination> _builder;
 
         public PartialSelection(PartialSelectionBuilder<TSource, TDestination> builder)
         {
@@ -19,18 +19,18 @@ namespace NHibernate.FlowQuery.Core.Selection
                 throw new ArgumentNullException("builder");
             }
 
-            m_Builder = builder;
+            _builder = builder;
 
-            m_Expressions = new List<Expression<Func<TSource, TDestination>>>();
+            _expressions = new List<Expression<Func<TSource, TDestination>>>();
         }
 
         public virtual PartialSelection<TSource, TDestination> Add(Expression<Func<TSource, TDestination>> expression)
         {
             if (expression != null)
             {
-                if (expression.Body.NodeType == ExpressionType.MemberInit || (m_Expressions.Count == 0 && expression.Body.NodeType == ExpressionType.New))
+                if (expression.Body.NodeType == ExpressionType.MemberInit || (_expressions.Count == 0 && expression.Body.NodeType == ExpressionType.New))
                 {
-                    m_Expressions.Add(expression);
+                    _expressions.Add(expression);
                 }
             }
 
@@ -39,14 +39,14 @@ namespace NHibernate.FlowQuery.Core.Selection
 
         public virtual int Count
         {
-            get { return m_Expressions.Count; }
+            get { return _expressions.Count; }
         }
 
         public virtual Expression<Func<TSource, TDestination>> Compile()
         {
             if (Count > 0)
             {
-                return ExpressionHelper.Combine(m_Expressions.ToArray());
+                return ExpressionHelper.Combine(_expressions.ToArray());
             }
 
             return null;
@@ -54,7 +54,7 @@ namespace NHibernate.FlowQuery.Core.Selection
 
         public virtual FlowQuerySelection<TDestination> Select()
         {
-            return m_Builder(this);
+            return _builder(this);
         }
     }
 }

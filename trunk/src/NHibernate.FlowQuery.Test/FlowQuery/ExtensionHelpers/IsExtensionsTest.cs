@@ -1,5 +1,7 @@
+// ReSharper disable CSharpWarnings::CS0618
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using NHibernate.FlowQuery.ExtensionHelpers;
 using NHibernate.FlowQuery.Test.Setup.Entities;
@@ -7,14 +9,11 @@ using NUnit.Framework;
 
 namespace NHibernate.FlowQuery.Test.FlowQuery.ExtensionHelpers
 {
-    using System.Collections.Generic;
     using Is = NUnit.Framework.Is;
 
     [TestFixture]
     public class IsExtensionsTest : BaseTest
     {
-        #region Methods (22)
-
         [Test]
         public void CanPerformIsBetween()
         {
@@ -106,10 +105,10 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.ExtensionHelpers
         }
 
         [Test]
-        public void CanPerformIsInWithSubQuery()
+        public void CanPerformIsInWithSubquery()
         {
             var ids = Query<UserEntity>()
-                .Where(u => u.Id.IsIn(Query<UserEntity>().Detached().Where(x => x.Id == 3).Select(x => x.Id)))
+                .Where(u => u.Id.IsIn(DetachedQuery<UserEntity>().Where(x => x.Id == 3).Select(x => x.Id)))
                 .Select(u => u.Id)
                 ;
 
@@ -192,90 +191,80 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.ExtensionHelpers
         [Test]
         public void IsBetweenThrowsWhenCalledOutsideLambdaExpression()
         {
-            Assert.That(() => { "".IsBetween("", ""); }, Throws.InstanceOf<InvalidOperationException>());
+            Assert.That(() => "".IsBetween("", ""), Throws.InstanceOf<InvalidOperationException>());
         }
 
         [Test]
         public void IsEqualToThrowsWhenCalledOutsideLambdaExpression()
         {
-            Assert.That(() => { "".IsEqualTo(""); }, Throws.InstanceOf<InvalidOperationException>());
+            Assert.That(() => "".IsEqualTo(""), Throws.InstanceOf<InvalidOperationException>());
         }
 
         [Test]
         public void IsGreaterThanOrEqualToThrowsWhenCalledOutsideLambdaExpression()
         {
-            Assert.That(() => { "".IsGreaterThanOrEqualTo(""); }, Throws.InstanceOf<InvalidOperationException>());
+            Assert.That(() => "".IsGreaterThanOrEqualTo(""), Throws.InstanceOf<InvalidOperationException>());
         }
 
         [Test]
         public void IsGreaterThanThrowsWhenCalledOutsideLambdaExpression()
         {
-            Assert.That(() => { "".IsGreaterThan(""); }, Throws.InstanceOf<InvalidOperationException>());
+            Assert.That(() => "".IsGreaterThan(""), Throws.InstanceOf<InvalidOperationException>());
         }
 
         [Test]
         public void IsInThrowsWhenCalledOutsideLambdaExpression()
         {
-            Assert.That(() => { "".IsIn(""); }, Throws.InstanceOf<InvalidOperationException>());
-            Assert.That(() => { 2.IsIn(1, 2, 3); }, Throws.InstanceOf<InvalidOperationException>());
-            Assert.That(() => { 2.IsIn(new List<int>()); }, Throws.InstanceOf<InvalidOperationException>());
-            Assert.That(() => { "".IsIn(Query<UserEntity>().Detached()); }, Throws.InstanceOf<InvalidOperationException>());
+            Assert.That(() => "".IsIn(""), Throws.InstanceOf<InvalidOperationException>());
+            Assert.That(() => 2.IsIn(1, 2, 3), Throws.InstanceOf<InvalidOperationException>());
+            Assert.That(() => 2.IsIn(new List<int>()), Throws.InstanceOf<InvalidOperationException>());
+            Assert.That(() => "".IsIn(DetachedQuery<UserEntity>()), Throws.InstanceOf<InvalidOperationException>());
         }
 
         [Test]
         public void IsLessThanOrEqualToThrowsWhenCalledOutsideLambdaExpression()
         {
-            Assert.That(() => { "".IsLessThanOrEqualTo(""); }, Throws.InstanceOf<InvalidOperationException>());
+            Assert.That(() => "".IsLessThanOrEqualTo(""), Throws.InstanceOf<InvalidOperationException>());
         }
 
         [Test]
         public void IsLessThanThrowsWhenCalledOutsideLambdaExpression()
         {
-            Assert.That(() => { "".IsLessThan(""); }, Throws.InstanceOf<InvalidOperationException>());
+            Assert.That(() => "".IsLessThan(""), Throws.InstanceOf<InvalidOperationException>());
         }
 
         [Test]
         public void IsLikeThrowsWhenCalledOutsideLambdaExpression()
         {
-            Assert.That(() => { "".IsLike(""); }, Throws.InstanceOf<InvalidOperationException>());
+            Assert.That(() => "".IsLike(""), Throws.InstanceOf<InvalidOperationException>());
         }
 
         [Test]
         public void IsNotNullThrowsWhenCalledOutsideLambdaExpression()
         {
-            Assert.That(() => { "".IsNotNull(); }, Throws.InstanceOf<InvalidOperationException>());
+            Assert.That(() => "".IsNotNull(), Throws.InstanceOf<InvalidOperationException>());
         }
 
         [Test]
         public void IsNullThrowsWhenCalledOutsideLambdaExpression()
         {
-            Assert.That(() => { "".IsNull(); }, Throws.InstanceOf<InvalidOperationException>());
+            Assert.That(() => "".IsNull(), Throws.InstanceOf<InvalidOperationException>());
         }
-
-        #endregion Methods
-
-
-
-        #region TestEnumerable
 
         public class TestEnumerable : IEnumerable
         {
-            private object[] m_Values;
+            private readonly object[] _values;
 
             public TestEnumerable(params object[] values)
             {
-                m_Values = values;
+                _values = values;
             }
-
-            #region IEnumerable Members
 
             public IEnumerator GetEnumerator()
             {
-                return m_Values.GetEnumerator();
+                return _values.GetEnumerator();
             }
-
-            #endregion
         }
-        #endregion !TestEnumerable
     }
 }
+// ReSharper restore CSharpWarnings::CS0618

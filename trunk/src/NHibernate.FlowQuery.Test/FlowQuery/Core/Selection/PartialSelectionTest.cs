@@ -4,6 +4,7 @@ using NHibernate.FlowQuery.Test.Setup.Dtos;
 using NHibernate.FlowQuery.Test.Setup.Entities;
 using NUnit.Framework;
 
+// ReSharper disable ExpressionIsAlwaysNull
 namespace NHibernate.FlowQuery.Test.FlowQuery.Core.Selection
 {
     using Is = NUnit.Framework.Is;
@@ -14,23 +15,13 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.Selection
         [Test]
         public void PartialSelectionThrowsIfBuilderIsNull()
         {
-            Assert.That(() =>
-                        {
-                            new PartialSelection<UserEntity, UserDto>(null);
-
-                        }, Throws.InstanceOf<ArgumentNullException>());
+            Assert.That(() => new PartialSelection<UserEntity, UserDto>(null), Throws.InstanceOf<ArgumentNullException>());
         }
 
         [Test]
         public void PartialSelectionThrowsIfSelectionIsEmpty()
         {
-            Assert.That(() =>
-                        {
-                            Query<UserEntity>()
-                                .PartialSelect<UserDto>()
-                                    .Select();
-
-                        }, Throws.ArgumentException);
+            Assert.That(() => DummyQuery<UserEntity>().PartialSelect<UserDto>().Select(), Throws.ArgumentException);
         }
 
         [Test]
@@ -38,18 +29,13 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.Selection
         {
             PartialSelection<UserEntity, UserDto> selection = null;
 
-            Assert.That(() =>
-                        {
-                            Query<UserEntity>()
-                                .Select(selection);
-
-                        }, Throws.InstanceOf<ArgumentNullException>());
+            Assert.That(() => DummyQuery<UserEntity>().Select(selection), Throws.InstanceOf<ArgumentNullException>());
         }
 
         [Test]
         public void PartialSelectionReturnsNullAtCompileIfEmpty()
         {
-            var selection = Query<UserEntity>()
+            var selection = DummyQuery<UserEntity>()
                 .PartialSelect<UserDto>();
 
             var expression = selection.Compile();

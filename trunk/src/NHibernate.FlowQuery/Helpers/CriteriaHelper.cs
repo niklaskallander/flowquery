@@ -1,23 +1,85 @@
 ﻿using System;
+using System.Linq;
 using NHibernate.Criterion;
 using NHibernate.FlowQuery.Core;
+using NHibernate.FlowQuery.Core.CustomProjections;
 using NHibernate.FlowQuery.Core.Joins;
+using NHibernate.FlowQuery.Core.Locks;
 
 namespace NHibernate.FlowQuery.Helpers
 {
     public static class CriteriaHelper
     {
+        private static IProjection GetProjection(IMorphableFlowQuery query)
+        {
+            IProjection queryProjection = query.Projection;
+
+            var projectionList = queryProjection as ProjectionList;
+
+            bool isAggregate = query.GroupBys.Count > 0;
+
+            if (projectionList != null || isAggregate)
+            {
+                var newList = new FqProjectionList();
+
+                if (projectionList != null)
+                {
+                    for (int i = 0; i < projectionList.Length; i++)
+                    {
+                        IProjection projection = projectionList[i];
+
+                        isAggregate = isAggregate || projection.IsAggregate || projection.IsGrouped;
+                    }
+
+                    for (int i = 0; i < projectionList.Length; i++)
+                    {
+                        IProjection projection = projectionList[i];
+
+                        if (isAggregate)
+                        {
+                            if (!projection.IsAggregate && !projection.IsGrouped)
+                            {
+                                var alias = projection as FqAliasProjection;
+
+                                if (alias == null || !(alias.Projection is SubqueryProjection))
+                                {
+                                    projection = Projections.GroupProperty(projection);
+                                }
+                            }
+                        }
+
+                        newList.Add(projection);
+                    }
+                }
+                else
+                {
+                    newList.Add(query.Projection);
+                }
+
+                foreach (var projection in query.GroupBys)
+                {
+                    newList.Add(projection);
+                }
+
+                queryProjection = newList;
+            }
+
+            return query.IsDistinct
+                ? Projections.Distinct(queryProjection)
+                : queryProjection;
+        }
+
         public static DetachedCriteria BuildDetachedCriteria<TSource>(IDetachedFlowQuery<TSource> query)
             where TSource : class
         {
-            IMorphableFlowQuery options = query as IMorphableFlowQuery;
+            var options = query as IMorphableFlowQuery;
 
             if (options == null)
             {
                 return null;
             }
 
-            DetachedCriteria criteria = DetachedCriteria.For<TSource>();
+            DetachedCriteria criteria = DetachedCriteria.For<TSource>(options.Alias);
 
             foreach (Join join in options.Joins)
             {
@@ -27,6 +89,18 @@ namespace NHibernate.FlowQuery.Helpers
             foreach (ICriterion criterion in options.Criterions)
             {
                 criteria.Add(criterion);
+            }
+
+            foreach (Lock fqLock in options.Locks)
+            {
+                if (fqLock.Alias == null)
+                {
+                    criteria.SetLockMode(fqLock.LockMode);
+                }
+                else
+                {
+                    criteria.SetLockMode(fqLock.Alias, fqLock.LockMode);
+                }
             }
 
             bool skips = options.ResultsToSkip.HasValue && options.ResultsToSkip.Value > 0;
@@ -43,12 +117,25 @@ namespace NHibernate.FlowQuery.Helpers
                 criteria.SetMaxResults(options.ResultsToTake.Value);
             }
 
+            if (options.IsCacheable)
+            {
+                criteria.SetCacheable(true);
+
+                if (options.CacheMode.HasValue)
+                {
+                    criteria.SetCacheMode(options.CacheMode.Value);
+                }
+
+                if (!string.IsNullOrEmpty(options.CacheRegion))
+                {
+                    criteria.SetCacheRegion(options.CacheRegion);
+                }
+            }
+
             criteria
                 .SetProjection
                 (
-                    options.IsDistinct
-                        ? Projections.Distinct(options.Projection)
-                        : options.Projection
+                    GetProjection(options)
                 );
 
             if (options.ResultTransformer != null)
@@ -85,6 +172,23 @@ namespace NHibernate.FlowQuery.Helpers
                 query.Options.Use(criteria);
             }
 
+            // remove fetch duplicates created by aliasing
+            var fetches = query.Fetches
+                .Select
+                (
+                    x => new
+                    {
+                        x.Path,
+                        x.FetchMode
+                    }
+                )
+                .Distinct();
+
+            foreach (var fetch in fetches)
+            {
+                criteria.SetFetchMode(fetch.Path, fetch.FetchMode);
+            }
+
             foreach (Join join in query.Joins)
             {
                 criteria.CreateAlias(join.Property, join.Alias, join.JoinType, join.WithClause);
@@ -93,6 +197,18 @@ namespace NHibernate.FlowQuery.Helpers
             foreach (ICriterion criterion in query.Criterions)
             {
                 criteria.Add(criterion);
+            }
+
+            foreach (Lock fqLock in query.Locks)
+            {
+                if (fqLock.Alias == null)
+                {
+                    criteria.SetLockMode(fqLock.LockMode);
+                }
+                else
+                {
+                    criteria.SetLockMode(fqLock.Alias, fqLock.LockMode);
+                }
             }
 
             if (query.ResultsToSkip.HasValue)
@@ -105,13 +221,46 @@ namespace NHibernate.FlowQuery.Helpers
                 criteria.SetMaxResults(query.ResultsToTake.Value);
             }
 
+            if (query.IsCacheable)
+            {
+                criteria.SetCacheable(true);
+
+                if (query.CacheMode.HasValue)
+                {
+                    criteria.SetCacheMode(query.CacheMode.Value);
+                }
+
+                if (!string.IsNullOrEmpty(query.CacheRegion))
+                {
+                    criteria.SetCacheRegion(query.CacheRegion);
+                }
+            }
+
+            if (query.IsReadOnly.HasValue)
+            {
+                criteria.SetReadOnly(query.IsReadOnly.Value);
+            }
+
+            if (query.CommentValue != null)
+            {
+                criteria.SetComment(query.CommentValue);
+            }
+
+            if (query.FetchSizeValue > 0)
+            {
+                criteria.SetFetchSize(query.FetchSizeValue);
+            }
+
             criteria
                 .SetProjection
                 (
-                    query.IsDistinct
-                        ? Projections.Distinct(query.Projection)
-                        : query.Projection
+                    GetProjection(query)
                 );
+
+            if (query.TimeoutValue.HasValue)
+            {
+                criteria.SetTimeout(query.TimeoutValue.Value);
+            }
 
             if (query.ResultTransformer != null)
             {
@@ -138,7 +287,7 @@ namespace NHibernate.FlowQuery.Helpers
                             throw new InvalidOperationException("unable to order by a projection property that is not projected into by the query");
                         }
 
-                        criteria.AddOrder(new Order(query.Mappings[statement.Property], statement.OrderAscending));
+                        criteria.AddOrder(new Order(statement.Property, statement.OrderAscending));
                     }
                 }
             }

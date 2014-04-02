@@ -4,15 +4,13 @@ using NHibernate.FlowQuery.Revealing.Conventions;
 using NHibernate.FlowQuery.Test.Setup.Entities;
 using NUnit.Framework;
 
-namespace NHibernate.FlowQuery.Test
+namespace NHibernate.FlowQuery.Test.FlowQuery
 {
     using Is = NUnit.Framework.Is;
 
     [TestFixture]
     public class RevealTest
     {
-        #region Methods (23)
-
         [Test]
         public void CanCreateRevealerUsingConventionDelegate()
         {
@@ -144,7 +142,7 @@ namespace NHibernate.FlowQuery.Test
         [Test]
         public void CanRevealWithoutSpecifyingDefaultConvention()
         {
-            Assert.That(() => { Reveal.ByConvention<UserEntity>(x => x.Password); }, Throws.Nothing);
+            Assert.That(() => Reveal.ByConvention<UserEntity>(x => x.Password), Throws.Nothing);
         }
 
         [Test]
@@ -179,7 +177,8 @@ namespace NHibernate.FlowQuery.Test
         [Test]
         public void CustomConventionThrowsWhenAttemptingToInstantiateItWithNullAsConventionDelegate()
         {
-            Assert.That(() => { new CustomConvention(null); }, Throws.InstanceOf<ArgumentNullException>());
+            // ReSharper disable once ObjectCreationAsStatement
+            Assert.That(() => new CustomConvention(null), Throws.InstanceOf<ArgumentNullException>());
         }
 
         [Test]
@@ -187,11 +186,13 @@ namespace NHibernate.FlowQuery.Test
         {
             IRevealConvention c = null;
 
-            Assert.That(() => { Reveal.SetDefaultConvention(c); }, Throws.InstanceOf<ArgumentNullException>());
+            // ReSharper disable once ExpressionIsAlwaysNull
+            Assert.That(() => Reveal.SetDefaultConvention(c), Throws.InstanceOf<ArgumentNullException>());
 
             Func<string, string> d = null;
 
-            Assert.That(() => { Reveal.SetDefaultConvention(d); }, Throws.InstanceOf<ArgumentNullException>());
+            // ReSharper disable once ExpressionIsAlwaysNull
+            Assert.That(() => Reveal.SetDefaultConvention(d), Throws.InstanceOf<ArgumentNullException>());
         }
 
         [TearDown]
@@ -205,7 +206,5 @@ namespace NHibernate.FlowQuery.Test
         {
             Assert.That(Reveal.ByConvention<UserEntity>(x => x.Password), Is.EqualTo("m_Password"));
         }
-
-        #endregion Methods
     }
 }
