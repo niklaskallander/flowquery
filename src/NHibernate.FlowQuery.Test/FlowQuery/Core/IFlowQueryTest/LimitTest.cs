@@ -1,10 +1,11 @@
-using System.Linq;
-using NHibernate.FlowQuery.Test.Setup.Entities;
-using NUnit.Framework;
-
 namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
 {
-    using Is = NUnit.Framework.Is;
+    using System.Linq;
+
+    using NHibernate.FlowQuery.Core;
+    using NHibernate.FlowQuery.Test.Setup.Entities;
+
+    using NUnit.Framework;
 
     [TestFixture]
     public class LimitTest : BaseTest
@@ -12,10 +13,9 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         [Test]
         public void CanConstrainFirstResultWithLimit()
         {
-            var users = Query<UserEntity>()
+            FlowQuerySelection<UserEntity> users = Query<UserEntity>()
                 .Limit(2, 1)
-                .Select()
-                ;
+                .Select();
 
             Assert.That(users.Count(), Is.EqualTo(2));
             Assert.That(users.First().Id, Is.EqualTo(2));
@@ -24,10 +24,9 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         [Test]
         public void CanConstrainFirstResultWithSkip()
         {
-            var users = Query<UserEntity>()
+            FlowQuerySelection<UserEntity> users = Query<UserEntity>()
                 .Skip(1)
-                .Select()
-                ;
+                .Select();
 
             Assert.That(users.First().Id, Is.EqualTo(2));
         }
@@ -35,10 +34,9 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         [Test]
         public void CanConstrainMaxResultsWithLimit()
         {
-            var users = Query<UserEntity>()
+            FlowQuerySelection<UserEntity> users = Query<UserEntity>()
                 .Limit(2)
-                .Select()
-                ;
+                .Select();
 
             Assert.That(users.Count(), Is.EqualTo(2));
         }
@@ -46,10 +44,9 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         [Test]
         public void CanConstrainMaxResultsWithTake()
         {
-            var users = Query<UserEntity>()
+            FlowQuerySelection<UserEntity> users = Query<UserEntity>()
                 .Take(2)
-                .Select()
-                ;
+                .Select();
 
             Assert.That(users.Count(), Is.EqualTo(2));
         }

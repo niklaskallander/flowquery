@@ -1,38 +1,34 @@
-﻿using NHibernate.FlowQuery.Helpers;
-
-namespace NHibernate.FlowQuery.AutoMapping
+﻿namespace NHibernate.FlowQuery.AutoMapping
 {
+    using System;
+
+    using NHibernate.FlowQuery.Helpers;
+
+    /// <summary>
+    ///     The default mapper used by FlowQuery.
+    /// </summary>
     public class DefaultMapper : IMapper
     {
-        protected virtual TDestination Map<TSource, TDestination>(TSource source)
+        /// <inheritdoc />
+        public virtual TDestination Map<TSource, TDestination>(TSource source)
             where TDestination : new()
         {
-            string[] properties = ReflectionHelper.GetNamesFromPublicToPublicTypeToTypeMappableProperties<TSource, TDestination>();
+            string[] properties = ReflectionHelper
+                .GetNamesFromPublicToPublicTypeToTypeMappableProperties<TSource, TDestination>();
 
-            System.Type rType = typeof(TDestination);
-            System.Type sType = typeof(TSource);
+            Type destinationType = typeof(TDestination);
+            Type sourceType = typeof(TSource);
 
-            TDestination item = new TDestination();
+            var item = new TDestination();
 
             foreach (string property in properties)
             {
-                object value = sType.GetProperty(property).GetValue(source, null);
+                object value = sourceType.GetProperty(property).GetValue(source, null);
 
-                rType.GetProperty(property).SetValue(item, value, null);
+                destinationType.GetProperty(property).SetValue(item, value, null);
             }
 
             return item;
         }
-
-
-
-        #region IMapper Members
-
-        TDestination IMapper.Map<TSource, TDestination>(TSource source)
-        {
-            return Map<TSource, TDestination>(source);
-        }
-
-        #endregion
     }
 }

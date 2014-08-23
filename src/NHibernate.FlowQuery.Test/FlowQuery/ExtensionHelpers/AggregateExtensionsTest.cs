@@ -1,11 +1,12 @@
-using System;
-using NHibernate.FlowQuery.ExtensionHelpers;
-using NHibernate.FlowQuery.Test.Setup.Entities;
-using NUnit.Framework;
-
 namespace NHibernate.FlowQuery.Test.FlowQuery.ExtensionHelpers
 {
-    using Is = NUnit.Framework.Is;
+    using System;
+
+    using NHibernate.FlowQuery.Core;
+    using NHibernate.FlowQuery.ExtensionHelpers;
+    using NHibernate.FlowQuery.Test.Setup.Entities;
+
+    using NUnit.Framework;
 
     [TestFixture]
     public class AggregateExtensionsTest : BaseTest
@@ -13,19 +14,18 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.ExtensionHelpers
         [Test]
         public void AverageThrowsWhenCalledOutsideLambdaExpression()
         {
-            Assert.That(() => "".Average(), Throws.InstanceOf<InvalidOperationException>());
+            Assert.That(() => string.Empty.Average(), Throws.InstanceOf<InvalidOperationException>());
         }
 
         [Test]
         public void CanAggregateAverage()
         {
-            var avgs = Query<UserEntity>()
-                .Select(u => (int)u.Id.Average())
-                ;
+            FlowQuerySelection<int> avgs = Query<UserEntity>()
+                .Select(u => (int)u.Id.Average());
 
             Assert.That(avgs, Is.Not.Empty);
 
-            foreach (var avg in avgs)
+            foreach (int avg in avgs)
             {
                 Assert.That(avg, Is.EqualTo(2));
             }
@@ -34,13 +34,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.ExtensionHelpers
         [Test]
         public void CanAggregateCount()
         {
-            var counts = Query<UserEntity>()
-                .Select(u => u.Id.Count())
-                ;
+            FlowQuerySelection<int> counts = Query<UserEntity>()
+                .Select(u => u.Id.Count());
 
             Assert.That(counts, Is.Not.Empty);
 
-            foreach (var count in counts)
+            foreach (int count in counts)
             {
                 Assert.That(count, Is.EqualTo(4));
             }
@@ -49,13 +48,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.ExtensionHelpers
         [Test]
         public void CanAggregateDistinctCount()
         {
-            var counts = Query<UserEntity>()
-                .Select(u => u.Setting.Id.CountDistinct())
-                ;
+            FlowQuerySelection<int> counts = Query<UserEntity>()
+                .Select(u => u.Setting.Id.CountDistinct());
 
             Assert.That(counts, Is.Not.Empty);
 
-            foreach (var count in counts)
+            foreach (int count in counts)
             {
                 Assert.That(count, Is.EqualTo(1));
             }
@@ -67,7 +65,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.ExtensionHelpers
             var counts = Query<UserEntity>()
                 .Select(u => new
                 {
-                    Count = u.Id.Count(),
+                    Count = u.Id.Count(), 
                     Username = u.Username.GroupBy()
                 });
 
@@ -82,13 +80,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.ExtensionHelpers
         [Test]
         public void CanAggregateMax()
         {
-            var maxs = Query<UserEntity>()
-                .Select(u => u.Id.Max())
-                ;
+            FlowQuerySelection<long> maxs = Query<UserEntity>()
+                .Select(u => u.Id.Max());
 
             Assert.That(maxs, Is.Not.Empty);
 
-            foreach (var max in maxs)
+            foreach (long max in maxs)
             {
                 Assert.That(max, Is.EqualTo(4));
             }
@@ -97,13 +94,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.ExtensionHelpers
         [Test]
         public void CanAggregateMin()
         {
-            var mins = Query<UserEntity>()
-                .Select(u => u.Id.Min())
-                ;
+            FlowQuerySelection<long> mins = Query<UserEntity>()
+                .Select(u => u.Id.Min());
 
             Assert.That(mins, Is.Not.Empty);
 
-            foreach (var min in mins)
+            foreach (long min in mins)
             {
                 Assert.That(min, Is.EqualTo(1));
             }
@@ -112,13 +108,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.ExtensionHelpers
         [Test]
         public void CanAggregateSum()
         {
-            var sums = Query<UserEntity>()
-                .Select(u => u.Id.Sum())
-                ;
+            FlowQuerySelection<long> sums = Query<UserEntity>()
+                .Select(u => u.Id.Sum());
 
             Assert.That(sums, Is.Not.Empty);
 
-            foreach (var sum in sums)
+            foreach (long sum in sums)
             {
                 Assert.That(sum, Is.EqualTo(10));
             }
@@ -127,37 +122,37 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.ExtensionHelpers
         [Test]
         public void CountDistinctThrowsWhenCalledOutsideLambdaExpression()
         {
-            Assert.That(() => "".CountDistinct(), Throws.InstanceOf<InvalidOperationException>());
+            Assert.That(() => string.Empty.CountDistinct(), Throws.InstanceOf<InvalidOperationException>());
         }
 
         [Test]
         public void CountThrowsWhenCalledOutsideLambdaExpression()
         {
-            Assert.That(() => "".Count(), Throws.InstanceOf<InvalidOperationException>());
+            Assert.That(() => string.Empty.Count(), Throws.InstanceOf<InvalidOperationException>());
         }
 
         [Test]
         public void GroupByThrowsWhenCalledOutsideLambdaExpression()
         {
-            Assert.That(() => "".GroupBy(), Throws.InstanceOf<InvalidOperationException>());
+            Assert.That(() => string.Empty.GroupBy(), Throws.InstanceOf<InvalidOperationException>());
         }
 
         [Test]
         public void MaxThrowsWhenCalledOutsideLambdaExpression()
         {
-            Assert.That(() => "".Max(), Throws.InstanceOf<InvalidOperationException>());
+            Assert.That(() => string.Empty.Max(), Throws.InstanceOf<InvalidOperationException>());
         }
 
         [Test]
         public void MinThrowsWhenCalledOutsideLambdaExpression()
         {
-            Assert.That(() => "".Min(), Throws.InstanceOf<InvalidOperationException>());
+            Assert.That(() => string.Empty.Min(), Throws.InstanceOf<InvalidOperationException>());
         }
 
         [Test]
         public void SumThrowsWhenCalledOutsideLambdaExpression()
         {
-            Assert.That(() => "".Sum(), Throws.InstanceOf<InvalidOperationException>());
+            Assert.That(() => string.Empty.Sum(), Throws.InstanceOf<InvalidOperationException>());
         }
     }
 }

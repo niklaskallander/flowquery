@@ -1,12 +1,14 @@
-using System.Linq;
-using NHibernate.Criterion;
-using NHibernate.Engine;
-using NHibernate.FlowQuery.Test.Setup.Entities;
-using NUnit.Framework;
-
 namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
 {
-    using Is = NUnit.Framework.Is;
+    using System;
+    using System.Linq;
+
+    using NHibernate.Criterion;
+    using NHibernate.Engine;
+    using NHibernate.FlowQuery.Core;
+    using NHibernate.FlowQuery.Test.Setup.Entities;
+
+    using NUnit.Framework;
 
     [TestFixture]
     public class DelayedCountTest : BaseTest
@@ -14,16 +16,14 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         [Test]
         public void CanCountDistinctOnProperty()
         {
-            var userCount = Query<UserEntity>()
+            Lazy<int> userCount = Query<UserEntity>()
                 .Delayed()
                 .Distinct()
-                .Count(u => u.IsOnline)
-                ;
+                .Count(u => u.IsOnline);
 
-            var users = Query<UserEntity>()
+            FlowQuerySelection<UserEntity> users = Query<UserEntity>()
                 .Delayed()
-                .Select()
-                ;
+                .Select();
 
             var sessionImpl = (ISessionImplementor)Session;
 
@@ -40,16 +40,14 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         [Test]
         public void CanCountDistinctOnPropertyUsingString()
         {
-            var userCount = Query<UserEntity>()
+            Lazy<int> userCount = Query<UserEntity>()
                 .Delayed()
                 .Distinct()
-                .Count("IsOnline")
-                ;
+                .Count("IsOnline");
 
-            var users = Query<UserEntity>()
+            FlowQuerySelection<UserEntity> users = Query<UserEntity>()
                 .Delayed()
-                .Select()
-                ;
+                .Select();
 
             var sessionImpl = (ISessionImplementor)Session;
 
@@ -66,15 +64,13 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         [Test]
         public void CanCountLongOnStar()
         {
-            var userCount = Query<UserEntity>()
+            Lazy<long> userCount = Query<UserEntity>()
                 .Delayed()
-                .CountLong()
-                ;
+                .CountLong();
 
-            var users = Query<UserEntity>()
+            FlowQuerySelection<UserEntity> users = Query<UserEntity>()
                 .Delayed()
-                .Select()
-                ;
+                .Select();
 
             var sessionImpl = (ISessionImplementor)Session;
 
@@ -91,15 +87,13 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         [Test]
         public void CanCountOnProjection()
         {
-            var userCount = Query<UserEntity>()
+            Lazy<int> userCount = Query<UserEntity>()
                 .Delayed()
-                .Count(Projections.Distinct(Projections.Property("IsOnline")))
-                ;
+                .Count(Projections.Distinct(Projections.Property("IsOnline")));
 
-            var users = Query<UserEntity>()
+            FlowQuerySelection<UserEntity> users = Query<UserEntity>()
                 .Delayed()
-                .Select()
-                ;
+                .Select();
 
             var sessionImpl = (ISessionImplementor)Session;
 
@@ -116,15 +110,13 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         [Test]
         public void CanCountOnProperty()
         {
-            var userCount = Query<UserEntity>()
+            Lazy<int> userCount = Query<UserEntity>()
                 .Delayed()
-                .Count(u => u.IsOnline)
-                ;
+                .Count(u => u.IsOnline);
 
-            var users = Query<UserEntity>()
+            FlowQuerySelection<UserEntity> users = Query<UserEntity>()
                 .Delayed()
-                .Select()
-                ;
+                .Select();
 
             var sessionImpl = (ISessionImplementor)Session;
 
@@ -142,15 +134,13 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         [Test]
         public void CanCountOnPropertyUsingString()
         {
-            var userCount = Query<UserEntity>()
+            Lazy<int> userCount = Query<UserEntity>()
                 .Delayed()
-                .Count("IsOnline")
-                ;
+                .Count("IsOnline");
 
-            var users = Query<UserEntity>()
+            FlowQuerySelection<UserEntity> users = Query<UserEntity>()
                 .Delayed()
-                .Select()
-                ;
+                .Select();
 
             var sessionImpl = (ISessionImplementor)Session;
 
@@ -168,15 +158,13 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         [Test]
         public void CanCountOnStar()
         {
-            var userCount = Query<UserEntity>()
+            Lazy<int> userCount = Query<UserEntity>()
                 .Delayed()
-                .Count()
-                ;
+                .Count();
 
-            var users = Query<UserEntity>()
+            FlowQuerySelection<UserEntity> users = Query<UserEntity>()
                 .Delayed()
-                .Select()
-                ;
+                .Select();
 
             var sessionImpl = (ISessionImplementor)Session;
 

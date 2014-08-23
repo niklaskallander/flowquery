@@ -1,11 +1,13 @@
-﻿using System.Linq;
-using NHibernate.Engine;
-using NHibernate.FlowQuery.Test.Setup.Entities;
-using NUnit.Framework;
-
-namespace NHibernate.FlowQuery.Test.FlowQuery.Documentation
+﻿namespace NHibernate.FlowQuery.Test.FlowQuery.Documentation
 {
-    using Is = NUnit.Framework.Is;
+    using System;
+    using System.Linq;
+
+    using NHibernate.Engine;
+    using NHibernate.FlowQuery.Core;
+    using NHibernate.FlowQuery.Test.Setup.Entities;
+
+    using NUnit.Framework;
 
     [TestFixture]
     public class InterchangeabilityTest : BaseTest
@@ -13,13 +15,13 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Documentation
         [Test]
         public void DefinitionExample1()
         {
-            var query = Session.FlowQuery<UserEntity>()
+            IDelayedFlowQuery<UserEntity> query = Session.FlowQuery<UserEntity>()
                 .Delayed()
                 .Where(x => x.IsOnline);
 
-            var count = query.Count();
+            Lazy<int> count = query.Count();
 
-            var users = query
+            FlowQuerySelection<UserEntity> users = query
                 .Take(10)
                 .Select();
 
@@ -38,49 +40,9 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Documentation
         }
 
         [Test]
-        public void ReusabilityMechanismsCopy()
-        {
-            var baseQuery = Session.DelayedFlowQuery<UserEntity>()
-                .Where(x => x.IsOnline)
-                .OrderBy(x => x.Username);
-
-            var onlineAdministrators = baseQuery
-                .Copy()
-                .Where(x => x.Role == RoleEnum.Administrator)
-                .Select();
-
-            var onlineNonAdministrators = baseQuery
-                .Copy()
-                .Where(x => x.Role != RoleEnum.Administrator)
-                .Select();
-
-            Assert.That(onlineAdministrators.Count(), Is.EqualTo(2));
-            Assert.That(onlineNonAdministrators.Count(), Is.EqualTo(1));
-        }
-
-        [Test]
-        public void ReusabilityMechanismsClearRestrictions()
-        {
-            var query = Session.DelayedFlowQuery<UserEntity>()
-                .OrderBy(x => x.Username);
-
-            var onlineAdministrators = query
-                .Where(x => x.IsOnline && x.Role == RoleEnum.Administrator)
-                .Select();
-
-            var onlineNonAdministrators = query
-                .ClearRestrictions()
-                .Where(x =>  x.IsOnline && x.Role != RoleEnum.Administrator)
-                .Select();
-
-            Assert.That(onlineAdministrators.Count(), Is.EqualTo(2));
-            Assert.That(onlineNonAdministrators.Count(), Is.EqualTo(1));
-        }
-
-        [Test]
         public void ReusabilityMechanismsClear()
         {
-            var query = DummyQuery<UserEntity>();
+            IImmediateFlowQuery<UserEntity> query = DummyQuery<UserEntity>();
 
             // reset fetch instructions specified using query.Fetch(..)
             query.ClearFetches();
@@ -104,7 +66,47 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Documentation
             query.ClearRestrictions();
 
             // reset timeout specified using query.Timeout(..)/TimeoutAfter(..)
-            query.ClearTimeout();       
+            query.ClearTimeout();
+        }
+
+        [Test]
+        public void ReusabilityMechanismsClearRestrictions()
+        {
+            IDelayedFlowQuery<UserEntity> query = Session.DelayedFlowQuery<UserEntity>()
+                .OrderBy(x => x.Username);
+
+            FlowQuerySelection<UserEntity> onlineAdministrators = query
+                .Where(x => x.IsOnline && x.Role == RoleEnum.Administrator)
+                .Select();
+
+            FlowQuerySelection<UserEntity> onlineNonAdministrators = query
+                .ClearRestrictions()
+                .Where(x => x.IsOnline && x.Role != RoleEnum.Administrator)
+                .Select();
+
+            Assert.That(onlineAdministrators.Count(), Is.EqualTo(2));
+            Assert.That(onlineNonAdministrators.Count(), Is.EqualTo(1));
+        }
+
+        [Test]
+        public void ReusabilityMechanismsCopy()
+        {
+            IDelayedFlowQuery<UserEntity> baseQuery = Session.DelayedFlowQuery<UserEntity>()
+                .Where(x => x.IsOnline)
+                .OrderBy(x => x.Username);
+
+            FlowQuerySelection<UserEntity> onlineAdministrators = baseQuery
+                .Copy()
+                .Where(x => x.Role == RoleEnum.Administrator)
+                .Select();
+
+            FlowQuerySelection<UserEntity> onlineNonAdministrators = baseQuery
+                .Copy()
+                .Where(x => x.Role != RoleEnum.Administrator)
+                .Select();
+
+            Assert.That(onlineAdministrators.Count(), Is.EqualTo(2));
+            Assert.That(onlineNonAdministrators.Count(), Is.EqualTo(1));
         }
     }
 }

@@ -4,7 +4,6 @@
     {
         public CacheableUser()
         {
-            
         }
 
         public CacheableUser(string name)

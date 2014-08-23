@@ -1,11 +1,13 @@
-using System.Linq;
-using NHibernate.FlowQuery.Test.Setup.Entities;
-using NUnit.Framework;
-
 namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
 {
+    using System.Linq;
+
+    using NHibernate.FlowQuery.Core;
+    using NHibernate.FlowQuery.Test.Setup.Entities;
+
+    using NUnit.Framework;
+
     using FqIs = Is;
-    using Is = NUnit.Framework.Is;
 
     [TestFixture]
     public class LimitTest : BaseTest
@@ -13,15 +15,14 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void CanConstrainFirstAndMaxResultsWithTakeAndSkip()
         {
-            var query = DetachedQuery<UserEntity>()
+            IDetachedFlowQuery<UserEntity> query = DetachedQuery<UserEntity>()
                 .Take(2)
                 .Skip(1)
                 .Select(u => u.Id);
 
-            var users = Query<UserEntity>()
+            FlowQuerySelection<UserEntity> users = Query<UserEntity>()
                 .Where(u => u.Id, FqIs.In(query))
-                .Select()
-                ;
+                .Select();
 
             Assert.That(users.Count(), Is.EqualTo(2));
             Assert.That(users.First().Id, Is.EqualTo(2));
@@ -30,14 +31,13 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void CanConstrainFirstResultWithLimit()
         {
-            var query = DetachedQuery<UserEntity>()
+            IDetachedFlowQuery<UserEntity> query = DetachedQuery<UserEntity>()
                 .Limit(2, 1)
                 .Select(u => u.Id);
 
-            var users = Query<UserEntity>()
+            FlowQuerySelection<UserEntity> users = Query<UserEntity>()
                 .Where(u => u.Id, FqIs.In(query))
-                .Select()
-                ;
+                .Select();
 
             Assert.That(users.Count(), Is.EqualTo(2));
             Assert.That(users.First().Id, Is.EqualTo(2));
@@ -46,14 +46,13 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void CanConstrainMaxResultsWithLimit()
         {
-            var query = DetachedQuery<UserEntity>()
+            IDetachedFlowQuery<UserEntity> query = DetachedQuery<UserEntity>()
                 .Limit(2)
                 .Select(u => u.Id);
 
-            var users = Query<UserEntity>()
+            FlowQuerySelection<UserEntity> users = Query<UserEntity>()
                 .Where(u => u.Id, FqIs.In(query))
-                .Select()
-                ;
+                .Select();
 
             Assert.That(users.Count(), Is.EqualTo(2));
         }

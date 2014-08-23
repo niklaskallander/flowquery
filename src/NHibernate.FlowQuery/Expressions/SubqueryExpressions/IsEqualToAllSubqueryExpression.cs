@@ -1,17 +1,22 @@
-﻿using NHibernate.Criterion;
-using NHibernate.FlowQuery.Core;
-
-namespace NHibernate.FlowQuery.Expressions.SubqueryExpressions
+﻿namespace NHibernate.FlowQuery.Expressions.SubqueryExpressions
 {
+    using NHibernate.Criterion;
+    using NHibernate.FlowQuery.Core;
+
+    /// <summary>
+    ///     Represents a "is (not) equal to all" filter.
+    /// </summary>
     public class IsEqualToAllSubqueryExpression : SubqueryIsExpressionBase
     {
-        public IsEqualToAllSubqueryExpression(IDetachedImmutableFlowQuery value)
-            : base(value)
-        { }
-
-        protected override ICriterion CompileCore(string property)
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="IsEqualToAllSubqueryExpression" /> class.
+        /// </summary>
+        /// <param name="query">
+        ///     The query.
+        /// </param>
+        public IsEqualToAllSubqueryExpression(IDetachedImmutableFlowQuery query)
+            : base(query, Subqueries.PropertyEqAll)
         {
-            return Subqueries.PropertyEqAll(property, Query.Criteria);
         }
     }
 }

@@ -1,20 +1,30 @@
-using System;
-
 namespace NHibernate.FlowQuery.Revealing.Conventions
 {
+    using System;
+
     /// <summary>
-    /// Lets you provide a custom convention delegate.
+    ///     Lets you provide a custom convention delegate.
     /// </summary>
+    /// <seealso cref="IRevealConvention" />
+    /// <seealso cref="MConvention" />
+    /// <seealso cref="MUnderscoreConvention" />
+    /// <seealso cref="UnderscoreConvention" />
     public class CustomConvention : IRevealConvention
     {
-		#region Fields (1) 
+        /// <summary>
+        ///     The custom convention delegate.
+        /// </summary>
+        private readonly Func<string, string> _customConvention;
 
-        private Func<string, string> m_CustomConvention;
-
-		#endregion Fields 
-
-		#region Constructors (1) 
-
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="CustomConvention"/> class.
+        /// </summary>
+        /// <param name="customConvention">
+        ///     The custom convention delegate.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        ///     <paramref name="customConvention" /> is null.
+        /// </exception>
         public CustomConvention(Func<string, string> customConvention)
         {
             if (customConvention == null)
@@ -22,29 +32,16 @@ namespace NHibernate.FlowQuery.Revealing.Conventions
                 throw new ArgumentNullException("customConvention");
             }
 
-            m_CustomConvention = customConvention;
+            _customConvention = customConvention;
         }
 
-		#endregion Constructors 
-
-		#region Methods (1) 
-
-        protected virtual string RevealFrom(string property)
+        /// <summary>
+        ///     Returns the <paramref name="property" /> name after passing it through the given delegate.
+        /// </summary>
+        /// <inheritdoc />
+        public virtual string RevealFrom(string property)
         {
-            return m_CustomConvention(property);
+            return _customConvention(property);
         }
-
-		#endregion Methods 
-
-
-
-        #region IRevealConvention Members
-
-        string IRevealConvention.RevealFrom(string property)
-        {
-            return RevealFrom(property);
-        }
-
-        #endregion
     }
 }

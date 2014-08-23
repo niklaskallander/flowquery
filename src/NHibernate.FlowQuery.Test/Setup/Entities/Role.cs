@@ -2,11 +2,16 @@
 {
     public enum RoleEnum
     {
-        Default = 0,
-        Administrator,
-        Webmaster,
-        Guest,
-        Standard,
+        Default = 0, 
+
+        Administrator, 
+
+        Webmaster, 
+
+        Guest, 
+
+        Standard, 
+
         Premium
     }
 }

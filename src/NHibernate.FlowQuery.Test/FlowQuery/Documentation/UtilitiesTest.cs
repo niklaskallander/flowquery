@@ -1,18 +1,93 @@
-﻿using System.Linq;
-using NHibernate.FlowQuery.Test.Setup.Entities;
-using NUnit.Framework;
-
-namespace NHibernate.FlowQuery.Test.FlowQuery.Documentation
+﻿namespace NHibernate.FlowQuery.Test.FlowQuery.Documentation
 {
-    using Is = NUnit.Framework.Is;
+    using System.Linq;
+
+    using NHibernate.FlowQuery.Core;
+    using NHibernate.FlowQuery.Test.Setup.Entities;
+
+    using NUnit.Framework;
 
     [TestFixture]
     public class UtilitiesTest : BaseTest
     {
         [Test]
+        public void SetCacheableExample1()
+        {
+            FlowQuerySelection<UserEntity> users = Session.FlowQuery<UserEntity>()
+                .Cacheable()
+                .Select();
+
+            Assert.That(users.Count(), Is.EqualTo(4));
+        }
+
+        [Test]
+        public void SetCacheableExample2()
+        {
+            FlowQuerySelection<UserEntity> users = Session.FlowQuery<UserEntity>()
+                .Cacheable("Region1")
+                .Select();
+
+            Assert.That(users.Count(), Is.EqualTo(4));
+        }
+
+        [Test]
+        public void SetCacheableExample3()
+        {
+            FlowQuerySelection<UserEntity> users = Session.FlowQuery<UserEntity>()
+                .Cacheable("Region1", CacheMode.Normal)
+                .Select();
+
+            Assert.That(users.Count(), Is.EqualTo(4));
+        }
+
+        [Test]
+        public void SetCacheableExample4()
+        {
+            FlowQuerySelection<UserEntity> users = Session.FlowQuery<UserEntity>()
+                .Cacheable(CacheMode.Normal)
+                .Select();
+
+            Assert.That(users.Count(), Is.EqualTo(4));
+        }
+
+        [Test]
+        public void SetCacheableExample5()
+        {
+            FlowQuerySelection<UserEntity> users = Session.FlowQuery<UserEntity>()
+                .Cacheable(false)
+                .Select();
+
+            Assert.That(users.Count(), Is.EqualTo(4));
+        }
+
+        [Test]
+        public void SetCommentExample1()
+        {
+            FlowQuerySelection<UserEntity> users = Session.FlowQuery<UserEntity>()
+                .Comment("This is an example comment.")
+                .Select();
+
+            Assert.That(users.Count(), Is.EqualTo(4));
+        }
+
+        [Test]
+        public void SetCommentExample2()
+        {
+            IImmediateFlowQuery<UserEntity> query = Session.FlowQuery<UserEntity>()
+                .Comment("This is an example comment.");
+
+            // ... code ...
+            FlowQuerySelection<UserEntity> users = query
+                .Comment(null)
+                .Select();
+
+            Assert.That(users.Count(), Is.EqualTo(4));
+        }
+
+        [Test]
         public void SetFetchModeExample1()
         {
-            var users = Session.FlowQuery<UserEntity>()
+            FlowQuerySelection<UserEntity> users = Session.FlowQuery<UserEntity>()
                 .Fetch(x => x.Groups).Eagerly()
                 .Select();
 
@@ -24,7 +99,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Documentation
         {
             UserGroupLinkEntity groupLink = null;
 
-            var users = Session.FlowQuery<UserEntity>()
+            FlowQuerySelection<UserEntity> users = Session.FlowQuery<UserEntity>()
                 .Fetch(x => x.Groups, () => groupLink).Eagerly()
                 .Fetch(x => groupLink.Group.Customers).Eagerly()
                 .Select();
@@ -35,7 +110,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Documentation
         [Test]
         public void SetFetchModeExample3()
         {
-            var users = Session.FlowQuery<UserEntity>()
+            FlowQuerySelection<UserEntity> users = Session.FlowQuery<UserEntity>()
                 .Fetch("Groups.Group.Customers").Eagerly()
                 .Select();
 
@@ -47,13 +122,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Documentation
         {
             UserGroupLinkEntity groupLink = null;
 
-            var query = Session.FlowQuery<UserEntity>()
+            IImmediateFlowQuery<UserEntity> query = Session.FlowQuery<UserEntity>()
                 .Fetch(x => x.Groups, () => groupLink).Eagerly()
                 .Fetch(x => groupLink.Group.Customers).Eagerly();
 
             // ... code ...
-
-            var users = query
+            FlowQuerySelection<UserEntity> users = query
                 .ClearFetches()
                 .Select();
 
@@ -61,70 +135,24 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Documentation
         }
 
         [Test]
-        public void SetCacheableExample1()
+        public void SetFetchSizeExample1()
         {
-            var users = Session.FlowQuery<UserEntity>()
-                .Cacheable()
+            FlowQuerySelection<UserEntity> users = Session.FlowQuery<UserEntity>()
+                .FetchSize(50)
                 .Select();
 
             Assert.That(users.Count(), Is.EqualTo(4));
         }
 
         [Test]
-        public void SetCacheableExample2()
+        public void SetFetchSizeExample2()
         {
-            var users = Session.FlowQuery<UserEntity>()
-                .Cacheable("Region1")
-                .Select();
+            IImmediateFlowQuery<UserEntity> query = Session.FlowQuery<UserEntity>()
+                .FetchSize(50);
 
-            Assert.That(users.Count(), Is.EqualTo(4));
-        }
-
-        [Test]
-        public void SetCacheableExample3()
-        {
-            var users = Session.FlowQuery<UserEntity>()
-                .Cacheable("Region1", CacheMode.Normal)
-                .Select();
-
-            Assert.That(users.Count(), Is.EqualTo(4));
-        }
-
-        [Test]
-        public void SetCacheableExample4()
-        {
-            var users = Session.FlowQuery<UserEntity>()
-                .Cacheable(CacheMode.Normal)
-                .Select();
-
-            Assert.That(users.Count(), Is.EqualTo(4));
-        }
-
-        [Test]
-        public void SetCacheableExample5()
-        {
-            var users = Session.FlowQuery<UserEntity>()
-                .Cacheable(false)
-                .Select();
-
-            Assert.That(users.Count(), Is.EqualTo(4));
-        }
-
-        [Test]
-        public void SetReadOnlyExample1()
-        {
-            var users = Session.FlowQuery<UserEntity>()
-                .ReadOnly()
-                .Select();
-
-            Assert.That(users.Count(), Is.EqualTo(4));
-        }
-
-        [Test]
-        public void SetReadOnlyExample2()
-        {
-            var users = Session.FlowQuery<UserEntity>()
-                .ReadOnly(false)
+            // ... code ...
+            FlowQuerySelection<UserEntity> users = query
+                .FetchSize(0)
                 .Select();
 
             Assert.That(users.Count(), Is.EqualTo(4));
@@ -133,7 +161,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Documentation
         [Test]
         public void SetLockModeExample1()
         {
-            var users = Session.FlowQuery<UserEntity>()
+            FlowQuerySelection<UserEntity> users = Session.FlowQuery<UserEntity>()
                 .Lock().Write()
                 .Select();
 
@@ -145,7 +173,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Documentation
         {
             UserEntity user = null;
 
-            var users = Session.FlowQuery<UserEntity>(() => user)
+            FlowQuerySelection<UserEntity> users = Session.FlowQuery<UserEntity>(() => user)
                 .Lock(() => user).Write()
                 .Select();
 
@@ -157,7 +185,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Documentation
         {
             UserGroupLinkEntity groupLink = null;
 
-            var users = Session.FlowQuery<UserEntity>()
+            FlowQuerySelection<UserEntity> users = Session.FlowQuery<UserEntity>()
                 .Inner.Join(x => x.Groups, () => groupLink)
                 .Lock(() => groupLink).Write()
                 .Select();
@@ -170,7 +198,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Documentation
         {
             UserGroupLinkEntity groupLink = null;
 
-            var users = Session.FlowQuery<UserEntity>()
+            FlowQuerySelection<UserEntity> users = Session.FlowQuery<UserEntity>()
                 .Inner.Join(x => x.Groups, () => groupLink)
                 .Lock("groupLink").Write()
                 .Select();
@@ -183,14 +211,13 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Documentation
         {
             UserGroupLinkEntity groupLink = null;
 
-            var query = Session.FlowQuery<UserEntity>()
+            IImmediateFlowQuery<UserEntity> query = Session.FlowQuery<UserEntity>()
                 .Inner.Join(x => x.Groups, () => groupLink)
                 .Lock().Write()
                 .Lock(() => groupLink).Write();
 
             // ... code ...
-
-            var users = query
+            FlowQuerySelection<UserEntity> users = query
                 .ClearLocks()
                 .Select();
 
@@ -198,9 +225,29 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Documentation
         }
 
         [Test]
+        public void SetReadOnlyExample1()
+        {
+            FlowQuerySelection<UserEntity> users = Session.FlowQuery<UserEntity>()
+                .ReadOnly()
+                .Select();
+
+            Assert.That(users.Count(), Is.EqualTo(4));
+        }
+
+        [Test]
+        public void SetReadOnlyExample2()
+        {
+            FlowQuerySelection<UserEntity> users = Session.FlowQuery<UserEntity>()
+                .ReadOnly(false)
+                .Select();
+
+            Assert.That(users.Count(), Is.EqualTo(4));
+        }
+
+        [Test]
         public void SetTimeoutExample1()
         {
-            var users = Session.FlowQuery<UserEntity>()
+            FlowQuerySelection<UserEntity> users = Session.FlowQuery<UserEntity>()
                 .Timeout(10)
                 .Select();
 
@@ -210,63 +257,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Documentation
         [Test]
         public void SetTimeoutExample2()
         {
-            var query = Session.FlowQuery<UserEntity>()
+            IImmediateFlowQuery<UserEntity> query = Session.FlowQuery<UserEntity>()
                 .Timeout(10);
 
             // ... code ...
-
-            var users = query
+            FlowQuerySelection<UserEntity> users = query
                 .ClearTimeout()
-                .Select();
-
-            Assert.That(users.Count(), Is.EqualTo(4));
-        }
-
-        [Test]
-        public void SetFetchSizeExample1()
-        {
-            var users = Session.FlowQuery<UserEntity>()
-                .FetchSize(50)
-                .Select();
-
-            Assert.That(users.Count(), Is.EqualTo(4));
-        }
-
-        [Test]
-        public void SetFetchSizeExample2()
-        {
-            var query = Session.FlowQuery<UserEntity>()
-                .FetchSize(50);
-
-            // ... code ...
-
-            var users = query
-                .FetchSize(0)
-                .Select();
-
-            Assert.That(users.Count(), Is.EqualTo(4));
-        }
-
-        [Test]
-        public void SetCommentExample1()
-        {
-            var users = Session.FlowQuery<UserEntity>()
-                .Comment("This is an example comment.")
-                .Select();
-
-            Assert.That(users.Count(), Is.EqualTo(4));
-        }
-
-        [Test]
-        public void SetCommentExample2()
-        {
-            var query = Session.FlowQuery<UserEntity>()
-                .Comment("This is an example comment.");
-
-            // ... code ...
-
-            var users = query
-                .Comment(null)
                 .Select();
 
             Assert.That(users.Count(), Is.EqualTo(4));

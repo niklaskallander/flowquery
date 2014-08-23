@@ -1,18 +1,17 @@
-﻿using NHibernate.FlowQuery.Test.Setup.Entities;
-using NUnit.Framework;
-
-namespace NHibernate.FlowQuery.Test.FlowQuery.Documentation
+﻿namespace NHibernate.FlowQuery.Test.FlowQuery.Documentation
 {
-    using Is = NUnit.Framework.Is;
+    using NHibernate.FlowQuery.Core;
+    using NHibernate.FlowQuery.Test.Setup.Entities;
+
+    using NUnit.Framework;
 
     [TestFixture]
     public class BasicsTest : BaseTest
     {
-
         [Test]
         public virtual void ConstructionExample1()
         {
-            var query = Session.FlowQuery<UserEntity>();
+            IImmediateFlowQuery<UserEntity> query = Session.FlowQuery<UserEntity>();
 
             Assert.That(query, Is.Not.Null);
         }
@@ -22,7 +21,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Documentation
         {
             UserEntity alias = null;
 
-            var query = Session.FlowQuery(() => alias);
+            IImmediateFlowQuery<UserEntity> query = Session.FlowQuery(() => alias);
 
             Assert.That(query, Is.Not.Null);
         }
@@ -34,7 +33,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Documentation
 
             options.Add(criteria => criteria.SetCacheMode(CacheMode.Refresh));
 
-            var query = Session.FlowQuery<UserEntity>(options);
+            IImmediateFlowQuery<UserEntity> query = Session.FlowQuery<UserEntity>(options);
 
             Assert.That(query, Is.Not.Null);
         }
@@ -48,7 +47,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Documentation
 
             options.Add(criteria => criteria.SetCacheMode(CacheMode.Refresh));
 
-            var query = Session.FlowQuery(() => alias, options);
+            IImmediateFlowQuery<UserEntity> query = Session.FlowQuery(() => alias, options);
 
             Assert.That(query, Is.Not.Null);
         }

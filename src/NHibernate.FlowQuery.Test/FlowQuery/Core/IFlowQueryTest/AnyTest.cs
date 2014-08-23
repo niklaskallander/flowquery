@@ -1,66 +1,24 @@
-﻿using NHibernate.Criterion;
-using NHibernate.Engine;
-using NHibernate.FlowQuery.Test.Setup.Entities;
-using NUnit.Framework;
-
-namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
+﻿namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
 {
+    using System;
+
+    using NHibernate.Criterion;
+    using NHibernate.Engine;
+    using NHibernate.FlowQuery.Core;
+    using NHibernate.FlowQuery.Test.Setup.Entities;
+
+    using NUnit.Framework;
+
     using FqIs = Is;
-    using Is = NUnit.Framework.Is;
 
     [TestFixture]
     public class AnyTest : BaseTest
     {
         [Test]
-        public void CanAnyWithExpressions()
-        {
-            var any = Query<UserEntity>()
-                .Any(u => u.Firstname.Contains("kl")  // Matches one
-                       && !u.IsOnline) // In combination with above, matches zero, otherwise 1
-                ;
-
-            Assert.That(any, Is.False);
-        }
-
-        [Test]
-        public void CanAnyWithSubquery()
-        {
-            var subquery = DetachedQuery<UserEntity>()
-                .Select(x => x.Id);
-
-            var any = Query<UserEntity>()
-                .Any(x => x.Id, FqIs.In(subquery))
-                ;
-
-            Assert.That(any, Is.True);
-        }
-
-        [Test]
-        public void LogicalAndWithConstantFalseResultsInNone()
-        {
-            var any = Query<UserEntity>()
-                .Any(u => u.Id > 0 && false)
-                ;
-
-            Assert.That(any, Is.False);
-        }
-
-        [Test]
-        public void LogicalAndWithStringAndIsHelper()
-        {
-            var any = Query<UserEntity>()
-                .Any("IsOnline", FqIs.EqualTo(true))
-                ;
-
-            Assert.That(any, Is.True);
-        }
-
-        [Test]
         public void AnyWithCriterions()
         {
-            var any = Query<UserEntity>()
-                .Any(Restrictions.Eq("IsOnline", true), Restrictions.Like("Firstname", "%kl%"))
-                ;
+            bool any = Query<UserEntity>()
+                .Any(Restrictions.Eq("IsOnline", true), Restrictions.Like("Firstname", "%kl%"));
 
             Assert.That(any, Is.True);
         }
@@ -68,102 +26,44 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         [Test]
         public void AnyWithWhereDelegateHelper()
         {
-            var any = Query<UserEntity>()
+            var lastNames = new object[] { "Nilsson", "Källander" };
+
+            bool any = Query<UserEntity>()
                 .Any((u, where) => u.Firstname == "Niklas"
-                                  && (where(u.Lastname, FqIs.In(new object[] { "Nilsson", "Källander" }))
-                                  || where(u.IsOnline, FqIs.Not.EqualTo(true))))
-                ;
+                    && (where(u.Lastname, FqIs.In(lastNames))
+                        || where(u.IsOnline, FqIs.Not.EqualTo(true))));
 
             Assert.That(any, Is.True);
         }
 
         [Test]
-        public void DelayedCanAnyWithExpressions()
+        public void CanAnyWithExpressions()
         {
-            var any = Query<UserEntity>()
-                .Delayed()
-                .Any(u => u.Firstname.Contains("kl")  // Matches one
-                       && !u.IsOnline) // In combination with above, matches zero, otherwise 1
-                ;
+            bool any = Query<UserEntity>()
+                .Any(u => u.Firstname.Contains("kl") // Matches one
+                    && !u.IsOnline); // In combination with above, matches zero, otherwise 1
 
-            var sessionImpl = (ISessionImplementor)Session;
-
-            int count = 0;
-
-            Assert.That(() => count = sessionImpl.FutureCriteriaBatch.Results.Count, Throws.Nothing);
-
-            Assert.That(count, Is.EqualTo(1));
-
-            Assert.That(any.Value, Is.False);
+            Assert.That(any, Is.False);
         }
 
         [Test]
-        public void DelayedCanAnyWithSubquery()
+        public void CanAnyWithSubquery()
         {
-            var subquery = DetachedQuery<UserEntity>()
+            IDetachedFlowQuery<UserEntity> subquery = DetachedQuery<UserEntity>()
                 .Select(x => x.Id);
 
-            var any = Query<UserEntity>()
-                .Delayed()
-                .Any(x => x.Id, FqIs.In(subquery))
-                ;
+            bool any = Query<UserEntity>()
+                .Any(x => x.Id, FqIs.In(subquery));
 
-            var sessionImpl = (ISessionImplementor)Session;
-
-            int count = 0;
-
-            Assert.That(() => count = sessionImpl.FutureCriteriaBatch.Results.Count, Throws.Nothing);
-
-            Assert.That(count, Is.EqualTo(1));
-
-            Assert.That(any.Value, Is.True);
-        }
-
-        [Test]
-        public void DelayedLogicalAndWithConstantFalseResultsInNone()
-        {
-            var any = Query<UserEntity>()
-                .Delayed()
-                .Any(u => u.Id > 0 && false)
-                ;
-
-            var sessionImpl = (ISessionImplementor)Session;
-
-            int count = 0;
-
-            Assert.That(() => count = sessionImpl.FutureCriteriaBatch.Results.Count, Throws.Nothing);
-
-            Assert.That(count, Is.EqualTo(1));
-
-            Assert.That(any.Value, Is.False);
-        }
-
-        [Test]
-        public void DelayedLogicalAndWithStringAndIsHelper()
-        {
-            var any = Query<UserEntity>()
-                .Delayed()
-                .Any("IsOnline", FqIs.EqualTo(true))
-                ;
-
-            var sessionImpl = (ISessionImplementor)Session;
-
-            int count = 0;
-
-            Assert.That(() => count = sessionImpl.FutureCriteriaBatch.Results.Count, Throws.Nothing);
-
-            Assert.That(count, Is.EqualTo(1));
-
-            Assert.That(any.Value, Is.True);
+            Assert.That(any, Is.True);
         }
 
         [Test]
         public void DelayedAnyWithCriterions()
         {
-            var any = Query<UserEntity>()
+            Lazy<bool> any = Query<UserEntity>()
                 .Delayed()
-                .Any(Restrictions.Eq("IsOnline", true), Restrictions.Like("Firstname", "%kl%"))
-                ;
+                .Any(Restrictions.Eq("IsOnline", true), Restrictions.Like("Firstname", "%kl%"));
 
             var sessionImpl = (ISessionImplementor)Session;
 
@@ -179,12 +79,13 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         [Test]
         public void DelayedAnyWithWhereDelegateHelper()
         {
-            var any = Query<UserEntity>()
+            var lastNames = new object[] { "Nilsson", "Källander" };
+
+            Lazy<bool> any = Query<UserEntity>()
                 .Delayed()
                 .Any((u, where) => u.Firstname == "Niklas"
-                                  && (where(u.Lastname, FqIs.In(new object[] { "Nilsson", "Källander" }))
-                                  || where(u.IsOnline, FqIs.Not.EqualTo(true))))
-                ;
+                    && (where(u.Lastname, FqIs.In(lastNames))
+                        || where(u.IsOnline, FqIs.Not.EqualTo(true))));
 
             var sessionImpl = (ISessionImplementor)Session;
 
@@ -195,6 +96,100 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
             Assert.That(count, Is.EqualTo(1));
 
             Assert.That(any.Value, Is.True);
+        }
+
+        [Test]
+        public void DelayedCanAnyWithExpressions()
+        {
+            Lazy<bool> any = Query<UserEntity>()
+                .Delayed()
+                .Any(u => u.Firstname.Contains("kl") // matches one
+                    && !u.IsOnline); // in combination with above, matches zero, otherwise 1
+
+            var sessionImpl = (ISessionImplementor)Session;
+
+            int count = 0;
+
+            Assert.That(() => count = sessionImpl.FutureCriteriaBatch.Results.Count, Throws.Nothing);
+
+            Assert.That(count, Is.EqualTo(1));
+
+            Assert.That(any.Value, Is.False);
+        }
+
+        [Test]
+        public void DelayedCanAnyWithSubquery()
+        {
+            IDetachedFlowQuery<UserEntity> subquery = DetachedQuery<UserEntity>()
+                .Select(x => x.Id);
+
+            Lazy<bool> any = Query<UserEntity>()
+                .Delayed()
+                .Any(x => x.Id, FqIs.In(subquery));
+
+            var sessionImpl = (ISessionImplementor)Session;
+
+            int count = 0;
+
+            Assert.That(() => count = sessionImpl.FutureCriteriaBatch.Results.Count, Throws.Nothing);
+
+            Assert.That(count, Is.EqualTo(1));
+
+            Assert.That(any.Value, Is.True);
+        }
+
+        [Test]
+        public void DelayedLogicalAndWithConstantFalseResultsInNone()
+        {
+            Lazy<bool> any = Query<UserEntity>()
+                .Delayed()
+                .Any(u => u.Id > 0 && false);
+
+            var sessionImpl = (ISessionImplementor)Session;
+
+            int count = 0;
+
+            Assert.That(() => count = sessionImpl.FutureCriteriaBatch.Results.Count, Throws.Nothing);
+
+            Assert.That(count, Is.EqualTo(1));
+
+            Assert.That(any.Value, Is.False);
+        }
+
+        [Test]
+        public void DelayedLogicalAndWithStringAndIsHelper()
+        {
+            Lazy<bool> any = Query<UserEntity>()
+                .Delayed()
+                .Any("IsOnline", FqIs.EqualTo(true));
+
+            var sessionImpl = (ISessionImplementor)Session;
+
+            int count = 0;
+
+            Assert.That(() => count = sessionImpl.FutureCriteriaBatch.Results.Count, Throws.Nothing);
+
+            Assert.That(count, Is.EqualTo(1));
+
+            Assert.That(any.Value, Is.True);
+        }
+
+        [Test]
+        public void LogicalAndWithConstantFalseResultsInNone()
+        {
+            bool any = Query<UserEntity>()
+                .Any(u => u.Id > 0 && false);
+
+            Assert.That(any, Is.False);
+        }
+
+        [Test]
+        public void LogicalAndWithStringAndIsHelper()
+        {
+            bool any = Query<UserEntity>()
+                .Any("IsOnline", FqIs.EqualTo(true));
+
+            Assert.That(any, Is.True);
         }
     }
 }

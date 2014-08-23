@@ -1,8 +1,9 @@
-using System;
-using System.Collections.Generic;
-
 namespace NHibernate.FlowQuery.Test.Setup.Entities
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
+
     public interface IUserEntity
     {
         DateTime CreatedStamp { get; set; }
@@ -26,7 +27,25 @@ namespace NHibernate.FlowQuery.Test.Setup.Entities
 
     public class UserEntity : IUserEntity
     {
-        public UserEntity(string username, string password, string firstname, string lastname, DateTime createdStamp, RoleEnum role, string testvalue)
+        // ReSharper disable once InconsistentNaming
+        [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1306:FieldNamesMustBeginWithLowerCaseLetter", 
+            Justification = "Reviewed. Suppression is OK here.")]
+        [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:FieldsMustBePrivate", 
+            Justification = "Reviewed. Suppression is OK here.")]
+        [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1308:VariableNamesMustNotBePrefixed", 
+            Justification = "Reviewed. Suppression is OK here.")]
+        protected string m_TestValue;
+
+        public UserEntity
+            (
+            string username, 
+            string password, 
+            string firstname, 
+            string lastname, 
+            DateTime createdStamp, 
+            RoleEnum role, 
+            string testvalue
+            )
             : this()
         {
             Username = username;
@@ -43,8 +62,6 @@ namespace NHibernate.FlowQuery.Test.Setup.Entities
             Groups = new List<UserGroupLinkEntity>();
         }
 
-        public virtual int NumberOfLogOns { get; set; }
-
         public virtual DateTime CreatedStamp { get; set; }
 
         public virtual string Firstname { get; set; }
@@ -59,6 +76,8 @@ namespace NHibernate.FlowQuery.Test.Setup.Entities
 
         public virtual string Lastname { get; set; }
 
+        public virtual int NumberOfLogOns { get; set; }
+
         public virtual string Password { get; set; }
 
         public virtual RoleEnum Role { get; set; }
@@ -66,7 +85,5 @@ namespace NHibernate.FlowQuery.Test.Setup.Entities
         public virtual Setting Setting { get; set; }
 
         public virtual string Username { get; set; }
-
-        protected string m_TestValue;
     }
 }

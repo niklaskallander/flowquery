@@ -1,12 +1,10 @@
-using System;
-using System.Collections.Generic;
-
 namespace NHibernate.FlowQuery.Test.Setup.Entities
 {
+    using System;
+    using System.Collections.Generic;
+
     public class CustomerEntity
     {
-		#region Constructors (2) 
-
         public CustomerEntity(string name, DateTime createdStamp)
             : this()
         {
@@ -19,10 +17,6 @@ namespace NHibernate.FlowQuery.Test.Setup.Entities
             Groups = new List<CustomerGroupLinkEntity>();
         }
 
-		#endregion Constructors 
-
-		#region Properties (4) 
-
         public virtual DateTime CreatedStamp { get; set; }
 
         public virtual IList<CustomerGroupLinkEntity> Groups { get; set; }
@@ -30,7 +24,5 @@ namespace NHibernate.FlowQuery.Test.Setup.Entities
         public virtual long Id { get; set; }
 
         public virtual string Name { get; set; }
-
-		#endregion Properties 
     }
 }

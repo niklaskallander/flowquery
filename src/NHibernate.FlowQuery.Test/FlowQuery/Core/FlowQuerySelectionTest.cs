@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using NHibernate.FlowQuery.Core;
-using NUnit.Framework;
-
-// ReSharper disable ExpressionIsAlwaysNull
-namespace NHibernate.FlowQuery.Test.FlowQuery.Core
+﻿namespace NHibernate.FlowQuery.Test.FlowQuery.Core
 {
-    using Is = NUnit.Framework.Is;
+    using System;
+    using System.Collections.Generic;
+
+    using NHibernate.FlowQuery.Core;
+
+    using NUnit.Framework;
 
     [TestFixture]
     public class FlowQuerySelectionTest
@@ -25,30 +24,6 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core
         }
 
         [Test]
-        public void CanImplicitlyCastToSingleTSourceItem()
-        {
-            int singleItem = new FlowQuerySelection<int>(new[] { 7, 2, 3, 4, 5 });
-
-            Assert.That(singleItem, Is.EqualTo(7));
-        }
-
-        [Test]
-        public void ImplicitOperatorToSingleItemReturnsDefaultValuesIfSelectionIsNullOrEmpty()
-        {
-            FlowQuerySelection<int> selection = null;
-
-            int singleItem = selection;
-
-            Assert.That(singleItem, Is.EqualTo(0));
-
-            selection = new FlowQuerySelection<int>(new int[0]);
-
-            singleItem = selection;
-
-            Assert.That(singleItem, Is.EqualTo(0));
-        }
-
-        [Test]
         public void CanImplicitlyCastToList()
         {
             List<int> list = new FlowQuerySelection<int>(new[] { 1, 2, 3, 4, 5 });
@@ -62,35 +37,68 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core
         }
 
         [Test]
-        public void ConstructorThrowsIfSelectionIsNull()
+        public void CanImplicitlyCastToSingleTSourceItem()
         {
-            Assert.That(() => new FlowQuerySelection<object>((IEnumerable<object>)null), Throws.InstanceOf<ArgumentNullException>());
+            int singleItem = new FlowQuerySelection<int>(new[] { 7, 2, 3, 4, 5 });
+
+            Assert.That(singleItem, Is.EqualTo(7));
         }
 
         [Test]
         public void ConstructorThrowsIfDelayedSelectionIsNull()
         {
-            Assert.That(() => new FlowQuerySelection<object>((Func<IEnumerable<object>>)null), Throws.InstanceOf<ArgumentNullException>());
+            Assert
+                .That
+                (
+                    () => new FlowQuerySelection<object>((Func<IEnumerable<object>>)null), 
+                    Throws.InstanceOf<ArgumentNullException>()
+                );
+        }
+
+        [Test]
+        public void ConstructorThrowsIfSelectionIsNull()
+        {
+            Assert
+                .That
+                (
+                    () => new FlowQuerySelection<object>((IEnumerable<object>)null), 
+                    Throws.InstanceOf<ArgumentNullException>()
+                );
         }
 
         [Test]
         public void ImplicitOperatorToArrayReturnsNullIfSelectionIsNull()
         {
-            FlowQuerySelection<int> selection = null;
+            int[] array = (FlowQuerySelection<int>)null;
 
-            int[] array = selection;
-
+            // ReSharper disable once ExpressionIsAlwaysNull
             Assert.That(array, Is.Null);
         }
 
         [Test]
         public void ImplicitOperatorToListReturnsNullIfSelectionIsNull()
         {
+            List<int> list = (FlowQuerySelection<int>)null;
+
+            // ReSharper disable once ExpressionIsAlwaysNull
+            Assert.That(list, Is.Null);
+        }
+
+        [Test]
+        public void ImplicitOperatorToSingleItemReturnsDefaultValuesIfSelectionIsNullOrEmpty()
+        {
             FlowQuerySelection<int> selection = null;
 
-            List<int> list = selection;
+            // ReSharper disable once ExpressionIsAlwaysNull
+            int singleItem = selection;
 
-            Assert.That(list, Is.Null);
+            Assert.That(singleItem, Is.EqualTo(0));
+
+            selection = new FlowQuerySelection<int>(new int[0]);
+
+            singleItem = selection;
+
+            Assert.That(singleItem, Is.EqualTo(0));
         }
     }
 }

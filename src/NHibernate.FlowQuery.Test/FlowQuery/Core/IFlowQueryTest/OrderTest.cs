@@ -1,13 +1,14 @@
-using System;
-using System.Linq;
-using NHibernate.Criterion;
-using NHibernate.FlowQuery.Test.Setup.Dtos;
-using NHibernate.FlowQuery.Test.Setup.Entities;
-using NUnit.Framework;
-
 namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
 {
-    using Is = NUnit.Framework.Is;
+    using System;
+    using System.Linq;
+
+    using NHibernate.Criterion;
+    using NHibernate.FlowQuery.Core;
+    using NHibernate.FlowQuery.Test.Setup.Dtos;
+    using NHibernate.FlowQuery.Test.Setup.Entities;
+
+    using NUnit.Framework;
 
     [TestFixture]
     public class OrderTest : BaseTest
@@ -15,10 +16,9 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         [Test]
         public void CanOrderAscending()
         {
-            var users = Query<UserEntity>()
+            FlowQuerySelection<UserEntity> users = Query<UserEntity>()
                 .OrderBy(u => u.Firstname)
-                .Select()
-                ;
+                .Select();
 
             Assert.That(users.Count(), Is.EqualTo(4));
             Assert.That(users.ElementAt(0).Firstname, Is.EqualTo("Kossan"));
@@ -30,10 +30,9 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         [Test]
         public void CanOrderAscendingUsingProjection()
         {
-            var users = Query<UserEntity>()
+            FlowQuerySelection<UserEntity> users = Query<UserEntity>()
                 .OrderBy(Projections.Property("Firstname"))
-                .Select()
-                ;
+                .Select();
 
             Assert.That(users.Count(), Is.EqualTo(4));
             Assert.That(users.ElementAt(0).Firstname, Is.EqualTo("Kossan"));
@@ -45,10 +44,9 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         [Test]
         public void CanOrderAscendingUsingString()
         {
-            var users = Query<UserEntity>()
+            FlowQuerySelection<UserEntity> users = Query<UserEntity>()
                 .OrderBy("Firstname")
-                .Select()
-                ;
+                .Select();
 
             Assert.That(users.Count(), Is.EqualTo(4));
             Assert.That(users.ElementAt(0).Firstname, Is.EqualTo("Kossan"));
@@ -60,13 +58,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         [Test]
         public void CanOrderByProjectionPropertyAscending()
         {
-            var users = Query<UserEntity>()
+            FlowQuerySelection<UserDto> users = Query<UserEntity>()
                 .OrderBy<UserDto>(x => x.SomeValue)
                 .Select(x => new UserDto
                 {
                     SomeValue = x.Firstname + " " + x.Lastname
-                })
-                ;
+                });
 
             Assert.That(users.Count(), Is.EqualTo(4));
             Assert.That(users.ElementAt(0).SomeValue, Is.EqualTo("Kossan Muu"));
@@ -78,13 +75,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         [Test]
         public void CanOrderByProjectionPropertyAscendingUsingString()
         {
-            var users = Query<UserEntity>()
+            FlowQuerySelection<UserDto> users = Query<UserEntity>()
                 .OrderBy<UserDto>("SomeValue")
                 .Select(x => new UserDto
                 {
                     SomeValue = x.Firstname
-                })
-                ;
+                });
 
             Assert.That(users.Count(), Is.EqualTo(4));
             Assert.That(users.ElementAt(0).SomeValue, Is.EqualTo("Kossan"));
@@ -93,18 +89,50 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
             Assert.That(users.ElementAt(3).SomeValue, Is.EqualTo("Niklas"));
         }
 
+        [Test]
+        public void CanOrderByProjectionPropertyAscendingUsingStringCaseInsensitive()
+        {
+            FlowQuerySelection<UserDto> users = Query<UserEntity>()
+                .OrderBy<UserDto>("somevalue")
+                .Select(x => new UserDto
+                {
+                    SomeValue = x.Firstname
+                });
+
+            Assert.That(users.Count(), Is.EqualTo(4));
+            Assert.That(users.ElementAt(0).SomeValue, Is.EqualTo("Kossan"));
+            Assert.That(users.ElementAt(1).SomeValue, Is.EqualTo("Lars"));
+            Assert.That(users.ElementAt(2).SomeValue, Is.EqualTo("Lotta"));
+            Assert.That(users.ElementAt(3).SomeValue, Is.EqualTo("Niklas"));
+        }
+
+        [Test]
+        public void CanOrderByProjectionPropertyDescending()
+        {
+            FlowQuerySelection<UserDto> users = Query<UserEntity>()
+                .OrderByDescending<UserDto>(x => x.SomeValue)
+                .Select(x => new UserDto
+                {
+                    SomeValue = x.Firstname
+                });
+
+            Assert.That(users.Count(), Is.EqualTo(4));
+            Assert.That(users.ElementAt(0).SomeValue, Is.EqualTo("Niklas"));
+            Assert.That(users.ElementAt(1).SomeValue, Is.EqualTo("Lotta"));
+            Assert.That(users.ElementAt(2).SomeValue, Is.EqualTo("Lars"));
+            Assert.That(users.ElementAt(3).SomeValue, Is.EqualTo("Kossan"));
+        }
 
         [Test]
         public void CanOrderByProjectionPropertyDescendingComplex()
         {
-            var users = Query<UserEntity>()
+            FlowQuerySelection<UserDto> users = Query<UserEntity>()
                 .OrderByDescending<UserDto>(x => x.SomeValue)
                 .Distinct()
                 .Select(x => new UserDto
                 {
                     SomeValue = x.Firstname + " " + x.Lastname + " | " + x.Username
-                })
-                ;
+                });
 
             Assert.That(users.Count(), Is.EqualTo(4));
             Assert.That(users.ElementAt(0).SomeValue, Is.EqualTo("Niklas Källander | Wimpy"));
@@ -114,15 +142,14 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         }
 
         [Test]
-        public void CanOrderByProjectionPropertyDescending()
+        public void CanOrderByProjectionPropertyDescendingUsingString()
         {
-            var users = Query<UserEntity>()
-                .OrderByDescending<UserDto>(x => x.SomeValue)
+            FlowQuerySelection<UserDto> users = Query<UserEntity>()
+                .OrderByDescending<UserDto>("SomeValue")
                 .Select(x => new UserDto
                 {
                     SomeValue = x.Firstname
-                })
-                ;
+                });
 
             Assert.That(users.Count(), Is.EqualTo(4));
             Assert.That(users.ElementAt(0).SomeValue, Is.EqualTo("Niklas"));
@@ -132,30 +159,26 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         }
 
         [Test]
-        public void CanOrderByProjectionPropertyDescendingUsingString()
+        public void CanOrderByTernaryProjection()
         {
-            var users = Query<UserEntity>()
-                .OrderByDescending<UserDto>("SomeValue")
-                .Select(x => new UserDto
-                {
-                    SomeValue = x.Firstname
-                })
-                ;
+            FlowQuerySelection<UserEntity> users = Query<UserEntity>()
+                .OrderBy(x => x.IsOnline ? 1 : 0)
+                .OrderBy(x => x.Firstname)
+                .Select();
 
             Assert.That(users.Count(), Is.EqualTo(4));
-            Assert.That(users.ElementAt(0).SomeValue, Is.EqualTo("Niklas"));
-            Assert.That(users.ElementAt(1).SomeValue, Is.EqualTo("Lotta"));
-            Assert.That(users.ElementAt(2).SomeValue, Is.EqualTo("Lars"));
-            Assert.That(users.ElementAt(3).SomeValue, Is.EqualTo("Kossan"));
+            Assert.That(users.ElementAt(0).Firstname, Is.EqualTo("Lotta"));
+            Assert.That(users.ElementAt(1).Firstname, Is.EqualTo("Kossan"));
+            Assert.That(users.ElementAt(2).Firstname, Is.EqualTo("Lars"));
+            Assert.That(users.ElementAt(3).Firstname, Is.EqualTo("Niklas"));
         }
 
         [Test]
         public void CanOrderDescending()
         {
-            var users = Query<UserEntity>()
+            FlowQuerySelection<UserEntity> users = Query<UserEntity>()
                 .OrderByDescending(u => u.Firstname)
-                .Select()
-                ;
+                .Select();
 
             Assert.That(users.Count(), Is.EqualTo(4));
             Assert.That(users.ElementAt(0).Firstname, Is.EqualTo("Niklas"));
@@ -167,10 +190,9 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         [Test]
         public void CanOrderDescendingUsingProjection()
         {
-            var users = Query<UserEntity>()
+            FlowQuerySelection<UserEntity> users = Query<UserEntity>()
                 .OrderByDescending(Projections.Property("Firstname"))
-                .Select()
-                ;
+                .Select();
 
             Assert.That(users.Count(), Is.EqualTo(4));
             Assert.That(users.ElementAt(0).Firstname, Is.EqualTo("Niklas"));
@@ -182,10 +204,9 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         [Test]
         public void CanOrderDescendingUsingString()
         {
-            var users = Query<UserEntity>()
+            FlowQuerySelection<UserEntity> users = Query<UserEntity>()
                 .OrderByDescending("Firstname")
-                .Select()
-                ;
+                .Select();
 
             Assert.That(users.Count(), Is.EqualTo(4));
             Assert.That(users.ElementAt(0).Firstname, Is.EqualTo("Niklas"));
@@ -197,46 +218,107 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         [Test]
         public void OrderByProjectionWithoutProjectingThePropertyThrows()
         {
-            Assert.That(() =>
-            {
-                Query<UserEntity>()
-                    .OrderBy<UserDto>(x => x.SomeValue)
-                    .Select(x => new UserDto
+            Assert
+                .That
+                (
+                    () =>
                     {
-                        Username = x.Firstname
-                    });
+                        Query<UserEntity>()
+                            .OrderBy<UserDto>(x => x.SomeValue)
+                            .Select(x => new UserDto
+                            {
+                                Username = x.Firstname
+                            });
+                    }, 
+                    Throws.InstanceOf<InvalidOperationException>()
+                );
+        }
 
-            }, Throws.InstanceOf<InvalidOperationException>());
+        [Test]
+        public void OrderByProjectionWithoutProjectingThePropertyThrowsNothingIfErrorsAreSuppressedGlobally()
+        {
+            FlowQueryOptions.GloballySuppressOrderByProjectionErrors = true;
+
+            Assert
+                .That
+                (
+                    () =>
+                    {
+                        Query<UserEntity>()
+                            .OrderBy<UserDto>(x => x.SomeValue)
+                            .Select(x => new UserDto
+                            {
+                                Username = x.Firstname
+                            });
+                    }, 
+                    Throws.Nothing
+                );
+
+            FlowQueryOptions.GloballySuppressOrderByProjectionErrors = false;
+        }
+
+        [Test]
+        public void OrderByProjectionWithoutProjectingThePropertyThrowsNothingIfErrorsAreSuppressedNonGlobally()
+        {
+            FlowQueryOptions options = new FlowQueryOptions()
+                .SuppressOrderByProjectionErrors();
+
+            Assert
+                .That
+                (
+                    () =>
+                    {
+                        Session.FlowQuery<UserEntity>(options)
+                            .OrderBy<UserDto>(x => x.SomeValue)
+                            .Select(x => new UserDto
+                            {
+                                Username = x.Firstname
+                            });
+                    }, 
+                    Throws.Nothing
+                );
         }
 
         [Test]
         public void OrderByProjectionWithoutProjectingToProjectionTypeThrows()
         {
-            Assert.That(() =>
-            {
-                Query<UserEntity>()
-                    .OrderBy<UserDto>(x => x.SomeValue)
-                    .Select(x => new UserEntity
+            Assert
+                .That
+                (
+                    () =>
                     {
-                        Username = x.Firstname
-                    });
-
-            }, Throws.InstanceOf<InvalidOperationException>());
+                        Query<UserEntity>()
+                            .OrderBy<UserDto>(x => x.SomeValue)
+                            .Select(x => new UserEntity
+                            {
+                                Username = x.Firstname
+                            });
+                    }, 
+                    Throws.InstanceOf<InvalidOperationException>()
+                );
         }
 
         [Test]
-        public void CanOrderByTernaryProjection()
+        public void OrderByProjectionWithoutProjectingToProjectionTypeThrowsNothingIfErrorsAreSuppressed()
         {
-            var users = Query<UserEntity>()
-                .OrderBy(x => x.IsOnline ? 1 : 0)
-                .OrderBy(x => x.Firstname)
-                .Select();
+            FlowQueryOptions.GloballySuppressOrderByProjectionErrors = true;
 
-            Assert.That(users.Count(), Is.EqualTo(4));
-            Assert.That(users.ElementAt(0).Firstname, Is.EqualTo("Lotta"));
-            Assert.That(users.ElementAt(1).Firstname, Is.EqualTo("Kossan"));
-            Assert.That(users.ElementAt(2).Firstname, Is.EqualTo("Lars"));
-            Assert.That(users.ElementAt(3).Firstname, Is.EqualTo("Niklas"));
+            Assert
+                .That
+                (
+                    () =>
+                    {
+                        Query<UserEntity>()
+                            .OrderBy<UserDto>(x => x.SomeValue)
+                            .Select(x => new UserEntity
+                            {
+                                Username = x.Firstname
+                            });
+                    }, 
+                    Throws.Nothing
+                );
+
+            FlowQueryOptions.GloballySuppressOrderByProjectionErrors = false;
         }
     }
 }

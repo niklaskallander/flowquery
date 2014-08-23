@@ -104,12 +104,15 @@
     <Compile Include="FlowQuery\Core\ISubFlowQueryTest\SelectTest.cs" />
     <Compile Include="FlowQuery\Core\ISubFlowQueryTest\WhereTest.cs" />
     <Compile Include="FlowQuery\Core\Selection\PartialSelectionTest.cs" />
+    <Compile Include="FlowQuery\CriteriaBuilderTest.cs" />
+    <Compile Include="FlowQuery\DetachedFlowQueryTest.cs" />
     <Compile Include="FlowQuery\Documentation\BasicsTest.cs" />
     <Compile Include="FlowQuery\Documentation\InterchangeabilityTest.cs" />
     <Compile Include="FlowQuery\Documentation\OrdersTest.cs" />
     <Compile Include="FlowQuery\Documentation\JoinsTest.cs" />
     <Compile Include="FlowQuery\Documentation\ProjectionsTest.cs" />
     <Compile Include="FlowQuery\Documentation\RestrictionsTest.cs" />
+    <Compile Include="FlowQuery\Documentation\SuppressionTest.cs" />
     <Compile Include="FlowQuery\Documentation\UtilitiesTest.cs" />
     <Compile Include="FlowQuery\ExtensionHelpers\AggregateExtensionsTest.cs" />
     <Compile Include="FlowQuery\AggregateTest.cs" />
@@ -121,6 +124,7 @@
     <Compile Include="FlowQuery\Helpers\ExpressionHelperTest.cs" />
     <Compile Include="FlowQuery\Helpers\RestrictionHelperTest.cs" />
     <Compile Include="FlowQuery\Helpers\TypeHelperTest.cs" />
+    <Compile Include="FlowQuery\ProjectionListExtensionsTest.cs" />
     <Compile Include="Setup\Entities\CacheableUser.cs" />
     <Compile Include="Setup\Entities\Setting.cs" />
     <Compile Include="FlowQuery\Core\DistinctSetupPartTest.cs" />

@@ -1,12 +1,12 @@
-﻿using System.Linq;
-using NHibernate.FlowQuery.Core;
-using NHibernate.FlowQuery.Revealing.Conventions;
-using NHibernate.FlowQuery.Test.Setup.Entities;
-using NUnit.Framework;
-
-namespace NHibernate.FlowQuery.Test.FlowQuery.Documentation
+﻿namespace NHibernate.FlowQuery.Test.FlowQuery.Documentation
 {
-    using Is = NUnit.Framework.Is;
+    using System.Linq;
+
+    using NHibernate.FlowQuery.Core;
+    using NHibernate.FlowQuery.Revealing.Conventions;
+    using NHibernate.FlowQuery.Test.Setup.Entities;
+
+    using NUnit.Framework;
 
     [TestFixture]
     public class JoinsTest : BaseTest
@@ -25,7 +25,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Documentation
         {
             UserGroupLinkEntity linkAlias = null;
 
-            var users = Session.FlowQuery<UserEntity>()
+            FlowQuerySelection<UserEntity> users = Session.FlowQuery<UserEntity>()
                 .Inner.Join(x => x.Groups, () => linkAlias)
                 .Select();
 
@@ -37,7 +37,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Documentation
         {
             UserGroupLinkEntity linkAlias = null;
 
-            var users = Session.FlowQuery<UserEntity>()
+            FlowQuerySelection<UserEntity> users = Session.FlowQuery<UserEntity>()
                 .Inner.Join(x => x.Groups, () => linkAlias, () => linkAlias.Group.Id == 1)
                 .Select();
 
@@ -47,33 +47,47 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Documentation
         [Test]
         public void HowToExample4WithOnClauseAndRevealConvention()
         {
-            Assert.That(() =>
-            {
-                UserGroupLinkEntity linkAlias = null;
-                GroupEntity groupAlias = null;
+            Assert
+                .That
+                (
+                    () =>
+                    {
+                        UserGroupLinkEntity linkAlias = null;
+                        GroupEntity groupAlias = null;
 
-                Session.FlowQuery<UserEntity>()
-                    .Inner.Join(x => x.Groups, () => linkAlias)
-                    .Inner.Join(x => linkAlias.Group, () => groupAlias, () => groupAlias.Id == 1, new CustomConvention(x => "m_" + x))
-                    .Select();
-
-            }, Throws.InstanceOf<QueryException>());
+                        Session.FlowQuery<UserEntity>()
+                            .Inner.Join(x => x.Groups, () => linkAlias)
+                            .Inner.Join
+                            (
+                                x => linkAlias.Group, 
+                                () => groupAlias, 
+                                () => groupAlias.Id == 1, 
+                                new CustomConvention(x => "m_" + x)
+                            )
+                            .Select();
+                    }, 
+                    Throws.InstanceOf<QueryException>()
+                );
         }
 
         [Test]
         public void HowToExample4WithOnlyRevealConvention()
         {
-            Assert.That(() =>
-            {
-                UserGroupLinkEntity linkAlias = null;
-                GroupEntity groupAlias = null;
+            Assert
+                .That
+                (
+                    () =>
+                    {
+                        UserGroupLinkEntity linkAlias = null;
+                        GroupEntity groupAlias = null;
 
-                Session.FlowQuery<UserEntity>()
-                    .Inner.Join(x => x.Groups, () => linkAlias)
-                    .Inner.Join(x => linkAlias.Group, () => groupAlias, new CustomConvention(x => "m_" + x))
-                    .Select();
-
-            }, Throws.InstanceOf<QueryException>());
+                        Session.FlowQuery<UserEntity>()
+                            .Inner.Join(x => x.Groups, () => linkAlias)
+                            .Inner.Join(x => linkAlias.Group, () => groupAlias, new CustomConvention(x => "m_" + x))
+                            .Select();
+                    }, 
+                    Throws.InstanceOf<QueryException>()
+                );
         }
 
         [Test]
@@ -81,7 +95,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Documentation
         {
             UserGroupLinkEntity linkAlias = null;
 
-            var query = Session.FlowQuery<UserEntity>()
+            IImmediateFlowQuery<UserEntity> query = Session.FlowQuery<UserEntity>()
                 .Inner.Join(x => x.Groups, () => linkAlias, () => linkAlias.Group.Id == 1);
 
             var morphable = (IMorphableFlowQuery)query;

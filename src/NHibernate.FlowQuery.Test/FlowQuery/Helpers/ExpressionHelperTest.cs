@@ -1,16 +1,16 @@
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq.Expressions;
-using NHibernate.FlowQuery.Core.Joins;
-using NHibernate.FlowQuery.Helpers;
-using NHibernate.FlowQuery.Test.Setup.Dtos;
-using NHibernate.FlowQuery.Test.Setup.Entities;
-using NUnit.Framework;
-
 namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
 {
-    using Is = NUnit.Framework.Is;
+    using System;
+    using System.Collections.Generic;
+    using System.Globalization;
+    using System.Linq.Expressions;
+
+    using NHibernate.FlowQuery.Core.Structures;
+    using NHibernate.FlowQuery.Helpers;
+    using NHibernate.FlowQuery.Test.Setup.Dtos;
+    using NHibernate.FlowQuery.Test.Setup.Entities;
+
+    using NUnit.Framework;
 
     [TestFixture]
     public class ExpressionHelperTest
@@ -44,7 +44,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
 
             Expression<Func<UserDto, object>> expression = u => x.Username;
 
-            Assert.That(ExpressionHelper.GetPropertyName(expression.Body, expression.Parameters[0].Name), Is.EqualTo("x.Username"));
+            Assert
+                .That
+                (
+                    ExpressionHelper.GetPropertyName(expression.Body, expression.Parameters[0].Name),
+                    Is.EqualTo("x.Username")
+                );
         }
 
         [Test]
@@ -52,7 +57,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
         {
             Expression<Func<UserDto, object>> expression = u => u.Username;
 
-            Assert.That(ExpressionHelper.GetPropertyName(expression.Body, expression.Parameters[0].Name), Is.EqualTo("Username"));
+            Assert
+                .That
+                (
+                    ExpressionHelper.GetPropertyName(expression.Body, expression.Parameters[0].Name),
+                    Is.EqualTo("Username")
+                );
         }
 
         [Test]
@@ -178,8 +188,79 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
         }
 
         [Test]
+        public void CombineThrowsIfExpressionsContainsNonMemberInitExpression()
+        {
+            Assert
+                .That
+                (
+                    () =>
+                    {
+                        var dto = new UserDto();
+
+                        ExpressionHelper
+                            .Combine<UserEntity, UserDto>
+                            (
+                                x => new UserDto { Id = x.Id },
+                                x => dto,
+                                x => new UserDto { Username = x.Username }
+                            );
+                    },
+                    Throws.ArgumentException
+                );
+        }
+
+        [Test]
+        public void CombineThrowsIfExpressionsIsNull()
+        {
+            Assert
+                .That
+                (
+                    () => { ExpressionHelper.Combine<UserEntity, UserDto>(null); },
+                    Throws.InstanceOf<ArgumentNullException>()
+                );
+        }
+
+        [Test]
+        public void CombineThrowsIfFirstExpressionIsOtherThanMemberInitExpressionOrNewExpression()
+        {
+            Assert
+                .That
+                (
+                    () =>
+                    {
+                        var dto = new UserDto();
+
+                        ExpressionHelper
+                            .Combine<UserEntity, UserDto>(x => dto, x => new UserDto { Username = x.Username });
+                    },
+                    Throws.ArgumentException
+                );
+        }
+
+        [Test]
+        public void CombineThrowsNothingIfExpressionsContainsNull()
+        {
+            Assert
+                .That
+                (
+                    () =>
+                    {
+                        ExpressionHelper
+                            .Combine<UserEntity, UserDto>
+                            (
+                                x => new UserDto { Id = x.Id },
+                                null,
+                                x => new UserDto { Username = x.Username }
+                            );
+                    },
+                    Throws.Nothing
+                );
+        }
+
+        [Test]
         public void GetConstantRootStringReturnsNullIfExpressionIsNotSupported()
         {
+            // ReSharper disable once ConvertToConstant.Local
             long x = 22;
 
             Expression<Func<bool>> expression = () => x == 23;
@@ -190,66 +271,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
         [Test]
         public void GetConstantRootStringUsingBoolExpressionWithConstantDoesNotReturnNullSinceExpressionIsPreEvaluated()
         {
-            const long x = 22;
+            const long X = 22;
 
-            Expression<Func<bool>> expression = () => x == 23;
+            Expression<Func<bool>> expression = () => X == 23;
 
             Assert.That(ExpressionHelper.GetConstantRootString(expression), Is.Not.Null);
-        }
-
-        [Test]
-        public void IsRootedThrowsIfExpressionIsNull()
-        {
-            Expression<Func<UserDto, object>> expression = null;
-
-            Assert.That(() =>
-            {
-                // ReSharper disable once ExpressionIsAlwaysNull
-                ExpressionHelper.IsRooted(expression, "x", null);
-
-            }, Throws.InstanceOf<ArgumentNullException>());
-        }
-
-        [Test]
-        public void IsRootedDoesNotThrowIfExpectedRootIsNull()
-        {
-            Expression<Func<UserDto, object>> expression = x => x.Id;
-
-            Assert.That(() =>
-            {
-                ExpressionHelper.IsRooted(expression, null, new QueryHelperData(new Dictionary<string, string>(), new List<Join>(), null));
-
-            }, Throws.Nothing);
-        }
-
-        [Test]
-        public void GetValueDoesNotThrowWhereTargetInvocationExceptionMightBeExpected()
-        {
-            object argument = null;
-
-            Expression<Func<object>> expression = () => argument.ToString();
-
-            object value = 1;
-
-            Assert.That(() =>
-            {
-                value = ExpressionHelper.GetValue(expression.Body);
-
-            }, Throws.Nothing);
-
-            Assert.That(value, Is.Null);
-        }
-
-        [Test]
-        public void IsRootedDoesNotThrowIfExpectedRootIsEmpty()
-        {
-            Expression<Func<UserDto, object>> expression = x => x.Id;
-
-            Assert.That(() =>
-            {
-                ExpressionHelper.IsRooted(expression, string.Empty, new QueryHelperData(new Dictionary<string, string>(), new List<Join>(), null));
-
-            }, Throws.Nothing);
         }
 
         [Test]
@@ -257,11 +283,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
         {
             Expression<Func<UserDto, object>> expression = u => u.Username;
 
-            Assert.That(() =>
-            {
-                ExpressionHelper.GetPropertyName(expression.Body, string.Empty);
-
-            }, Throws.Nothing);
+            Assert.That(() => { ExpressionHelper.GetPropertyName(expression.Body, string.Empty); }, Throws.Nothing);
         }
 
         [Test]
@@ -269,21 +291,18 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
         {
             Expression<Func<UserDto, object>> expression = u => u.Username;
 
-            Assert.That(() =>
-            {
-                ExpressionHelper.GetPropertyName(expression.Body, null);
-
-            }, Throws.Nothing);
+            Assert.That(() => { ExpressionHelper.GetPropertyName(expression.Body, null); }, Throws.Nothing);
         }
 
         [Test]
         public void GetPropertyNameFromExpressionAndExpectedRootThrowsWhenExpressionIsNull()
         {
-            Assert.That(() =>
-            {
-                ExpressionHelper.GetPropertyName(null, "u");
-
-            }, Throws.InstanceOf<ArgumentNullException>());
+            Assert
+                .That
+                (
+                    () => { ExpressionHelper.GetPropertyName(null, "u"); },
+                    Throws.InstanceOf<ArgumentNullException>()
+                );
         }
 
         [Test]
@@ -327,6 +346,20 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
         }
 
         [Test]
+        public void GetValueDoesNotThrowWhereTargetInvocationExceptionMightBeExpected()
+        {
+            object argument = null;
+
+            Expression<Func<object>> expression = () => argument.ToString();
+
+            object value = 1;
+
+            Assert.That(() => { value = ExpressionHelper.GetValue(expression.Body); }, Throws.Nothing);
+
+            Assert.That(value, Is.Null);
+        }
+
+        [Test]
         public void GetValueThrowsIfExpressionIsNull()
         {
             Assert.That(() => { ExpressionHelper.GetValue(null); }, Throws.InstanceOf<ArgumentNullException>());
@@ -340,47 +373,64 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
         }
 
         [Test]
-        public void CombineThrowsIfExpressionsIsNull()
+        public void IsRootedDoesNotThrowIfExpectedRootIsEmpty()
         {
-            Assert.That(() =>
-            {
-                ExpressionHelper.Combine<UserEntity, UserDto>(null);
+            Expression<Func<UserDto, object>> expression = x => x.Id;
 
-            }, Throws.InstanceOf<ArgumentNullException>());
+            Assert
+                .That
+                (
+                    () =>
+                    {
+                        ExpressionHelper
+                            .IsRooted
+                            (
+                                expression,
+                                string.Empty,
+                                new QueryHelperData(new Dictionary<string, string>(), new List<Join>())
+                            );
+                    },
+                    Throws.Nothing
+                );
         }
 
         [Test]
-        public void CombineThrowsNothingIfExpressionsContainsNull()
+        public void IsRootedDoesNotThrowIfExpectedRootIsNull()
         {
-            Assert.That(() =>
-            {
-                ExpressionHelper.Combine<UserEntity, UserDto>(x => new UserDto { Id = x.Id }, null, x => new UserDto { Username = x.Username });
+            Expression<Func<UserDto, object>> expression = x => x.Id;
 
-            }, Throws.Nothing);
+            Assert
+                .That
+                (
+                    () =>
+                    {
+                        ExpressionHelper
+                            .IsRooted
+                            (
+                                expression,
+                                null,
+                                new QueryHelperData(new Dictionary<string, string>(), new List<Join>())
+                            );
+                    },
+                    Throws.Nothing
+                );
         }
 
         [Test]
-        public void CombineThrowsIfExpressionsContainsNonMemberInitExpression()
+        public void IsRootedThrowsIfExpressionIsNull()
         {
-            Assert.That(() =>
-            {
-                var dto = new UserDto();
+            Expression<Func<UserDto, object>> expression = null;
 
-                ExpressionHelper.Combine<UserEntity, UserDto>(x => new UserDto { Id = x.Id }, x => dto, x => new UserDto { Username = x.Username });
-
-            }, Throws.ArgumentException);
-        }
-
-        [Test]
-        public void CombineThrowsIfFirstExpressionIsOtherThanMemberInitExpressionOrNewExpression()
-        {
-            Assert.That(() =>
-            {
-                var dto = new UserDto();
-
-                ExpressionHelper.Combine<UserEntity, UserDto>(x => dto, x => new UserDto { Username = x.Username });
-
-            }, Throws.ArgumentException);
+            Assert
+                .That
+                (
+                    () =>
+                    {
+                        // ReSharper disable once ExpressionIsAlwaysNull
+                        ExpressionHelper.IsRooted(expression, "x", null);
+                    },
+                    Throws.InstanceOf<ArgumentNullException>()
+                );
         }
     }
 }
