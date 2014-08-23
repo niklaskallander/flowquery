@@ -1,12 +1,12 @@
-﻿using System;
-using NHibernate.FlowQuery.Revealing;
-using NHibernate.FlowQuery.Revealing.Conventions;
-using NHibernate.FlowQuery.Test.Setup.Entities;
-using NUnit.Framework;
-
-namespace NHibernate.FlowQuery.Test.FlowQuery
+﻿namespace NHibernate.FlowQuery.Test.FlowQuery
 {
-    using Is = NUnit.Framework.Is;
+    using System;
+
+    using NHibernate.FlowQuery.Revealing;
+    using NHibernate.FlowQuery.Revealing.Conventions;
+    using NHibernate.FlowQuery.Test.Setup.Entities;
+
+    using NUnit.Framework;
 
     [TestFixture]
     public class RevealTest
@@ -26,7 +26,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery
         [Test]
         public void CanCreateTypeIgnorantRevealerWithConventionProvided()
         {
-            var revealer = Reveal.CreateRevealer(new UnderscoreConvention());
+            IRevealer revealer = Reveal.CreateRevealer(new UnderscoreConvention());
 
             Assert.That(revealer.Reveal<UserEntity>(x => x.Password), Is.EqualTo("_Password"));
         }
@@ -34,7 +34,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery
         [Test]
         public void CanCreateTypeIgnorantRevealerWithDefaultConvention()
         {
-            var revealer = Reveal.CreateRevealer();
+            IRevealer revealer = Reveal.CreateRevealer();
 
             Assert.That(revealer.Reveal<UserEntity>(x => x.Username), Is.EqualTo("m_Username"));
         }
@@ -42,7 +42,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery
         [Test]
         public void CanCreateTypeLockedRevealerWithConventionProvided()
         {
-            var revealer = Reveal.CreateRevealer<UserEntity>(new UnderscoreConvention());
+            IRevealer<UserEntity> revealer = Reveal.CreateRevealer<UserEntity>(new UnderscoreConvention());
 
             Assert.That(revealer.Reveal(x => x.Password), Is.EqualTo("_Password"));
         }
@@ -50,7 +50,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery
         [Test]
         public void CanCreateTypeLockedRevealerWithDefaultConvention()
         {
-            var revealer = Reveal.CreateRevealer<UserEntity>();
+            IRevealer<UserEntity> revealer = Reveal.CreateRevealer<UserEntity>();
 
             Assert.That(revealer.Reveal(x => x.Username), Is.EqualTo("m_Username"));
         }
@@ -94,6 +94,19 @@ namespace NHibernate.FlowQuery.Test.FlowQuery
         }
 
         [Test]
+        public void CanRevealWithAliasFromTypedExpressionUsingProvidedConvention()
+        {
+            UserEntity u = null;
+
+            Assert
+                .That
+                (
+                    Reveal.ByConvention<UserEntity>(x => u.Password, new UnderscoreConvention()), 
+                    Is.EqualTo("u._Password")
+                );
+        }
+
+        [Test]
         public void CanRevealWithAliasFromTypedExpressions()
         {
             UserEntity u = null;
@@ -106,15 +119,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery
         {
             UserEntity u = null;
 
-            Assert.That(Reveal.ByConvention(() => u, x => x.Password, new UnderscoreConvention()), Is.EqualTo("u._Password"));
-        }
-
-        [Test]
-        public void CanRevealWithAliasFromTypedExpressionUsingProvidedConvention()
-        {
-            UserEntity u = null;
-
-            Assert.That(Reveal.ByConvention<UserEntity>(x => u.Password, new UnderscoreConvention()), Is.EqualTo("u._Password"));
+            Assert
+                .That
+                (
+                    Reveal.ByConvention(() => u, x => x.Password, new UnderscoreConvention()), 
+                    Is.EqualTo("u._Password")
+                );
         }
 
         [Test]

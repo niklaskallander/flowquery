@@ -1,42 +1,49 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
-using NHibernate.FlowQuery.Core.Joins;
-using NHibernate.FlowQuery.Helpers;
-using NUnit.Framework;
-
-namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
+﻿namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq.Expressions;
+
+    using NHibernate.FlowQuery.Core.Structures;
+    using NHibernate.FlowQuery.Helpers;
+
+    using NUnit.Framework;
+
     [TestFixture]
     public class RestrictionHelperTest
     {
         [Test]
-        public void GetProjectionValueCriterionThrowsIfNodeTypeIsInvalid()
+        public void GetProjectionProjectionCriterionThrowsIfNodeTypeIsInvalid()
         {
-            Assert.That(() =>
-            {
-                RestrictionHelper
-                    .GetProjectionValueCriterion
-                    (
-                        Expression.Equal(Expression.Constant(true), Expression.Constant(true)), 
-                        true, 
-                        ExpressionType.ListInit, 
-                        null, 
-                        new QueryHelperData(new Dictionary<string, string>(), new List<Join>(), null), 
-                        false
-                    );
-
-            }, Throws.InstanceOf<NotSupportedException>());
+            Assert
+                .That
+                (
+                    () => { RestrictionHelper.GetProjectionProjectionCriterion(null, null, ExpressionType.Block); },
+                    Throws.InstanceOf<NotSupportedException>()
+                );
         }
 
         [Test]
-        public void GetProjectionProjectionCriterionThrowsIfNodeTypeIsInvalid()
+        public void GetProjectionValueCriterionThrowsIfNodeTypeIsInvalid()
         {
-            Assert.That(() =>
-            {
-                RestrictionHelper.GetProjectionProjectionCriterion(null, null, ExpressionType.Block);
-
-            }, Throws.InstanceOf<NotSupportedException>());
+            Assert
+                .That
+                (
+                    () =>
+                    {
+                        RestrictionHelper
+                            .GetProjectionValueCriterion
+                            (
+                                Expression.Equal(Expression.Constant(true), Expression.Constant(true)),
+                                true,
+                                ExpressionType.ListInit,
+                                null,
+                                new QueryHelperData(new Dictionary<string, string>(), new List<Join>()),
+                                false
+                            );
+                    },
+                    Throws.InstanceOf<NotSupportedException>()
+                );
         }
     }
 }

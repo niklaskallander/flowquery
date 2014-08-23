@@ -1,14 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
-using NHibernate.Type;
-
-namespace NHibernate.FlowQuery.Helpers
+﻿namespace NHibernate.FlowQuery.Helpers
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Reflection;
+
+    using NHibernate.Type;
+
+    /// <summary>
+    ///     A static utility class providing methods to resolve <see cref="NHibernate.Type.IType" />
+    ///     representations from <see cref="System.Type" /> instances.
+    /// </summary>
     public static class TypeHelper
     {
-        private static readonly Dictionary<System.Type, IType> m_ClrTypeToNHibernateType = new Dictionary<System.Type, IType>();
+        /// <summary>
+        ///     Type cache.
+        /// </summary>
+        private static readonly Dictionary<Type, IType> ClrTypeToNHibernateType = new Dictionary<Type, IType>();
 
+        /// <summary>
+        ///     Initializes static members of the <see cref="TypeHelper" /> class.
+        /// </summary>
         static TypeHelper()
         {
             PropertyInfo[] properties = typeof(TypeHelper).GetProperties();
@@ -20,28 +31,223 @@ namespace NHibernate.FlowQuery.Helpers
 
                 if (isAssignable)
                 {
-                    IType type = (IType)info.GetValue(null, null);
+                    var type = (IType)info.GetValue(null, null);
 
-                    m_ClrTypeToNHibernateType[type.ReturnedClass] = type;
+                    ClrTypeToNHibernateType[type.ReturnedClass] = type;
                 }
             }
         }
 
-        public static IType GuessType(System.Type type, bool isCastType = false)
+        /// <summary>
+        ///     Gets the NHibernate boolean type.
+        /// </summary>
+        /// <value>
+        ///     The NHibernate boolean type.
+        /// </value>
+        public static NullableType Boolean
         {
-            if (type.IsGenericType && typeof(Nullable<>).Equals(type.GetGenericTypeDefinition()))
+            get
             {
-                type = type.GetGenericArguments()[0];
+                return NHibernateUtil.Boolean;
+            }
+        }
+
+        /// <summary>
+        ///     Gets the NHibernate date + time type.
+        /// </summary>
+        /// <value>
+        ///     The NHibernate date + time type.
+        /// </value>
+        public static NullableType DateTime
+        {
+            get
+            {
+                return NHibernateUtil.DateTime;
+            }
+        }
+
+        /// <summary>
+        ///     Gets the NHibernate decimal type.
+        /// </summary>
+        /// <value>
+        ///     The NHibernate decimal type.
+        /// </value>
+        public static NullableType Decimal
+        {
+            get
+            {
+                return NHibernateUtil.Decimal;
+            }
+        }
+
+        /// <summary>
+        ///     Gets the NHibernate double type.
+        /// </summary>
+        /// <value>
+        ///     The NHibernate double type.
+        /// </value>
+        public static NullableType Double
+        {
+            get
+            {
+                return NHibernateUtil.Double;
+            }
+        }
+
+        /// <summary>
+        ///     Gets the NHibernate UUID type.
+        /// </summary>
+        /// <value>
+        ///     The NHibernate UUID type.
+        /// </value>
+        public static NullableType Guid
+        {
+            get
+            {
+                return NHibernateUtil.Guid;
+            }
+        }
+
+        /// <summary>
+        ///     Gets the NHibernate short type.
+        /// </summary>
+        /// <value>
+        ///     The NHibernate short type.
+        /// </value>
+        public static NullableType Int16
+        {
+            get
+            {
+                return NHibernateUtil.Int16;
+            }
+        }
+
+        /// <summary>
+        ///     Gets the NHibernate integer type.
+        /// </summary>
+        /// <value>
+        ///     The NHibernate integer type.
+        /// </value>
+        public static NullableType Int32
+        {
+            get
+            {
+                return NHibernateUtil.Int32;
+            }
+        }
+
+        /// <summary>
+        ///     Gets the NHibernate long type.
+        /// </summary>
+        /// <value>
+        ///     The NHibernate long type.
+        /// </value>
+        public static NullableType Int64
+        {
+            get
+            {
+                return NHibernateUtil.Int64;
+            }
+        }
+
+        /// <summary>
+        /// Gets the NHibernate string type.
+        /// </summary>
+        /// <value>
+        /// The NHibernate string type.
+        /// </value>
+        public static NullableType String
+        {
+            get
+            {
+                return NHibernateUtil.String;
+            }
+        }
+
+        /// <summary>
+        /// Gets the NHibernate time type.
+        /// </summary>
+        /// <value>
+        /// The NHibernate time type.
+        /// </value>
+        public static NullableType TimeSpan
+        {
+            get
+            {
+                return NHibernateUtil.TimeSpan;
+            }
+        }
+
+        /// <summary>
+        /// Gets the NHibernate unsigned short type.
+        /// </summary>
+        /// <value>
+        /// The NHibernate unsigned short type.
+        /// </value>
+        public static NullableType UInt16
+        {
+            get
+            {
+                return NHibernateUtil.UInt16;
+            }
+        }
+
+        /// <summary>
+        /// Gets the NHibernate unsigned integer type.
+        /// </summary>
+        /// <value>
+        /// The NHibernate unsigned integer type.
+        /// </value>
+        public static NullableType UInt32
+        {
+            get
+            {
+                return NHibernateUtil.UInt32;
+            }
+        }
+
+        /// <summary>
+        /// Gets the NHibernate unsigned long type.
+        /// </summary>
+        /// <value>
+        /// The NHibernate unsigned long type.
+        /// </value>
+        public static NullableType UInt64
+        {
+            get
+            {
+                return NHibernateUtil.UInt64;
+            }
+        }
+
+        /// <summary>
+        ///     Attempts to resolve the <see cref="IType" /> representation for the provided <see cref="System.Type" />
+        ///     value.
+        /// </summary>
+        /// <param name="clrType">
+        ///     The <see cref="System.Type" /> value to resolve.
+        /// </param>
+        /// <param name="isCastType">
+        ///     A value indicating whether the provided <see cref="System.Type" /> value is used in a casting operation.
+        /// </param>
+        /// <returns>
+        ///     The resolved <see cref="IType"/> representation of the provided <see cref="System.Type" /> value.
+        /// </returns>
+        public static IType GuessType(Type clrType, bool isCastType = false)
+        {
+            if (clrType.IsGenericType && typeof(Nullable<>) == clrType.GetGenericTypeDefinition())
+            {
+                clrType = clrType.GetGenericArguments()[0];
             }
 
-            IType iType;
+            IType nhibernateType;
 
-            bool flag = m_ClrTypeToNHibernateType
-                .TryGetValue(type, out iType);
+            bool flag = ClrTypeToNHibernateType
+                .TryGetValue(clrType, out nhibernateType);
 
             if (flag)
             {
-                return iType;
+                return nhibernateType;
             }
 
             if (isCastType)
@@ -49,72 +255,7 @@ namespace NHibernate.FlowQuery.Helpers
                 return null;
             }
 
-            return NHibernateUtil.GuessType(type);
+            return NHibernateUtil.GuessType(clrType);
         }
-
-        /// <summary>
-        /// NHibernate boolean type
-        /// </summary>
-        public static NullableType Boolean { get { return NHibernateUtil.Boolean; } }
-
-        /// <summary>
-        /// NHibernate date type
-        /// </summary>
-        public static NullableType DateTime { get { return NHibernateUtil.DateTime; } }
-
-        /// <summary>
-        /// NHibernate decimal type
-        /// </summary>
-        public static NullableType Decimal { get { return NHibernateUtil.Decimal; } }
-
-        /// <summary>
-        /// NHibernate double type
-        /// </summary>
-        public static NullableType Double { get { return NHibernateUtil.Double; } }
-
-        /// <summary>
-        /// NHibernate Guid type.
-        /// </summary>
-        public static NullableType Guid { get { return NHibernateUtil.Guid; } }
-
-        /// <summary>
-        /// NHibernate System.Int16 (short in C#) type
-        /// </summary>
-        public static NullableType Int16 { get { return NHibernateUtil.Int16; } }
-
-        /// <summary>
-        /// NHibernate System.Int32 (int in C#) type
-        /// </summary>
-        public static NullableType Int32 { get { return NHibernateUtil.Int32; } }
-
-        /// <summary>
-        /// NHibernate System.Int64 (long in C#) type
-        /// </summary>
-        public static NullableType Int64 { get { return NHibernateUtil.Int64; } }
-
-        /// <summary>
-        /// NHibernate System.UInt16 (ushort in C#) type
-        /// </summary>
-        public static NullableType UInt16 { get { return NHibernateUtil.UInt16; } }
-
-        /// <summary>
-        /// NHibernate System.UInt32 (uint in C#) type
-        /// </summary>
-        public static NullableType UInt32 { get { return NHibernateUtil.UInt32; } }
-
-        /// <summary>
-        /// NHibernate System.UInt64 (ulong in C#) type
-        /// </summary>
-        public static NullableType UInt64 { get { return NHibernateUtil.UInt64; } }
-
-        /// <summary>
-        /// NHibernate String type
-        /// </summary>
-        public static NullableType String { get { return NHibernateUtil.String; } }
-
-        /// <summary>
-        /// NHibernate Ticks type
-        /// </summary>
-        public static NullableType TimeSpan { get { return NHibernateUtil.TimeSpan; } }
     }
 }

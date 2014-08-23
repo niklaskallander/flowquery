@@ -1,28 +1,22 @@
-using System;
-using System.Linq.Expressions;
-using NHibernate.FlowQuery.Core.Selection;
-using NHibernate.FlowQuery.Test.Setup.Dtos;
-using NHibernate.FlowQuery.Test.Setup.Entities;
-using NUnit.Framework;
-
 namespace NHibernate.FlowQuery.Test.FlowQuery.Core
 {
-    using Is = NUnit.Framework.Is;
+    using System;
+    using System.Linq.Expressions;
+
+    using NHibernate.FlowQuery.Core;
+    using NHibernate.FlowQuery.Core.Implementations;
+    using NHibernate.FlowQuery.Test.Setup.Dtos;
+    using NHibernate.FlowQuery.Test.Setup.Entities;
+
+    using NUnit.Framework;
 
     [TestFixture]
     public class DistinctSetupTest : BaseTest
     {
-        protected ISelectSetup<UserEntity, UserDto> CreateSetup()
-        {
-            return DummyQuery<UserEntity>()
-                .Distinct()
-                .Select<UserDto>();
-        }
-            
         [Test]
         public void CanConstruct()
         {
-            var setup = CreateSetup();
+            ISelectSetup<UserEntity, UserDto> setup = CreateSetup();
 
             Assert.That(setup, Is.Not.Null);
         }
@@ -30,7 +24,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core
         [Test]
         public void CanUseExpressionInForCall()
         {
-            var setupPart = CreateSetup()
+            ISelectSetupPart<UserEntity, UserDto> setupPart = CreateSetup()
                 .For(x => x.IsOnline);
 
             Assert.That(setupPart, Is.Not.Null);
@@ -39,7 +33,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core
         [Test]
         public void CanUseStringInForCall()
         {
-            var setupPart = CreateSetup()
+            ISelectSetupPart<UserEntity, UserDto> setupPart = CreateSetup()
                 .For("IsOnline");
 
             Assert.That(setupPart, Is.Not.Null);
@@ -48,7 +42,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core
         [Test]
         public void ConstructorThrowsWhenSelectionBuilderIsNull()
         {
-            Assert.That(() => new SelectSetup<UserEntity, UserDto>(null, null), Throws.InstanceOf<ArgumentNullException>());
+            Assert
+                .That
+                (
+                    () => new SelectSetup<UserEntity, UserDto>(null, null),
+                    Throws.InstanceOf<ArgumentNullException>()
+                );
         }
 
         [Test]
@@ -87,6 +86,13 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core
         public void SelectThrowsIfNoSetupHasBeenProvided()
         {
             Assert.That(() => CreateSetup().Select(), Throws.InstanceOf<InvalidOperationException>());
+        }
+
+        protected ISelectSetup<UserEntity, UserDto> CreateSetup()
+        {
+            return DummyQuery<UserEntity>()
+                .Distinct()
+                .Select<UserDto>();
         }
     }
 }

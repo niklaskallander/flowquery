@@ -1,16 +1,17 @@
-﻿using System;
-using System.Collections;
-using System.Linq;
-using System.Linq.Expressions;
-using NHibernate.Criterion;
-using NHibernate.FlowQuery.Helpers;
-using NHibernate.FlowQuery.Test.Setup.Dtos;
-using NHibernate.FlowQuery.Test.Setup.Entities;
-using NUnit.Framework;
-
-namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
+﻿namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
 {
-    using Is = NUnit.Framework.Is;
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Linq.Expressions;
+
+    using NHibernate.Criterion;
+    using NHibernate.FlowQuery.Helpers;
+    using NHibernate.FlowQuery.Test.Setup.Dtos;
+    using NHibernate.FlowQuery.Test.Setup.Entities;
+
+    using NUnit.Framework;
 
     [TestFixture]
     public class ConstructionHelperTest : BaseTest
@@ -24,15 +25,20 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
                 .SetProjection(Projections.Property("IsOnline"))
                 .List();
 
-            var isOnline = ConstructionHelper.GetListByExpression<Wrapper>(expression, enumerable);
+            IEnumerable<Wrapper> isOnline = ConstructionHelper.GetListByExpression<Wrapper>(expression, enumerable);
 
             Assert.That(isOnline.Count(), Is.EqualTo(4));
         }
 
         [Test]
-        public void GetListByExpressionThrowsWhenExpressionIsNull()
+        public void CanHandleSortsOutLambdaExpression()
         {
-            Assert.That(() => ConstructionHelper.GetListByExpression<int>(null, new object[] { }), Throws.InstanceOf<ArgumentNullException>());
+            Expression<Func<UserEntity, UserDto>> expression =
+                x => new UserDto { Fullname = x.Firstname + " " + x.Lastname };
+
+            bool canHandle = ConstructionHelper.CanHandle(expression);
+
+            Assert.That(canHandle, Is.True);
         }
 
         [Test]
@@ -42,23 +48,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
         }
 
         [Test]
-        public void CanHandleSortsOutLambdaExpression()
-        {
-            Expression<Func<UserEntity, UserDto>> expression = x => new UserDto { Fullname = x.Firstname + " " + x.Lastname };
-
-            bool canHandle = ConstructionHelper.CanHandle(expression);
-
-            Assert.That(canHandle, Is.True);
-        }
-
-        [Test]
         public void GetListByExpressionReturnsNullIfSelectionIsNull()
         {
-            var criteria = Session.CreateCriteria<UserEntity>();
-
             Expression<Func<UserEntity, object>> expression = x => new { x.IsOnline };
 
-            var list = ConstructionHelper.GetListByExpression<int>(expression, null);
+            IEnumerable<int> list = ConstructionHelper.GetListByExpression<int>(expression, null);
 
             Assert.That(list, Is.Null);
         }
@@ -72,13 +66,25 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
 
             Expression<Func<UserEntity, object>> expression = x => x.IsOnline;
 
-            var list = ConstructionHelper.GetListByExpression<int>(expression, enumerable);
+            IEnumerable<int> list = ConstructionHelper.GetListByExpression<int>(expression, enumerable);
 
             Assert.That(list, Is.Null);
         }
 
+        [Test]
+        public void GetListByExpressionThrowsWhenExpressionIsNull()
+        {
+            Assert
+                .That
+                (
+                    () => ConstructionHelper.GetListByExpression<int>(null, new object[] { }), 
+                    Throws.InstanceOf<ArgumentNullException>()
+                );
+        }
+
         private class Wrapper
         {
+            // ReSharper disable once UnusedAutoPropertyAccessor.Local
             public bool Value { get; set; }
         }
     }

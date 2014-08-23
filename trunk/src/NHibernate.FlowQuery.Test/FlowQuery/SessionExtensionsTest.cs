@@ -1,14 +1,26 @@
-using NHibernate.Criterion;
-using NHibernate.FlowQuery.Core;
-using NHibernate.FlowQuery.Helpers;
-using NHibernate.FlowQuery.Test.Setup.Entities;
-using NUnit.Framework;
-
 namespace NHibernate.FlowQuery.Test.FlowQuery
 {
+    using NHibernate.Criterion;
+    using NHibernate.FlowQuery.Core;
+    using NHibernate.FlowQuery.Core.Implementations;
+    using NHibernate.FlowQuery.Helpers;
+    using NHibernate.FlowQuery.Test.Setup.Entities;
+
+    using NUnit.Framework;
+
     [TestFixture]
     public class SessionExtensionTest : BaseTest
     {
+        [Test]
+        public void CanCreateDelayedStatelessFlowQuery()
+        {
+            Assert.That(() => StatelessSession.DelayedFlowQuery<UserEntity>(), Throws.Nothing);
+
+            IDelayedFlowQuery<UserEntity> query = StatelessSession.DelayedFlowQuery<UserEntity>();
+
+            Assert.That(query != null);
+        }
+
         [Test]
         public void CanCreateFlowQuery()
         {
@@ -30,9 +42,10 @@ namespace NHibernate.FlowQuery.Test.FlowQuery
 
             Assert.That(query != null);
 
-            ICriteria criteria = CriteriaHelper.BuildCriteria<UserEntity, UserEntity>(QuerySelection.Create(query as IQueryableFlowQuery));
+            ICriteria criteria = new CriteriaBuilder()
+                .Build<UserEntity, UserEntity>(QuerySelection.Create(query as IQueryableFlowQuery));
 
-            Assert.That(criteria.Alias, NUnit.Framework.Is.EqualTo("alias"));
+            Assert.That(criteria.Alias, Is.EqualTo("alias"));
         }
 
         [Test]
@@ -41,6 +54,71 @@ namespace NHibernate.FlowQuery.Test.FlowQuery
             Assert.That(() => Session.FlowQuery<UserEntity>(new FlowQueryOptions()), Throws.Nothing);
 
             IImmediateFlowQuery<UserEntity> query = Session.FlowQuery<UserEntity>(new FlowQueryOptions());
+
+            Assert.That(query != null);
+        }
+
+        [Test]
+        public void CanCreateStatelessDelayedFlowQueryWithAlias()
+        {
+            UserEntity alias = null;
+
+            Assert.That(() => StatelessSession.DelayedFlowQuery(() => alias), Throws.Nothing);
+
+            IDelayedFlowQuery<UserEntity> query = StatelessSession.DelayedFlowQuery(() => alias);
+
+            Assert.That(query != null);
+
+            ICriteria criteria = new CriteriaBuilder()
+                .Build<UserEntity, UserEntity>(QuerySelection.Create(query as IQueryableFlowQuery));
+
+            Assert.That(criteria.Alias, Is.EqualTo("alias"));
+        }
+
+        [Test]
+        public void CanCreateStatelessDelayedFlowQueryWithOptions()
+        {
+            Assert.That(() => StatelessSession.DelayedFlowQuery<UserEntity>(new FlowQueryOptions()), Throws.Nothing);
+
+            IDelayedFlowQuery<UserEntity> query = StatelessSession.DelayedFlowQuery<UserEntity>(new FlowQueryOptions());
+
+            Assert.That(query != null);
+        }
+
+        [Test]
+        public void CanCreateStatelessDetachedFlowQuery()
+        {
+            Assert.That(() => StatelessSession.DetachedFlowQuery<UserEntity>(), Throws.Nothing);
+
+            IDetachedFlowQuery<UserEntity> query = StatelessSession.DetachedFlowQuery<UserEntity>();
+
+            Assert.That(query != null);
+        }
+
+        [Test]
+        public void CanCreateStatelessDetachedFlowQueryWithAlias()
+        {
+            UserEntity alias = null;
+
+            Assert.That(() => StatelessSession.DetachedFlowQuery(() => alias), Throws.Nothing);
+
+            var query = StatelessSession.DetachedFlowQuery(() => alias) as DetachedFlowQuery<UserEntity>;
+
+            Assert.That(query != null);
+
+            DetachedCriteria criteria = new CriteriaBuilder()
+                .Build<UserEntity>(query);
+
+            Assert.That(criteria.Alias, Is.EqualTo("alias"));
+        }
+
+        [Test]
+        public void CanCreateStatelessDetachedFlowQueryWithOptions()
+        {
+            Assert.That(() => StatelessSession.DetachedFlowQuery<UserEntity>(new FlowQueryOptions()), Throws.Nothing);
+
+            IDetachedFlowQuery<UserEntity> query = StatelessSession
+                .DetachedFlowQuery<UserEntity>(new FlowQueryOptions());
 
             Assert.That(query != null);
         }
@@ -66,9 +144,10 @@ namespace NHibernate.FlowQuery.Test.FlowQuery
 
             Assert.That(query != null);
 
-            ICriteria criteria = CriteriaHelper.BuildCriteria<UserEntity, UserEntity>(QuerySelection.Create(query as IQueryableFlowQuery));
+            ICriteria criteria = new CriteriaBuilder()
+                .Build<UserEntity, UserEntity>(QuerySelection.Create(query as IQueryableFlowQuery));
 
-            Assert.That(criteria.Alias, NUnit.Framework.Is.EqualTo("alias"));
+            Assert.That(criteria.Alias, Is.EqualTo("alias"));
         }
 
         [Test]
@@ -102,9 +181,10 @@ namespace NHibernate.FlowQuery.Test.FlowQuery
 
             Assert.That(query != null);
 
-            ICriteria criteria = CriteriaHelper.BuildCriteria<UserEntity, UserEntity>(QuerySelection.Create(query as IQueryableFlowQuery));
+            ICriteria criteria = new CriteriaBuilder()
+                .Build<UserEntity, UserEntity>(QuerySelection.Create(query as IQueryableFlowQuery));
 
-            Assert.That(criteria.Alias, NUnit.Framework.Is.EqualTo("alias"));
+            Assert.That(criteria.Alias, Is.EqualTo("alias"));
         }
 
         [Test]
@@ -112,79 +192,8 @@ namespace NHibernate.FlowQuery.Test.FlowQuery
         {
             Assert.That(() => StatelessSession.ImmediateFlowQuery<UserEntity>(new FlowQueryOptions()), Throws.Nothing);
 
-            IImmediateFlowQuery<UserEntity> query = StatelessSession.ImmediateFlowQuery<UserEntity>(new FlowQueryOptions());
-
-            Assert.That(query != null);
-        }
-
-        [Test]
-        public void CanCreateDelayedStatelessFlowQuery()
-        {
-            Assert.That(() => StatelessSession.DelayedFlowQuery<UserEntity>(), Throws.Nothing);
-
-            IDelayedFlowQuery<UserEntity> query = StatelessSession.DelayedFlowQuery<UserEntity>();
-
-            Assert.That(query != null);
-        }
-
-        [Test]
-        public void CanCreateStatelessDelayedFlowQueryWithAlias()
-        {
-            UserEntity alias = null;
-
-            Assert.That(() => StatelessSession.DelayedFlowQuery(() => alias), Throws.Nothing);
-
-            IDelayedFlowQuery<UserEntity> query = StatelessSession.DelayedFlowQuery(() => alias);
-
-            Assert.That(query != null);
-
-            ICriteria criteria = CriteriaHelper.BuildCriteria<UserEntity, UserEntity>(QuerySelection.Create(query as IQueryableFlowQuery));
-
-            Assert.That(criteria.Alias, NUnit.Framework.Is.EqualTo("alias"));
-        }
-
-        [Test]
-        public void CanCreateStatelessDelayedFlowQueryWithOptions()
-        {
-            Assert.That(() => StatelessSession.DelayedFlowQuery<UserEntity>(new FlowQueryOptions()), Throws.Nothing);
-
-            IDelayedFlowQuery<UserEntity> query = StatelessSession.DelayedFlowQuery<UserEntity>(new FlowQueryOptions());
-
-            Assert.That(query != null);
-        }
-
-        [Test]
-        public void CanCreateStatelessDetachedFlowQuery()
-        {
-            Assert.That(() => StatelessSession.DetachedFlowQuery<UserEntity>(), Throws.Nothing);
-
-            IDetachedFlowQuery<UserEntity> query = StatelessSession.DetachedFlowQuery<UserEntity>();
-
-            Assert.That(query != null);
-        }
-
-        [Test]
-        public void CanCreateStatelessDetachedFlowQueryWithAlias()
-        {
-            UserEntity alias = null;
-
-            Assert.That(() => StatelessSession.DetachedFlowQuery(() => alias), Throws.Nothing);
-
-            IDetachedFlowQuery<UserEntity> query = StatelessSession.DetachedFlowQuery(() => alias);
-
-            Assert.That(query != null);
-
-            DetachedCriteria criteria = CriteriaHelper.BuildDetachedCriteria(query);
-
-            Assert.That(criteria.Alias, NUnit.Framework.Is.EqualTo("alias"));
-        }
-
-        [Test]
-        public void CanCreateStatelessDetachedFlowQueryWithOptions()
-        {
-            Assert.That(() => StatelessSession.DetachedFlowQuery<UserEntity>(new FlowQueryOptions()), Throws.Nothing);
-
-            IDetachedFlowQuery<UserEntity> query = StatelessSession.DetachedFlowQuery<UserEntity>(new FlowQueryOptions());
+            IImmediateFlowQuery<UserEntity> query =
+                StatelessSession.ImmediateFlowQuery<UserEntity>(new FlowQueryOptions());
 
             Assert.That(query != null);
         }

@@ -1,24 +1,61 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
-using NHibernate.FlowQuery.Core.Joins;
-
 namespace NHibernate.FlowQuery.Helpers
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Linq.Expressions;
+    using System.Reflection;
+
+    /// <summary>
+    ///     A static utility class providing methods to work with <see cref="System.Linq.Expressions.Expression" />
+    ///     objects.
+    /// </summary>
     public static class ExpressionHelper
     {
-        public static Expression<Func<TSource, TDestination>> Combine<TSource, TDestination>(params Expression<Func<TSource, TDestination>>[] expressions)
+        /// <summary>
+        ///     Combines (merges) the provided expressions into one.
+        /// </summary>
+        /// <param name="expressions">
+        ///     The expressions to merge.
+        /// </param>
+        /// <typeparam name="TSource">
+        ///     The <see cref="System.Type" /> of the source entity.
+        /// </typeparam>
+        /// <typeparam name="TDestination">
+        ///     The <see cref="System.Type" /> of the result.
+        /// </typeparam>
+        /// <returns>
+        ///     The resulting expression.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        ///     <paramref name="expressions" /> is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        ///     If one or more of the provided expressions is neither of <see cref="MemberInitExpression" /> or
+        ///     <see cref="NewExpression" />, or if any but the first expression is a <see cref="NewExpression" />.
+        /// </exception>
+        public static Expression<Func<TSource, TDestination>> Combine<TSource, TDestination>
+            (
+            params Expression<Func<TSource, TDestination>>[] expressions
+            )
         {
             if (expressions == null)
             {
                 throw new ArgumentNullException("expressions");
             }
 
-            if (!expressions.Where(x => x != null).Skip(1).All(x => x.Body is MemberInitExpression))
+            bool allAreMemberInit = expressions
+                .Where(x => x != null)
+                .Skip(1) // skip first which may also be a NewExpression
+                .All(x => x.Body is MemberInitExpression);
+
+            if (!allAreMemberInit)
             {
-                throw new ArgumentException("All expressions must be MemberInitExpression except the first which can also be a NewExpression", "expressions");
+                throw new ArgumentException
+                (
+                    "All expressions must be MemberInitExpression except the first which can also be a NewExpression",
+                    "expressions"
+                );
             }
 
             Expression first = expressions[0].Body;
@@ -41,7 +78,11 @@ namespace NHibernate.FlowQuery.Helpers
             }
             else
             {
-                throw new ArgumentException("The first expression is not a MemberInitExpression, nor is it a NewExpression", "expressions");
+                throw new ArgumentException
+                (
+                    "The first expression is not a MemberInitExpression, nor is it a NewExpression",
+                    "expressions"
+                );
             }
 
             ParameterExpression parameter = expressions[0].Parameters[0];
@@ -75,6 +116,15 @@ namespace NHibernate.FlowQuery.Helpers
             return Expression.Lambda<Func<TSource, TDestination>>(combined, parameter);
         }
 
+        /// <summary>
+        ///     Gets the constant root <see cref="string" /> value of a <see cref="Expression" />.
+        /// </summary>
+        /// <param name="expression">
+        ///     The expression.
+        /// </param>
+        /// <returns>
+        ///     The constant root <see cref="string" /> value.
+        /// </returns>
         public static string GetConstantRootString(Expression expression)
         {
             if (expression != null)
@@ -104,6 +154,18 @@ namespace NHibernate.FlowQuery.Helpers
             return null;
         }
 
+        /// <summary>
+        ///     Gets the property name for the provided <see cref="MemberExpression" />.
+        /// </summary>
+        /// <param name="expression">
+        ///     The expression.
+        /// </param>
+        /// <returns>
+        ///     The property name.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        ///     <paramref name="expression" /> is null.
+        /// </exception>
         public static string GetPropertyName(MemberExpression expression)
         {
             if (expression == null)
@@ -126,6 +188,18 @@ namespace NHibernate.FlowQuery.Helpers
             return fullExpression;
         }
 
+        /// <summary>
+        ///     Gets the property name for the provided <see cref="Expression" />.
+        /// </summary>
+        /// <param name="expression">
+        ///     The expression.
+        /// </param>
+        /// <returns>
+        ///     The property name.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        ///     <paramref name="expression" /> is null.
+        /// </exception>
         public static string GetPropertyName(Expression expression)
         {
             if (expression == null)
@@ -150,6 +224,7 @@ namespace NHibernate.FlowQuery.Helpers
                     return GetPropertyName(expression as MemberExpression);
 
                 case ExpressionType.Constant:
+
                     if (expression.Type == typeof(string))
                     {
                         return GetValue<string>(expression);
@@ -161,27 +236,21 @@ namespace NHibernate.FlowQuery.Helpers
             throw new NotSupportedException("The expression contains unsupported features please revise your code");
         }
 
-        public static bool IsRooted(Expression expression, string expectedRoot, QueryHelperData data)
-        {
-            if (expression == null)
-            {
-                throw new ArgumentNullException("expression");
-            }
-
-            string property = GetPropertyName(expression);
-
-            string[] splits = property.Split('.');
-
-            if (splits.Length <= 1)
-            {
-                return false;
-            }
-
-            return splits[0] == expectedRoot 
-                || data.Aliases
-                    .ContainsValue(splits[0]);
-        }
-
+        /// <summary>
+        ///     Gets the property name for the provided <see cref="Expression" />.
+        /// </summary>
+        /// <param name="expression">
+        ///     The expression.
+        /// </param>
+        /// <param name="expectedRoot">
+        ///     The expected root.
+        /// </param>
+        /// <returns>
+        ///     The property name.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        ///     <paramref name="expression" /> is null.
+        /// </exception>
         public static string GetPropertyName(Expression expression, string expectedRoot)
         {
             if (expression == null)
@@ -208,6 +277,18 @@ namespace NHibernate.FlowQuery.Helpers
             return property;
         }
 
+        /// <summary>
+        ///     Gets the root <see cref="string" /> value for the provided <see cref="Expression" />.
+        /// </summary>
+        /// <param name="expression">
+        ///     The expression.
+        /// </param>
+        /// <returns>
+        ///     The root <see cref="string" /> value.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        ///     <paramref name="expression" /> is null.
+        /// </exception>
         public static string GetRoot(Expression expression)
         {
             if (expression == null)
@@ -218,6 +299,7 @@ namespace NHibernate.FlowQuery.Helpers
             switch (expression.NodeType)
             {
                 case ExpressionType.Call:
+
                     var methodCall = (MethodCallExpression)expression;
 
                     return GetRoot(methodCall.Object ?? methodCall.Arguments[0]); // original method ?? extension method
@@ -232,6 +314,7 @@ namespace NHibernate.FlowQuery.Helpers
                     return GetPropertyName(expression as MemberExpression).Split('.')[0];
 
                 case ExpressionType.Constant:
+
                     if (expression.Type == typeof(string))
                     {
                         string[] splits = GetValue<string>(expression).Split('.');
@@ -245,6 +328,18 @@ namespace NHibernate.FlowQuery.Helpers
             return null;
         }
 
+        /// <summary>
+        ///     Gets the value from the provided <see cref="Expression" />.
+        /// </summary>
+        /// <param name="expression">
+        ///     The expression.
+        /// </param>
+        /// <returns>
+        ///     The <see cref="object" /> value.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        ///     <paramref name="expression" /> is null.
+        /// </exception>
         public static object GetValue(Expression expression)
         {
             if (expression == null)
@@ -256,8 +351,8 @@ namespace NHibernate.FlowQuery.Helpers
             {
                 return Expression
                     .Lambda(expression, null)
-                        .Compile()
-                            .DynamicInvoke(null);
+                    .Compile()
+                    .DynamicInvoke(null);
             }
             catch (TargetInvocationException)
             {
@@ -265,6 +360,21 @@ namespace NHibernate.FlowQuery.Helpers
             }
         }
 
+        /// <summary>
+        ///     Gets the value for the provided <see cref="Expression" />.
+        /// </summary>
+        /// <param name="expression">
+        ///     The expression.
+        /// </param>
+        /// <typeparam name="T">
+        ///     The <see cref="System.Type" /> of the value.
+        /// </typeparam>
+        /// <returns>
+        ///     The <see cref="T:T" /> value.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        ///     <paramref name="expression" /> is null.
+        /// </exception>
         public static T GetValue<T>(Expression expression)
         {
             if (expression == null)
@@ -274,10 +384,19 @@ namespace NHibernate.FlowQuery.Helpers
 
             return Expression
                 .Lambda<Func<T>>(expression, null)
-                    .Compile()
-                        .Invoke();
+                .Compile()
+                .Invoke();
         }
 
+        /// <summary>
+        ///     Determines whether the <see cref="Expression" /> has a constant root.
+        /// </summary>
+        /// <param name="expression">
+        ///     The expression.
+        /// </param>
+        /// <returns>
+        ///     True if the <see cref="Expression" /> has a constant root; false otherwise.
+        /// </returns>
         public static bool HasConstantRoot(Expression expression)
         {
             if (expression != null)
@@ -285,6 +404,7 @@ namespace NHibernate.FlowQuery.Helpers
                 switch (expression.NodeType)
                 {
                     case ExpressionType.Call:
+
                         var methodCall = (MethodCallExpression)expression;
 
                         return HasConstantRoot(methodCall.Object ?? methodCall.Arguments[0]);
@@ -304,6 +424,45 @@ namespace NHibernate.FlowQuery.Helpers
             }
 
             return false;
+        }
+
+        /// <summary>
+        ///     Determines whether the <see cref="Expression" /> is rooted.
+        /// </summary>
+        /// <param name="expression">
+        ///     The expression.
+        /// </param>
+        /// <param name="expectedRoot">
+        ///     The expected root.
+        /// </param>
+        /// <param name="data">
+        ///     The <see cref="QueryHelperData" /> info.
+        /// </param>
+        /// <returns>
+        ///     True if the <see cref="Expression" /> is rooted; false otherwise.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        ///     <paramref name="expression" /> is null.
+        /// </exception>
+        public static bool IsRooted(Expression expression, string expectedRoot, QueryHelperData data)
+        {
+            if (expression == null)
+            {
+                throw new ArgumentNullException("expression");
+            }
+
+            string property = GetPropertyName(expression);
+
+            string[] splits = property.Split('.');
+
+            if (splits.Length <= 1)
+            {
+                return false;
+            }
+
+            return splits[0] == expectedRoot
+                || data.Aliases
+                    .ContainsValue(splits[0]);
         }
     }
 }

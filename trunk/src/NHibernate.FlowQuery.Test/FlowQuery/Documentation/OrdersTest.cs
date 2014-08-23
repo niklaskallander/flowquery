@@ -1,13 +1,13 @@
-﻿using System.Linq;
-using NHibernate.Criterion;
-using NHibernate.FlowQuery.Core;
-using NHibernate.FlowQuery.Test.Setup.Dtos;
-using NHibernate.FlowQuery.Test.Setup.Entities;
-using NUnit.Framework;
-
-namespace NHibernate.FlowQuery.Test.FlowQuery.Documentation
+﻿namespace NHibernate.FlowQuery.Test.FlowQuery.Documentation
 {
-    using Is = NUnit.Framework.Is;
+    using System.Linq;
+
+    using NHibernate.Criterion;
+    using NHibernate.FlowQuery.Core;
+    using NHibernate.FlowQuery.Test.Setup.Dtos;
+    using NHibernate.FlowQuery.Test.Setup.Entities;
+
+    using NUnit.Framework;
 
     [TestFixture]
     public class OrdersTest : BaseTest
@@ -15,7 +15,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Documentation
         [Test]
         public void HowToExample1()
         {
-            var users = Session.FlowQuery<UserEntity>()
+            FlowQuerySelection<UserEntity> users = Session.FlowQuery<UserEntity>()
                 .OrderByDescending(x => x.IsOnline)
                 .OrderBy(x => x.Role)
                 .OrderBy(x => x.Username)
@@ -27,7 +27,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Documentation
         [Test]
         public void HowToExample2UsingBoolFlag()
         {
-            var users = Session.FlowQuery<UserEntity>()
+            FlowQuerySelection<UserEntity> users = Session.FlowQuery<UserEntity>()
                 .OrderBy(x => x.IsOnline, false)
                 .OrderBy(x => x.Role, true)
                 .OrderBy(x => x.Username, true)
@@ -39,14 +39,14 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Documentation
         [Test]
         public void HowToExample3UsingDto()
         {
-            var users = Session.FlowQuery<UserEntity>()
+            FlowQuerySelection<UserDto> users = Session.FlowQuery<UserEntity>()
                 .OrderBy(x => x.IsOnline)
                 .OrderBy<UserDto>(x => x.SomeValue)
                 .Select(x => new UserDto
                 {
-                    Fullname = x.Firstname + " " + x.Lastname,
-                    Username = x.Username,
-                    IsOnline = x.IsOnline,
+                    Fullname = x.Firstname + " " + x.Lastname, 
+                    Username = x.Username, 
+                    IsOnline = x.IsOnline, 
                     SomeValue = x.Username.Substring(0, 3) + x.Firstname.Substring(0, 3) + x.Lastname.Substring(0, 3)
                 });
 
@@ -56,7 +56,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Documentation
         [Test]
         public void HowToExample4UsingStringsAndIProjection()
         {
-            var users = Session.FlowQuery<UserEntity>()
+            FlowQuerySelection<UserEntity> users = Session.FlowQuery<UserEntity>()
                 .OrderByDescending("IsOnline")
                 .OrderBy(Projections.Property("Role"))
                 .OrderBy("Username")
@@ -68,7 +68,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Documentation
         [Test]
         public void HowToExample5ClearOrders()
         {
-            var query = Session.FlowQuery<UserEntity>()
+            IImmediateFlowQuery<UserEntity> query = Session.FlowQuery<UserEntity>()
                 .OrderBy(x => x.IsOnline, false)
                 .OrderBy(x => x.Role, true)
                 .OrderBy(x => x.Username, true);

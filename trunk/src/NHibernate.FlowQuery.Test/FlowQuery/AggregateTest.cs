@@ -1,10 +1,12 @@
-using System;
-using NHibernate.Criterion;
-using NHibernate.FlowQuery.Core;
-using NUnit.Framework;
-
 namespace NHibernate.FlowQuery.Test.FlowQuery
 {
+    using System;
+
+    using NHibernate.Criterion;
+    using NHibernate.FlowQuery.Core;
+
+    using NUnit.Framework;
+
     [TestFixture]
     public class AggregateHelperTest
     {
@@ -51,17 +53,28 @@ namespace NHibernate.FlowQuery.Test.FlowQuery
         }
 
         [Test]
+        public void SubqueryThrowsWhenCalledOutsideLambdaExpression()
+        {
+            Assert
+                .That
+                (
+                    () => Aggregate.Subquery<int>(null as DetachedCriteria), 
+                    Throws.InstanceOf<InvalidOperationException>()
+                );
+
+            Assert
+                .That
+                (
+                    () => Aggregate.Subquery<int>(null as IDetachedImmutableFlowQuery), 
+                    Throws.InstanceOf<InvalidOperationException>()
+                );
+        }
+
+        [Test]
         public void SumThrowsWhenCalledOutsideLambdaExpression()
         {
             Assert.That(() => Aggregate.Sum(3), Throws.InstanceOf<InvalidOperationException>());
             Assert.That(() => Aggregate.Sum((int?)3), Throws.InstanceOf<InvalidOperationException>());
-        }
-
-        [Test]
-        public void SubqueryThrowsWhenCalledOutsideLambdaExpression()
-        {
-            Assert.That(() => Aggregate.Subquery<int>(null as DetachedCriteria), Throws.InstanceOf<InvalidOperationException>());
-            Assert.That(() => Aggregate.Subquery<int>(null as IDetachedImmutableFlowQuery), Throws.InstanceOf<InvalidOperationException>());
         }
     }
 }

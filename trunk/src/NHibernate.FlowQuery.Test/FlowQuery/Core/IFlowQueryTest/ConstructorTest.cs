@@ -1,131 +1,21 @@
-using System;
-using NHibernate.Criterion;
-using NHibernate.FlowQuery.Core;
-using NHibernate.FlowQuery.Helpers;
-using NHibernate.FlowQuery.Test.FlowQuery.Helpers;
-using NHibernate.FlowQuery.Test.Setup.Entities;
-using NUnit.Framework;
-
 // ReSharper disable ExpressionIsAlwaysNull
 namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
 {
-    using Is = NUnit.Framework.Is;
+    using NHibernate.Criterion;
+    using NHibernate.FlowQuery.Core;
+    using NHibernate.FlowQuery.Core.Implementations;
+    using NHibernate.FlowQuery.Helpers;
+    using NHibernate.FlowQuery.Test.Setup.Entities;
+
+    using NUnit.Framework;
 
     [TestFixture]
     public class ConstructorTest : BaseTest
     {
         [Test]
-        public void ThrowsIfMetaDataFactoryIsNull()
-        {
-            Assert.That(() => new DummyQuery2(Session.CreateCriteria, null), Throws.InstanceOf<ArgumentNullException>());
-        }
-
-        [Test]
-        public void CanCreateFlowQuery()
-        {
-            var q = Session.FlowQuery<UserEntity>();
-
-            Assert.That(q, Is.Not.Null);
-        }
-
-        [Test]
-        public void CanCreateFlowQueryWithAlias()
-        {
-            UserEntity user = null;
-
-            var q = Session.FlowQuery(() => user);
-
-            Assert.That(q, Is.Not.Null);
-        }
-
-        [Test]
-        public void CanCreateFlowQueryWithOptions()
-        {
-            var options = new FlowQueryOptions()
-                .Add(c => c.SetMaxResults(5));
-
-            var q = Session.FlowQuery<UserEntity>(options);
-
-            Assert.That(q, Is.Not.Null);
-
-            ICriteria criteria = CriteriaHelper.BuildCriteria<UserEntity, UserEntity>(QuerySelection.Create(q as IQueryableFlowQuery));
-
-            Assert.That(criteria.GetRootEntityTypeIfAvailable(), Is.EqualTo(typeof(UserEntity)));
-        }
-
-        [Test]
-        public void CanCreateFlowQueryWithAliasAndOptions()
-        {
-            UserEntity user = null;
-
-            var q = Session.FlowQuery(() => user, new FlowQueryOptions());
-
-            Assert.That(q, Is.Not.Null);
-        }
-
-        [Test]
-        public void DoesNotThrowWhenOptionsIsNull()
-        {
-            FlowQueryOptions options = null;
-
-            Assert.That(() => Session.FlowQuery<UserEntity>(options), Throws.Nothing);
-        }
-
-        [Test]
-        public void CanCreateImmediateFlowQuery()
-        {
-            var q = Session.ImmediateFlowQuery<UserEntity>();
-
-            Assert.That(q, Is.Not.Null);
-        }
-
-        [Test]
-        public void CanCreateImmediateFlowQueryWithAlias()
-        {
-            UserEntity user = null;
-
-            var q = Session.ImmediateFlowQuery(() => user);
-
-            Assert.That(q, Is.Not.Null);
-        }
-
-        [Test]
-        public void CanCreateImmediateFlowQueryWithOptions()
-        {
-            var options = new FlowQueryOptions()
-                .Add(c => c.SetMaxResults(5));
-
-            var q = Session.ImmediateFlowQuery<UserEntity>(options);
-
-            Assert.That(q, Is.Not.Null);
-
-            ICriteria criteria = CriteriaHelper.BuildCriteria<UserEntity, UserEntity>(QuerySelection.Create(q as IQueryableFlowQuery));
-
-            Assert.That(criteria.GetRootEntityTypeIfAvailable(), Is.EqualTo(typeof(UserEntity)));
-        }
-
-        [Test]
-        public void CanCreateImmediateFlowQueryWithAliasAndOptions()
-        {
-            UserEntity user = null;
-
-            var q = Session.ImmediateFlowQuery(() => user, new FlowQueryOptions());
-
-            Assert.That(q, Is.Not.Null);
-        }
-
-        [Test]
-        public void ImmediateDoesNotThrowWhenOptionsIsNull()
-        {
-            FlowQueryOptions options = null;
-
-            Assert.That(() => Session.ImmediateFlowQuery<UserEntity>(options), Throws.Nothing);
-        }
-
-        [Test]
         public void CanCreateDelayedFlowQuery()
         {
-            var q = Session.DelayedFlowQuery<UserEntity>();
+            IDelayedFlowQuery<UserEntity> q = Session.DelayedFlowQuery<UserEntity>();
 
             Assert.That(q, Is.Not.Null);
         }
@@ -135,24 +25,9 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         {
             UserEntity user = null;
 
-            var q = Session.DelayedFlowQuery(() => user);
+            IDelayedFlowQuery<UserEntity> q = Session.DelayedFlowQuery(() => user);
 
             Assert.That(q, Is.Not.Null);
-        }
-
-        [Test]
-        public void CanCreateDelayedFlowQueryWithOptions()
-        {
-            var options = new FlowQueryOptions()
-                .Add(c => c.SetMaxResults(5));
-
-            var q = Session.DelayedFlowQuery<UserEntity>(options);
-
-            Assert.That(q, Is.Not.Null);
-
-            ICriteria criteria = CriteriaHelper.BuildCriteria<UserEntity, UserEntity>(QuerySelection.Create(q as IQueryableFlowQuery));
-
-            Assert.That(criteria.GetRootEntityTypeIfAvailable(), Is.EqualTo(typeof(UserEntity)));
         }
 
         [Test]
@@ -160,9 +35,157 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         {
             UserEntity user = null;
 
-            var q = Session.DelayedFlowQuery(() => user, new FlowQueryOptions());
+            IDelayedFlowQuery<UserEntity> q = Session.DelayedFlowQuery(() => user, new FlowQueryOptions());
 
             Assert.That(q, Is.Not.Null);
+        }
+
+        [Test]
+        public void CanCreateDelayedFlowQueryWithOptions()
+        {
+            FlowQueryOptions options = new FlowQueryOptions()
+                .Add(c => c.SetMaxResults(5));
+
+            IDelayedFlowQuery<UserEntity> q = Session.DelayedFlowQuery<UserEntity>(options);
+
+            Assert.That(q, Is.Not.Null);
+
+            ICriteria criteria = new CriteriaBuilder()
+                .Build<UserEntity, UserEntity>(QuerySelection.Create(q as IQueryableFlowQuery));
+
+            Assert.That(criteria.GetRootEntityTypeIfAvailable(), Is.EqualTo(typeof(UserEntity)));
+        }
+
+        [Test]
+        public void CanCreateDetachedFlowQuery()
+        {
+            IDetachedFlowQuery<UserEntity> q = Session.DetachedFlowQuery<UserEntity>();
+
+            Assert.That(q, Is.Not.Null);
+        }
+
+        [Test]
+        public void CanCreateDetachedFlowQueryWithAlias()
+        {
+            UserEntity user = null;
+
+            IDetachedFlowQuery<UserEntity> q = Session.DetachedFlowQuery(() => user);
+
+            Assert.That(q, Is.Not.Null);
+        }
+
+        [Test]
+        public void CanCreateDetachedFlowQueryWithAliasAndOptions()
+        {
+            UserEntity user = null;
+
+            IDetachedFlowQuery<UserEntity> q = Session.DetachedFlowQuery(() => user, new FlowQueryOptions());
+
+            Assert.That(q, Is.Not.Null);
+        }
+
+        [Test]
+        public void CanCreateDetachedFlowQueryWithOptions()
+        {
+            FlowQueryOptions options = new FlowQueryOptions()
+                .Add(c => c.SetMaxResults(5));
+
+            var q = Session.DetachedFlowQuery<UserEntity>(options) as DetachedFlowQuery<UserEntity>;
+
+            Assert.That(q, Is.Not.Null);
+
+            DetachedCriteria criteria = new CriteriaBuilder()
+                .Build<UserEntity>(q);
+
+            Assert.That(criteria.GetRootEntityTypeIfAvailable(), Is.EqualTo(typeof(UserEntity)));
+        }
+
+        [Test]
+        public void CanCreateFlowQuery()
+        {
+            IImmediateFlowQuery<UserEntity> q = Session.FlowQuery<UserEntity>();
+
+            Assert.That(q, Is.Not.Null);
+        }
+
+        [Test]
+        public void CanCreateFlowQueryWithAlias()
+        {
+            UserEntity user = null;
+
+            IImmediateFlowQuery<UserEntity> q = Session.FlowQuery(() => user);
+
+            Assert.That(q, Is.Not.Null);
+        }
+
+        [Test]
+        public void CanCreateFlowQueryWithAliasAndOptions()
+        {
+            UserEntity user = null;
+
+            IImmediateFlowQuery<UserEntity> q = Session.FlowQuery(() => user, new FlowQueryOptions());
+
+            Assert.That(q, Is.Not.Null);
+        }
+
+        [Test]
+        public void CanCreateFlowQueryWithOptions()
+        {
+            FlowQueryOptions options = new FlowQueryOptions()
+                .Add(c => c.SetMaxResults(5));
+
+            IImmediateFlowQuery<UserEntity> q = Session.FlowQuery<UserEntity>(options);
+
+            Assert.That(q, Is.Not.Null);
+
+            ICriteria criteria = new CriteriaBuilder()
+                .Build<UserEntity, UserEntity>(QuerySelection.Create(q as IQueryableFlowQuery));
+
+            Assert.That(criteria.GetRootEntityTypeIfAvailable(), Is.EqualTo(typeof(UserEntity)));
+        }
+
+        [Test]
+        public void CanCreateImmediateFlowQuery()
+        {
+            IImmediateFlowQuery<UserEntity> q = Session.ImmediateFlowQuery<UserEntity>();
+
+            Assert.That(q, Is.Not.Null);
+        }
+
+        [Test]
+        public void CanCreateImmediateFlowQueryWithAlias()
+        {
+            UserEntity user = null;
+
+            IImmediateFlowQuery<UserEntity> q = Session.ImmediateFlowQuery(() => user);
+
+            Assert.That(q, Is.Not.Null);
+        }
+
+        [Test]
+        public void CanCreateImmediateFlowQueryWithAliasAndOptions()
+        {
+            UserEntity user = null;
+
+            IImmediateFlowQuery<UserEntity> q = Session.ImmediateFlowQuery(() => user, new FlowQueryOptions());
+
+            Assert.That(q, Is.Not.Null);
+        }
+
+        [Test]
+        public void CanCreateImmediateFlowQueryWithOptions()
+        {
+            FlowQueryOptions options = new FlowQueryOptions()
+                .Add(c => c.SetMaxResults(5));
+
+            IImmediateFlowQuery<UserEntity> q = Session.ImmediateFlowQuery<UserEntity>(options);
+
+            Assert.That(q, Is.Not.Null);
+
+            ICriteria criteria = new CriteriaBuilder()
+                .Build<UserEntity, UserEntity>(QuerySelection.Create(q as IQueryableFlowQuery));
+
+            Assert.That(criteria.GetRootEntityTypeIfAvailable(), Is.EqualTo(typeof(UserEntity)));
         }
 
         [Test]
@@ -174,54 +197,27 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         }
 
         [Test]
-        public void CanCreateDetachedFlowQuery()
-        {
-            var q = Session.DetachedFlowQuery<UserEntity>();
-
-            Assert.That(q, Is.Not.Null);
-        }
-
-        [Test]
-        public void CanCreateDetachedFlowQueryWithAlias()
-        {
-            UserEntity user = null;
-
-            var q = Session.DetachedFlowQuery(() => user);
-
-            Assert.That(q, Is.Not.Null);
-        }
-
-        [Test]
-        public void CanCreateDetachedFlowQueryWithOptions()
-        {
-            var options = new FlowQueryOptions()
-                .Add(c => c.SetMaxResults(5));
-
-            var q = Session.DetachedFlowQuery<UserEntity>(options);
-
-            Assert.That(q, Is.Not.Null);
-
-            DetachedCriteria criteria = CriteriaHelper.BuildDetachedCriteria(q);
-
-            Assert.That(criteria.GetRootEntityTypeIfAvailable(), Is.EqualTo(typeof(UserEntity)));
-        }
-
-        [Test]
-        public void CanCreateDetachedFlowQueryWithAliasAndOptions()
-        {
-            UserEntity user = null;
-
-            var q = Session.DetachedFlowQuery(() => user, new FlowQueryOptions());
-
-            Assert.That(q, Is.Not.Null);
-        }
-
-        [Test]
         public void DetachedDoesNotThrowWhenOptionsIsNull()
         {
             FlowQueryOptions options = null;
 
             Assert.That(() => Session.DetachedFlowQuery<UserEntity>(options), Throws.Nothing);
+        }
+
+        [Test]
+        public void DoesNotThrowWhenOptionsIsNull()
+        {
+            FlowQueryOptions options = null;
+
+            Assert.That(() => Session.FlowQuery<UserEntity>(options), Throws.Nothing);
+        }
+
+        [Test]
+        public void ImmediateDoesNotThrowWhenOptionsIsNull()
+        {
+            FlowQueryOptions options = null;
+
+            Assert.That(() => Session.ImmediateFlowQuery<UserEntity>(options), Throws.Nothing);
         }
     }
 }

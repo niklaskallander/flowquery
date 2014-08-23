@@ -1,21 +1,38 @@
-﻿using System;
-using NHibernate.FlowQuery.Core.Selection;
-using NHibernate.FlowQuery.Test.Setup.Dtos;
-using NHibernate.FlowQuery.Test.Setup.Entities;
-using NUnit.Framework;
-
-// ReSharper disable ExpressionIsAlwaysNull
-namespace NHibernate.FlowQuery.Test.FlowQuery.Core.Selection
+﻿namespace NHibernate.FlowQuery.Test.FlowQuery.Core.Selection
 {
-    using Is = NUnit.Framework.Is;
+    using System;
+    using System.Linq.Expressions;
+
+    using NHibernate.FlowQuery.Core;
+    using NHibernate.FlowQuery.Core.Implementations;
+    using NHibernate.FlowQuery.Test.Setup.Dtos;
+    using NHibernate.FlowQuery.Test.Setup.Entities;
+
+    using NUnit.Framework;
 
     [TestFixture]
     public class PartialSelectionTest : BaseTest
     {
         [Test]
+        public void PartialSelectionReturnsNullAtCompileIfEmpty()
+        {
+            IPartialSelection<UserEntity, UserDto> selection = DummyQuery<UserEntity>()
+                .PartialSelect<UserDto>();
+
+            Expression<Func<UserEntity, UserDto>> expression = selection.Compile();
+
+            Assert.That(expression, Is.Null);
+        }
+
+        [Test]
         public void PartialSelectionThrowsIfBuilderIsNull()
         {
-            Assert.That(() => new PartialSelection<UserEntity, UserDto>(null), Throws.InstanceOf<ArgumentNullException>());
+            Assert
+                .That
+                (
+                    () => new PartialSelection<UserEntity, UserDto>(null),
+                    Throws.InstanceOf<ArgumentNullException>()
+                );
         }
 
         [Test]
@@ -27,20 +44,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.Selection
         [Test]
         public void PartialSelectionThrowsIfSelectionIsNull()
         {
-            PartialSelection<UserEntity, UserDto> selection = null;
-
-            Assert.That(() => DummyQuery<UserEntity>().Select(selection), Throws.InstanceOf<ArgumentNullException>());
-        }
-
-        [Test]
-        public void PartialSelectionReturnsNullAtCompileIfEmpty()
-        {
-            var selection = DummyQuery<UserEntity>()
-                .PartialSelect<UserDto>();
-
-            var expression = selection.Compile();
-
-            Assert.That(expression, Is.Null);
+            Assert
+                .That
+                (
+                    () => DummyQuery<UserEntity>().Select((PartialSelection<UserEntity, UserDto>)null),
+                    Throws.InstanceOf<ArgumentNullException>()
+                );
         }
     }
 }

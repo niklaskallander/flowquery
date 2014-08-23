@@ -1,12 +1,14 @@
-using System.Linq;
-using NHibernate.Criterion;
-using NHibernate.FlowQuery.Test.Setup.Entities;
-using NUnit.Framework;
-
 namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
 {
+    using System.Linq;
+
+    using NHibernate.Criterion;
+    using NHibernate.FlowQuery.Core;
+    using NHibernate.FlowQuery.Test.Setup.Entities;
+
+    using NUnit.Framework;
+
     using FqIs = Is;
-    using Is = NUnit.Framework.Is;
 
     [TestFixture]
     public class SelectDistinctTest : BaseTest
@@ -14,14 +16,13 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void CanSelectDistinctUsingExpression()
         {
-            var query = DetachedQuery<UserEntity>()
+            IDetachedFlowQuery<UserEntity> query = DetachedQuery<UserEntity>()
                 .Where(x => x.IsOnline)
                 .Distinct().Select(x => x.Id);
 
-            var users = Query<UserEntity>()
+            FlowQuerySelection<UserEntity> users = Query<UserEntity>()
                 .Where(x => x.Id, FqIs.In(query))
-                .Select()
-                ;
+                .Select();
 
             Assert.That(users.Count(), Is.EqualTo(3));
         }
@@ -29,14 +30,13 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void CanSelectDistinctUsingProjection()
         {
-            var query = DetachedQuery<UserEntity>()
+            IDetachedFlowQuery<UserEntity> query = DetachedQuery<UserEntity>()
                 .Where(x => x.IsOnline)
                 .Distinct().Select(Projections.Property("Id"));
 
-            var users = Query<UserEntity>()
+            FlowQuerySelection<UserEntity> users = Query<UserEntity>()
                 .Where(x => x.Id, FqIs.In(query))
-                .Select()
-                ;
+                .Select();
 
             Assert.That(users.Count(), Is.EqualTo(3));
         }
@@ -44,14 +44,13 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         [Test]
         public void CanSelectDistinctUsingString()
         {
-            var query = DetachedQuery<UserEntity>()
+            IDetachedFlowQuery<UserEntity> query = DetachedQuery<UserEntity>()
                 .Where(x => x.IsOnline)
-                .Distinct().Select(new[] { "Id" });
+                .Distinct().Select("Id");
 
-            var users = Query<UserEntity>()
+            FlowQuerySelection<UserEntity> users = Query<UserEntity>()
                 .Where(x => x.Id, FqIs.In(query))
-                .Select()
-                ;
+                .Select();
 
             Assert.That(users.Count(), Is.EqualTo(3));
         }

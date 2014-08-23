@@ -1,34 +1,43 @@
-﻿using System.Linq;
-using System.Reflection;
-using NHibernate.Criterion;
-using NHibernate.FlowQuery.Core;
-using NHibernate.FlowQuery.Helpers;
-using NHibernate.FlowQuery.Test.Setup.Entities;
-using NHibernate.Impl;
-using NHibernate.SqlCommand;
-using NUnit.Framework;
-
-namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
+﻿namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
 {
-    using Is = NUnit.Framework.Is;
+    using System.Linq;
+    using System.Reflection;
+
+    using NHibernate.Criterion;
+    using NHibernate.FlowQuery.Core;
+    using NHibernate.FlowQuery.Core.Implementations;
+    using NHibernate.FlowQuery.Core.Structures;
+    using NHibernate.FlowQuery.Helpers;
+    using NHibernate.FlowQuery.Test.Setup.Entities;
+    using NHibernate.Impl;
+
+    using NUnit.Framework;
 
     [TestFixture]
     public class LockTest : BaseTest
     {
         [Test]
-        public void CanGetLockBuilder()
+        public void CanClearLocks()
         {
-            var builder = DummyQuery<UserEntity>()
-                .Lock();
+            IImmediateFlowQuery<UserEntity> query = DummyQuery<UserEntity>()
+                .Lock().Upgrade()
+                .Lock("user").Read()
+                .Lock("testAlias").Force();
 
-            Assert.That(builder, Is.Not.Null);
+            var info = (IFlowQuery)query;
+
+            Assert.That(info.Locks.Count, Is.EqualTo(3));
+
+            query.ClearLocks();
+
+            Assert.That(info.Locks.Count, Is.EqualTo(0));
         }
 
         [Test]
-        public void CanGetLockBuilderUsingStringAlias()
+        public void CanGetLockBuilder()
         {
-            var builder = DummyQuery<UserEntity>()
-                .Lock("user");
+            ILockBuilder<UserEntity, IImmediateFlowQuery<UserEntity>> builder = DummyQuery<UserEntity>()
+                .Lock();
 
             Assert.That(builder, Is.Not.Null);
         }
@@ -38,46 +47,19 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         {
             UserEntity user = null;
 
-            var builder = DummyQuery<UserEntity>()
+            ILockBuilder<UserEntity, IImmediateFlowQuery<UserEntity>> builder = DummyQuery<UserEntity>()
                 .Lock(() => user);
 
             Assert.That(builder, Is.Not.Null);
         }
 
         [Test]
-        public void CanSetLockModeWithoutAlias()
+        public void CanGetLockBuilderUsingStringAlias()
         {
-            var builder = DummyQuery<UserEntity>()
-                .Lock();
-
-            Assert.That(builder, Is.Not.Null);
-
-            var query = (IFlowQuery)builder.Upgrade();
-
-            Assert.That(query.Locks.Count, Is.EqualTo(1));
-
-            var only = query.Locks.Single();
-
-            Assert.That(only.Alias, Is.Null);
-            Assert.That(only.LockMode, Is.EqualTo(LockMode.Upgrade));
-        }
-
-        [Test]
-        public void CanSetLockModeWithAliasUsingString()
-        {
-            var builder = DummyQuery<UserEntity>()
+            ILockBuilder<UserEntity, IImmediateFlowQuery<UserEntity>> builder = DummyQuery<UserEntity>()
                 .Lock("user");
 
             Assert.That(builder, Is.Not.Null);
-
-            var query = (IFlowQuery)builder.Upgrade();
-
-            Assert.That(query.Locks.Count, Is.EqualTo(1));
-
-            var only = query.Locks.Single();
-
-            Assert.That(only.Alias, Is.EqualTo("user"));
-            Assert.That(only.LockMode, Is.EqualTo(LockMode.Upgrade));
         }
 
         [Test]
@@ -85,7 +67,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         {
             UserEntity user = null;
 
-            var builder = DummyQuery<UserEntity>()
+            ILockBuilder<UserEntity, IImmediateFlowQuery<UserEntity>> builder = DummyQuery<UserEntity>()
                 .Lock(() => user);
 
             Assert.That(builder, Is.Not.Null);
@@ -94,43 +76,16 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
 
             Assert.That(query.Locks.Count, Is.EqualTo(1));
 
-            var only = query.Locks.Single();
+            Lock only = query.Locks.Single();
 
             Assert.That(only.Alias, Is.EqualTo("user"));
             Assert.That(only.LockMode, Is.EqualTo(LockMode.Upgrade));
         }
 
         [Test]
-        public void CanUpdateLockModeWithoutAlias()
+        public void CanSetLockModeWithAliasUsingString()
         {
-            var builder = DummyQuery<UserEntity>()
-                .Lock();
-
-            Assert.That(builder, Is.Not.Null);
-
-            var query = (IFlowQuery)builder.Upgrade();
-
-            Assert.That(query.Locks.Count, Is.EqualTo(1));
-
-            var only = query.Locks.Single();
-
-            Assert.That(only.Alias, Is.Null);
-            Assert.That(only.LockMode, Is.EqualTo(LockMode.Upgrade));
-
-            builder.Read();
-
-            Assert.That(query.Locks.Count, Is.EqualTo(1));
-
-            only = query.Locks.Single();
-
-            Assert.That(only.Alias, Is.Null);
-            Assert.That(only.LockMode, Is.EqualTo(LockMode.Read));
-        }
-
-        [Test]
-        public void CanUpdateLockModeWithAliasUsingString()
-        {
-            var builder = DummyQuery<UserEntity>()
+            ILockBuilder<UserEntity, IImmediateFlowQuery<UserEntity>> builder = DummyQuery<UserEntity>()
                 .Lock("user");
 
             Assert.That(builder, Is.Not.Null);
@@ -139,28 +94,17 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
 
             Assert.That(query.Locks.Count, Is.EqualTo(1));
 
-            var only = query.Locks.Single();
+            Lock only = query.Locks.Single();
 
             Assert.That(only.Alias, Is.EqualTo("user"));
             Assert.That(only.LockMode, Is.EqualTo(LockMode.Upgrade));
-
-            builder.Read();
-
-            Assert.That(query.Locks.Count, Is.EqualTo(1));
-
-            only = query.Locks.Single();
-
-            Assert.That(only.Alias, Is.EqualTo("user"));
-            Assert.That(only.LockMode, Is.EqualTo(LockMode.Read));
         }
 
         [Test]
-        public void CanUpdateLockModeWithAliasUsingExpression()
+        public void CanSetLockModeWithoutAlias()
         {
-            UserEntity user = null;
-
-            var builder = DummyQuery<UserEntity>()
-                .Lock(() => user);
+            ILockBuilder<UserEntity, IImmediateFlowQuery<UserEntity>> builder = DummyQuery<UserEntity>()
+                .Lock();
 
             Assert.That(builder, Is.Not.Null);
 
@@ -168,19 +112,10 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
 
             Assert.That(query.Locks.Count, Is.EqualTo(1));
 
-            var only = query.Locks.Single();
+            Lock only = query.Locks.Single();
 
-            Assert.That(only.Alias, Is.EqualTo("user"));
+            Assert.That(only.Alias, Is.Null);
             Assert.That(only.LockMode, Is.EqualTo(LockMode.Upgrade));
-
-            builder.Read();
-
-            Assert.That(query.Locks.Count, Is.EqualTo(1));
-
-            only = query.Locks.Single();
-
-            Assert.That(only.Alias, Is.EqualTo("user"));
-            Assert.That(only.LockMode, Is.EqualTo(LockMode.Read));
         }
 
         [Test]
@@ -193,7 +128,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
 
             Assert.That(query.Locks.Count, Is.EqualTo(3));
 
-            foreach (var lockInfo in query.Locks)
+            foreach (Lock lockInfo in query.Locks)
             {
                 switch (lockInfo.Alias)
                 {
@@ -213,62 +148,18 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         }
 
         [Test]
-        public void CanClearLocks()
-        {
-            var query = DummyQuery<UserEntity>()
-                .Lock().Upgrade()
-                .Lock("user").Read()
-                .Lock("testAlias").Force();
-
-            var info = (IFlowQuery)query;
-
-            Assert.That(info.Locks.Count, Is.EqualTo(3));
-
-            query.ClearLocks();
-
-            Assert.That(info.Locks.Count, Is.EqualTo(0));
-        }
-
-        [Test]
-        public void CanUpdateLockForAliasSetUsingStringByAliasSetUsingExpression()
-        {
-            UserEntity user = null;
-
-            var query = DummyQuery<UserEntity>()
-                .Lock("user").Upgrade();
-
-            var info = (IFlowQuery)query;
-
-            Assert.That(info.Locks.Count, Is.EqualTo(1));
-
-            var only = info.Locks.Single();
-
-            Assert.That(only.Alias, Is.EqualTo("user"));
-            Assert.That(only.LockMode, Is.EqualTo(LockMode.Upgrade));
-
-            query.Lock(() => user).Force();
-
-            Assert.That(info.Locks.Count, Is.EqualTo(1));
-
-            only = info.Locks.Single();
-
-            Assert.That(only.Alias, Is.EqualTo("user"));
-            Assert.That(only.LockMode, Is.EqualTo(LockMode.Force));
-        }
-
-        [Test]
         public void CanUpdateLockForAliasSetUsingExpressionByAliasSetUsingString()
         {
             UserEntity user = null;
 
-            var query = DummyQuery<UserEntity>()
+            IImmediateFlowQuery<UserEntity> query = DummyQuery<UserEntity>()
                 .Lock(() => user).Upgrade();
 
             var info = (IFlowQuery)query;
 
             Assert.That(info.Locks.Count, Is.EqualTo(1));
 
-            var only = info.Locks.Single();
+            Lock only = info.Locks.Single();
 
             Assert.That(only.Alias, Is.EqualTo("user"));
             Assert.That(only.LockMode, Is.EqualTo(LockMode.Upgrade));
@@ -284,14 +175,125 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         }
 
         [Test]
+        public void CanUpdateLockForAliasSetUsingStringByAliasSetUsingExpression()
+        {
+            UserEntity user = null;
+
+            IImmediateFlowQuery<UserEntity> query = DummyQuery<UserEntity>()
+                .Lock("user").Upgrade();
+
+            var info = (IFlowQuery)query;
+
+            Assert.That(info.Locks.Count, Is.EqualTo(1));
+
+            Lock only = info.Locks.Single();
+
+            Assert.That(only.Alias, Is.EqualTo("user"));
+            Assert.That(only.LockMode, Is.EqualTo(LockMode.Upgrade));
+
+            query.Lock(() => user).Force();
+
+            Assert.That(info.Locks.Count, Is.EqualTo(1));
+
+            only = info.Locks.Single();
+
+            Assert.That(only.Alias, Is.EqualTo("user"));
+            Assert.That(only.LockMode, Is.EqualTo(LockMode.Force));
+        }
+
+        [Test]
+        public void CanUpdateLockModeWithAliasUsingExpression()
+        {
+            UserEntity user = null;
+
+            ILockBuilder<UserEntity, IImmediateFlowQuery<UserEntity>> builder = DummyQuery<UserEntity>()
+                .Lock(() => user);
+
+            Assert.That(builder, Is.Not.Null);
+
+            var query = (IFlowQuery)builder.Upgrade();
+
+            Assert.That(query.Locks.Count, Is.EqualTo(1));
+
+            Lock only = query.Locks.Single();
+
+            Assert.That(only.Alias, Is.EqualTo("user"));
+            Assert.That(only.LockMode, Is.EqualTo(LockMode.Upgrade));
+
+            builder.Read();
+
+            Assert.That(query.Locks.Count, Is.EqualTo(1));
+
+            only = query.Locks.Single();
+
+            Assert.That(only.Alias, Is.EqualTo("user"));
+            Assert.That(only.LockMode, Is.EqualTo(LockMode.Read));
+        }
+
+        [Test]
+        public void CanUpdateLockModeWithAliasUsingString()
+        {
+            ILockBuilder<UserEntity, IImmediateFlowQuery<UserEntity>> builder = DummyQuery<UserEntity>()
+                .Lock("user");
+
+            Assert.That(builder, Is.Not.Null);
+
+            var query = (IFlowQuery)builder.Upgrade();
+
+            Assert.That(query.Locks.Count, Is.EqualTo(1));
+
+            Lock only = query.Locks.Single();
+
+            Assert.That(only.Alias, Is.EqualTo("user"));
+            Assert.That(only.LockMode, Is.EqualTo(LockMode.Upgrade));
+
+            builder.Read();
+
+            Assert.That(query.Locks.Count, Is.EqualTo(1));
+
+            only = query.Locks.Single();
+
+            Assert.That(only.Alias, Is.EqualTo("user"));
+            Assert.That(only.LockMode, Is.EqualTo(LockMode.Read));
+        }
+
+        [Test]
+        public void CanUpdateLockModeWithoutAlias()
+        {
+            ILockBuilder<UserEntity, IImmediateFlowQuery<UserEntity>> builder = DummyQuery<UserEntity>()
+                .Lock();
+
+            Assert.That(builder, Is.Not.Null);
+
+            var query = (IFlowQuery)builder.Upgrade();
+
+            Assert.That(query.Locks.Count, Is.EqualTo(1));
+
+            Lock only = query.Locks.Single();
+
+            Assert.That(only.Alias, Is.Null);
+            Assert.That(only.LockMode, Is.EqualTo(LockMode.Upgrade));
+
+            builder.Read();
+
+            Assert.That(query.Locks.Count, Is.EqualTo(1));
+
+            only = query.Locks.Single();
+
+            Assert.That(only.Alias, Is.Null);
+            Assert.That(only.LockMode, Is.EqualTo(LockMode.Read));
+        }
+
+        [Test]
         public void LocksArePopulatedOnCriteria()
         {
-            var query = Query<UserEntity>()
+            IImmediateFlowQuery<UserEntity> query = Query<UserEntity>()
                 .Lock().Upgrade()
                 .Lock("user").Read()
                 .Lock("testAlias").Force();
 
-            ICriteria criteria = CriteriaHelper.BuildCriteria<UserEntity, UserEntity>(QuerySelection.Create((IQueryableFlowQuery)query));
+            ICriteria criteria = new CriteriaBuilder()
+                .Build<UserEntity, UserEntity>(QuerySelection.Create((IQueryableFlowQuery)query));
 
             Assert.That(criteria, Is.Not.Null);
 
@@ -312,9 +314,10 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
             var query = DetachedQuery<UserEntity>()
                 .Lock().None()
                 .Lock("user").Write()
-                .Lock("testAlias").UpgradeNoWait();
+                .Lock("testAlias").UpgradeNoWait() as DetachedFlowQuery<UserEntity>;
 
-            DetachedCriteria detachedCriteria = CriteriaHelper.BuildDetachedCriteria(query);
+            DetachedCriteria detachedCriteria = new CriteriaBuilder()
+                .Build<UserEntity>(query);
 
             Assert.That(detachedCriteria, Is.Not.Null);
 

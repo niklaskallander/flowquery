@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using NHibernate.FlowQuery.AutoMapping;
-
-namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest.Mappers
+﻿namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest.Mappers
 {
-    using Type = System.Type;
+    using System;
+    using System.Collections.Generic;
+
+    using NHibernate.FlowQuery.AutoMapping;
 
     public class CustomMapper : DefaultMapper
     {
@@ -26,7 +25,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest.Mappers
             _maps[typeof(TSource)].Add(typeof(TDestination), mappingDelegate);
         }
 
-        protected override TDestination Map<TSource, TDestination>(TSource source)
+        public override TDestination Map<TSource, TDestination>(TSource source)
         {
             var mappingDelegate = (Func<TSource, TDestination>)_maps[typeof(TSource)][typeof(TDestination)];
 

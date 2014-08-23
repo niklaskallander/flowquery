@@ -1,296 +1,37 @@
-﻿using System;
-using System.Linq;
-using System.Linq.Expressions;
-using AutoMapper;
-using NHibernate.Criterion;
-using NHibernate.FlowQuery.AutoMapping;
-using NHibernate.FlowQuery.Core;
-using NHibernate.FlowQuery.Core.CustomProjections;
-using NHibernate.FlowQuery.Core.Selection;
-using NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest.Mappers;
-using NHibernate.FlowQuery.Test.Setup.Dtos;
-using NHibernate.FlowQuery.Test.Setup.Entities;
-using NUnit.Framework;
-
-// ReSharper disable ExpressionIsAlwaysNull
-// ReSharper disable SimplifyConditionalTernaryExpression
-namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
+﻿namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
 {
-    using Is = NUnit.Framework.Is;
+    using System;
+    using System.Collections;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
+    using System.Linq.Expressions;
+
+    using AutoMapper;
+
+    using NHibernate.Criterion;
+    using NHibernate.FlowQuery.AutoMapping;
+    using NHibernate.FlowQuery.Core;
+    using NHibernate.FlowQuery.Core.CustomProjections;
+    using NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest.Mappers;
+    using NHibernate.FlowQuery.Test.Setup.Dtos;
+    using NHibernate.FlowQuery.Test.Setup.Entities;
+
+    using NUnit.Framework;
+
+    using Property = NHibernate.FlowQuery.Property;
 
     [TestFixture]
     public class SelectTest : BaseTest
     {
-        [SetUp]
-        public override void Setup()
-        {
-            base.Setup();
-
-            Mapping.SetMapper(new DefaultMapper());
-        }
-
-        public class TestSelectSubqueryModel
-        {
-            public virtual string Name { get; set; }
-
-            public virtual int NumberOfGroups { get; set; }
-        }
-
-        public class PuffClass
-        {
-            public string Puff;
-        }
-
-        public class TestCastingModel
-        {
-            public long? Test1 { get; set; }
-            public decimal Test2 { get; set; }
-            public double Test3 { get; set; }
-            public decimal Test4 { get; set; }
-            public float Test5 { get; set; }
-            public object Test6 { get; set; }
-        }
-
-        [Test]
-        public void TestCasting()
-        {
-            var stuff = Query<UserEntity>()
-                .Where(x => x.Id == 1)
-                .Select
-                (
-                    x => new TestCastingModel
-                    {
-                        Test1 = x.Id,
-                        Test2 = (decimal)Aggregate.Average(x.Id),
-                        Test3 = Aggregate.Average(x.Id),
-                        Test4 = x.Id,
-                        Test5 = x.Id,
-                        Test6 = x.Id
-                    }
-                )
-                .ToArray();
-
-            Assert.That(stuff.Length, Is.EqualTo(1));
-            Assert.That(stuff[0].Test1, Is.EqualTo(1));
-            Assert.That(stuff[0].Test2, Is.EqualTo(1));
-            Assert.That(stuff[0].Test3, Is.EqualTo(1));
-            Assert.That(stuff[0].Test4, Is.EqualTo(1));
-            Assert.That(stuff[0].Test5, Is.EqualTo(1));
-            Assert.That(stuff[0].Test6, Is.EqualTo(1));
-        }
-
-        [Test]
-        public void TestGroupByWithoutSelectUsingICriteria()
-        {
-            var stuff = Session.CreateCriteria<UserEntity>()
-                .AddOrder(Order.Asc(Projections.Property("IsOnline")))
-                .SetProjection
-                (
-                    new FqProjectionList()
-                        .Add(Projections.Count("Id"))
-                        .Add(new FqGroupByProjection(Projections.Property("IsOnline"), false))
-                )
-                .List();
-
-            Assert.That(stuff[0], Is.EqualTo(1));
-            Assert.That(stuff[1], Is.EqualTo(3));
-        }
-
-        [Test]
-        public void GroupByThrowsIfProjectionIsGroupBy()
-        {
-            Assert.That(() =>
-            {
-                DummyQuery<UserEntity>()
-                    .GroupBy(x => Aggregate.GroupBy(x.Id));
-
-            }, Throws.InvalidOperationException);
-        }
-
-        [Test]
-        public void GroupByThrowsIfProjectionIsAggregate()
-        {
-            Assert.That(() =>
-            {
-                DummyQuery<UserEntity>()
-                    .GroupBy(x => Aggregate.Average(x.Id));
-
-            }, Throws.InvalidOperationException);
-        }
-
-        [Test]
-        public void CanClearGroupBys()
-        {
-            var query = DummyQuery<UserEntity>();
-
-            var queryable = (IQueryableFlowQuery)query;
-
-            Assert.That(queryable.GroupBys.Count, Is.EqualTo(0));
-
-            query.GroupBy(x => x.Id);
-
-            Assert.That(queryable.GroupBys.Count, Is.EqualTo(1));
-
-            query.GroupBy(x => x.IsOnline);
-
-            Assert.That(queryable.GroupBys.Count, Is.EqualTo(2));
-
-            query.ClearGroupBys();
-
-            Assert.That(queryable.GroupBys.Count, Is.EqualTo(0));
-        }
-
-        [Test]
-        public void TestGroupByWithSelectUsingICriteria()
-        {
-            var stuff = Session.CreateCriteria<UserEntity>()
-                .AddOrder(Order.Asc(Projections.Property("IsOnline")))
-                .SetProjection
-                (
-                    new FqProjectionList()
-                        .Add(Projections.Count("Id"))
-                        .Add(new FqGroupByProjection(Projections.Property("IsOnline"), true))
-                )
-                .List();
-
-            var stuff1 = (object[])stuff[0];
-            var stuff2 = (object[])stuff[1];
-
-            Assert.That(stuff1[0], Is.EqualTo(1));
-            Assert.That(stuff1[1], Is.False);
-
-            Assert.That(stuff2[0], Is.EqualTo(3));
-            Assert.That(stuff2[1], Is.True);
-        }
-
-        [Test]
-        public void CanSelectSinglePropertyWithSeparateGroupBy()
-        {
-            bool[] values = Query<UserEntity>()
-                .OrderBy(x => x.IsOnline)
-                .GroupBy(x => x.IsOnline)
-                .Select<bool>(Projections.Property("IsOnline"))
-                .ToArray();
-
-            Assert.That(values.Length, Is.EqualTo(2));
-            Assert.That(values[0], Is.False);
-            Assert.That(values[1], Is.True);
-        }
-
-        [Test]
-        public void TestSelectSubqueryWithGroupBy()
-        {
-            UserEntity root = null;
-
-            var subquery = Query<UserGroupLinkEntity>()
-                .Detached()
-                .SetRootAlias(() => root)
-                .Where(x => x.User.Id == root.Id)
-                .Count();
-
-            var stuff = Session.FlowQuery(() => root)
-                .OrderBy<TestSelectSubqueryModel>(x => x.NumberOfGroups)
-                .GroupBy(x => x.Id)
-                .Select(x => new TestSelectSubqueryModel
-                {
-                    Name = x.Firstname,
-                    NumberOfGroups = Aggregate.Subquery<int>(subquery)
-                })
-                .ToArray();
-
-            Assert.That(stuff.Length, Is.EqualTo(4));
-            Assert.That(stuff[0].NumberOfGroups, Is.EqualTo(0));
-            Assert.That(stuff[1].NumberOfGroups, Is.EqualTo(1));
-            Assert.That(stuff[2].NumberOfGroups, Is.EqualTo(2));
-            Assert.That(stuff[3].NumberOfGroups, Is.EqualTo(2));
-        }
-
-        [Test]
-        public void TestSelectSubqueryThrowsIfSubqueryIsNull()
-        {
-            DetachedCriteria subquery = null;
-
-            Assert.That(() =>
-            {
-                DummyQuery<UserEntity>()
-                    .Select(x => new 
-                    {
-                        NumberOfGroups = Aggregate.Subquery<int>(subquery)
-                    });
-
-            }, Throws.InstanceOf<NotSupportedException>());
-        }
-
-        [Test]
-        public void TestSelectSubquery()
-        {
-            UserEntity root = null;
-
-            var subquery = Query<UserGroupLinkEntity>()
-                .Detached()
-                .SetRootAlias(() => root)
-                .Where(x => x.User.Id == root.Id)
-                .Count();
-
-            var stuff = Session.FlowQuery(() => root)
-                .OrderBy<TestSelectSubqueryModel>(x => x.NumberOfGroups)
-                .Select(x => new TestSelectSubqueryModel
-                {
-                    Name = x.Firstname,
-                    NumberOfGroups = Aggregate.Subquery<int>(subquery)
-                })
-                .ToArray();
-
-            Assert.That(stuff.Length, Is.EqualTo(4));
-            Assert.That(stuff[0].NumberOfGroups, Is.EqualTo(0));
-            Assert.That(stuff[1].NumberOfGroups, Is.EqualTo(1));
-            Assert.That(stuff[2].NumberOfGroups, Is.EqualTo(2));
-            Assert.That(stuff[3].NumberOfGroups, Is.EqualTo(2));
-        }
-
-        [Test]
-        public void TestInferredGrouping()
-        {
-            var stuff = Query<UserEntity>()
-                .Select(x => new
-                {
-                    Count = Aggregate.Count(x.Id),
-                    x.IsOnline
-                })
-                .ToArray();
-
-            Assert.That(stuff[0].Count, Is.GreaterThan(0));
-            Assert.That(stuff[1].Count, Is.GreaterThan(0));
-        }
-
-        [Test]
-        public void TestSelectRootByParameterNameThrows()
-        {
-            Assert.That(() => DummyQuery<UserEntity>().Select(x => x), Throws.InstanceOf<NotSupportedException>());
-        }
-
-        [Test]
-        public void TestSelectByAliasReturnsNull()
-        {
-            UserGroupLinkEntity groupLink = null;
-            GroupEntity group = null;
-
-            var stuff1 = Query<UserEntity>()
-                .Inner.Join(x => x.Groups, () => groupLink)
-                .Inner.Join(x => groupLink.Group, () => group)
-                .Select(x => group)
-                .ToArray();
-
-            foreach (var item in stuff1)
-            {
-                Assert.That(item, Is.Null);
-            }
-        }
-
         [Test]
         public void AttemptToSelectInvalidAggregationThrows()
         {
-            Assert.That(() => DummyQuery<UserEntity>().Select(x => x.Id.GetHashCode()), Throws.InstanceOf<NotSupportedException>());
+            Assert
+                .That
+                (
+                    () => DummyQuery<UserEntity>().Select(x => x.Id.GetHashCode()),
+                    Throws.InstanceOf<NotSupportedException>()
+                );
         }
 
         [Test]
@@ -338,15 +79,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
             var mapper = new CustomMapper();
 
             mapper
-                .AddMap<UserEntity, UserDto>
-                (
-                    x => new UserDto(x.Firstname + " " + x.Lastname)
-                    {
-                        Id = x.Id,
-                        IsOnline = x.IsOnline,
-                        Username = x.Username
-                    }
-                );
+                .AddMap<UserEntity, UserDto>(x => new UserDto(x.Firstname + " " + x.Lastname)
+                {
+                    Id = x.Id,
+                    IsOnline = x.IsOnline,
+                    Username = x.Username
+                });
 
             Mapping.SetMapper(mapper);
 
@@ -380,17 +118,36 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         }
 
         [Test]
+        public void CanClearGroupBys()
+        {
+            IImmediateFlowQuery<UserEntity> query = DummyQuery<UserEntity>();
+
+            var queryable = (IQueryableFlowQuery)query;
+
+            Assert.That(queryable.GroupBys.Count, Is.EqualTo(0));
+
+            query.GroupBy(x => x.Id);
+
+            Assert.That(queryable.GroupBys.Count, Is.EqualTo(1));
+
+            query.GroupBy(x => x.IsOnline);
+
+            Assert.That(queryable.GroupBys.Count, Is.EqualTo(2));
+
+            query.ClearGroupBys();
+
+            Assert.That(queryable.GroupBys.Count, Is.EqualTo(0));
+        }
+
+        [Test]
         public void CanSelectAggregationInGroupByUsingAggregateHelper()
         {
             var aggregations = Query<UserEntity>()
-                .Select
-                (
-                    u => new
-                    {
-                        Count = Aggregate.Count(u.Id),
-                        Role = Aggregate.GroupBy(u.Role)
-                    }
-                );
+                .Select(u => new
+                {
+                    Count = Aggregate.Count(u.Id),
+                    Role = Aggregate.GroupBy(u.Role)
+                });
 
             Assert.That(aggregations.Count(), Is.EqualTo(3));
 
@@ -411,18 +168,15 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void CanSelectAggregationUsingAggregateHelper()
         {
             var aggregation = Query<UserEntity>()
-                .Select
-                (
-                    u => new
-                    {
-                        Avg = Aggregate.Average(u.Id),
-                        Sum = Aggregate.Sum(u.Id),
-                        Min = Aggregate.Min(u.Id),
-                        Max = Aggregate.Max(u.Id),
-                        Cnt = Aggregate.Count(u.Id),
-                        Cnd = Aggregate.CountDistinct(u.Id)
-                    }
-                );
+                .Select(u => new
+                {
+                    Avg = Aggregate.Average(u.Id),
+                    Sum = Aggregate.Sum(u.Id),
+                    Min = Aggregate.Min(u.Id),
+                    Max = Aggregate.Max(u.Id),
+                    Cnt = Aggregate.Count(u.Id),
+                    Cnd = Aggregate.CountDistinct(u.Id)
+                });
 
             Assert.That(aggregation.Count(), Is.EqualTo(1));
 
@@ -447,13 +201,10 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void CanSelectAnonymous()
         {
             var anonymous = Query<UserEntity>()
-                .Select
-                (
-                    u => new
-                    {
-                        u.Username
-                    }
-                );
+                .Select(u => new
+                {
+                    u.Username
+                });
 
             Assert.That(anonymous.Count(), Is.EqualTo(4));
 
@@ -467,21 +218,18 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void CanSelectArithmeticOperations()
         {
             var anonymous = Query<UserEntity>()
-                .Select
-                (
-                    u => new
-                    {
-                        Value = ((u.Id - 1)*2 + 15)/u.Id,
-                        u.Id
-                    }
-                );
+                .Select(u => new
+                {
+                    Value = (((u.Id - 1) * 2) + 15) / u.Id,
+                    u.Id
+                });
 
             Assert.That(anonymous.Count(), Is.EqualTo(4));
 
             foreach (var item in anonymous)
             {
                 Assert.That(Ids, Contains.Item(item.Id));
-                Assert.That(item.Value, Is.EqualTo(((item.Id - 1)*2 + 15)/item.Id));
+                Assert.That(item.Value, Is.EqualTo((((item.Id - 1) * 2) + 15) / item.Id));
             }
         }
 
@@ -489,14 +237,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void CanSelectBinaryExpressions()
         {
             var anonymous = Query<UserEntity>()
-                .Select
-                (
-                    u => new
-                    {
-                        IsAdministrator = u.Role == RoleEnum.Administrator,
-                        u.Role
-                    }
-                );
+                .Select(u => new
+                {
+                    IsAdministrator = u.Role == RoleEnum.Administrator,
+                    u.Role
+                });
 
             Assert.That(anonymous.Count(), Is.EqualTo(4));
 
@@ -517,13 +262,10 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void CanSelectConcatenatedProperties()
         {
             var anonymous = Query<UserEntity>()
-                .Select
-                (
-                    u => new
-                    {
-                        Fullname = u.Firstname + (" " + u.Lastname)
-                    }
-                );
+                .Select(u => new
+                {
+                    Fullname = u.Firstname + (" " + u.Lastname)
+                });
 
             Assert.That(anonymous.Count(), Is.EqualTo(4));
 
@@ -551,14 +293,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void CanSelectConditionals()
         {
             var anonymous = Query<UserEntity>()
-                .Select
-                (
-                    u => new
-                    {
-                        IsAdministrator = u.Role == RoleEnum.Administrator ? true : false,
-                        u.Role
-                    }
-                );
+                .Select(u => new
+                {
+                    // ReSharper disable once RedundantTernaryExpression
+                    IsAdministrator = u.Role == RoleEnum.Administrator ? true : false,
+                    u.Role
+                });
 
             Assert.That(anonymous.Count(), Is.EqualTo(4));
 
@@ -576,19 +316,16 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         }
 
         [Test]
-        //, Ignore("NHibernate currently translates the system types to mismatching ITypes making NHibernate throw exceptions. YesNoType is not the same type as BooleanType. Have not found a way to work-around this issue yet.")
         public void CanSelectConditionalsWithMixedProjectionAndConstant()
         {
             var anonymous = Query<UserEntity>()
-                .Select
-                (
-                    u => new
-                    {
-                        IsAdministrator = u.Role == RoleEnum.Administrator ? u.IsOnline : false,
-                        u.Role,
-                        u.IsOnline
-                    }
-                );
+                .Select(u => new
+                {
+                    // ReSharper disable once SimplifyConditionalTernaryExpression
+                    IsAdministrator = u.Role == RoleEnum.Administrator ? u.IsOnline : false,
+                    u.Role,
+                    u.IsOnline
+                });
 
             Assert.That(anonymous.Count(), Is.EqualTo(4));
 
@@ -606,20 +343,17 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         }
 
         [Test]
-        public void CanSelectConditionalsWithMixedProjectionAndLocalVariable()
+        public void CanSelectConditionalsWithMixedProjectionAndLocalConstant()
         {
-            // ReSharper disable once ConvertToConstant.Local
-            bool notTrue = false;
+            const bool NotTrue = false;
 
             var anonymous = Query<UserEntity>()
-                .Select
-                (
-                    u => new
-                    {
-                        IsAdministrator = u.Role == RoleEnum.Administrator ? true : notTrue,
-                        u.Role
-                    }
-                );
+                .Select(u => new
+                {
+                    // ReSharper disable once SimplifyConditionalTernaryExpression
+                    IsAdministrator = u.Role == RoleEnum.Administrator ? true : NotTrue,
+                    u.Role
+                });
 
             Assert.That(anonymous.Count(), Is.EqualTo(4));
 
@@ -637,19 +371,18 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         }
 
         [Test]
-        public void CanSelectConditionalsWithMixedProjectionAndLocalConstant()
+        public void CanSelectConditionalsWithMixedProjectionAndLocalVariable()
         {
-            const bool notTrue = false;
+            // ReSharper disable once ConvertToConstant.Local
+            bool notTrue = false;
 
             var anonymous = Query<UserEntity>()
-                .Select
-                (
-                    u => new
-                    {
-                        IsAdministrator = u.Role == RoleEnum.Administrator ? true : notTrue,
-                        u.Role
-                    }
-                );
+                .Select(u => new
+                {
+                    // ReSharper disable once SimplifyConditionalTernaryExpression
+                    IsAdministrator = u.Role == RoleEnum.Administrator ? true : notTrue,
+                    u.Role
+                });
 
             Assert.That(anonymous.Count(), Is.EqualTo(4));
 
@@ -673,13 +406,10 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
 
             var ids = Query<UserEntity>()
                 .Inner.Join(u => u.Groups, () => link)
-                .Select
-                (
-                    u => new
-                    {
-                        link.Id
-                    }
-                );
+                .Select(u => new
+                {
+                    link.Id
+                });
 
             Assert.That(ids, Is.Not.Empty);
 
@@ -693,18 +423,15 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void CanSelectMemberInitNestedInAnonymous()
         {
             var anonymous = Query<UserEntity>()
-                .Select
-                (
-                    u => new
+                .Select(u => new
+                {
+                    Something = u.CreatedStamp,
+                    Member = new UserDto(u.Firstname + " " + u.Lastname)
                     {
-                        Something = u.CreatedStamp,
-                        Member = new UserDto(u.Firstname + " " + u.Lastname)
-                        {
-                            Id = u.Id,
-                            Username = u.Username
-                        }
+                        Id = u.Id,
+                        Username = u.Username
                     }
-                );
+                });
 
             Assert.That(anonymous.Count(), Is.EqualTo(4));
 
@@ -722,15 +449,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void CanSelectMultipleBinaryExpressions()
         {
             var anonymous = Query<UserEntity>()
-                .Select
-                (
-                    u => new
-                    {
-                        IsAdministrator = u.Role == RoleEnum.Administrator && u.Id < 3,
-                        u.Role,
-                        u.Id
-                    }
-                );
+                .Select(u => new
+                {
+                    IsAdministrator = u.Role == RoleEnum.Administrator && u.Id < 3,
+                    u.Role,
+                    u.Id
+                });
 
             Assert.That(anonymous.Count(), Is.EqualTo(4));
 
@@ -751,15 +475,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void CanSelectMultipleBinaryExpressionsWithOr()
         {
             var anonymous = Query<UserEntity>()
-                .Select
-                (
-                    u => new
-                    {
-                        IsAdministrator = u.Role == RoleEnum.Administrator || u.Id < 3,
-                        u.Role,
-                        u.Id
-                    }
-                );
+                .Select(u => new
+                {
+                    IsAdministrator = u.Role == RoleEnum.Administrator || u.Id < 3,
+                    u.Role,
+                    u.Id
+                });
 
             Assert.That(anonymous.Count(), Is.EqualTo(4));
 
@@ -780,18 +501,15 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void CanSelectNestedAnonymous()
         {
             var anonymous = Query<UserEntity>()
-                .Select
-                (
-                    u => new
+                .Select(u => new
+                {
+                    u.Username,
+                    Name = new
                     {
-                        u.Username,
-                        Name = new
-                        {
-                            u.Firstname,
-                            u.Lastname
-                        }
+                        u.Firstname,
+                        u.Lastname
                     }
-                );
+                });
 
             Assert.That(anonymous.Count(), Is.EqualTo(4));
 
@@ -807,19 +525,17 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void CanSelectNestedConditionals()
         {
             var anonymous = Query<UserEntity>()
-                .Select
-                (
-                    u => new
-                    {
-                        IsAdministrator = u.Role == RoleEnum.Administrator 
-                            ? true 
-                            : u.Id < 3 
-                                ? true 
-                                : false,
-                        u.Role,
-                        u.Id
-                    }
-                );
+                .Select(u => new
+                {
+                    // ReSharper disable once SimplifyConditionalTernaryExpression, RedundantTernaryExpression
+                    IsAdministrator = u.Role == RoleEnum.Administrator
+                        ? true
+                        : u.Id < 3
+                            ? true
+                            : false,
+                    u.Role,
+                    u.Id
+                });
 
             Assert.That(anonymous.Count(), Is.EqualTo(4));
 
@@ -853,17 +569,14 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void CanSelectNestedMemberInits()
         {
             FlowQuerySelection<UserEntity> users = Query<UserEntity>()
-                .Select
-                (
-                    x => new UserEntity
+                .Select(x => new UserEntity
+                {
+                    Id = x.Id,
+                    Setting = new Setting
                     {
-                        Id = x.Id,
-                        Setting = new Setting
-                        {
-                            Id = x.Setting.Id
-                        }
+                        Id = x.Setting.Id
                     }
-                );
+                });
 
             Assert.That(users.Count(), Is.EqualTo(4));
 
@@ -878,26 +591,20 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         [Test]
         public void CanSelectPartially()
         {
-            PartialSelection<UserEntity, UserDto> partialSelection = Query<UserEntity>()
+            IPartialSelection<UserEntity, UserDto> partialSelection = Query<UserEntity>()
                 .PartialSelect(x => new UserDto(x.Firstname + " " + x.Lastname));
 
             partialSelection
-                .Add
-                (
-                    x => new UserDto
-                    {
-                        Id = x.Id
-                    }
-                );
+                .Add(x => new UserDto
+                {
+                    Id = x.Id
+                });
 
             partialSelection
-                .Add
-                (
-                    x => new UserDto
-                    {
-                        Username = x.Username
-                    }
-                );
+                .Add(x => new UserDto
+                {
+                    Username = x.Username
+                });
 
             FlowQuerySelection<UserDto> users = partialSelection
                 .Select();
@@ -921,6 +628,20 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
             {
                 Assert.That(Usernames, Contains.Item(name));
             }
+        }
+
+        [Test]
+        public void CanSelectSinglePropertyWithSeparateGroupBy()
+        {
+            bool[] values = Query<UserEntity>()
+                .OrderBy(x => x.IsOnline)
+                .GroupBy(x => x.IsOnline)
+                .Select<bool>(Projections.Property("IsOnline"))
+                .ToArray();
+
+            Assert.That(values.Length, Is.EqualTo(2));
+            Assert.That(values[0], Is.False);
+            Assert.That(values[1], Is.True);
         }
 
         [Test]
@@ -948,14 +669,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void CanSelectSpecificPropertiesUsingMemberInit()
         {
             FlowQuerySelection<UserEntity> users = Query<UserEntity>()
-                .Select
-                (
-                    u => new UserEntity
-                    {
-                        Id = u.Id,
-                        Role = u.Role
-                    }
-                );
+                .Select(u => new UserEntity
+                {
+                    Id = u.Id,
+                    Role = u.Role
+                });
 
             Assert.That(users.Count(), Is.EqualTo(4));
 
@@ -1011,13 +729,10 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void CanSelectToClassWithPublicFields()
         {
             FlowQuerySelection<PuffClass> puffClasses = Query<UserEntity>()
-                .Select
-                (
-                    x => new PuffClass
-                    {
-                        Puff = x.Firstname + " " + x.Lastname
-                    }
-                );
+                .Select(x => new PuffClass
+                {
+                    Puff = x.Firstname + " " + x.Lastname
+                });
 
             Assert.That(puffClasses.Count(), Is.EqualTo(4));
 
@@ -1076,14 +791,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void CanSelectUsingMemberInit()
         {
             FlowQuerySelection<UserDto> dtos = Query<UserEntity>()
-                .Select
-                (
-                    u => new UserDto
-                    {
-                        Fullname = u.Firstname + " " + u.Lastname,
-                        Id = u.Id
-                    }
-                );
+                .Select(u => new UserDto
+                {
+                    Fullname = u.Firstname + " " + u.Lastname,
+                    Id = u.Id
+                });
 
             Assert.That(dtos.Count(), Is.EqualTo(4));
 
@@ -1099,13 +811,10 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void CanSelectUsingMemberInitWithConstructor()
         {
             FlowQuerySelection<UserDto> dtos = Query<UserEntity>()
-                .Select
-                (
-                    u => new UserDto(u.Firstname + " " + u.Lastname)
-                    {
-                        Id = u.Id
-                    }
-                );
+                .Select(u => new UserDto(u.Firstname + " " + u.Lastname)
+                {
+                    Id = u.Id
+                });
 
             Assert.That(dtos.Count(), Is.EqualTo(4));
 
@@ -1135,13 +844,10 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void CanSelectUsingPropertyHelper()
         {
             FlowQuerySelection<UserEntity> users = Query<UserEntity>()
-                .Select
-                (
-                    u => new UserEntity
-                    {
-                        Id = Property.As<long>("u.Id")
-                    }
-                );
+                .Select(u => new UserEntity
+                {
+                    Id = Property.As<long>("u.Id")
+                });
 
             Assert.That(users.Count(), Is.EqualTo(4));
 
@@ -1228,14 +934,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void CanSelectWithStringEmptyInProjections()
         {
             var anonymous = Query<UserEntity>()
-                .Select
-                (
-                    x => new
-                    {
-                        Prop = x.Role == RoleEnum.Administrator ? "Admin" : string.Empty,
-                        x.Role
-                    }
-                );
+                .Select(x => new
+                {
+                    Prop = x.Role == RoleEnum.Administrator ? "Admin" : string.Empty,
+                    x.Role
+                });
 
             foreach (var item in anonymous)
             {
@@ -1253,27 +956,24 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         [Test]
         public void CanUseLocalVariableInProjections()
         {
-            const string local = "TEST";
+            const string Local = "TEST";
 
             var anonymous = Query<UserEntity>()
-                .Select
-                (
-                    x => new
-                    {
-                        Prop = x.Role == RoleEnum.Administrator ? local : x.Username,
-                        local,
-                        x.Role,
-                        x.Username
-                    }
-                );
+                .Select(x => new
+                {
+                    Prop = x.Role == RoleEnum.Administrator ? Local : x.Username,
+                    local = Local,
+                    x.Role,
+                    x.Username
+                });
 
             foreach (var item in anonymous)
             {
-                Assert.That(item.local, Is.EqualTo(local));
+                Assert.That(item.local, Is.EqualTo(Local));
 
                 if (item.Role == RoleEnum.Administrator)
                 {
-                    Assert.That(item.Prop, Is.EqualTo(local));
+                    Assert.That(item.Prop, Is.EqualTo(Local));
                 }
                 else
                 {
@@ -1283,11 +983,44 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         }
 
         [Test]
+        public void GroupByThrowsIfProjectionIsAggregate()
+        {
+            Assert
+                .That
+                (
+                    () =>
+                    {
+                        DummyQuery<UserEntity>()
+                            .GroupBy(x => Aggregate.Average(x.Id));
+                    },
+                    Throws.InvalidOperationException
+                );
+        }
+
+        [Test]
+        public void GroupByThrowsIfProjectionIsGroupBy()
+        {
+            Assert
+                .That
+                (
+                    () =>
+                    {
+                        DummyQuery<UserEntity>()
+                            .GroupBy(x => Aggregate.GroupBy(x.Id));
+                    },
+                    Throws.InvalidOperationException
+                );
+        }
+
+        [Test]
         public void ProjectUsingSelectSetupThrowsIfSetupIsNull()
         {
-            ISelectSetup<UserEntity, UserDto> setup = null;
-
-            Assert.That(() => DummyQuery<UserEntity>().Select(setup), Throws.InstanceOf<ArgumentNullException>());
+            Assert
+                .That
+                (
+                    () => DummyQuery<UserEntity>().Select((ISelectSetup<UserEntity, UserDto>)null),
+                    Throws.InstanceOf<ArgumentNullException>()
+                );
         }
 
         [Test]
@@ -1304,25 +1037,34 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         [Test]
         public void SelectUsingExpressionsThrowsIfExpressionArrayIsNull()
         {
-            Expression<Func<UserEntity, object>>[] e = null;
-
-            Assert.That(() => DummyQuery<UserEntity>().Select(e), Throws.InstanceOf<ArgumentNullException>());
+            Assert
+                .That
+                (
+                    () => DummyQuery<UserEntity>().Select((Expression<Func<UserEntity, object>>[])null),
+                    Throws.InstanceOf<ArgumentNullException>()
+                );
         }
 
         [Test]
         public void SelectUsingProjectionThrowsIfProjectionIsNull()
         {
-            IProjection p = null;
-
-            Assert.That(() => DummyQuery<UserEntity>().Select(p), Throws.InstanceOf<ArgumentNullException>());
+            Assert
+                .That
+                (
+                    () => DummyQuery<UserEntity>().Select((IProjection)null),
+                    Throws.InstanceOf<ArgumentNullException>()
+                );
         }
 
         [Test]
         public void SelectUsingPropertyProjectionThrowsIfPropertyProjectionIsNull()
         {
-            PropertyProjection p = null;
-
-            Assert.That(() => DummyQuery<UserEntity>().Select(p), Throws.InstanceOf<ArgumentNullException>());
+            Assert
+                .That
+                (
+                    () => DummyQuery<UserEntity>().Select((PropertyProjection)null),
+                    Throws.InstanceOf<ArgumentNullException>()
+                );
         }
 
         [Test]
@@ -1334,27 +1076,35 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         [Test]
         public void SelectUsingSelectSetupWithStringInUseStatementThrowsIfStringIsEmpty()
         {
-            Assert.That(() =>
-            {
-                DummyQuery<UserEntity>()
-                    .Select<UserDto>()
-                    .For(x => x.IsOnline).Use(string.Empty)
-                    .Select();
-
-            }, Throws.ArgumentException);
+            Assert
+                .That
+                (
+                    () =>
+                    {
+                        DummyQuery<UserEntity>()
+                            .Select<UserDto>()
+                            .For(x => x.IsOnline).Use(string.Empty)
+                            .Select();
+                    },
+                    Throws.ArgumentException
+                );
         }
 
         [Test]
         public void SelectUsingSelectSetupWithStringInUseStatementThrowsIfStringIsNull()
         {
-            Assert.That(() =>
-            {
-                DummyQuery<UserEntity>()
-                    .Select<UserDto>()
-                    .For(x => x.IsOnline).Use(null as string)
-                    .Select();
-
-            }, Throws.ArgumentException);
+            Assert
+                .That
+                (
+                    () =>
+                    {
+                        DummyQuery<UserEntity>()
+                            .Select<UserDto>()
+                            .For(x => x.IsOnline).Use(null as string)
+                            .Select();
+                    },
+                    Throws.ArgumentException
+                );
         }
 
         [Test]
@@ -1362,7 +1112,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         {
             var strings = new[]
             {
-                "UserName",
+                "UserName", 
                 string.Empty
             };
 
@@ -1374,7 +1124,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         {
             var strings = new[]
             {
-                "UserName",
+                "UserName", 
                 null
             };
 
@@ -1384,15 +1134,234 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         [Test]
         public void SelectUsingStringsThrowsIfStringArrayIsNull()
         {
-            string[] strings = null;
-
-            Assert.That(() => DummyQuery<UserEntity>().Select(strings), Throws.InstanceOf<ArgumentNullException>());
+            Assert
+                .That
+                (
+                    () => DummyQuery<UserEntity>().Select((string[])null),
+                    Throws.InstanceOf<ArgumentNullException>()
+                );
         }
 
         [Test]
         public void SetMapperThrowsIfMapperIsNull()
         {
             Assert.That(() => Mapping.SetMapper(null), Throws.InstanceOf<ArgumentNullException>());
+        }
+
+        [SetUp]
+        public override void Setup()
+        {
+            base.Setup();
+
+            Mapping.SetMapper(new DefaultMapper());
+        }
+
+        [Test]
+        public void TestCasting()
+        {
+            TestCastingModel[] stuff = Query<UserEntity>()
+                .Where(x => x.Id == 1)
+                .Select(x => new TestCastingModel
+                {
+                    Test1 = x.Id,
+                    Test2 = (decimal)Aggregate.Average(x.Id),
+                    Test3 = Aggregate.Average(x.Id),
+                    Test4 = x.Id,
+                    Test5 = x.Id,
+                    Test6 = x.Id
+                })
+                .ToArray();
+
+            Assert.That(stuff.Length, Is.EqualTo(1));
+            Assert.That(stuff[0].Test1, Is.EqualTo(1));
+            Assert.That(stuff[0].Test2, Is.EqualTo(1));
+            Assert.That(stuff[0].Test3, Is.EqualTo(1));
+            Assert.That(stuff[0].Test4, Is.EqualTo(1));
+            Assert.That(stuff[0].Test5, Is.EqualTo(1));
+            Assert.That(stuff[0].Test6, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void TestGroupByWithSelectUsingICriteria()
+        {
+            IList stuff = Session.CreateCriteria<UserEntity>()
+                .AddOrder(Order.Asc(Projections.Property("IsOnline")))
+                .SetProjection
+                (
+                    new FqProjectionList()
+                        .Add(Projections.Count("Id"))
+                        .Add(new FqGroupByProjection(Projections.Property("IsOnline")))
+                )
+                .List();
+
+            var stuff1 = (object[])stuff[0];
+            var stuff2 = (object[])stuff[1];
+
+            Assert.That(stuff1[0], Is.EqualTo(1));
+            Assert.That(stuff1[1], Is.False);
+
+            Assert.That(stuff2[0], Is.EqualTo(3));
+            Assert.That(stuff2[1], Is.True);
+        }
+
+        [Test]
+        public void TestGroupByWithoutSelectUsingICriteria()
+        {
+            IList stuff = Session.CreateCriteria<UserEntity>()
+                .AddOrder(Order.Asc(Projections.Property("IsOnline")))
+                .SetProjection
+                (
+                    new FqProjectionList()
+                        .Add(Projections.Count("Id"))
+                        .Add(new FqGroupByProjection(Projections.Property("IsOnline"), false))
+                )
+                .List();
+
+            Assert.That(stuff[0], Is.EqualTo(1));
+            Assert.That(stuff[1], Is.EqualTo(3));
+        }
+
+        [Test]
+        public void TestInferredGrouping()
+        {
+            var stuff = Query<UserEntity>()
+                .Select(x => new
+                {
+                    Count = Aggregate.Count(x.Id),
+                    x.IsOnline
+                })
+                .ToArray();
+
+            Assert.That(stuff[0].Count, Is.GreaterThan(0));
+            Assert.That(stuff[1].Count, Is.GreaterThan(0));
+        }
+
+        [Test]
+        public void TestSelectByAliasReturnsNull()
+        {
+            UserGroupLinkEntity groupLink = null;
+            GroupEntity group = null;
+
+            GroupEntity[] stuff1 = Query<UserEntity>()
+                .Inner.Join(x => x.Groups, () => groupLink)
+                .Inner.Join(x => groupLink.Group, () => group)
+                .Select(x => group)
+                .ToArray();
+
+            foreach (GroupEntity item in stuff1)
+            {
+                Assert.That(item, Is.Null);
+            }
+        }
+
+        [Test]
+        public void TestSelectRootByParameterNameThrows()
+        {
+            Assert.That(() => DummyQuery<UserEntity>().Select(x => x), Throws.InstanceOf<NotSupportedException>());
+        }
+
+        [Test]
+        public void TestSelectSubquery()
+        {
+            UserEntity root = null;
+
+            IDetachedFlowQuery<UserGroupLinkEntity> subquery = Query<UserGroupLinkEntity>()
+                .Detached()
+                .SetRootAlias(() => root)
+                .Where(x => x.User.Id == root.Id)
+                .Count();
+
+            TestSelectSubqueryModel[] stuff = Session.FlowQuery(() => root)
+                .OrderBy<TestSelectSubqueryModel>(x => x.NumberOfGroups)
+                .Select(x => new TestSelectSubqueryModel
+                {
+                    Name = x.Firstname,
+                    NumberOfGroups = Aggregate.Subquery<int>(subquery)
+                })
+                .ToArray();
+
+            Assert.That(stuff.Length, Is.EqualTo(4));
+            Assert.That(stuff[0].NumberOfGroups, Is.EqualTo(0));
+            Assert.That(stuff[1].NumberOfGroups, Is.EqualTo(1));
+            Assert.That(stuff[2].NumberOfGroups, Is.EqualTo(2));
+            Assert.That(stuff[3].NumberOfGroups, Is.EqualTo(2));
+        }
+
+        [Test]
+        public void TestSelectSubqueryThrowsIfSubqueryIsNull()
+        {
+            DetachedCriteria subquery = null;
+
+            Assert
+                .That
+                (
+                    () =>
+                    {
+                        DummyQuery<UserEntity>()
+                            .Select(x => new
+                            {
+                                NumberOfGroups = Aggregate.Subquery<int>(subquery)
+                            });
+                    },
+                    Throws.InstanceOf<NotSupportedException>()
+                );
+        }
+
+        [Test]
+        public void TestSelectSubqueryWithGroupBy()
+        {
+            UserEntity root = null;
+
+            IDetachedFlowQuery<UserGroupLinkEntity> subquery = Query<UserGroupLinkEntity>()
+                .Detached()
+                .SetRootAlias(() => root)
+                .Where(x => x.User.Id == root.Id)
+                .Count();
+
+            TestSelectSubqueryModel[] stuff = Session.FlowQuery(() => root)
+                .OrderBy<TestSelectSubqueryModel>(x => x.NumberOfGroups)
+                .GroupBy(x => x.Id)
+                .Select(x => new TestSelectSubqueryModel
+                {
+                    Name = x.Firstname,
+                    NumberOfGroups = Aggregate.Subquery<int>(subquery)
+                })
+                .ToArray();
+
+            Assert.That(stuff.Length, Is.EqualTo(4));
+            Assert.That(stuff[0].NumberOfGroups, Is.EqualTo(0));
+            Assert.That(stuff[1].NumberOfGroups, Is.EqualTo(1));
+            Assert.That(stuff[2].NumberOfGroups, Is.EqualTo(2));
+            Assert.That(stuff[3].NumberOfGroups, Is.EqualTo(2));
+        }
+
+        public class PuffClass
+        {
+            [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:FieldsMustBePrivate",
+                Justification = "Reviewed. Suppression is OK here.")]
+            public string Puff;
+        }
+
+        public class TestCastingModel
+        {
+            public long? Test1 { get; set; }
+
+            public decimal Test2 { get; set; }
+
+            public double Test3 { get; set; }
+
+            public decimal Test4 { get; set; }
+
+            public float Test5 { get; set; }
+
+            public object Test6 { get; set; }
+        }
+
+        public class TestSelectSubqueryModel
+        {
+            public virtual string Name { get; set; }
+
+            public virtual int NumberOfGroups { get; set; }
         }
     }
 }

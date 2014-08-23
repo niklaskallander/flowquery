@@ -1,40 +1,27 @@
-﻿using NHibernate.FlowQuery.Core;
-using NHibernate.FlowQuery.Helpers;
-using NHibernate.FlowQuery.Test.Setup.Entities;
-using NHibernate.Impl;
-using NUnit.Framework;
-
-namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
+﻿namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
 {
-    using Is = NUnit.Framework.Is;
+    using NHibernate.FlowQuery.Core;
+    using NHibernate.FlowQuery.Core.Implementations;
+    using NHibernate.FlowQuery.Helpers;
+    using NHibernate.FlowQuery.Test.Setup.Entities;
+    using NHibernate.Impl;
+
+    using NUnit.Framework;
 
     [TestFixture]
     public class CommentTest : BaseTest
     {
         [Test]
-        public void CanSetComment()
-        {
-            const string comment = "Should fetch all users";
-
-            var query = DummyQuery<UserEntity>()
-                .Comment(comment);
-
-            var queryable = (IQueryableFlowQuery)query;
-
-            Assert.That(queryable.CommentValue, Is.EqualTo(comment));
-        }
-
-        [Test]
         public void CanClearCommentUsingNull()
         {
-            const string comment = "Should fetch all users";
+            const string Comment = "Should fetch all users";
 
-            var query = DummyQuery<UserEntity>()
-                .Comment(comment);
+            IImmediateFlowQuery<UserEntity> query = DummyQuery<UserEntity>()
+                .Comment(Comment);
 
             var queryable = (IQueryableFlowQuery)query;
 
-            Assert.That(queryable.CommentValue, Is.EqualTo(comment));
+            Assert.That(queryable.CommentValue, Is.EqualTo(Comment));
 
             query.Comment(null);
 
@@ -42,24 +29,38 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         }
 
         [Test]
-        public void CommentIsPopulatedOnCriteria()
+        public void CanSetComment()
         {
-            const string comment = "Should fetch all users";
+            const string Comment = "Should fetch all users";
 
-            var query = Query<UserEntity>()
-                .Comment(comment);
+            IImmediateFlowQuery<UserEntity> query = DummyQuery<UserEntity>()
+                .Comment(Comment);
 
             var queryable = (IQueryableFlowQuery)query;
 
-            Assert.That(queryable.CommentValue, Is.EqualTo(comment));
+            Assert.That(queryable.CommentValue, Is.EqualTo(Comment));
+        }
 
-            ICriteria criteria = CriteriaHelper.BuildCriteria<UserEntity, UserEntity>(QuerySelection.Create((IQueryableFlowQuery)query));
+        [Test]
+        public void CommentIsPopulatedOnCriteria()
+        {
+            const string Comment = "Should fetch all users";
+
+            IImmediateFlowQuery<UserEntity> query = Query<UserEntity>()
+                .Comment(Comment);
+
+            var queryable = (IQueryableFlowQuery)query;
+
+            Assert.That(queryable.CommentValue, Is.EqualTo(Comment));
+
+            ICriteria criteria = new CriteriaBuilder()
+                .Build<UserEntity, UserEntity>(QuerySelection.Create((IQueryableFlowQuery)query));
 
             Assert.That(criteria, Is.Not.Null);
 
             var impl = (CriteriaImpl)criteria;
 
-            Assert.That(impl.Comment, Is.EqualTo(comment));
+            Assert.That(impl.Comment, Is.EqualTo(Comment));
         }
     }
 }

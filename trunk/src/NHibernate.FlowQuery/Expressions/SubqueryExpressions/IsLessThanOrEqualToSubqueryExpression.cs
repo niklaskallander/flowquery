@@ -1,17 +1,22 @@
-﻿using NHibernate.Criterion;
-using NHibernate.FlowQuery.Core;
-
-namespace NHibernate.FlowQuery.Expressions.SubqueryExpressions
+﻿namespace NHibernate.FlowQuery.Expressions.SubqueryExpressions
 {
+    using NHibernate.Criterion;
+    using NHibernate.FlowQuery.Core;
+
+    /// <summary>
+    ///     Represents a "is (not) less than or equal to" filter.
+    /// </summary>
     public class IsLessThanOrEqualToSubqueryExpression : SubqueryIsExpressionBase
     {
-        public IsLessThanOrEqualToSubqueryExpression(IDetachedImmutableFlowQuery value)
-            : base(value)
-        { }
-
-        protected override ICriterion CompileCore(string property)
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="IsLessThanOrEqualToSubqueryExpression" /> class.
+        /// </summary>
+        /// <param name="query">
+        ///     The query.
+        /// </param>
+        public IsLessThanOrEqualToSubqueryExpression(IDetachedImmutableFlowQuery query)
+            : base(query, Subqueries.PropertyLe)
         {
-            return Subqueries.PropertyLe(property, Query.Criteria);
         }
     }
 }

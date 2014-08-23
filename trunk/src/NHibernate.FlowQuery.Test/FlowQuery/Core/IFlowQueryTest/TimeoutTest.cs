@@ -1,31 +1,20 @@
-﻿using NHibernate.FlowQuery.Core;
-using NHibernate.FlowQuery.Helpers;
-using NHibernate.FlowQuery.Test.Setup.Entities;
-using NHibernate.Impl;
-using NUnit.Framework;
-
-namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
+﻿namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
 {
-    using Is = NUnit.Framework.Is;
+    using NHibernate.FlowQuery.Core;
+    using NHibernate.FlowQuery.Core.Implementations;
+    using NHibernate.FlowQuery.Helpers;
+    using NHibernate.FlowQuery.Test.Setup.Entities;
+    using NHibernate.Impl;
+
+    using NUnit.Framework;
 
     [TestFixture]
     public class TimeoutTest : BaseTest
     {
         [Test]
-        public void CanSetTimeoutOnQuery()
-        {
-            var query = DummyQuery<UserEntity>()
-                .Timeout(10);
-
-            var queryable = (IQueryableFlowQuery)query;
-
-            Assert.That(queryable.TimeoutValue, Is.EqualTo(10));
-        }
-
-        [Test]
         public void CanClearTimeoutOnQuery()
         {
-            var query = DummyQuery<UserEntity>()
+            IImmediateFlowQuery<UserEntity> query = DummyQuery<UserEntity>()
                 .Timeout(10);
 
             var queryable = (IQueryableFlowQuery)query;
@@ -38,12 +27,24 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         }
 
         [Test]
-        public void SpecifiedTimeoutIsUsedOnCriteria()
+        public void CanSetTimeoutOnQuery()
         {
-            var query = Query<UserEntity>()
+            IImmediateFlowQuery<UserEntity> query = DummyQuery<UserEntity>()
                 .Timeout(10);
 
-            ICriteria criteria = CriteriaHelper.BuildCriteria<UserEntity, UserEntity>(QuerySelection.Create((IQueryableFlowQuery)query));
+            var queryable = (IQueryableFlowQuery)query;
+
+            Assert.That(queryable.TimeoutValue, Is.EqualTo(10));
+        }
+
+        [Test]
+        public void SpecifiedTimeoutIsUsedOnCriteria()
+        {
+            IImmediateFlowQuery<UserEntity> query = Query<UserEntity>()
+                .Timeout(10);
+
+            ICriteria criteria = new CriteriaBuilder()
+                .Build<UserEntity, UserEntity>(QuerySelection.Create((IQueryableFlowQuery)query));
 
             Assert.That(criteria, Is.Not.Null);
 

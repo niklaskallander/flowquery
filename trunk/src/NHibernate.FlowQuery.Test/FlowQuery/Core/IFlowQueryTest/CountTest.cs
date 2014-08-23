@@ -1,10 +1,9 @@
-using NHibernate.Criterion;
-using NHibernate.FlowQuery.Test.Setup.Entities;
-using NUnit.Framework;
-
 namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
 {
-    using Is = NUnit.Framework.Is;
+    using NHibernate.Criterion;
+    using NHibernate.FlowQuery.Test.Setup.Entities;
+
+    using NUnit.Framework;
 
     [TestFixture]
     public class CountTest : BaseTest
@@ -12,10 +11,9 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         [Test]
         public void CanCountDistinctOnProperty()
         {
-            var count = Query<UserEntity>()
+            int count = Query<UserEntity>()
                 .Distinct()
-                .Count(u => u.IsOnline)
-                ;
+                .Count(u => u.IsOnline);
 
             Assert.That(count, Is.EqualTo(2));
         }
@@ -23,10 +21,9 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         [Test]
         public void CanCountDistinctOnPropertyUsingString()
         {
-            var count = Query<UserEntity>()
+            int count = Query<UserEntity>()
                 .Distinct()
-                .Count("IsOnline")
-                ;
+                .Count("IsOnline");
 
             Assert.That(count, Is.EqualTo(2));
         }
@@ -34,9 +31,8 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         [Test]
         public void CanCountLongOnStar()
         {
-            var count = Query<UserEntity>()
-                .CountLong()
-                ;
+            long count = Query<UserEntity>()
+                .CountLong();
 
             Assert.That(count, Is.EqualTo(4));
         }
@@ -44,9 +40,8 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         [Test]
         public void CanCountOnProjection()
         {
-            var count = Query<UserEntity>()
-                .Count(Projections.Distinct(Projections.Property("IsOnline")))
-                ;
+            int count = Query<UserEntity>()
+                .Count(Projections.Distinct(Projections.Property("IsOnline")));
 
             Assert.That(count, Is.EqualTo(2));
         }
@@ -54,9 +49,8 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         [Test]
         public void CanCountOnProperty()
         {
-            var count = Query<UserEntity>()
-                .Count(u => u.IsOnline)
-                ;
+            int count = Query<UserEntity>()
+                .Count(u => u.IsOnline);
 
             Assert.That(count, Is.EqualTo(4));
         }
@@ -64,9 +58,8 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         [Test]
         public void CanCountOnPropertyUsingString()
         {
-            var count = Query<UserEntity>()
-                .Count("IsOnline")
-                ;
+            int count = Query<UserEntity>()
+                .Count("IsOnline");
 
             Assert.That(count, Is.EqualTo(4));
         }
@@ -74,9 +67,8 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         [Test]
         public void CanCountOnStar()
         {
-            var count = Query<UserEntity>()
-                .Count()
-                ;
+            int count = Query<UserEntity>()
+                .Count();
 
             Assert.That(count, Is.EqualTo(4));
         }

@@ -1,16 +1,18 @@
-﻿using System;
-using System.Linq;
-using System.Linq.Expressions;
-using NHibernate.Criterion;
-using NHibernate.FlowQuery.Test.Setup.Dtos;
-using NHibernate.FlowQuery.Test.Setup.Entities;
-using NUnit.Framework;
-
-// ReSharper disable ExpressionIsAlwaysNull
+﻿// ReSharper disable ExpressionIsAlwaysNull
 namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
 {
-    using Is = NUnit.Framework.Is;
-    using Property = Property;
+    using System;
+    using System.Linq;
+    using System.Linq.Expressions;
+
+    using NHibernate.Criterion;
+    using NHibernate.FlowQuery.Core;
+    using NHibernate.FlowQuery.Test.Setup.Dtos;
+    using NHibernate.FlowQuery.Test.Setup.Entities;
+
+    using NUnit.Framework;
+
+    using Property = NHibernate.FlowQuery.Property;
 
     [TestFixture]
     public class SelectDistinctTest : BaseTest
@@ -18,7 +20,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         [Test]
         public void CanAutomapDistinctlyUsingExpressions()
         {
-            var users = Query<UserEntity>()
+            FlowQuerySelection<UserDto> users = Query<UserEntity>()
                 .Distinct()
                 .Select(x => x.IsOnline, x => x.Role)
                 .ToMap<UserDto>();
@@ -26,7 +28,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
             Assert.That(users.Count(), Is.EqualTo(3));
             Assert.That(users.Any(x => x.IsOnline));
 
-            foreach (var u in users)
+            foreach (UserDto u in users)
             {
                 Assert.That(u.Id, Is.EqualTo(0));
                 Assert.That(u.Fullname, Is.Null);
@@ -37,15 +39,14 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         [Test]
         public void CanAutomapDistinctlyUsingStrings()
         {
-            var users = Query<UserEntity>()
+            FlowQuerySelection<UserDto> users = Query<UserEntity>()
                 .Distinct()
                 .Select("IsOnline")
-
                 .ToMap<UserDto>();
 
             Assert.That(users.Count(), Is.EqualTo(2));
 
-            foreach (var u in users)
+            foreach (UserDto u in users)
             {
                 Assert.That(u.Id, Is.EqualTo(0));
                 Assert.That(u.Fullname, Is.Null);
@@ -60,10 +61,9 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                 .Distinct()
                 .Select(u => new
                 {
-                    Count = Aggregate.Count(u.Id),
+                    Count = Aggregate.Count(u.Id), 
                     Role = Aggregate.GroupBy(u.Role)
-                })
-                ;
+                });
 
             Assert.That(aggregations.Count(), Is.EqualTo(3));
 
@@ -86,8 +86,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         {
             var aggregations = Query<UserEntity>()
                 .Distinct()
-                .Select(x => new { avg = Aggregate.Average(x.Id) })
-                ;
+                .Select(x => new { avg = Aggregate.Average(x.Id) });
 
             Assert.That(aggregations.Count(), Is.EqualTo(1));
         }
@@ -95,10 +94,9 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         [Test]
         public void CanSelectDistinctOnMultipleProperties()
         {
-            var users = Query<UserEntity>()
+            FlowQuerySelection<UserEntity> users = Query<UserEntity>()
                 .Distinct()
-                .Select(x => x.Role, x => x.IsOnline, x => x.Username)
-                ;
+                .Select(x => x.Role, x => x.IsOnline, x => x.Username);
 
             Assert.That(users.Count(), Is.EqualTo(4));
         }
@@ -106,10 +104,9 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         [Test]
         public void CanSelectDistinctOnSingleProperty()
         {
-            var roles = Query<UserEntity>()
+            FlowQuerySelection<RoleEnum> roles = Query<UserEntity>()
                 .Distinct()
-                .Select(x => x.Role)
-                ;
+                .Select(x => x.Role);
 
             Assert.That(roles.Count(), Is.EqualTo(3));
         }
@@ -119,8 +116,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         {
             var news = Query<UserEntity>()
                 .Distinct()
-                .Select(x => new { x.Role })
-                ;
+                .Select(x => new { x.Role });
 
             Assert.That(news.Count(), Is.EqualTo(3));
         }
@@ -128,10 +124,9 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         [Test]
         public void CanSelectDistinctToMemberInitExpression()
         {
-            var members = Query<UserEntity>()
+            FlowQuerySelection<UserDto> members = Query<UserEntity>()
                 .Distinct()
-                .Select(x => new UserDto("Niklas"))
-                ;
+                .Select(x => new UserDto("Niklas"));
 
             Assert.That(members.Count(), Is.EqualTo(1));
         }
@@ -141,8 +136,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         {
             var anonymous = Query<UserEntity>()
                 .Distinct()
-                .Select(x => new { x.IsOnline, Member = new UserDto("Niklas") })
-                ;
+                .Select(x => new { x.IsOnline, Member = new UserDto("Niklas") });
 
             Assert.That(anonymous.Count(), Is.EqualTo(2));
         }
@@ -152,8 +146,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         {
             var anonymous = Query<UserEntity>()
                 .Distinct()
-                .Select(x => new { Something = new { x.Role } })
-                ;
+                .Select(x => new { Something = new { x.Role } });
 
             Assert.That(anonymous.Count(), Is.EqualTo(3));
         }
@@ -161,17 +154,17 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         [Test]
         public void CanSelectDistinctToNestedMemberInits()
         {
-            var users = Query<UserEntity>()
+            FlowQuerySelection<UserEntity> users = Query<UserEntity>()
                 .Distinct()
                 .Select(x => new UserEntity
                 {
-                    Id = x.Id,
+                    Id = x.Id, 
                     Setting = new Setting()
                 });
 
             Assert.That(users.Count(), Is.EqualTo(4));
 
-            foreach (var user in users)
+            foreach (UserEntity user in users)
             {
                 Assert.That(user.Id, Is.GreaterThan(0));
                 Assert.That(user.Setting, Is.Not.Null);
@@ -180,95 +173,17 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         }
 
         [Test]
-        public void CanSelectDistinctUsingPropertyHelper()
-        {
-            var roles = Query<UserEntity>()
-                .Distinct()
-                .Select(x => Property.As<RoleEnum>("x.Role"))
-                ;
-
-            Assert.That(roles.Count(), Is.EqualTo(3));
-        }
-
-        [Test]
-        public void CanSelectDistinctUsingPropertyProjectionTyped()
-        {
-            var bools = Query<UserEntity>()
-                .Distinct()
-                .Select<bool>(Projections.Property("IsOnline"))
-                ;
-
-            Assert.That(bools.Count(), Is.EqualTo(2));
-            Assert.That(bools.ElementAt(0), Is.False);
-            Assert.That(bools.ElementAt(1), Is.True);
-        }
-
-        [Test]
-        public void CanSelectDistinctUsingSelectSetup()
-        {
-            var users = Query<UserEntity>()
-                .Distinct().Select<UserDto>()
-                    .For(x => x.IsOnline).Use(x => x.IsOnline)
-                    .Select()
-                    ;
-
-            Assert.That(users.Count(), Is.EqualTo(2));
-            Assert.That(users.First().IsOnline, Is.False);
-            Assert.That(users.Last().IsOnline, Is.True);
-        }
-
-        [Test]
-        public void CanSelectDistinctUsingSelectSetupWithProjections()
-        {
-            var users = Query<UserEntity>()
-                .Distinct()
-                .Select<UserEntity>()
-                    .For(x => x.IsOnline).Use(Projections.Property("IsOnline"))
-                    .Select()
-                    ;
-
-            Assert.That(users.Count(), Is.EqualTo(2));
-            Assert.That(users.First().IsOnline, Is.False);
-            Assert.That(users.Last().IsOnline, Is.True);
-        }
-
-        [Test]
-        public void CanSelectDistinctUsingSelectSetupWithStrings()
-        {
-            var users = Query<UserEntity>()
-                .Distinct().Select<UserDto>()
-                    .For("IsOnline").Use(x => x.IsOnline)
-                    .Select()
-                    ;
-
-            Assert.That(users.Count(), Is.EqualTo(2));
-            Assert.That(users.First().IsOnline, Is.False);
-            Assert.That(users.Last().IsOnline, Is.True);
-        }
-
-        [Test]
-        public void CanSelectDistinctUsingString()
-        {
-            var roles = Query<UserEntity>()
-                .Distinct().Select("Role")
-                ;
-
-            Assert.That(roles.Count(), Is.EqualTo(3));
-        }
-
-        [Test]
         public void CanSelectDistinctUsingBasicProjection()
         {
-            var users = Query<UserEntity>()
+            FlowQuerySelection<UserEntity> users = Query<UserEntity>()
                 .OrderBy("Id")
                 .Distinct().Select
                 (
                     Projections
                         .ProjectionList()
-                            .AddProperty("Id")
-                            .AddProperty("Username")
-                )
-                ;
+                        .AddProperty("Id")
+                        .AddProperty("Username")
+                );
 
             Assert.That(users.Count(), Is.EqualTo(4));
             Assert.That(users.ElementAt(0).Id, Is.EqualTo(1));
@@ -288,20 +203,91 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         [Test]
         public void CanSelectDistinctUsingProjection()
         {
-            var users = Query<UserEntity>()
+            FlowQuerySelection<UserEntity> users = Query<UserEntity>()
                 .Distinct()
-                .Select(Projections.ProjectionList().AddProperty("Username").AddProperty("Firstname"))
-                ;
+                .Select(Projections.ProjectionList().AddProperty("Username").AddProperty("Firstname"));
 
             Assert.That(users.Count(), Is.EqualTo(4));
         }
 
         [Test]
+        public void CanSelectDistinctUsingPropertyHelper()
+        {
+            FlowQuerySelection<RoleEnum> roles = Query<UserEntity>()
+                .Distinct()
+                .Select(x => Property.As<RoleEnum>("x.Role"));
+
+            Assert.That(roles.Count(), Is.EqualTo(3));
+        }
+
+        [Test]
+        public void CanSelectDistinctUsingPropertyProjectionTyped()
+        {
+            FlowQuerySelection<bool> bools = Query<UserEntity>()
+                .Distinct()
+                .Select<bool>(Projections.Property("IsOnline"));
+
+            Assert.That(bools.Count(), Is.EqualTo(2));
+            Assert.That(bools.ElementAt(0), Is.False);
+            Assert.That(bools.ElementAt(1), Is.True);
+        }
+
+        [Test]
+        public void CanSelectDistinctUsingSelectSetup()
+        {
+            FlowQuerySelection<UserDto> users = Query<UserEntity>()
+                .Distinct().Select<UserDto>()
+                .For(x => x.IsOnline).Use(x => x.IsOnline)
+                .Select();
+
+            Assert.That(users.Count(), Is.EqualTo(2));
+            Assert.That(users.First().IsOnline, Is.False);
+            Assert.That(users.Last().IsOnline, Is.True);
+        }
+
+        [Test]
+        public void CanSelectDistinctUsingSelectSetupWithProjections()
+        {
+            FlowQuerySelection<UserEntity> users = Query<UserEntity>()
+                .Distinct()
+                .Select<UserEntity>()
+                .For(x => x.IsOnline).Use(Projections.Property("IsOnline"))
+                .Select();
+
+            Assert.That(users.Count(), Is.EqualTo(2));
+            Assert.That(users.First().IsOnline, Is.False);
+            Assert.That(users.Last().IsOnline, Is.True);
+        }
+
+        [Test]
+        public void CanSelectDistinctUsingSelectSetupWithStrings()
+        {
+            FlowQuerySelection<UserDto> users = Query<UserEntity>()
+                .Distinct().Select<UserDto>()
+                .For("IsOnline").Use(x => x.IsOnline)
+                .Select();
+
+            Assert.That(users.Count(), Is.EqualTo(2));
+            Assert.That(users.First().IsOnline, Is.False);
+            Assert.That(users.Last().IsOnline, Is.True);
+        }
+
+        [Test]
+        public void CanSelectDistinctUsingString()
+        {
+            FlowQuerySelection<UserEntity> roles = Query<UserEntity>()
+                .Distinct()
+                .Select("Role");
+
+            Assert.That(roles.Count(), Is.EqualTo(3));
+        }
+
+        [Test]
         public void CanSelectDistinctWithArithmeticOperations()
         {
-            var results = Query<UserEntity>()
-                .Distinct().Select(x => x.Id * 2 + 1 / 3 - 1)
-                ;
+            FlowQuerySelection<long> results = Query<UserEntity>()
+                .Distinct()
+                .Select(x => (x.Id * 2) + (1 / 3) - 1);
 
             Assert.That(results.Count(), Is.EqualTo(4));
         }
@@ -311,13 +297,17 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         {
             Expression<Func<UserEntity, object>> x = null;
 
-            Assert.That(() =>
-            {
-                DummyQuery<UserEntity>()
-                    .Distinct().Select<UserDto>()
-                        .For(c => c.Fullname).Use(x);
-
-            }, Throws.InstanceOf<ArgumentNullException>());
+            Assert
+                .That
+                (
+                    () =>
+                    {
+                        DummyQuery<UserEntity>()
+                            .Distinct().Select<UserDto>()
+                            .For(c => c.Fullname).Use(x);
+                    }, 
+                    Throws.InstanceOf<ArgumentNullException>()
+                );
         }
 
         [Test]
@@ -325,49 +315,48 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         {
             Expression<Func<UserDto, object>> x = null;
 
-            Assert.That(() =>
-            {
-                DummyQuery<UserEntity>()
-                    .Distinct().Select<UserDto>()
-                        .For(x);
-
-            }, Throws.InstanceOf<ArgumentNullException>());
+            Assert
+                .That
+                (
+                    () =>
+                    {
+                        DummyQuery<UserEntity>()
+                            .Distinct().Select<UserDto>()
+                            .For(x);
+                    }, 
+                    Throws.InstanceOf<ArgumentNullException>()
+                );
         }
 
         [Test]
         public void SelectDistinctUsingDistinctSetupThrowsWhenSelectingEmediately()
         {
-            Assert.That(() =>
-            {
-                DummyQuery<UserEntity>()
-                    .Distinct().Select<UserDto>()
-                        .Select();
-
-            }, Throws.InstanceOf<InvalidOperationException>());
-        }
-
-        [Test]
-        public void SelectDistinctUsingExpressionsThrowsIfExpressionArrayIsNull()
-        {
-            Expression<Func<UserEntity, object>>[] e = null;
-
-            Assert.That(() =>
-            {
-                DummyQuery<UserEntity>()
-                    .Distinct().Select(e);
-
-            }, Throws.InstanceOf<ArgumentNullException>());
+            Assert
+                .That
+                (
+                    () =>
+                    {
+                        DummyQuery<UserEntity>()
+                            .Distinct().Select<UserDto>()
+                            .Select();
+                    }, 
+                    Throws.InstanceOf<InvalidOperationException>()
+                );
         }
 
         [Test]
         public void SelectDistinctUsingExpressionThrowsWhenExpressionDoesNotContainAnyProjections()
         {
-            Assert.That(() =>
-            {
-                DummyQuery<UserEntity>()
-                    .Distinct().Select(x => new { });
-
-            }, Throws.InstanceOf<NotSupportedException>());
+            Assert
+                .That
+                (
+                    () =>
+                    {
+                        DummyQuery<UserEntity>()
+                            .Distinct().Select(x => new { });
+                    }, 
+                    Throws.InstanceOf<NotSupportedException>()
+                );
         }
 
         [Test]
@@ -375,12 +364,33 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         {
             Expression<Func<UserEntity, UserDto>> e = null;
 
-            Assert.That(() =>
-            {
-                DummyQuery<UserEntity>()
-                    .Distinct().Select(e);
+            Assert
+                .That
+                (
+                    () =>
+                    {
+                        DummyQuery<UserEntity>()
+                            .Distinct().Select(e);
+                    }, 
+                    Throws.InstanceOf<ArgumentNullException>()
+                );
+        }
 
-            }, Throws.InstanceOf<ArgumentNullException>());
+        [Test]
+        public void SelectDistinctUsingExpressionsThrowsIfExpressionArrayIsNull()
+        {
+            Expression<Func<UserEntity, object>>[] e = null;
+
+            Assert
+                .That
+                (
+                    () =>
+                    {
+                        DummyQuery<UserEntity>()
+                            .Distinct().Select(e);
+                    }, 
+                    Throws.InstanceOf<ArgumentNullException>()
+                );
         }
 
         [Test]
@@ -388,19 +398,27 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         {
             IProjection p = null;
 
-            Assert.That(() =>
-            {
-                DummyQuery<UserEntity>()
-                    .Distinct().Select(p);
+            Assert
+                .That
+                (
+                    () =>
+                    {
+                        DummyQuery<UserEntity>()
+                            .Distinct().Select(p);
+                    }, 
+                    Throws.InstanceOf<ArgumentNullException>()
+                );
 
-            }, Throws.InstanceOf<ArgumentNullException>());
-
-            Assert.That(() =>
-            {
-                DummyQuery<UserEntity>()
-                    .Distinct().Select<UserDto>(p);
-
-            }, Throws.InstanceOf<ArgumentNullException>());
+            Assert
+                .That
+                (
+                    () =>
+                    {
+                        DummyQuery<UserEntity>()
+                            .Distinct().Select<UserDto>(p);
+                    }, 
+                    Throws.InstanceOf<ArgumentNullException>()
+                );
         }
 
         [Test]
@@ -408,33 +426,45 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         {
             PropertyProjection p = null;
 
-            Assert.That(() =>
-            {
-                DummyQuery<UserEntity>()
-                    .Distinct().Select(p);
+            Assert
+                .That
+                (
+                    () =>
+                    {
+                        DummyQuery<UserEntity>()
+                            .Distinct().Select(p);
+                    }, 
+                    Throws.InstanceOf<ArgumentNullException>()
+                );
 
-            }, Throws.InstanceOf<ArgumentNullException>());
-
-            Assert.That(() =>
-            {
-                DummyQuery<UserEntity>()
-                    .Distinct()
-                    .Select<UserDto>(p);
-
-            }, Throws.InstanceOf<ArgumentNullException>());
+            Assert
+                .That
+                (
+                    () =>
+                    {
+                        DummyQuery<UserEntity>()
+                            .Distinct()
+                            .Select<UserDto>(p);
+                    }, 
+                    Throws.InstanceOf<ArgumentNullException>()
+                );
         }
 
         [Test]
         public void SelectDistinctUsingSelectSetupThrowsIfNoSetupIsMade()
         {
-            Assert.That(() =>
-            {
-                DummyQuery<UserEntity>()
-                    .Distinct()
-                    .Select<UserEntity>()
-                        .Select();
-
-            }, Throws.InvalidOperationException);
+            Assert
+                .That
+                (
+                    () =>
+                    {
+                        DummyQuery<UserEntity>()
+                            .Distinct()
+                            .Select<UserEntity>()
+                            .Select();
+                    }, 
+                    Throws.InvalidOperationException
+                );
         }
 
         [Test]
@@ -442,12 +472,16 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         {
             string[] strings = null;
 
-            Assert.That(() =>
-            {
-                DummyQuery<UserEntity>()
-                    .Distinct().Select(strings);
-
-            }, Throws.InstanceOf<ArgumentNullException>());
+            Assert
+                .That
+                (
+                    () =>
+                    {
+                        DummyQuery<UserEntity>()
+                            .Distinct().Select(strings);
+                    }, 
+                    Throws.InstanceOf<ArgumentNullException>()
+                );
         }
     }
 }

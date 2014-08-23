@@ -1,13 +1,14 @@
-﻿using System;
-using System.Linq.Expressions;
-using NHibernate.FlowQuery.Revealing;
-using NHibernate.FlowQuery.Revealing.Conventions;
-using NHibernate.FlowQuery.Test.Setup.Entities;
-using NUnit.Framework;
-
-namespace NHibernate.FlowQuery.Test.FlowQuery.Revealing
+﻿namespace NHibernate.FlowQuery.Test.FlowQuery.Revealing
 {
-    using Is = NUnit.Framework.Is;
+    using System;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Linq.Expressions;
+
+    using NHibernate.FlowQuery.Revealing;
+    using NHibernate.FlowQuery.Revealing.Conventions;
+    using NHibernate.FlowQuery.Test.Setup.Entities;
+
+    using NUnit.Framework;
 
     [TestFixture]
     public class Revealer1Test
@@ -73,6 +74,14 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Revealing
         }
 
         [Test]
+        public void CanRevealWithAliasFromTypedExpressionUsingProvidedConvention()
+        {
+            UserEntity u = null;
+
+            Assert.That(Revealer.Reveal(x => u.Password, new UnderscoreConvention()), Is.EqualTo("u._Password"));
+        }
+
+        [Test]
         public void CanRevealWithAliasFromTypedExpressions()
         {
             UserEntity u = null;
@@ -85,15 +94,8 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Revealing
         {
             UserEntity u = null;
 
-            Assert.That(Revealer.Reveal(() => u, x => x.Password, new UnderscoreConvention()), Is.EqualTo("u._Password"));
-        }
-
-        [Test]
-        public void CanRevealWithAliasFromTypedExpressionUsingProvidedConvention()
-        {
-            UserEntity u = null;
-
-            Assert.That(Revealer.Reveal(x => u.Password, new UnderscoreConvention()), Is.EqualTo("u._Password"));
+            Assert
+                .That(Revealer.Reveal(() => u, x => x.Password, new UnderscoreConvention()), Is.EqualTo("u._Password"));
         }
 
         [Test]
@@ -113,12 +115,8 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Revealing
         }
 
         [Test]
-        public void RevealerUsesMUnderscoreConventionByDefault()
-        {
-            Assert.That(Revealer.Reveal(x => x.Password), Is.EqualTo("m_Password"));
-        }
-
-        [Test]
+        [SuppressMessage("StyleCop.CSharp.ReadabilityRules", "SA1122:UseStringEmptyForEmptyStrings",
+            Justification = "Reviewed. Suppression is OK here.")]
         public void RevealThrowsWhenProvidingExpressionNotPointingToAMemberExpression()
         {
             Assert.That(() => Revealer.Reveal(() => ""), Throws.InstanceOf<ArgumentException>());
@@ -139,7 +137,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Revealing
 
             Assert.That(() => Revealer.Reveal(x => x.Password, null), Throws.InstanceOf<ArgumentNullException>());
 
-            Assert.That(() => Revealer.Reveal(() => u, x => x.Password, null), Throws.InstanceOf<ArgumentNullException>());
+            Assert
+                .That
+                (
+                    () => Revealer.Reveal(() => u, x => x.Password, null),
+                    Throws.InstanceOf<ArgumentNullException>()
+                );
         }
 
         [Test]
@@ -151,11 +154,17 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Revealing
             // ReSharper disable ExpressionIsAlwaysNull
             Assert.That(() => Revealer.Reveal(expression1), Throws.InstanceOf<ArgumentNullException>());
             Assert.That(() => Revealer.Reveal(expression2), Throws.InstanceOf<ArgumentNullException>());
-            // ReSharper restore ExpressionIsAlwaysNull
 
+            // ReSharper restore ExpressionIsAlwaysNull
             UserEntity u = null;
 
             Assert.That(() => Revealer.Reveal(() => u, null), Throws.InstanceOf<ArgumentNullException>());
+        }
+
+        [Test]
+        public void RevealerUsesMUnderscoreConventionByDefault()
+        {
+            Assert.That(Revealer.Reveal(x => x.Password), Is.EqualTo("m_Password"));
         }
 
         [SetUp]

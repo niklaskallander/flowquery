@@ -1,16 +1,16 @@
-using System;
-using System.Linq;
-using System.Linq.Expressions;
-using NHibernate.Criterion;
-using NHibernate.FlowQuery.Core.Selection;
-using NHibernate.FlowQuery.Test.Setup.Dtos;
-using NHibernate.FlowQuery.Test.Setup.Entities;
-using NUnit.Framework;
-
-// ReSharper disable ExpressionIsAlwaysNull
 namespace NHibernate.FlowQuery.Test.FlowQuery.Core
 {
-    using Is = NUnit.Framework.Is;
+    using System;
+    using System.Linq;
+    using System.Linq.Expressions;
+
+    using NHibernate.Criterion;
+    using NHibernate.FlowQuery.Core;
+    using NHibernate.FlowQuery.Core.Implementations;
+    using NHibernate.FlowQuery.Test.Setup.Dtos;
+    using NHibernate.FlowQuery.Test.Setup.Entities;
+
+    using NUnit.Framework;
 
     [TestFixture]
     public class DistinctSetupPartTest : BaseTest
@@ -18,9 +18,8 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core
         [Test]
         public void CanConstruct()
         {
-            var setup = DummyQuery<UserEntity>()
-                .Select<UserDto>()
-                    ;
+            ISelectSetup<UserEntity, UserDto> setup = DummyQuery<UserEntity>()
+                .Select<UserDto>();
 
             var part = new SelectSetupPart<UserEntity, UserDto>("IsOnline", setup, null);
 
@@ -30,11 +29,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core
         [Test]
         public void CanUseExpressionInUseCall()
         {
-            var users = Query<UserEntity>()
-                .Distinct().Select<UserDto>()
-                    .For(x => x.IsOnline).Use(x => x.IsOnline)
-                    .Select()
-                    ;
+            FlowQuerySelection<UserDto> users = Query<UserEntity>()
+                .Distinct()
+                .Select<UserDto>()
+                .For(x => x.IsOnline).Use(x => x.IsOnline)
+                .Select();
 
             Assert.That(users.Count(), Is.EqualTo(2));
             Assert.That(users.First().IsOnline, Is.False);
@@ -44,12 +43,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core
         [Test]
         public void CanUseProjectionInUseCall()
         {
-            var users = Query<UserEntity>()
+            FlowQuerySelection<UserDto> users = Query<UserEntity>()
                 .Distinct()
                 .Select<UserDto>()
-                    .For(x => x.IsOnline).Use(Projections.Property("IsOnline"))
-                    .Select()
-                    ;
+                .For(x => x.IsOnline).Use(Projections.Property("IsOnline"))
+                .Select();
 
             Assert.That(users.Count(), Is.EqualTo(2));
             Assert.That(users.First().IsOnline, Is.False);
@@ -59,55 +57,67 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core
         [Test]
         public void ConstructorThrowsIfSetupIsNull()
         {
-            Assert.That(() => new SelectSetupPart<UserEntity, UserDto>("IsOnline", null, null), Throws.InstanceOf<ArgumentNullException>());
+            Assert
+                .That
+                (
+                    () => new SelectSetupPart<UserEntity, UserDto>("IsOnline", null, null),
+                    Throws.InstanceOf<ArgumentNullException>()
+                );
         }
 
         [Test]
         public void ConstructorThrowsIfStringIsEmpty()
         {
-            var setup = DummyQuery<UserEntity>()
-                .Select<UserDto>()
-                    ;
+            ISelectSetup<UserEntity, UserDto> setup = DummyQuery<UserEntity>()
+                .Select<UserDto>();
 
-            Assert.That(() => new SelectSetupPart<UserEntity, UserDto>(string.Empty, setup, null), Throws.ArgumentException);
+            Assert
+                .That
+                (
+                    () => new SelectSetupPart<UserEntity, UserDto>(string.Empty, setup, null),
+                    Throws.ArgumentException
+                );
         }
 
         [Test]
         public void ConstructorThrowsIfStringIsNull()
         {
-            var setup = DummyQuery<UserEntity>()
-                .Select<UserDto>()
-                    ;
+            ISelectSetup<UserEntity, UserDto> setup = DummyQuery<UserEntity>()
+                .Select<UserDto>();
 
-            Assert.That(() =>new SelectSetupPart<UserEntity, UserDto>(null, setup, null), Throws.ArgumentException);
+            Assert.That(() => new SelectSetupPart<UserEntity, UserDto>(null, setup, null), Throws.ArgumentException);
         }
 
         [Test]
         public void UseThrowsIfExpressionIsNull()
         {
-            Assert.That(() =>
-            {
-                Expression<Func<UserEntity, object>> e = null;
-
-                DummyQuery<UserEntity>()
-                    .Distinct().Select<UserDto>()
-                        .For(x => x.IsOnline).Use(e);
-
-            }, Throws.InstanceOf<ArgumentNullException>());
+            Assert
+                .That
+                (
+                    () =>
+                    {
+                        DummyQuery<UserEntity>()
+                            .Distinct().Select<UserDto>()
+                            .For(x => x.IsOnline).Use((Expression<Func<UserEntity, object>>)null);
+                    },
+                    Throws.InstanceOf<ArgumentNullException>()
+                );
         }
 
         [Test]
         public void UseThrowsIfProjectionIsNull()
         {
-            Assert.That(() =>
-            {
-                IProjection p = null;
-
-                DummyQuery<UserEntity>()
-                    .Distinct().Select<UserDto>()
-                        .For(x => x.IsOnline).Use(p);
-
-            }, Throws.InstanceOf<ArgumentNullException>());
+            Assert
+                .That
+                (
+                    () =>
+                    {
+                        DummyQuery<UserEntity>()
+                            .Distinct().Select<UserDto>()
+                            .For(x => x.IsOnline).Use((IProjection)null);
+                    },
+                    Throws.InstanceOf<ArgumentNullException>()
+                );
         }
     }
 }

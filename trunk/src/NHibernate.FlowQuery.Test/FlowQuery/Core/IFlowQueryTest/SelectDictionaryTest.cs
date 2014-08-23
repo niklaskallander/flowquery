@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using NHibernate.FlowQuery.Test.Setup.Entities;
-using NUnit.Framework;
-
-namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
+﻿namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
 {
-    using Is = NUnit.Framework.Is;
+    using System.Collections.Generic;
+    using System.Linq;
+
+    using NHibernate.FlowQuery.Test.Setup.Entities;
+
+    using NUnit.Framework;
 
     [TestFixture]
     public class SelectDictionaryTest : BaseTest
@@ -15,8 +15,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         {
             Dictionary<long, string> userDictionary = Query<UserEntity>()
                 .OrderBy(x => x.Id)
-                .SelectDictionary(x => x.Id, x => x.Username)
-                ;
+                .SelectDictionary(x => x.Id, x => x.Username);
 
             Assert.That(userDictionary.Count, Is.EqualTo(4));
             Assert.That(userDictionary.ElementAt(0).Key, Is.EqualTo(1));

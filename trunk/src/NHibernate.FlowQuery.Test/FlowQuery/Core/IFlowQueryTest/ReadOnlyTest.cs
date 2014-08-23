@@ -1,33 +1,19 @@
-﻿using NHibernate.FlowQuery.Core;
-using NHibernate.FlowQuery.Helpers;
-using NHibernate.FlowQuery.Test.Setup.Entities;
-using NUnit.Framework;
-
-namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
+﻿namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
 {
-    using Is = NUnit.Framework.Is;
+    using NHibernate.FlowQuery.Core;
+    using NHibernate.FlowQuery.Core.Implementations;
+    using NHibernate.FlowQuery.Helpers;
+    using NHibernate.FlowQuery.Test.Setup.Entities;
+
+    using NUnit.Framework;
 
     [TestFixture]
     public class ReadOnlyTest : BaseTest
     {
         [Test]
-        public void CanSpecifyReadOnlyTrue()
-        {
-            var query = DummyQuery<UserEntity>();
-
-            var queryable = (IQueryableFlowQuery)query;
-
-            Assert.That(queryable.IsReadOnly, Is.Null);
-
-            query.ReadOnly();
-
-            Assert.That(queryable.IsReadOnly, Is.True);
-        }
-
-        [Test]
         public void CanSpecifyReadOnlyFale()
         {
-            var query = DummyQuery<UserEntity>();
+            IImmediateFlowQuery<UserEntity> query = DummyQuery<UserEntity>();
 
             var queryable = (IQueryableFlowQuery)query;
 
@@ -39,33 +25,49 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         }
 
         [Test]
-        public void ReadOnlyTrueIsPopulatedOnCriteria()
+        public void CanSpecifyReadOnlyTrue()
         {
-            var query = Query<UserEntity>()
-                .ReadOnly();
+            IImmediateFlowQuery<UserEntity> query = DummyQuery<UserEntity>();
 
             var queryable = (IQueryableFlowQuery)query;
 
-            ICriteria criteria = CriteriaHelper.BuildCriteria<UserEntity, UserEntity>(QuerySelection.Create(queryable));
+            Assert.That(queryable.IsReadOnly, Is.Null);
 
-            Assert.That(criteria, Is.Not.Null);
-            Assert.That(criteria.IsReadOnlyInitialized, Is.True, "Initialized");
-            Assert.That(criteria.IsReadOnly, Is.True, "ReadOnly");
+            query.ReadOnly();
+
+            Assert.That(queryable.IsReadOnly, Is.True);
         }
 
         [Test]
         public void ReadOnlyFalseIsPopulatedOnCriteria()
         {
-            var query = Query<UserEntity>()
+            IImmediateFlowQuery<UserEntity> query = Query<UserEntity>()
                 .ReadOnly(false);
 
             var queryable = (IQueryableFlowQuery)query;
 
-            ICriteria criteria = CriteriaHelper.BuildCriteria<UserEntity, UserEntity>(QuerySelection.Create(queryable));
+            ICriteria criteria = new CriteriaBuilder()
+                .Build<UserEntity, UserEntity>(QuerySelection.Create(queryable));
 
             Assert.That(criteria, Is.Not.Null);
             Assert.That(criteria.IsReadOnlyInitialized, Is.True, "Initialized");
             Assert.That(criteria.IsReadOnly, Is.False, "ReadOnly");
+        }
+
+        [Test]
+        public void ReadOnlyTrueIsPopulatedOnCriteria()
+        {
+            IImmediateFlowQuery<UserEntity> query = Query<UserEntity>()
+                .ReadOnly();
+
+            var queryable = (IQueryableFlowQuery)query;
+
+            ICriteria criteria = new CriteriaBuilder()
+                .Build<UserEntity, UserEntity>(QuerySelection.Create(queryable));
+
+            Assert.That(criteria, Is.Not.Null);
+            Assert.That(criteria.IsReadOnlyInitialized, Is.True, "Initialized");
+            Assert.That(criteria.IsReadOnly, Is.True, "ReadOnly");
         }
     }
 }

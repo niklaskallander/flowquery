@@ -1,17 +1,39 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace NHibernate.FlowQuery.Core
+﻿namespace NHibernate.FlowQuery.Core
 {
-    public class FlowQuerySelection<TSource> : IEnumerable<TSource>
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.Linq;
+
+    /// <summary>
+    ///     A class representing the result of an actual data selection made using <see cref="NHibernate.FlowQuery" />.
+    /// </summary>
+    /// <typeparam name="T">
+    ///     The <see cref="System.Type" /> of the result data.
+    /// </typeparam>
+    public class FlowQuerySelection<T> : IEnumerable<T>
     {
-        private IEnumerable<TSource> _selection;
+        /// <summary>
+        ///     If the selection is "delayed" (as indicated by <see cref="IsDelayed" />) this member contains an action 
+        ///     to retrieve the result when needed.
+        /// </summary>
+        private readonly Func<IEnumerable<T>> _delayedSelection;
 
-        private readonly Func<IEnumerable<TSource>> _delayedSelection;
+        /// <summary>
+        ///     The selection.
+        /// </summary>
+        private IEnumerable<T> _selection;
 
-        public FlowQuerySelection(Func<IEnumerable<TSource>> delayedSelection)
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="FlowQuerySelection{T}" /> class.
+        /// </summary>
+        /// <param name="delayedSelection">
+        ///     An action to retrieve the result of a delayed selection.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        ///     <paramref name="delayedSelection" /> is null.
+        /// </exception>
+        public FlowQuerySelection(Func<IEnumerable<T>> delayedSelection)
         {
             if (delayedSelection == null)
             {
@@ -23,7 +45,16 @@ namespace NHibernate.FlowQuery.Core
             IsDelayed = true;
         }
 
-        public FlowQuerySelection(IEnumerable<TSource> selection)
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="FlowQuerySelection{T}" /> class.
+        /// </summary>
+        /// <param name="selection">
+        ///     The selection.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        ///     <paramref name="selection" /> is null.
+        /// </exception>
+        public FlowQuerySelection(IEnumerable<T> selection)
         {
             if (selection == null)
             {
@@ -35,9 +66,23 @@ namespace NHibernate.FlowQuery.Core
             IsDelayed = false;
         }
 
+        /// <summary>
+        ///     Gets a value indicating whether this <see cref="FlowQuerySelection{T}" /> instance represents a delayed
+        ///     selection.
+        /// </summary>
+        /// <value>
+        ///     The value indicating whether this <see cref="FlowQuerySelection{T}" /> instance represents a delayed
+        ///     selection.
+        /// </value>
         public virtual bool IsDelayed { get; private set; }
 
-        protected virtual IEnumerable<TSource> Selection
+        /// <summary>
+        ///     Gets the selection.
+        /// </summary>
+        /// <value>
+        ///     The selection.
+        /// </value>
+        protected virtual IEnumerable<T> Selection
         {
             get
             {
@@ -55,47 +100,56 @@ namespace NHibernate.FlowQuery.Core
             }
         }
 
-        public virtual FlowQuerySelection<TDestination> ToMap<TDestination>()
-            where TDestination : new()
-        {
-            IEnumerable<TSource> currentSelection = Selection;
-
-            IEnumerable<TDestination> delayedSelection = new FlowQuerySelection<TDestination>(() =>
-
-                from item
-                in currentSelection
-                select Mapping.Map<TSource, TDestination>(item)
-            );
-
-            return new FlowQuerySelection<TDestination>(delayedSelection);
-        }
-
-        public virtual IEnumerator<TSource> GetEnumerator()
-        {
-            return Selection.GetEnumerator();
-        }
-
-        public static implicit operator List<TSource>(FlowQuerySelection<TSource> selection)
+        /// <summary>
+        ///     Casts the selection into a <see cref="List{T}" /> instance.
+        /// </summary>
+        /// <param name="selection">
+        ///     The selection to cast.
+        /// </param>
+        /// <returns>
+        ///     The created <see cref="List{T}" /> instance.
+        /// </returns>
+        public static implicit operator List<T>(FlowQuerySelection<T> selection)
         {
             if (selection == null)
             {
                 return null;
             }
 
-            return new List<TSource>(selection.Selection);
+            return new List<T>(selection.Selection);
         }
 
-        public static implicit operator TSource(FlowQuerySelection<TSource> selection)
+        /// <summary>
+        ///     Casts the selection into a <see cref="T:T" /> instance using a first-or-default strategy. NOTE: this 
+        ///     implicit casting operator does NOT verify that the selection only contains one item.
+        /// </summary>
+        /// <param name="selection">
+        ///     The selection to cast.
+        /// </param>
+        /// <returns>
+        ///     The <see cref="T:T" /> instance or the default value of <see cref="T:T" /> if the selection contain no 
+        ///     items.
+        /// </returns>
+        public static implicit operator T(FlowQuerySelection<T> selection)
         {
             if (selection == null || selection.Selection == null)
             {
-                return default(TSource);
+                return default(T);
             }
 
             return selection.Selection.FirstOrDefault();
         }
 
-        public static implicit operator TSource[](FlowQuerySelection<TSource> selection)
+        /// <summary>
+        ///     Casts the selection into a <see cref="T:T[]" /> instance.
+        /// </summary>
+        /// <param name="selection">
+        ///     The selection to cast.
+        /// </param>
+        /// <returns>
+        ///     The created <see cref="T:T[]" /> instance.
+        /// </returns>
+        public static implicit operator T[](FlowQuerySelection<T> selection)
         {
             if (selection == null || selection.Selection == null)
             {
@@ -105,6 +159,50 @@ namespace NHibernate.FlowQuery.Core
             return selection.Selection.ToArray();
         }
 
+        /// <summary>
+        ///     Retrieves the <see cref="IEnumerator{T}" /> for the underlying selection.
+        /// </summary>
+        /// <returns>
+        ///     The <see cref="IEnumerator{T}" /> for the underlying selection.
+        /// </returns>
+        public virtual IEnumerator<T> GetEnumerator()
+        {
+            return Selection.GetEnumerator();
+        }
+
+        /// <summary>
+        ///     Maps the underlying selection into a new <see cref="FlowQuerySelection{T}" /> instance of the specified
+        ///     type (<typeparamref name="TDestination" />) using the default mapping strategy specified for
+        ///     <see cref="Mapping.Map{TSource, TDestination}" />. 
+        /// </summary>
+        /// <typeparam name="TDestination">
+        ///     The <see cref="System.Type" /> of the mapped <see cref="FlowQuerySelection{T}" /> instance.
+        /// </typeparam>
+        /// <returns>
+        ///     The mapped <see cref="FlowQuerySelection{T}" /> instance.
+        /// </returns>
+        public virtual FlowQuerySelection<TDestination> ToMap<TDestination>()
+            where TDestination : new()
+        {
+            IEnumerable<T> currentSelection = Selection;
+
+            IEnumerable<TDestination> delayedSelection =
+
+                new FlowQuerySelection<TDestination>(() =>
+
+                    currentSelection
+                        .Select(Mapping.Map<T, TDestination>)
+                );
+
+            return new FlowQuerySelection<TDestination>(delayedSelection);
+        }
+
+        /// <summary>
+        ///     Retrieves the <see cref="IEnumerator" /> for the underlying selection.
+        /// </summary>
+        /// <returns>
+        ///     The <see cref="IEnumerator" /> for the underlying selection.
+        /// </returns>
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();

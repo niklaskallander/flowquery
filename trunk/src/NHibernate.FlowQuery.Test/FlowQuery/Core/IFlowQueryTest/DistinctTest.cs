@@ -1,28 +1,18 @@
-﻿using System;
-using System.Linq;
-using NHibernate.FlowQuery.Test.Setup.Entities;
-using NUnit.Framework;
-
-namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
+﻿namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
 {
+    using System;
+    using System.Linq;
+
+    using NHibernate.FlowQuery.Core;
+    using NHibernate.FlowQuery.Test.Setup.Entities;
+
+    using NUnit.Framework;
+
     using FqIs = Is;
-    using Is = NUnit.Framework.Is;
 
     [TestFixture]
     public class DistinctTest : BaseTest
     {
-        [Test]
-        public void CanMakeDistinctImmediateQueryIndistinct()
-        {
-            int immediateCount = Query<UserEntity>()
-                .Distinct()
-                .Indistinct()
-                .Count(u => u.IsOnline)
-                ;
-
-            Assert.That(immediateCount, Is.EqualTo(4));
-        }
-
         [Test]
         public void CanMakeDistinctDelayedQueryIndistinct()
         {
@@ -30,8 +20,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                 .Delayed()
                 .Distinct()
                 .Indistinct()
-                .Count(u => u.IsOnline)
-                ;
+                .Count(u => u.IsOnline);
 
             Assert.That(delayedCount.Value, Is.EqualTo(4));
         }
@@ -39,19 +28,29 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         [Test]
         public void CanMakeDistinctDetachedQueryIndistinct()
         {
-            var detachedCount = Query<UserEntity>()
+            IDetachedFlowQuery<UserEntity> detachedCount = Query<UserEntity>()
                 .Detached()
                 .Distinct()
                 .Indistinct()
-                .Count(u => u.IsOnline)
-                ;
+                .Count(u => u.IsOnline);
 
-            var query = Query<UserEntity>()
+            FlowQuerySelection<UserEntity> query = Query<UserEntity>()
                 .Where(x => x.Id, FqIs.In(detachedCount))
                 .Select();
 
             Assert.That(query.Count(), Is.EqualTo(1));
             Assert.That(query.First().Id, Is.EqualTo(4));
+        }
+
+        [Test]
+        public void CanMakeDistinctImmediateQueryIndistinct()
+        {
+            int immediateCount = Query<UserEntity>()
+                .Distinct()
+                .Indistinct()
+                .Count(u => u.IsOnline);
+
+            Assert.That(immediateCount, Is.EqualTo(4));
         }
     }
 }

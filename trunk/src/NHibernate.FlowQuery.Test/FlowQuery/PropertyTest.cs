@@ -1,8 +1,9 @@
-using System;
-using NUnit.Framework;
-
 namespace NHibernate.FlowQuery.Test.FlowQuery
 {
+    using System;
+
+    using NUnit.Framework;
+
     [TestFixture]
     public class PropertyTest
     {

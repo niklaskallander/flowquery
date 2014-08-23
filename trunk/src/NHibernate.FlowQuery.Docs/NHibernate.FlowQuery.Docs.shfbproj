@@ -1,0 +1,106 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <!-- The configuration and platform will be used to determine which assemblies to include from solution and
+				 project documentation sources -->
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{0c246062-dfc9-4830-badb-96f9417adeb4}</ProjectGuid>
+    <SHFBSchemaVersion>1.9.9.0</SHFBSchemaVersion>
+    <!-- AssemblyName, Name, and RootNamespace are not used by SHFB but Visual Studio adds them anyway -->
+    <AssemblyName>Documentation</AssemblyName>
+    <RootNamespace>Documentation</RootNamespace>
+    <Name>Documentation</Name>
+    <!-- SHFB properties -->
+    <FrameworkVersion>.NET Framework 4.0</FrameworkVersion>
+    <OutputPath>.\Help\</OutputPath>
+    <HtmlHelpName>NHibernate FlowQuery</HtmlHelpName>
+    <Language>en-US</Language>
+    <BuildAssemblerVerbosity>OnlyErrors</BuildAssemblerVerbosity>
+    <HelpFileFormat>HtmlHelp1</HelpFileFormat>
+    <IndentHtml>False</IndentHtml>
+    <KeepLogFile>False</KeepLogFile>
+    <DisableCodeBlockComponent>False</DisableCodeBlockComponent>
+    <CppCommentsFixup>False</CppCommentsFixup>
+    <CleanIntermediates>True</CleanIntermediates>
+    <DocumentationSources>
+      <DocumentationSource sourceFile="..\NHibernate.FlowQuery\bin\Release\NHibernate.FlowQuery.dll" />
+      <DocumentationSource sourceFile="..\NHibernate.FlowQuery\bin\Release\NHibernate.FlowQuery.xml" />
+    </DocumentationSources>
+    <MaximumGroupParts>2</MaximumGroupParts>
+    <NamespaceGrouping>False</NamespaceGrouping>
+    <SyntaxFilters>C#</SyntaxFilters>
+    <SdkLinkTarget>Blank</SdkLinkTarget>
+    <RootNamespaceContainer>False</RootNamespaceContainer>
+    <PresentationStyle>VS2013</PresentationStyle>
+    <Preliminary>False</Preliminary>
+    <NamingMethod>Guid</NamingMethod>
+    <HelpTitle>NHibernate FlowQuery</HelpTitle>
+    <ContentPlacement>AboveNamespaces</ContentPlacement>
+    <CatalogName>VisualStudio12</CatalogName>
+    <TocParentId>-1</TocParentId>
+    <TocParentVersion>100</TocParentVersion>
+    <TopicVersion>100</TopicVersion>
+    <TocOrder>-1</TocOrder>
+    <ProductTitle>NHibernate FlowQuery</ProductTitle>
+    <VendorName>Niklas K&amp;#228%3bllander</VendorName>
+    <MSHelpViewerSdkLinkType>Msdn</MSHelpViewerSdkLinkType>
+    <CatalogVersion>100</CatalogVersion>
+    <CatalogProductId>VS</CatalogProductId>
+    <VisibleItems>Attributes, ExplicitInterfaceImplementations, InheritedMembers, InheritedFrameworkMembers, Protected, ProtectedInternalAsProtected</VisibleItems>
+    <NamespaceSummaries>
+      <NamespaceSummaryItem name="NHibernate.FlowQuery" isDocumented="True" />
+      <NamespaceSummaryItem name="NHibernate.FlowQuery.AutoMapping" isDocumented="True" />
+      <NamespaceSummaryItem name="NHibernate.FlowQuery.Core" isDocumented="True" />
+      <NamespaceSummaryItem name="NHibernate.FlowQuery.Core.CustomProjections" isDocumented="True" />
+      <NamespaceSummaryItem name="NHibernate.FlowQuery.Core.Implementations" isDocumented="True" />
+      <NamespaceSummaryItem name="NHibernate.FlowQuery.Core.Structures" isDocumented="True" />
+    </NamespaceSummaries>
+    <CopyrightText>
+    </CopyrightText>
+    <MissingTags>Summary, Parameter, Returns, Value, AutoDocumentCtors, Namespace, TypeParameter, AutoDocumentDispose</MissingTags>
+    <CopyrightHref>
+    </CopyrightHref>
+    <FooterText>&amp;lt%3bp&amp;gt%3b&amp;lt%3ba href=&amp;quot%3bhttp://nhflowquery.wordpress.com/&amp;quot%3b target=&amp;quot%3b_blank&amp;quot%3b&amp;gt%3bCopyright &amp;#169%3b Niklas K&amp;#228%3bllander 2010 - 2014&amp;lt%3b/a&amp;gt%3b&amp;lt%3b/p&amp;gt%3b&amp;lt%3bp&amp;gt%3bSend feedback on this topic to &amp;lt%3ba href=&amp;quot%3bhttp://nhflowquery.wordpress.com/contact/&amp;quot%3b target=&amp;quot%3b_blank&amp;quot%3b&amp;gt%3bhttp://nhflowquery.wordpress.com/contact/&amp;lt%3b/a&amp;gt%3b&amp;lt%3b/p&amp;gt%3b&amp;lt%3bp&amp;gt%3b&amp;lt%3bsmall&amp;gt%3b&amp;lt%3bem&amp;gt%3bAdditional documentation for &amp;lt%3bstrong&amp;gt%3bNHibernate.FlowQuery&amp;lt%3b/strong&amp;gt%3b can be found at &amp;lt%3ba href=&amp;quot%3bhttp://nhflowquery.wordpress.com/documentation/&amp;quot%3b target=&amp;quot%3b_blank&amp;quot%3b&amp;gt%3bhttp://nhflowquery.wordpress.com/documentation/&amp;lt%3b/a&amp;gt%3b.&amp;lt%3b/em&amp;gt%3b&amp;lt%3b/small&amp;gt%3b&amp;lt%3b/p&amp;gt%3b</FooterText>
+    <HeaderText>
+    </HeaderText>
+    <FeedbackEMailLinkText>
+    </FeedbackEMailLinkText>
+    <FeedbackEMailAddress>
+    </FeedbackEMailAddress>
+  </PropertyGroup>
+  <!-- There are no properties for these groups.  AnyCPU needs to appear in order for Visual Studio to perform
+			 the build.  The others are optional common platform types that may appear. -->
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|Win32' ">
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|Win32' ">
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="NHibernate, Version=3.3.1.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4">
+      <HintPath>..\packages\NHibernate.3.3.3.4001\lib\Net35\NHibernate.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NHibernate.FlowQuery\NHibernate.FlowQuery.csproj">
+      <Name>NHibernate.FlowQuery</Name>
+      <Project>{f72e62cf-6dac-49e4-b533-89e5069ab942}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+  </ItemGroup>
+  <!-- Import the SHFB build targets -->
+  <Import Project="$(SHFBROOT)\SandcastleHelpFileBuilder.targets" />
+</Project>
