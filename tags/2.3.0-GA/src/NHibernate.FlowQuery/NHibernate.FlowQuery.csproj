@@ -1,0 +1,226 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{F72E62CF-6DAC-49E4-B533-89E5069AB942}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>NHibernate.FlowQuery</RootNamespace>
+    <AssemblyName>NHibernate.FlowQuery</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>
+    </DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\NHibernate.FlowQuery.xml</DocumentationFile>
+    <NoWarn>1591</NoWarn>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>
+    </DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\NHibernate.FlowQuery.xml</DocumentationFile>
+    <NoWarn>
+    </NoWarn>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>NHibernate.FlowQuery.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Iesi.Collections, Version=4.0.0.0, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Iesi.Collections.4.0.0.4000\lib\net40\Iesi.Collections.dll</HintPath>
+    </Reference>
+    <Reference Include="NHibernate, Version=4.0.0.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\NHibernate.4.0.0.4000\lib\net40\NHibernate.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Aggregate.cs" />
+    <Compile Include="AutoMapping\DefaultMapper.cs" />
+    <Compile Include="AutoMapping\IMapper.cs" />
+    <Compile Include="Core\ICriteriaBuilder%271.cs" />
+    <Compile Include="Core\Implementations\CriteriaBuilder.cs" />
+    <Compile Include="Core\Implementations\LockBuilder.cs" />
+    <Compile Include="Core\ILockBuilder.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Core\IPartialSelection%272.cs" />
+    <Compile Include="Core\Structures\Lock.cs" />
+    <Compile Include="Core\CustomProjections\FqAliasProjection.cs" />
+    <Compile Include="Core\CustomProjections\FqCastProjection.cs" />
+    <Compile Include="Core\CustomProjections\FqGroupByProjection.cs" />
+    <Compile Include="Core\CustomProjections\FqProjectionList.cs" />
+    <Compile Include="Core\Structures\Fetch.cs" />
+    <Compile Include="Core\Implementations\FetchBuilder.cs" />
+    <Compile Include="Core\IFetchBuilder.cs" />
+    <Compile Include="Core\IDetachedImmutableFlowQuery.cs" />
+    <Compile Include="Core\Implementations\DetachedImmutableFlowQuery.cs" />
+    <Compile Include="Core\Implementations\MorphableFlowQueryBase.cs" />
+    <Compile Include="Core\Implementations\QueryableFlowQueryBase.cs" />
+    <Compile Include="Core\IQueryableFlowQuery.cs" />
+    <Compile Include="Core\IFlowQuery.cs" />
+    <Compile Include="Core\IMorphableFlowQuery.cs" />
+    <Compile Include="Core\IQueryableFlowQuery%271.cs" />
+    <Compile Include="Core\IMorphableFlowQuery%272.cs" />
+    <Compile Include="Core\IDetachedFlowQuery%271.cs" />
+    <Compile Include="Core\IDelayedFlowQuery%271.cs" />
+    <Compile Include="Core\IImmediateFlowQuery%271.cs" />
+    <Compile Include="Core\Implementations\DetachedFlowQuery.cs" />
+    <Compile Include="Core\Implementations\ImmediateFlowQuery.cs" />
+    <Compile Include="Core\Implementations\DelayedFlowQuery.cs" />
+    <Compile Include="Core\Implementations\FlowQueryBase.cs" />
+    <Compile Include="Core\Structures\Join.cs" />
+    <Compile Include="Core\IJoinBuilder.cs" />
+    <Compile Include="Core\Implementations\JoinBuilder.cs" />
+    <Compile Include="Core\Implementations\PartialSelectionBuilder%272.cs" />
+    <Compile Include="Core\Implementations\PartialSelection%272.cs" />
+    <Compile Include="Core\ISelectSetup%272.cs" />
+    <Compile Include="Core\ISelectSetupPart%272.cs" />
+    <Compile Include="Core\Implementations\SelectionBuilder%272.cs" />
+    <Compile Include="Core\Implementations\SelectSetup%272.cs" />
+    <Compile Include="Core\Implementations\SelectSetupPart%272.cs" />
+    <Compile Include="Core\Structures\OrderByStatement.cs" />
+    <Compile Include="Core\Structures\Pair.cs" />
+    <Compile Include="Core\Implementations\ExampleWrapper.cs" />
+    <Compile Include="Core\FlowQuerySelection.cs" />
+    <Compile Include="Core\IExampleWrapper.cs" />
+    <Compile Include="Core\IFlowQuery%272.cs" />
+    <Compile Include="Core\WhereDelegate.cs" />
+    <Compile Include="DetachedCriteriaExtensions.cs" />
+    <Compile Include="DetachedFlowQuery.cs" />
+    <Compile Include="Expressions\IsHelper.cs" />
+    <Compile Include="Expressions\IsEmptyExpression.cs" />
+    <Compile Include="Expressions\SubqueryExpressions\IsEqualToAllSubqueryExpression.cs" />
+    <Compile Include="Expressions\SubqueryExpressions\IsEqualToSubqueryExpression.cs" />
+    <Compile Include="Expressions\SubqueryExpressions\IsGreaterThanAllSubqueryExpression.cs" />
+    <Compile Include="Expressions\SubqueryExpressions\IsGreaterThanOrEqualToAllSubqueryExpression.cs" />
+    <Compile Include="Expressions\SubqueryExpressions\IsGreaterThanOrEqualToSomeSubqueryExpression.cs" />
+    <Compile Include="Expressions\SubqueryExpressions\IsGreaterThanOrEqualToSubqueryExpression.cs" />
+    <Compile Include="Expressions\SubqueryExpressions\IsGreaterThanSomeSubqueryExpression.cs" />
+    <Compile Include="Expressions\SubqueryExpressions\IsGreaterThanSubqueryExpression.cs" />
+    <Compile Include="Expressions\SubqueryExpressions\IsLessThanOrEqualToAllSubqueryExpression.cs" />
+    <Compile Include="Expressions\SubqueryExpressions\IsLessThanOrEqualToSomeSubqueryExpression.cs" />
+    <Compile Include="Expressions\SubqueryExpressions\IsLessThanOrEqualToSubqueryExpression.cs" />
+    <Compile Include="Expressions\SubqueryExpressions\IsLessThanAllSubqueryExpression.cs" />
+    <Compile Include="Expressions\SubqueryExpressions\IsLessThanSomeSubqueryExpression.cs" />
+    <Compile Include="Expressions\SubqueryExpressions\IsLessThanSubqueryExpression.cs" />
+    <Compile Include="Expressions\SubqueryExpressions\SubqueryIsExpressionBase.cs" />
+    <Compile Include="ExtensionHelpers\AggregateExtensions.cs" />
+    <Compile Include="ExtensionHelpers\IsExtensions.cs" />
+    <Compile Include="ExtensionHelpers\PropertyExtensions.cs" />
+    <Compile Include="FlowQueryOptions.cs" />
+    <Compile Include="Helpers\ConstructionHelper.cs" />
+    <Compile Include="Helpers\ExpressionHelper.cs" />
+    <Compile Include="Helpers\ParameterReplaceVisitor.cs" />
+    <Compile Include="Helpers\ProjectionHelper.cs" />
+    <Compile Include="Helpers\ProjectionHandlers\MethodCalls\AsHandler.cs" />
+    <Compile Include="Helpers\ProjectionHandlers\MethodCalls\CountDistinctHandler.cs" />
+    <Compile Include="Helpers\ProjectionHandlers\MethodCalls\IMethodCallProjectionHandler.cs" />
+    <Compile Include="Helpers\ProjectionHandlers\MethodCalls\LikeHandler.cs" />
+    <Compile Include="Helpers\ProjectionHandlers\MethodCalls\MethodCallProjectionHandlerBase.cs" />
+    <Compile Include="Helpers\ProjectionHandlers\MethodCalls\RoundHandler.cs" />
+    <Compile Include="Helpers\ProjectionHandlers\MethodCalls\SimpleMethodCallHandler.cs" />
+    <Compile Include="Helpers\ProjectionHandlers\MethodCalls\SubqueryHandler.cs" />
+    <Compile Include="Helpers\ProjectionHandlers\MethodCalls\SubstringHandler.cs" />
+    <Compile Include="Helpers\ProjectionHandlers\MethodCalls\TrimHandler.cs" />
+    <Compile Include="Helpers\ProjectionHandlers\MethodCalls\TrimStartHandler.cs" />
+    <Compile Include="Helpers\ProjectionHandlers\MethodCalls\TrimEndHandler.cs" />
+    <Compile Include="Helpers\QueryHelperData.cs" />
+    <Compile Include="Helpers\ReflectionHelper.cs" />
+    <Compile Include="Helpers\RestrictionHelper.cs" />
+    <Compile Include="Helpers\SelectionHelper.cs" />
+    <Compile Include="Helpers\QuerySelection.cs" />
+    <Compile Include="Helpers\TypeHelper.cs" />
+    <Compile Include="Mapping.cs" />
+    <Compile Include="Properties\NamespaceDoc.cs" />
+    <Compile Include="Revealing\Conventions\CustomConvention.cs" />
+    <Compile Include="Revealing\Conventions\IRevealConvention.cs" />
+    <Compile Include="Is.cs" />
+    <Compile Include="Property.cs" />
+    <Compile Include="Reveal.cs" />
+    <Compile Include="Revealing\Conventions\MConvention.cs" />
+    <Compile Include="Revealing\Conventions\MUnderscoreConvention.cs" />
+    <Compile Include="Revealing\Conventions\UnderscoreConvention.cs" />
+    <Compile Include="Revealing\IRevealer%271.cs" />
+    <Compile Include="Revealing\IRevealer.cs" />
+    <Compile Include="Revealing\IRevealerBase.cs" />
+    <Compile Include="Revealing\Revealer%271.cs" />
+    <Compile Include="Revealing\Revealer.cs" />
+    <Compile Include="Revealing\RevealerBase.cs" />
+    <Compile Include="SessionExtensions.cs" />
+    <Compile Include="ProjectionListExtensions.cs" />
+    <Compile Include="Expressions\IsBetweenExpression.cs" />
+    <Compile Include="Expressions\IsEqualExpression.cs" />
+    <Compile Include="Expressions\IsExpression.cs" />
+    <Compile Include="Expressions\IsGreaterThanExpression.cs" />
+    <Compile Include="Expressions\IsGreaterThanOrEqualExpression.cs" />
+    <Compile Include="Expressions\SubqueryExpressions\IsInSubqueryExpression.cs" />
+    <Compile Include="Expressions\IsInValuesExpression.cs" />
+    <Compile Include="Expressions\IsLessThanExpression.cs" />
+    <Compile Include="Expressions\IsLessThanOrEqualExpression.cs" />
+    <Compile Include="Expressions\IsLikeExpression.cs" />
+    <Compile Include="Expressions\IsNullExpression.cs" />
+    <Compile Include="Expressions\SimpleIsExpression.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="NHibernate.FlowQuery.nuspec" />
+    <None Include="NHibernate.FlowQuery.snk" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="PostBuildMacros">
+    <GetAssemblyIdentity AssemblyFiles="$(TargetPath)">
+      <Output TaskParameter="Assemblies" ItemName="Targets" />
+    </GetAssemblyIdentity>
+  </Target>
+  <Target Condition="'$(Configuration)' == 'Release'" Name="BeforeBuild">
+    <!--<RemoveDir Directories="$(SolutionDir)..\builds" />
+        <MakeDir Directories="$(SolutionDir)..\builds" />-->
+    <RemoveDir Directories="$(TargetDir)" />
+  </Target>
+  <Target Condition="'$(Configuration)' == 'Release'" Name="AfterBuild">
+    <MSBuild Projects="$(SolutionDir)NHibernate.FlowQuery.Docs\NHibernate.FlowQuery.Docs.shfbproj" Properties="Configuration=Release" />
+    <MSBuild Projects="$(ProjectDir)$(ProjectFileName)" Properties="Configuration=Release" Targets="PackageRelease" />
+  </Target>
+  <Target Name="PackageRelease" DependsOnTargets="PostBuildMacros">
+    <Exec Command="copy &quot;$(SolutionDir)\License.txt&quot; &quot;$(TargetDir)License.txt&quot;" />
+    <Exec Command="copy &quot;$(SolutionDir)\Release Notes.txt&quot; &quot;$(TargetDir)ReleaseNotes.txt&quot;" />
+    <Exec Command="copy &quot;$(SolutionDir)NHibernate.FlowQuery.Docs\Help\NHibernate FlowQuery.chm&quot; &quot;$(TargetDir)NHibernate.FlowQuery.chm&quot;" />
+    <Exec Command="7z a -tzip &quot;$(SolutionDir)..\builds\@(Targets->'%(Version)')\NHibernate.FlowQuery.@(Targets->'%(Version)').bin.zip&quot; &quot;$(TargetFileName)&quot; &quot;$(TargetName).xml&quot; &quot;License.txt&quot; &quot;ReleaseNotes.txt&quot; &quot;NHibernate.FlowQuery.chm&quot;" WorkingDirectory="$(TargetDir)" />
+    <Exec Command="7z a -tzip -r -xr!packages -xr!bin -xr!obj -xr!*.suo -xr!*.user -xr!*.cache &quot;$(SolutionDir)..\builds\@(Targets->'%(Version)')\NHibernate.FlowQuery.@(Targets->'%(Version)').src.zip&quot; &quot;$(SolutionDir)*.*&quot;" />
+    <Exec Command="nuget pack $(ProjectFileName) -Prop Configuration=Release" WorkingDirectory="$(ProjectDir)" />
+    <Exec Command="move &quot;$(TargetName).*.nupkg&quot; &quot;$(SolutionDir)..\builds\@(Targets->'%(Version)')\$(TargetName).@(Targets->'%(Version)').nupkg&quot;" WorkingDirectory="$(ProjectDir)" />
+  </Target>
+</Project>
