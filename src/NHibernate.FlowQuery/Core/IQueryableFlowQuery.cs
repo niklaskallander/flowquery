@@ -1,7 +1,7 @@
 ﻿namespace NHibernate.FlowQuery.Core
 {
     /// <summary>
-    ///     An interface defining the basic structure of a project-able <see cref="NHibernate.FlowQuery" /> query.
+    ///     An interface defining the basic structure of a projectable <see cref="NHibernate.FlowQuery" /> query.
     /// </summary>
     /// <remarks>
     ///     This interface is not intended to exposed publicly as to let users manipulate the properties directly. It 

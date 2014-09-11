@@ -6,7 +6,7 @@
     using NHibernate.Criterion;
 
     /// <summary>
-    ///     An interface defining the functionality required of a detached query (a.k.a. sub-query).
+    ///     An interface defining the functionality required of a detached query (a.k.a. subquery).
     /// </summary>
     /// <typeparam name="TSource">
     ///     The <see cref="System.Type" /> of the underlying data for this query.
@@ -214,7 +214,7 @@
         IDetachedFlowQuery<TSource> Select(Expression<Func<TSource, object>> expression);
 
         /// <summary>
-        ///     Sets the alias of the root entity of the main query for this detached query (a.k.a. sub-query).
+        ///     Sets the alias of the root entity of the main query for this detached query (a.k.a. subquery).
         /// </summary>
         /// <param name="alias">
         ///     The alias.

@@ -30,7 +30,7 @@
         ///     Compiles this <see cref="IsExpression" /> into a <see cref="ICriterion" /> instance.
         /// </summary>
         /// <param name="subquery">
-        ///     The sub-query to filter.
+        ///     The subquery to filter.
         /// </param>
         /// <returns>
         ///     The compiled <see cref="ICriterion" /> instance.

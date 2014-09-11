@@ -52,11 +52,13 @@
     <AssemblyOriginatorKeyFile>NHibernate.FlowQuery.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Iesi.Collections">
-      <HintPath>..\packages\Iesi.Collections.3.2.0.1001\lib\Net35\Iesi.Collections.dll</HintPath>
+    <Reference Include="Iesi.Collections, Version=4.0.0.0, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Iesi.Collections.4.0.0.4000\lib\net40\Iesi.Collections.dll</HintPath>
     </Reference>
-    <Reference Include="NHibernate, Version=3.3.1.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
-      <HintPath>..\packages\NHibernate.3.3.3.4001\lib\Net35\NHibernate.dll</HintPath>
+    <Reference Include="NHibernate, Version=4.0.0.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\NHibernate.4.0.0.4000\lib\net40\NHibernate.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
@@ -142,6 +144,18 @@
     <Compile Include="Helpers\ExpressionHelper.cs" />
     <Compile Include="Helpers\ParameterReplaceVisitor.cs" />
     <Compile Include="Helpers\ProjectionHelper.cs" />
+    <Compile Include="Helpers\ProjectionHandlers\MethodCalls\AsHandler.cs" />
+    <Compile Include="Helpers\ProjectionHandlers\MethodCalls\CountDistinctHandler.cs" />
+    <Compile Include="Helpers\ProjectionHandlers\MethodCalls\IMethodCallProjectionHandler.cs" />
+    <Compile Include="Helpers\ProjectionHandlers\MethodCalls\LikeHandler.cs" />
+    <Compile Include="Helpers\ProjectionHandlers\MethodCalls\MethodCallProjectionHandlerBase.cs" />
+    <Compile Include="Helpers\ProjectionHandlers\MethodCalls\RoundHandler.cs" />
+    <Compile Include="Helpers\ProjectionHandlers\MethodCalls\SimpleMethodCallHandler.cs" />
+    <Compile Include="Helpers\ProjectionHandlers\MethodCalls\SubqueryHandler.cs" />
+    <Compile Include="Helpers\ProjectionHandlers\MethodCalls\SubstringHandler.cs" />
+    <Compile Include="Helpers\ProjectionHandlers\MethodCalls\TrimHandler.cs" />
+    <Compile Include="Helpers\ProjectionHandlers\MethodCalls\TrimStartHandler.cs" />
+    <Compile Include="Helpers\ProjectionHandlers\MethodCalls\TrimEndHandler.cs" />
     <Compile Include="Helpers\QueryHelperData.cs" />
     <Compile Include="Helpers\ReflectionHelper.cs" />
     <Compile Include="Helpers\RestrictionHelper.cs" />

@@ -92,10 +92,10 @@
         List<FqGroupByProjection> GroupBys { get; }
 
         /// <summary>
-        ///     Gets a value indicating whether the query is cache-able.
+        ///     Gets a value indicating whether the query is cacheable.
         /// </summary>
         /// <value>
-        ///     Indicates whether the query is cache-able (true) or not (false).
+        ///     Indicates whether the query is cacheable (true) or not (false).
         /// </value>
         bool IsCacheable { get; }
 

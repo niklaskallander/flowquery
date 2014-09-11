@@ -101,20 +101,40 @@
 
             FlowQuerySelection<UserEntity> users = Session.FlowQuery<UserEntity>()
                 .Fetch(x => x.Groups, () => groupLink).Eagerly()
-                .Fetch(x => groupLink.Group.Customers).Eagerly()
+                .Fetch(x => groupLink.Group).Eagerly()
                 .Select();
 
-            Assert.That(users.Count(), Is.EqualTo(15));
+            Assert.That(users.Count(), Is.EqualTo(6));
+
+            foreach (var user in users)
+            {
+                Assert.That(NHibernateUtil.IsInitialized(user.Groups));
+
+                foreach (var group in user.Groups)
+                {
+                    Assert.That(NHibernateUtil.IsInitialized(group.Group));
+                }
+            }
         }
 
         [Test]
         public void SetFetchModeExample3()
         {
             FlowQuerySelection<UserEntity> users = Session.FlowQuery<UserEntity>()
-                .Fetch("Groups.Group.Customers").Eagerly()
+                .Fetch("Groups.Group").Eagerly()
                 .Select();
 
-            Assert.That(users.Count(), Is.EqualTo(15));
+            Assert.That(users.Count(), Is.EqualTo(6));
+
+            foreach (var user in users)
+            {
+                Assert.That(NHibernateUtil.IsInitialized(user.Groups));
+
+                foreach (var group in user.Groups)
+                {
+                    Assert.That(NHibernateUtil.IsInitialized(group.Group));
+                }
+            }
         }
 
         [Test]

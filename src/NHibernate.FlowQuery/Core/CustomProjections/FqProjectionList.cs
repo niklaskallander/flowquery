@@ -15,7 +15,7 @@
     /// <remarks>
     ///     This implementation simply wraps a <see cref="ProjectionList" /> object and tweaks a few of its methods.
     /// </remarks>
-    public class FqProjectionList : IEnhancedProjection
+    public class FqProjectionList : IProjection
     {
         /// <summary>
         ///     The <see cref="IProjection" /> objects added to this <see cref="FqProjectionList" /> object.
@@ -176,39 +176,6 @@
         }
 
         /// <summary>
-        ///     Get the SQL select clause column aliases for a particular user-visible alias.
-        /// </summary>
-        /// <param name="alias">
-        ///     The criteria-level alias.
-        /// </param>
-        /// <param name="loc">
-        ///     Just as in <see cref="M:IProjection.ToSqlString" />, represents the number of columns rendered prior to
-        ///     this projection.
-        /// </param>
-        /// <returns>
-        ///     The columns aliases.
-        /// </returns>
-        public string[] GetColumnAliases(string alias, int loc)
-        {
-            return _list.GetColumnAliases(alias, loc);
-        }
-
-        /// <summary>
-        ///     Get the SQL select clause column aliases for a particular user-visible alias.
-        /// </summary>
-        /// <param name="loc">
-        ///     Just as in <see cref="M:IProjection.ToSqlString" />, represents the number of columns rendered prior to
-        ///     this projection.
-        /// </param>
-        /// <returns>
-        ///     The columns aliases.
-        /// </returns>
-        public string[] GetColumnAliases(int loc)
-        {
-            return _list.GetColumnAliases(loc);
-        }
-
-        /// <summary>
         ///     Gets the typed values for parameters in this projection.
         /// </summary>
         /// <param name="criteria">
@@ -334,9 +301,8 @@
                         buffer.Add(", ");
                     }
 
-                    string[] aliases = projection is IEnhancedProjection
-                        ? ((IEnhancedProjection)projection).GetColumnAliases(position, criteria, criteriaQuery)
-                        : projection.GetColumnAliases(position);
+                    string[] aliases = projection
+                        .GetColumnAliases(position, criteria, criteriaQuery);
 
                     position += aliases.Length;
 

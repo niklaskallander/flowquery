@@ -113,7 +113,7 @@ namespace NHibernate.FlowQuery.ExtensionHelpers
         ///     The property.
         /// </param>
         /// <param name="query">
-        ///     The sub-query yielding the results to match.
+        ///     The subquery yielding the results to match.
         /// </param>
         /// <typeparam name="TProperty">
         ///     The <see cref="System.Type" /> of the specified property.

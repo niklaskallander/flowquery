@@ -49,7 +49,7 @@
         }
 
         /// <summary>
-        ///     Creates an "is (not) empty" filter. Useful to filter on a sub-query that shouldn't yield any results, or
+        ///     Creates an "is (not) empty" filter. Useful to filter on a subquery that shouldn't yield any results, or
         ///     to filter on an association path pointing to a collection that should (not) be empty.
         /// </summary>
         /// <returns>
@@ -78,7 +78,7 @@
         ///     Creates an "is (not) equal to" filter.
         /// </summary>
         /// <param name="query">
-        ///     The sub-query yielding the result to match.
+        ///     The subquery yielding the result to match.
         /// </param>
         /// <returns>
         ///     The <see cref="IsExpression"/> filter.
@@ -92,7 +92,7 @@
         ///     Creates an "is (not) equal to all" filter.
         /// </summary>
         /// <param name="query">
-        ///     The sub-query yielding the result to match.
+        ///     The subquery yielding the result to match.
         /// </param>
         /// <returns>
         ///     The <see cref="IsExpression"/> filter.
@@ -120,7 +120,7 @@
         ///     Creates a "is (not) greater than" filter.
         /// </summary>
         /// <param name="query">
-        ///     The sub-query yielding the result to match.
+        ///     The subquery yielding the result to match.
         /// </param>
         /// <returns>
         ///     The <see cref="IsExpression"/> filter.
@@ -134,7 +134,7 @@
         ///     Creates a "is (not) greater than all" filter.
         /// </summary>
         /// <param name="query">
-        ///     The sub-query yielding the result to match.
+        ///     The subquery yielding the result to match.
         /// </param>
         /// <returns>
         ///     The <see cref="IsExpression"/> filter.
@@ -162,7 +162,7 @@
         ///     Creates a "is (not) greater than or equal to" filter.
         /// </summary>
         /// <param name="query">
-        ///     The sub-query yielding the result to match.
+        ///     The subquery yielding the result to match.
         /// </param>
         /// <returns>
         ///     The <see cref="IsExpression"/> filter.
@@ -176,7 +176,7 @@
         ///     Creates a "is (not) greater than or equal to all" filter.
         /// </summary>
         /// <param name="query">
-        ///     The sub-query yielding the result to match.
+        ///     The subquery yielding the result to match.
         /// </param>
         /// <returns>
         ///     The <see cref="IsExpression"/> filter.
@@ -190,7 +190,7 @@
         ///     Creates a "is (not) greater than or equal to some" filter.
         /// </summary>
         /// <param name="query">
-        ///     The sub-query yielding the result to match.
+        ///     The subquery yielding the result to match.
         /// </param>
         /// <returns>
         ///     The <see cref="IsExpression"/> filter.
@@ -204,7 +204,7 @@
         ///     Creates a "is (not) greater than some" filter.
         /// </summary>
         /// <param name="query">
-        ///     The sub-query yielding the result to match.
+        ///     The subquery yielding the result to match.
         /// </param>
         /// <returns>
         ///     The <see cref="IsExpression"/> filter.
@@ -218,7 +218,7 @@
         ///     Creates a "is (not) in" filter.
         /// </summary>
         /// <param name="query">
-        ///     The sub-query yielding the results to match.
+        ///     The subquery yielding the results to match.
         /// </param>
         /// <returns>
         ///     The <see cref="IsExpression"/> filter.
@@ -274,7 +274,7 @@
         ///     Creates a "is (not) less than" filter.
         /// </summary>
         /// <param name="query">
-        ///     The sub-query yielding the result to match.
+        ///     The subquery yielding the result to match.
         /// </param>
         /// <returns>
         ///     The <see cref="IsExpression"/> filter.
@@ -288,7 +288,7 @@
         ///     Creates a "is (not) less than all" filter.
         /// </summary>
         /// <param name="query">
-        ///     The sub-query yielding the result to match.
+        ///     The subquery yielding the result to match.
         /// </param>
         /// <returns>
         ///     The <see cref="IsExpression"/> filter.
@@ -316,7 +316,7 @@
         ///     Creates a "is (not) less than or equal to" filter.
         /// </summary>
         /// <param name="query">
-        ///     The sub-query yielding the result to match.
+        ///     The subquery yielding the result to match.
         /// </param>
         /// <returns>
         ///     The <see cref="IsExpression"/> filter.
@@ -330,7 +330,7 @@
         ///     Creates a "is (not) less than or equal to all" filter.
         /// </summary>
         /// <param name="query">
-        ///     The sub-query yielding the result to match.
+        ///     The subquery yielding the result to match.
         /// </param>
         /// <returns>
         ///     The <see cref="IsExpression"/> filter.
@@ -344,7 +344,7 @@
         ///     Creates a "is (not) less than or equal to some" filter.
         /// </summary>
         /// <param name="query">
-        ///     The sub-query yielding the result to match.
+        ///     The subquery yielding the result to match.
         /// </param>
         /// <returns>
         ///     The <see cref="IsExpression"/> filter.
@@ -358,7 +358,7 @@
         ///     Creates a "is (not) less than some" filter.
         /// </summary>
         /// <param name="query">
-        ///     The sub-query yielding the result to match.
+        ///     The subquery yielding the result to match.
         /// </param>
         /// <returns>
         ///     The <see cref="IsExpression"/> filter.

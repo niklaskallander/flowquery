@@ -5,7 +5,7 @@
     using NHibernate.Criterion;
 
     /// <summary>
-    ///     A sub-query class simply wrapping a <see cref="DetachedCriteria" /> instance.
+    ///     A subquery class simply wrapping a <see cref="DetachedCriteria" /> instance.
     /// </summary>
     public class DetachedImmutableFlowQuery : IDetachedImmutableFlowQuery
     {

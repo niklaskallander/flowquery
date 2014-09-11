@@ -8,7 +8,7 @@
     using NHibernate.FlowQuery.Helpers;
 
     /// <summary>
-    ///     A class implementing the basic functionality required of a project-able <see cref="NHibernate.FlowQuery" />
+    ///     A class implementing the basic functionality required of a projectable <see cref="NHibernate.FlowQuery" />
     ///     query.
     /// </summary>
     /// <typeparam name="TSource">

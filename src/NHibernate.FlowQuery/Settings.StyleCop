@@ -3,6 +3,7 @@
     <CollectionProperty Name="RecognizedWords">
       <Value>linq</Value>
       <Value>sql</Value>
+      <Value>subquery</Value>
     </CollectionProperty>
   </GlobalSettings>
   <Analyzers>

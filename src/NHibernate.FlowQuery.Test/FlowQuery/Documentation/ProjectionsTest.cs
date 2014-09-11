@@ -1,5 +1,6 @@
 ﻿namespace NHibernate.FlowQuery.Test.FlowQuery.Documentation
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
 
@@ -415,6 +416,36 @@
             Assert.That(users.Count(x => x.ContainsO), Is.EqualTo(2));
             Assert.That(users.Count(x => x.StartsWithN), Is.EqualTo(1));
             Assert.That(users.Count(x => x.EndsWithN), Is.EqualTo(1));
+        }
+
+        [Test]
+        public void MiscExample7MathRound()
+        {
+            var values = Session.FlowQuery<UserEntity>()
+                .Select(x => new
+                {
+                    Value = Math.Round(x.Id * 1.555M, 2)
+                });
+
+            Assert.That(values.Count(), Is.EqualTo(4));
+            Assert.That(values.ElementAt(0).Value, Is.EqualTo(1.56M));
+            Assert.That(values.ElementAt(1).Value, Is.EqualTo(3.11M));
+            Assert.That(values.ElementAt(2).Value, Is.EqualTo(4.67M));
+            Assert.That(values.ElementAt(3).Value, Is.EqualTo(6.22M));
+        }
+
+        [Test]
+        public void MiscExample8Trim()
+        {
+            var users = Session.FlowQuery<UserEntity>()
+                .Select(x => new
+                {
+                    Username = x.Username.Trim(),
+                    Firstname = x.Firstname.TrimEnd(),
+                    Lastname = x.Lastname.TrimStart()
+                });
+
+            Assert.That(users.Count(), Is.EqualTo(4));
         }
 
         [Test]

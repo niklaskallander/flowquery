@@ -65,7 +65,7 @@ namespace NHibernate.FlowQuery
         }
 
         /// <summary>
-        ///     Creates an "is empty" filter. Useful to filter on a sub-query that shouldn't yield any results, or to 
+        ///     Creates an "is empty" filter. Useful to filter on a subquery that shouldn't yield any results, or to 
         ///     filter on an association path pointing to a collection that should be empty.
         /// </summary>
         /// <returns>
@@ -94,7 +94,7 @@ namespace NHibernate.FlowQuery
         ///     Creates an "is equal to" filter.
         /// </summary>
         /// <param name="query">
-        ///     The sub-query yielding the result to match.
+        ///     The subquery yielding the result to match.
         /// </param>
         /// <returns>
         ///     The <see cref="IsExpression"/> filter.
@@ -108,7 +108,7 @@ namespace NHibernate.FlowQuery
         ///     Creates an "is equal to all" filter.
         /// </summary>
         /// <param name="query">
-        ///     The sub-query yielding the result to match.
+        ///     The subquery yielding the result to match.
         /// </param>
         /// <returns>
         ///     The <see cref="IsExpression"/> filter.
@@ -136,7 +136,7 @@ namespace NHibernate.FlowQuery
         ///     Creates a "is greater than" filter.
         /// </summary>
         /// <param name="query">
-        ///     The sub-query yielding the result to match.
+        ///     The subquery yielding the result to match.
         /// </param>
         /// <returns>
         ///     The <see cref="IsExpression"/> filter.
@@ -150,7 +150,7 @@ namespace NHibernate.FlowQuery
         ///     Creates a "is greater than all" filter.
         /// </summary>
         /// <param name="query">
-        ///     The sub-query yielding the result to match.
+        ///     The subquery yielding the result to match.
         /// </param>
         /// <returns>
         ///     The <see cref="IsExpression"/> filter.
@@ -178,7 +178,7 @@ namespace NHibernate.FlowQuery
         ///     Creates a "is greater than or equal to" filter.
         /// </summary>
         /// <param name="query">
-        ///     The sub-query yielding the result to match.
+        ///     The subquery yielding the result to match.
         /// </param>
         /// <returns>
         ///     The <see cref="IsExpression"/> filter.
@@ -192,7 +192,7 @@ namespace NHibernate.FlowQuery
         ///     Creates a "is greater than or equal to all" filter.
         /// </summary>
         /// <param name="query">
-        ///     The sub-query yielding the result to match.
+        ///     The subquery yielding the result to match.
         /// </param>
         /// <returns>
         ///     The <see cref="IsExpression"/> filter.
@@ -206,7 +206,7 @@ namespace NHibernate.FlowQuery
         ///     Creates a "is greater than or equal to some" filter.
         /// </summary>
         /// <param name="query">
-        ///     The sub-query yielding the result to match.
+        ///     The subquery yielding the result to match.
         /// </param>
         /// <returns>
         ///     The <see cref="IsExpression"/> filter.
@@ -220,7 +220,7 @@ namespace NHibernate.FlowQuery
         ///     Creates a "is greater than some" filter.
         /// </summary>
         /// <param name="query">
-        ///     The sub-query yielding the result to match.
+        ///     The subquery yielding the result to match.
         /// </param>
         /// <returns>
         ///     The <see cref="IsExpression"/> filter.
@@ -234,7 +234,7 @@ namespace NHibernate.FlowQuery
         ///     Creates a "is in" filter.
         /// </summary>
         /// <param name="query">
-        ///     The sub-query yielding the results to match.
+        ///     The subquery yielding the results to match.
         /// </param>
         /// <returns>
         ///     The <see cref="IsExpression"/> filter.
@@ -248,7 +248,7 @@ namespace NHibernate.FlowQuery
         ///     Creates a "is in" filter.
         /// </summary>
         /// <param name="query">
-        ///     The sub-query yielding the results to match.
+        ///     The subquery yielding the results to match.
         /// </param>
         /// <returns>
         ///     The <see cref="IsExpression"/> filter.
@@ -304,7 +304,7 @@ namespace NHibernate.FlowQuery
         ///     Creates a "is less than" filter.
         /// </summary>
         /// <param name="query">
-        ///     The sub-query yielding the result to match.
+        ///     The subquery yielding the result to match.
         /// </param>
         /// <returns>
         ///     The <see cref="IsExpression"/> filter.
@@ -318,7 +318,7 @@ namespace NHibernate.FlowQuery
         ///     Creates a "is less than all" filter.
         /// </summary>
         /// <param name="query">
-        ///     The sub-query yielding the result to match.
+        ///     The subquery yielding the result to match.
         /// </param>
         /// <returns>
         ///     The <see cref="IsExpression"/> filter.
@@ -346,7 +346,7 @@ namespace NHibernate.FlowQuery
         ///     Creates a "is less than or equal to" filter.
         /// </summary>
         /// <param name="query">
-        ///     The sub-query yielding the result to match.
+        ///     The subquery yielding the result to match.
         /// </param>
         /// <returns>
         ///     The <see cref="IsExpression"/> filter.
@@ -360,7 +360,7 @@ namespace NHibernate.FlowQuery
         ///     Creates a "is less than or equal to all" filter.
         /// </summary>
         /// <param name="query">
-        ///     The sub-query yielding the result to match.
+        ///     The subquery yielding the result to match.
         /// </param>
         /// <returns>
         ///     The <see cref="IsExpression"/> filter.
@@ -374,7 +374,7 @@ namespace NHibernate.FlowQuery
         ///     Creates a "is less than or equal to some" filter.
         /// </summary>
         /// <param name="query">
-        ///     The sub-query yielding the result to match.
+        ///     The subquery yielding the result to match.
         /// </param>
         /// <returns>
         ///     The <see cref="IsExpression"/> filter.
@@ -388,7 +388,7 @@ namespace NHibernate.FlowQuery
         ///     Creates a "is less than some" filter.
         /// </summary>
         /// <param name="query">
-        ///     The sub-query yielding the result to match.
+        ///     The subquery yielding the result to match.
         /// </param>
         /// <returns>
         ///     The <see cref="IsExpression"/> filter.

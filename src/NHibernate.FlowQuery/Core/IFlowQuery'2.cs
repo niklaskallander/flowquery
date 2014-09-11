@@ -143,10 +143,10 @@
         TQuery And(Expression<Func<TSource, WhereDelegate, bool>> expression);
 
         /// <summary>
-        ///     Adds a sub-query filter to the query.
+        ///     Adds a subquery filter to the query.
         /// </summary>
         /// <param name="subquery">
-        ///     The sub-query.
+        ///     The subquery.
         /// </param>
         /// <param name="expression">
         ///     The filter.
@@ -160,10 +160,10 @@
         TQuery And(IDetachedImmutableFlowQuery subquery, IsEmptyExpression expression);
 
         /// <summary>
-        ///     Adds a sub-query filter to the query.
+        ///     Adds a subquery filter to the query.
         /// </summary>
         /// <param name="subquery">
-        ///     The sub-query.
+        ///     The subquery.
         /// </param>
         /// <param name="expression">
         ///     The filter.
@@ -181,7 +181,8 @@
         /// </summary>
         /// <param name="isCacheable">
         ///     Optional switch (mostly to be able to turn cache-ability off after it's been switched on. If set to 
-        ///     false the values for |cacheRegion| and |cacheMode| will be reset as well.
+        ///     false the values for cache region (<see cref="IFlowQuery.CacheRegion" />) and cache mode
+        ///     (<see cref="IFlowQuery.CacheMode" />) will be reset as well.
         /// </param>
         /// <returns>
         ///     The <see cref="T:TQuery" /> instance.
@@ -637,10 +638,10 @@
         TQuery Where(Expression<Func<TSource, WhereDelegate, bool>> expression);
 
         /// <summary>
-        ///     Adds a sub-query filter to the query.
+        ///     Adds a subquery filter to the query.
         /// </summary>
         /// <param name="subquery">
-        ///     The sub-query.
+        ///     The subquery.
         /// </param>
         /// <param name="expression">
         ///     The filter.
@@ -651,10 +652,10 @@
         TQuery Where(IDetachedImmutableFlowQuery subquery, IsEmptyExpression expression);
 
         /// <summary>
-        ///     Adds a sub-query filter to the query.
+        ///     Adds a subquery filter to the query.
         /// </summary>
         /// <param name="subquery">
-        ///     The sub-query.
+        ///     The subquery.
         /// </param>
         /// <param name="expression">
         ///     The filter.

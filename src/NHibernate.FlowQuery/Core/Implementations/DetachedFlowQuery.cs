@@ -7,7 +7,7 @@
     using NHibernate.FlowQuery.Helpers;
 
     /// <summary>
-    ///     A class representing a detached query (a.k.a. sub-query).
+    ///     A class representing a detached query (a.k.a. subquery).
     /// </summary>
     /// <typeparam name="TSource">
     ///     The <see cref="System.Type" /> of the underlying data for this query.
