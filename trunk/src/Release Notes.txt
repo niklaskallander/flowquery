@@ -2,6 +2,31 @@
     (a "!" in the left margin indicates a potential breaking change)
 
 >--------------
+> BUILD 2.3.0
+>--------------
+
+    >-- IMPROVEMENTS
+        - Logic for resolving method call projections should be split up to make code more maintainable and extensible
+
+    >-- NEW FEATURES
+        - Add possibility to project Trim (on string properties/values)
+        - Add possibility to project TrimEnd (on string properties/values)
+        - Add possibility to project TrimStart (on string properties/values)
+        - Add possibility to project Math.Round
+        - Add possibility to add custom logic to resolve method call projections
+        - Add possibility to override default logic to resolve method call projections
+
+    >-- TASKS
+        - Remove unnecessary hyphens in comments (cache-able, sub-query, etc.)
+        - Upgrade to NHibernate 4.0
+
+    >-- TEST SUITE CHANGES
+        - Add tests for new features and other changes in version 2.2
+
+    >-- DOCUMENTATION
+        - Update documentation to cover changes and new features in version 2.2
+
+>--------------
 > BUILD 2.2.0
 >--------------
 

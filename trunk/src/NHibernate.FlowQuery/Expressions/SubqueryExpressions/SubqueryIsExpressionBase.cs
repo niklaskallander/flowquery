@@ -6,7 +6,7 @@
     using NHibernate.FlowQuery.Core;
 
     /// <summary>
-    ///     Provides base functionality and structure for a sub-query filter.
+    ///     Provides base functionality and structure for a subquery filter.
     /// </summary>
     public abstract class SubqueryIsExpressionBase : IsExpression
     {
@@ -14,7 +14,7 @@
         ///     Initializes a new instance of the <see cref="SubqueryIsExpressionBase"/> class.
         /// </summary>
         /// <param name="query">
-        ///     The sub-query to be used by the filter.
+        ///     The subquery to be used by the filter.
         /// </param>
         /// <param name="filterFactory">
         ///     The filter factory.
@@ -38,10 +38,10 @@
         protected Func<string, DetachedCriteria, ICriterion> FilterFactory { get; private set; }
 
         /// <summary>
-        ///     Gets the sub-query.
+        ///     Gets the subquery.
         /// </summary>
         /// <value>
-        ///     The sub-query.
+        ///     The subquery.
         /// </value>
         protected virtual IDetachedImmutableFlowQuery Query { get; private set; }
 

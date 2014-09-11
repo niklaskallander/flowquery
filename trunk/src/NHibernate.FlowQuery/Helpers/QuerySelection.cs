@@ -161,10 +161,10 @@
         public virtual List<FqGroupByProjection> GroupBys { get; private set; }
 
         /// <summary>
-        ///     Gets a value indicating whether the query is cache-able.
+        ///     Gets a value indicating whether the query is cacheable.
         /// </summary>
         /// <value>
-        ///     A value indicating whether the query is cache-able.
+        ///     A value indicating whether the query is cacheable.
         /// </value>
         public bool IsCacheable { get; private set; }
 

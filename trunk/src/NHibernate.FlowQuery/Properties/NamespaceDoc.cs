@@ -108,7 +108,7 @@ namespace NHibernate.FlowQuery.Expressions.SubqueryExpressions
     using System.Runtime.CompilerServices;
 
     /// <summary>
-    ///     The <see cref="NHibernate.FlowQuery.Expressions.SubqueryExpressions" /> namespace contains all sub-query
+    ///     The <see cref="NHibernate.FlowQuery.Expressions.SubqueryExpressions" /> namespace contains all subquery
     ///     filters used by the <see cref="Is" /> helper.
     /// </summary>
     [CompilerGenerated]
@@ -176,3 +176,6 @@ namespace NHibernate.FlowQuery.Revealing.Conventions
     {
     }
 }
+
+// TODO: DOC! NHibernate.FlowQuery.Helpers.ProjectionHandlers
+// TODO: DOC! NHibernate.FlowQuery.Helpers.ProjectionHandlers.MethodCalls

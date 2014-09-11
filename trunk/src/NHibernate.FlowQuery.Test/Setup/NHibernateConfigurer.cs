@@ -107,58 +107,58 @@
 
                     var u1 = new UserEntity
                         (
-                        "Wimpy", 
-                        "Cool01", 
-                        "Niklas", 
-                        "Källander", 
-                        new DateTime(2001, 9, 11), 
-                        RoleEnum.Administrator, 
+                        "Wimpy",
+                        "Cool01",
+                        "Niklas",
+                        "Källander",
+                        new DateTime(2001, 9, 11),
+                        RoleEnum.Administrator,
                         "1"
                         )
                     {
-                        LastLoggedInStamp = DateTime.Now, 
-                        IsOnline = true, 
-                        Setting = s6, 
+                        LastLoggedInStamp = DateTime.Now,
+                        IsOnline = true,
+                        Setting = s6,
                         NumberOfLogOns = 10
                     };
 
                     var u2 = new UserEntity
                         (
-                        "Izmid", 
-                        "Cool02", 
-                        "Lars", 
-                        "Wilk", 
-                        new DateTime(2001, 4, 22), 
-                        RoleEnum.Webmaster, 
+                        "Izmid",
+                        "Cool02",
+                        "Lars",
+                        "Wilk",
+                        new DateTime(2001, 4, 22),
+                        RoleEnum.Webmaster,
                         "2"
                         )
                     {
-                        LastLoggedInStamp = DateTime.Now, 
-                        IsOnline = true, 
-                        Setting = s6, 
+                        LastLoggedInStamp = DateTime.Now,
+                        IsOnline = true,
+                        Setting = s6,
                         NumberOfLogOns = 17
                     };
 
                     var u3 = new UserEntity
                         (
-                        "Empor", 
-                        "Cool03", 
-                        "Kossan", 
-                        "Muu", 
-                        new DateTime(2001, 5, 3), 
-                        RoleEnum.Administrator, 
+                        "Empor",
+                        "Cool03",
+                        "Kossan",
+                        "Muu",
+                        new DateTime(2001, 5, 3),
+                        RoleEnum.Administrator,
                         "3"
                         )
                     {
-                        LastLoggedInStamp = DateTime.Now, 
-                        IsOnline = true, 
-                        Setting = s6, 
+                        LastLoggedInStamp = DateTime.Now,
+                        IsOnline = true,
+                        Setting = s6,
                         NumberOfLogOns = 12
                     };
 
                     var u4 = new UserEntity("Lajsa", null, "Lotta", "Bråk", DateTime.Now, RoleEnum.Standard, "4")
                     {
-                        Setting = s6, 
+                        Setting = s6,
                         NumberOfLogOns = 4
                     };
 

@@ -7,7 +7,7 @@
     using NHibernate.FlowQuery.Core.Implementations;
 
     /// <summary>
-    ///     An interface defining the basic functionality required of a project-able
+    ///     An interface defining the basic functionality required of a projectable
     ///     <see cref="NHibernate.FlowQuery" /> query.
     /// </summary>
     /// <typeparam name="TSource">

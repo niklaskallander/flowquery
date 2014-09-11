@@ -6,18 +6,90 @@ namespace NHibernate.FlowQuery.Helpers
 
     using NHibernate.Criterion;
     using NHibernate.Dialect.Function;
-    using NHibernate.FlowQuery.Core;
     using NHibernate.FlowQuery.Core.CustomProjections;
+    using NHibernate.FlowQuery.Helpers.ProjectionHandlers.MethodCalls;
     using NHibernate.Type;
 
     using Expression = System.Linq.Expressions.Expression;
 
     /// <summary>
     ///     A static utility class providing methods to create <see cref="IProjection" />s from
-    ///     <see cref="Expression" />s.
+    ///     <see cref="System.Linq.Expressions.Expression" />s.
     /// </summary>
     public static class ProjectionHelper
     {
+        /// <summary>
+        ///     All custom method call handlers.
+        /// </summary>
+        private static readonly Dictionary<string, IMethodCallProjectionHandler> CustomMethodCallHandlers;
+
+        /// <summary>
+        ///     All default method call handlers.
+        /// </summary>
+        private static readonly Dictionary<string, IMethodCallProjectionHandler> DefaultMethodCallHandlers;
+
+        /// <summary>
+        ///     The method call handler lock.
+        /// </summary>
+        private static readonly object MethodHandlerLock;
+
+        /// <summary>
+        ///     Initializes static members of the <see cref="ProjectionHelper" /> class.
+        /// </summary>
+        static ProjectionHelper()
+        {
+            MethodHandlerLock = new object();
+
+            var likeHandler = new LikeHandler();
+
+            CustomMethodCallHandlers = new Dictionary<string, IMethodCallProjectionHandler>();
+
+            DefaultMethodCallHandlers = new Dictionary<string, IMethodCallProjectionHandler>();
+
+            AddMethodCallHandlerInternal("As", new AsHandler());
+            AddMethodCallHandlerInternal("Average", new SimpleMethodCallHandler(Projections.Avg));
+            AddMethodCallHandlerInternal("Contains", likeHandler);
+            AddMethodCallHandlerInternal("CountDistinct", new CountDistinctHandler());
+            AddMethodCallHandlerInternal("Count", new SimpleMethodCallHandler(Projections.Count));
+            AddMethodCallHandlerInternal("EndsWith", likeHandler);
+            AddMethodCallHandlerInternal("GroupBy", new SimpleMethodCallHandler(Projections.GroupProperty));
+            AddMethodCallHandlerInternal("Max", new SimpleMethodCallHandler(Projections.Max));
+            AddMethodCallHandlerInternal("Min", new SimpleMethodCallHandler(Projections.Min));
+            AddMethodCallHandlerInternal("Round", new RoundHandler());
+            AddMethodCallHandlerInternal("StartsWith", likeHandler);
+            AddMethodCallHandlerInternal("Subquery", new SubqueryHandler());
+            AddMethodCallHandlerInternal("Substring", new SubstringHandler());
+            AddMethodCallHandlerInternal("Sum", new SimpleMethodCallHandler(Projections.Sum));
+            AddMethodCallHandlerInternal("Trim", new TrimHandler());
+            AddMethodCallHandlerInternal("TrimEnd", new TrimEndHandler());
+            AddMethodCallHandlerInternal("TrimStart", new TrimStartHandler());
+        }
+
+        /// <summary>
+        ///     Adds a <see cref="IMethodCallProjectionHandler" /> to be used when handling method calls.
+        /// </summary>
+        /// <param name="methodName">
+        ///     The name of the method.
+        /// </param>
+        /// <param name="handler">
+        ///     The <see cref="IMethodCallProjectionHandler" />.
+        /// </param>
+        /// <returns>
+        ///     A value indicating whether the <see cref="IMethodCallProjectionHandler" /> was added (true) or not 
+        ///     (false). If another <see cref="IMethodCallProjectionHandler" /> with the same method name is already 
+        ///     added, false will be returned.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        ///     <paramref name="handler" /> is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        ///     <paramref name="methodName" /> is null or <see cref="string.Empty" />.
+        /// </exception>
+        public static bool AddMethodCallHandler(string methodName, IMethodCallProjectionHandler handler)
+        {
+            return AddMethodCallHandlerInternal(methodName, handler, false);
+        }
+
         /// <summary>
         ///     Returns all inner <see cref="Expression" />s for the given <see cref="BinaryExpression" /> in a list.
         /// </summary>
@@ -280,9 +352,9 @@ namespace NHibernate.FlowQuery.Helpers
                     if (expression.NodeType == ExpressionType.Parameter && expression.ToString() == root)
                     {
                         throw new NotSupportedException
-                        (
+                            (
                             "Unable to select the root entity like 'x => x', select without an expression instead"
-                        );
+                            );
                     }
 
                     value = ExpressionHelper.GetValue(expression);
@@ -342,6 +414,66 @@ namespace NHibernate.FlowQuery.Helpers
             }
 
             return list;
+        }
+
+        /// <summary>
+        ///     Adds a <see cref="IMethodCallProjectionHandler" /> to be used when handling method calls.
+        /// </summary>
+        /// <param name="methodName">
+        ///     The name of the method.
+        /// </param>
+        /// <param name="handler">
+        ///     The <see cref="IMethodCallProjectionHandler" />.
+        /// </param>
+        /// <param name="isDefaultHandler">
+        ///     A value indicating whether the handler is added internally (true) or externally using 
+        ///     <see cref="AddMethodCallHandler(string,IMethodCallProjectionHandler)" /> (false).
+        /// </param>
+        /// <returns>
+        ///     A value indicating whether the <see cref="IMethodCallProjectionHandler" /> was added (true) or not 
+        ///     (false). If another <see cref="IMethodCallProjectionHandler" /> with the same method name is already 
+        ///     added, false will be returned.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        ///     <paramref name="handler" /> is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        ///     <paramref name="methodName" /> is null or <see cref="string.Empty" />.
+        /// </exception>
+        internal static bool AddMethodCallHandlerInternal
+            (
+            string methodName,
+            IMethodCallProjectionHandler handler,
+            bool isDefaultHandler = true
+            )
+        {
+            lock (MethodHandlerLock)
+            {
+                if (handler == null)
+                {
+                    throw new ArgumentNullException("handler");
+                }
+
+                methodName = (methodName ?? string.Empty).Trim().ToLower();
+
+                if (methodName == string.Empty)
+                {
+                    throw new ArgumentException("key");
+                }
+
+                Dictionary<string, IMethodCallProjectionHandler> collection = isDefaultHandler
+                    ? DefaultMethodCallHandlers
+                    : CustomMethodCallHandlers;
+
+                if (collection.ContainsKey(methodName))
+                {
+                    return false;
+                }
+
+                collection.Add(methodName, handler);
+
+                return true;
+            }
         }
 
         /// <summary>
@@ -527,92 +659,46 @@ namespace NHibernate.FlowQuery.Helpers
             QueryHelperData data
             )
         {
-            Expression subExpression = expression.Object ?? expression.Arguments[0];
+            string key = expression.Method.Name.ToLower();
 
-            IProjection projection = GetProjection(subExpression, root, data);
+            IMethodCallProjectionHandler handler;
 
-            switch (expression.Method.Name)
+            IProjection projection;
+
+            // first, attempt with any found custom handler
+            bool found = CustomMethodCallHandlers.TryGetValue(key, out handler);
+
+            if (found)
             {
-                case "Sum":
-                    return Projections.Sum(projection);
+                projection = handler.Handle(expression, root, data);
 
-                case "Min":
-                    return Projections.Min(projection);
-
-                case "Max":
-                    return Projections.Max(projection);
-
-                case "GroupBy":
-                    return Projections.GroupProperty(projection);
-
-                case "Average":
-                    return Projections.Avg(projection);
-
-                case "Count":
-                    return Projections.Count(projection);
-
-                case "CountDistinct":
-                    return Projections.CountDistinct(ExpressionHelper.GetPropertyName(subExpression, root));
-
-                case "As":
-                    return Projections.Property(ExpressionHelper.GetPropertyName(subExpression, root));
-
-                case "Substring":
-
-                    int start = ExpressionHelper.GetValue<int>(expression.Arguments[0]) + 1;
-
-                    int length = expression.Arguments.Count > 1
-                        ? ExpressionHelper.GetValue<int>(expression.Arguments[1])
-                        : int.MaxValue;
-
-                    return new SqlFunctionProjection
-                    (
-                        "substring",
-                        NHibernateUtil.String,
-                        projection,
-                        Projections.Constant(start),
-                        Projections.Constant(length)
-                    );
-
-                case "StartsWith":
-                case "EndsWith":
-                case "Contains":
-
-                    ICriterion criterion = RestrictionHelper.GetCriterionForMethodCall(expression, root, data);
-
-                    return Projections
-                        .Conditional
-                        (
-                            criterion,
-                            Projections.Constant(true, NHibernateUtil.Boolean),
-                            Projections.Constant(false, NHibernateUtil.Boolean)
-                        );
-
-                case "Subquery":
-
-                    object value = ExpressionHelper.GetValue(expression.Arguments[0]);
-
-                    var criteria = value as DetachedCriteria;
-
-                    if (criteria == null)
-                    {
-                        var query = value as IDetachedImmutableFlowQuery;
-
-                        if (query != null)
-                        {
-                            criteria = query.Criteria;
-                        }
-                    }
-
-                    if (criteria != null)
-                    {
-                        return Projections.SubQuery(criteria);
-                    }
-
-                    break;
+                if (projection != null)
+                {
+                    return projection;
+                }
             }
 
-            throw new NotSupportedException("the expression contains unsupported features, please revise your code");
+            // if no luck with a custom handler, attempt with a default handler (if found)
+            found = DefaultMethodCallHandlers.TryGetValue(key, out handler);
+
+            if (found)
+            {
+                projection = handler.Handle(expression, root, data);
+
+                if (projection != null)
+                {
+                    return projection;
+                }
+            }
+
+            throw new NotSupportedException
+            (
+                string.Format
+                (
+                    "The expression contains unsupported features. Unable to resolve method call: '{0}'.",
+                    expression.Method.Name
+                )
+            );
         }
     }
 }

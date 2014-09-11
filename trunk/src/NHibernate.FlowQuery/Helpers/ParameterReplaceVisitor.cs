@@ -1,6 +1,7 @@
 ﻿namespace NHibernate.FlowQuery.Helpers
 {
     using System.Linq.Expressions;
+    using System.Runtime.InteropServices;
 
     using NHibernate.FlowQuery.Core.Implementations;
 
@@ -10,6 +11,7 @@
     ///     combine multiple <see cref="LambdaExpression" />s into one for
     ///     <see cref="PartialSelection{TSource,TDestination}" />s.
     /// </summary>
+    [ComVisible(false)] // CA1405
     public class ParameterReplaceVisitor : ExpressionVisitor
     {
         /// <summary>

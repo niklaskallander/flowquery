@@ -269,13 +269,13 @@ namespace NHibernate.FlowQuery
         }
 
         /// <summary>
-        ///     Specifies a Sub-query aggregation.
+        ///     Specifies a Subquery aggregation.
         /// </summary>
         /// <typeparam name="T">
-        ///     The return type of the given sub-query.
+        ///     The return type of the given subquery.
         /// </typeparam>
         /// <param name="subquery">
-        ///     The sub-query for which the aggregation should apply.
+        ///     The subquery for which the aggregation should apply.
         /// </param>
         /// <returns>
         ///     The aggregated value.
@@ -290,13 +290,13 @@ namespace NHibernate.FlowQuery
         }
 
         /// <summary>
-        ///     Specifies a Sub-query aggregation.
+        ///     Specifies a Subquery aggregation.
         /// </summary>
         /// <typeparam name="T">
-        ///     The return type of the given sub-query.
+        ///     The return type of the given subquery.
         /// </typeparam>
         /// <param name="subquery">
-        ///     The sub-query for which the aggregation should apply.
+        ///     The subquery for which the aggregation should apply.
         /// </param>
         /// <returns>
         ///     The aggregated value.

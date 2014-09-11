@@ -24,6 +24,141 @@
     public class SelectTest : BaseTest
     {
         [Test]
+        public void CanTrimStartOfStringWithoutAlsoTrimmingEnd()
+        {
+            var users = Query<UserEntity>()
+                .Select(x => new
+                {
+                    Value = "     " + x.Username + "     ",
+                    TrimmedValue = ("     " + x.Username + "     ").TrimStart()
+                });
+
+            Assert.That(users.Count(), Is.EqualTo(4));
+
+            foreach (var user in users)
+            {
+                Assert.That(user.Value != user.TrimmedValue);
+                Assert.That(user.Value.TrimStart() == user.TrimmedValue);
+                Assert.That(user.TrimmedValue.Last() == ' ');
+            }
+        }
+
+        [Test]
+        public void CanTrimEndOfStringWithoutAlsoTrimmingStart()
+        {
+            var users = Query<UserEntity>()
+                .Select(x => new
+                {
+                    Value = "     " + x.Username + "     ",
+                    TrimmedValue = ("     " + x.Username + "     ").TrimEnd()
+                });
+
+            Assert.That(users.Count(), Is.EqualTo(4));
+
+            foreach (var user in users)
+            {
+                Assert.That(user.Value != user.TrimmedValue);
+                Assert.That(user.Value.TrimEnd() == user.TrimmedValue);
+                Assert.That(user.TrimmedValue.First() == ' ');
+            }
+        }
+
+        [Test]
+        public void CanTrimString()
+        {
+            var users = Query<UserEntity>()
+                .Select(x => new
+                {
+                    Value = "     " + x.Username + "     ",
+                    TrimmedValue = ("     " + x.Username + "     ").Trim()
+                });
+
+            Assert.That(users.Count(), Is.EqualTo(4));
+
+            foreach (var user in users)
+            {
+                Assert.That(user.Value != user.TrimmedValue);
+                Assert.That(user.Value.Trim() == user.TrimmedValue);
+            }
+        }
+
+        [Test]
+        public void CanUseMathRoundInProjectionReturningDecimal()
+        {
+            var users = Query<UserEntity>()
+                .Select(x => new
+                {
+                    Value = x.NumberOfLogOns * 1.234M,
+                    RoundedValue = Math.Round(x.NumberOfLogOns * 1.234M)
+                });
+
+            Assert.That(users.Count(), Is.EqualTo(4));
+
+            foreach (var user in users)
+            {
+                Assert.That(user.Value != user.RoundedValue);
+                Assert.That(Math.Round(user.Value) == user.RoundedValue);
+            }
+        }
+
+        [Test]
+        public void CanUseMathRoundInProjectionSpecifyingDecimalPointsReturningDecimal()
+        {
+            var users = Query<UserEntity>()
+                .Select(x => new
+                {
+                    Value = x.NumberOfLogOns * 1.234567M,
+                    RoundedValue = Math.Round(x.NumberOfLogOns * 1.234567M, 3)
+                });
+
+            Assert.That(users.Count(), Is.EqualTo(4));
+
+            foreach (var user in users)
+            {
+                Assert.That(user.Value != user.RoundedValue);
+                Assert.That(Math.Round(user.Value, 3) == user.RoundedValue);
+            }
+        }
+
+        [Test]
+        public void CanUseMathRoundInProjectionReturningDouble()
+        {
+            var users = Query<UserEntity>()
+                .Select(x => new
+                {
+                    Value = x.NumberOfLogOns * 1.234D,
+                    RoundedValue = Math.Round(x.NumberOfLogOns * 1.234D)
+                });
+
+            Assert.That(users.Count(), Is.EqualTo(4));
+
+            foreach (var user in users)
+            {
+                Assert.That(user.Value != user.RoundedValue);
+                Assert.That(Math.Round(user.Value) == user.RoundedValue);
+            }
+        }
+
+        [Test]
+        public void CanUseMathRoundInProjectionSpecifyingDecimalPointsReturningDouble()
+        {
+            var users = Query<UserEntity>()
+                .Select(x => new
+                {
+                    Value = x.NumberOfLogOns * 1.234567D,
+                    RoundedValue = Math.Round(x.NumberOfLogOns * 1.234567D, 3)
+                });
+
+            Assert.That(users.Count(), Is.EqualTo(4));
+
+            foreach (var user in users)
+            {
+                Assert.That(user.Value != user.RoundedValue);
+                Assert.That(Math.Round(user.Value, 3) == user.RoundedValue);
+            }
+        }
+
+        [Test]
         public void AttemptToSelectInvalidAggregationThrows()
         {
             Assert

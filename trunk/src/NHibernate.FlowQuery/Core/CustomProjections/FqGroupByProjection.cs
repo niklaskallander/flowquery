@@ -55,47 +55,6 @@
         }
 
         /// <summary>
-        ///     Get the SQL select clause column aliases for a particular user-visible alias.
-        /// </summary>
-        /// <param name="loc">
-        ///     The column index.
-        /// </param>
-        /// <returns>
-        ///     The column aliases.
-        /// </returns>
-        public override string[] GetColumnAliases(int loc)
-        {
-            if (_includeInSelectList)
-            {
-                return base.GetColumnAliases(loc);
-            }
-
-            return new string[0];
-        }
-
-        /// <summary>
-        ///     Get the SQL select clause column aliases for a particular user-visible alias.
-        /// </summary>
-        /// <param name="alias">
-        ///     The alias.
-        /// </param>
-        /// <param name="loc">
-        ///     The index.
-        /// </param>
-        /// <returns>
-        ///     The column aliases.
-        /// </returns>
-        public override string[] GetColumnAliases(string alias, int loc)
-        {
-            if (_includeInSelectList)
-            {
-                return base.GetColumnAliases(alias, loc);
-            }
-
-            return new string[0];
-        }
-
-        /// <summary>
         ///     Return types for a particular user-visible alias.
         /// </summary>
         /// <param name="criteria">
