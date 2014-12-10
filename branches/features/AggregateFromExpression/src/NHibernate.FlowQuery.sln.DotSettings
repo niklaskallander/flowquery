@@ -398,6 +398,16 @@
 &lt;/Patterns&gt;</s:String>
 	<s:String x:Key="/Default/CodeStyle/CSharpMemberOrderPattern/LayoutType/@EntryValue">CustomLayout</s:String>
 	<s:Boolean x:Key="/Default/CodeStyle/CSharpUsing/AddImportsToDeepestScope/@EntryValue">True</s:Boolean>
+	<s:String x:Key="/Default/CodeStyle/CSharpUsing/KeepImports/=ScanCoin_002ECommon_002ECore_002EExtensionMethods/@EntryIndexedValue"></s:String>
+	<s:Boolean x:Key="/Default/CodeStyle/CSharpUsing/KeepImports/=ScanCoin_002ECommon_002ECore_002EExtensionMethods/@EntryIndexRemoved">True</s:Boolean>
+	<s:String x:Key="/Default/CodeStyle/CSharpUsing/KeepImports/=System/@EntryIndexedValue"></s:String>
+	<s:Boolean x:Key="/Default/CodeStyle/CSharpUsing/KeepImports/=System/@EntryIndexRemoved">True</s:Boolean>
+	<s:String x:Key="/Default/CodeStyle/CSharpUsing/KeepImports/=System_002ELinq/@EntryIndexedValue"></s:String>
+	<s:Boolean x:Key="/Default/CodeStyle/CSharpUsing/KeepImports/=System_002ELinq/@EntryIndexRemoved">True</s:Boolean>
+	<s:String x:Key="/Default/CodeStyle/CSharpUsing/MandatoryImports/=System/@EntryIndexedValue"></s:String>
+	<s:Boolean x:Key="/Default/CodeStyle/CSharpUsing/MandatoryImports/=System/@EntryIndexRemoved">True</s:Boolean>
+	<s:String x:Key="/Default/CodeStyle/CSharpUsing/MandatoryImports/=System_002ELinq/@EntryIndexedValue"></s:String>
+	<s:Boolean x:Key="/Default/CodeStyle/CSharpUsing/MandatoryImports/=System_002ELinq/@EntryIndexRemoved">True</s:Boolean>
 	<s:Boolean x:Key="/Default/CodeStyle/CSharpUsing/QualifiedUsingAtNestedScope/@EntryValue">True</s:Boolean>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/EventHandlerPatternLong/@EntryValue">$object$_On$event$</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/PredefinedNamingRules/=Constants/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="" Suffix="" Style="AaBb" /&gt;</s:String>

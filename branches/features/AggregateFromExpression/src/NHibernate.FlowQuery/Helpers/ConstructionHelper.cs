@@ -7,6 +7,8 @@ namespace NHibernate.FlowQuery.Helpers
     using System.Linq.Expressions;
     using System.Reflection;
 
+    // TODO: Refactor the "Invoke" methods to have a generic utility instead of duplicating code
+
     /// <summary>
     ///     A static utility class providing methods to build a <see cref="IEnumerable{T}" /> from a
     ///     <see cref="LambdaExpression" />.
@@ -125,7 +127,12 @@ namespace NHibernate.FlowQuery.Helpers
             {
                 object instance;
 
-                Invoke(expression, o as object[] ?? new[] { o }, out instance);
+                Invoke(expression,
+                    o as object[] ?? new[]
+                    {
+                        o
+                    },
+                    out instance);
 
                 temp.Add((TDestination)instance);
             }
@@ -161,12 +168,62 @@ namespace NHibernate.FlowQuery.Helpers
             {
                 object instance;
 
-                Invoke(expression, o as object[] ?? new[] { o }, out instance);
+                Invoke(expression,
+                    o as object[] ?? new[]
+                    {
+                        o
+                    },
+                    out instance);
 
                 temp.Add((TDestination)instance);
             }
 
             return temp;
+        }
+
+        /// <summary>
+        ///     Invokes the provided <see cref="MethodCallExpression" /> with the provided arguments.
+        /// </summary>
+        /// <param name="expression">
+        ///     The <see cref="MethodCallExpression" /> expression.
+        /// </param>
+        /// <param name="arguments">
+        ///     The constructor arguments.
+        /// </param>
+        /// <param name="instance">
+        ///     The generated instance.
+        /// </param>
+        /// <returns>
+        ///     The number of arguments used.
+        /// </returns>
+        private static int Invoke(MethodCallExpression expression, object[] arguments, out object instance)
+        {
+            // TODO: Implement IMethodCallConstructionHandler extension point
+            if (expression.Method.Name == "FromExpression")
+            {
+                var lambda = (LambdaExpression)ExpressionHelper.GetValue(expression.Arguments[0]);
+
+                switch (lambda.Body.NodeType)
+                {
+                    case ExpressionType.New:
+                        return Invoke(lambda.Body as NewExpression, arguments, out instance);
+
+                    case ExpressionType.MemberInit:
+                        return Invoke(lambda.Body as MemberInitExpression, arguments, out instance);
+
+                    case ExpressionType.Call:
+                        return Invoke(lambda.Body as MethodCallExpression, arguments, out instance);
+                }
+
+                throw new NotSupportedException
+                    (
+                    "The projection contains unsupported features, please revise your code"
+                    );
+            }
+
+            instance = arguments[0];
+
+            return 1;
         }
 
         /// <summary>
@@ -202,6 +259,10 @@ namespace NHibernate.FlowQuery.Helpers
 
                     case ExpressionType.MemberInit:
                         i += Invoke(argument as MemberInitExpression, arguments.Skip(i).ToArray(), out value);
+                        break;
+
+                    case ExpressionType.Call:
+                        i += Invoke(argument as MethodCallExpression, arguments.Skip(i).ToArray(), out value);
                         break;
 
                     default:
@@ -253,22 +314,33 @@ namespace NHibernate.FlowQuery.Helpers
                         case ExpressionType.New:
 
                             i += Invoke
-                            (
-                                memberAssignment.Expression as NewExpression,
-                                arguments.Skip(i).ToArray(),
-                                out value
-                            );
+                                (
+                                    memberAssignment.Expression as NewExpression,
+                                    arguments.Skip(i).ToArray(),
+                                    out value
+                                );
 
                             break;
 
                         case ExpressionType.MemberInit:
 
                             i += Invoke
-                            (
-                                memberAssignment.Expression as MemberInitExpression,
-                                arguments.Skip(i).ToArray(),
-                                out value
-                            );
+                                (
+                                    memberAssignment.Expression as MemberInitExpression,
+                                    arguments.Skip(i).ToArray(),
+                                    out value
+                                );
+
+                            break;
+
+                        case ExpressionType.Call:
+
+                            i += Invoke
+                                (
+                                    memberAssignment.Expression as MethodCallExpression,
+                                    arguments.Skip(i).ToArray(),
+                                    out value
+                                );
 
                             break;
 

@@ -52,6 +52,7 @@ namespace NHibernate.FlowQuery.Helpers
             AddMethodCallHandlerInternal("CountDistinct", new CountDistinctHandler());
             AddMethodCallHandlerInternal("Count", new SimpleMethodCallHandler(Projections.Count));
             AddMethodCallHandlerInternal("EndsWith", likeHandler);
+            AddMethodCallHandlerInternal("FromExpression", new FromExpressionHandler());
             AddMethodCallHandlerInternal("GroupBy", new SimpleMethodCallHandler(Projections.GroupProperty));
             AddMethodCallHandlerInternal("Max", new SimpleMethodCallHandler(Projections.Max));
             AddMethodCallHandlerInternal("Min", new SimpleMethodCallHandler(Projections.Min));
@@ -127,7 +128,7 @@ namespace NHibernate.FlowQuery.Helpers
         /// <summary>
         ///     Creates <see cref="IProjection" />s for all <see cref="Expression" />s within the given
         ///     <see cref="MemberInitExpression" /> and adds them to the given <see cref="ProjectionList" />
-        ///     <paramref name="list" /> and also to <paramref name="mappings" />.
+        ///     <paramref name="list" />.
         /// </summary>
         /// <param name="expression">
         ///     The expression.
@@ -141,19 +142,15 @@ namespace NHibernate.FlowQuery.Helpers
         /// <param name="list">
         ///     The <see cref="ProjectionList" /> instance.
         /// </param>
-        /// <param name="mappings">
-        ///     The mappings.
-        /// </param>
         public static void ForMemberInitExpression
             (
             MemberInitExpression expression,
             string root,
             QueryHelperData data,
-            ref ProjectionList list,
-            ref Dictionary<string, IProjection> mappings
+            ref ProjectionList list
             )
         {
-            ForNewExpression(expression.NewExpression, root, data, ref list, ref mappings);
+            ForNewExpression(expression.NewExpression, root, data, ref list);
 
             foreach (MemberBinding memberBinding in expression.Bindings)
             {
@@ -170,8 +167,7 @@ namespace NHibernate.FlowQuery.Helpers
                                 memberAssigment.Expression as MemberInitExpression,
                                 root,
                                 data,
-                                ref list,
-                                ref mappings
+                                ref list
                             );
 
                             break;
@@ -183,8 +179,7 @@ namespace NHibernate.FlowQuery.Helpers
                                 memberAssigment.Expression as NewExpression,
                                 root,
                                 data,
-                                ref list,
-                                ref mappings
+                                ref list
                             );
 
                             break;
@@ -197,9 +192,9 @@ namespace NHibernate.FlowQuery.Helpers
 
                             list.Add(new FqAliasProjection(projection, member));
 
-                            if (!mappings.ContainsKey(member))
+                            if (!data.Mappings.ContainsKey(member))
                             {
-                                mappings.Add(member, projection);
+                                data.Mappings.Add(member, projection);
                             }
 
                             break;
@@ -211,7 +206,7 @@ namespace NHibernate.FlowQuery.Helpers
         /// <summary>
         ///     Creates <see cref="IProjection" />s for all <see cref="Expression" />s within the given
         ///     <see cref="NewExpression" /> and adds them to the given <see cref="ProjectionList" />
-        ///     <paramref name="list" /> and also to <paramref name="mappings" />.
+        ///     <paramref name="list" />.
         /// </summary>
         /// <param name="expression">
         ///     The expression.
@@ -225,16 +220,12 @@ namespace NHibernate.FlowQuery.Helpers
         /// <param name="list">
         ///     The <see cref="ProjectionList" /> instance.
         /// </param>
-        /// <param name="mappings">
-        ///     The mappings.
-        /// </param>
         public static void ForNewExpression
             (
             NewExpression expression,
             string root,
             QueryHelperData data,
-            ref ProjectionList list,
-            ref Dictionary<string, IProjection> mappings
+            ref ProjectionList list
             )
         {
             foreach (Expression argument in expression.Arguments)
@@ -243,13 +234,13 @@ namespace NHibernate.FlowQuery.Helpers
                 {
                     case ExpressionType.MemberInit:
 
-                        ForMemberInitExpression(argument as MemberInitExpression, root, data, ref list, ref mappings);
+                        ForMemberInitExpression(argument as MemberInitExpression, root, data, ref list);
 
                         break;
 
                     case ExpressionType.New:
 
-                        ForNewExpression(argument as NewExpression, root, data, ref list, ref mappings);
+                        ForNewExpression(argument as NewExpression, root, data, ref list);
 
                         break;
 
@@ -375,9 +366,6 @@ namespace NHibernate.FlowQuery.Helpers
         /// <param name="data">
         ///     The <see cref="QueryHelperData" /> info.
         /// </param>
-        /// <param name="mappings">
-        ///     The mappings.
-        /// </param>
         /// <returns>
         ///     The resolved <see cref="IProjection" /> instance.
         /// </returns>
@@ -388,8 +376,7 @@ namespace NHibernate.FlowQuery.Helpers
             (
             Expression expression,
             string root,
-            QueryHelperData data,
-            ref Dictionary<string, IProjection> mappings
+            QueryHelperData data
             )
         {
             ProjectionList list = Projections.ProjectionList();
@@ -397,11 +384,11 @@ namespace NHibernate.FlowQuery.Helpers
             switch (expression.NodeType)
             {
                 case ExpressionType.New:
-                    ForNewExpression(expression as NewExpression, root, data, ref list, ref mappings);
+                    ForNewExpression(expression as NewExpression, root, data, ref list);
                     break;
 
                 case ExpressionType.MemberInit:
-                    ForMemberInitExpression(expression as MemberInitExpression, root, data, ref list, ref mappings);
+                    ForMemberInitExpression(expression as MemberInitExpression, root, data, ref list);
                     break;
 
                 default:

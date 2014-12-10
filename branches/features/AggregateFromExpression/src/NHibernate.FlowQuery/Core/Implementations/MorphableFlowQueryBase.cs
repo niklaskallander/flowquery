@@ -277,15 +277,12 @@
                 throw new ArgumentNullException("expression");
             }
 
-            var mappings = new Dictionary<string, IProjection>();
-
             ProjectionList list = ProjectionHelper
                 .GetProjectionListForExpression
                 (
                     expression.Body,
                     expression.Parameters[0].Name,
-                    Data,
-                    ref mappings
+                    Data
                 );
 
             if (list == null || list.Length == 0)
@@ -296,7 +293,7 @@
                 );
             }
 
-            return ProjectionBase<TDestination>(list, mappings, expression, false);
+            return ProjectionBase<TDestination>(list, Data.Mappings, expression, false);
         }
 
         /// <summary>

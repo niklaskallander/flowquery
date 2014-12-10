@@ -127,6 +127,7 @@
     <Compile Include="BaseTest.cs" />
     <Compile Include="FlowQuery\Core\IFlowQueryTest\CountTest.cs" />
     <Compile Include="FlowQuery\DetachedCriteriaExtensionsTest.cs" />
+    <Compile Include="FlowQuery\Features\AggregateFromExpressionTest.cs" />
     <Compile Include="FlowQuery\Helpers\ConstructionHelperTest.cs" />
     <Compile Include="FlowQuery\Helpers\CriteriaHelperTest.cs" />
     <Compile Include="FlowQuery\Helpers\ExpressionHelperTest.cs" />

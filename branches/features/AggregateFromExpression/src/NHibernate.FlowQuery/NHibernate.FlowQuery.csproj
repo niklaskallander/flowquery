@@ -143,6 +143,7 @@
     <Compile Include="Helpers\ConstructionHelper.cs" />
     <Compile Include="Helpers\ExpressionHelper.cs" />
     <Compile Include="Helpers\ParameterReplaceVisitor.cs" />
+    <Compile Include="Helpers\ProjectionHandlers\MethodCalls\FromExpressionHandler.cs" />
     <Compile Include="Helpers\ProjectionHelper.cs" />
     <Compile Include="Helpers\ProjectionHandlers\MethodCalls\AsHandler.cs" />
     <Compile Include="Helpers\ProjectionHandlers\MethodCalls\CountDistinctHandler.cs" />

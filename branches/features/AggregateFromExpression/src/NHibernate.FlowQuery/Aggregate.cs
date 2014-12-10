@@ -1,6 +1,7 @@
 namespace NHibernate.FlowQuery
 {
     using System;
+    using System.Linq.Expressions;
 
     using NHibernate.Criterion;
     using NHibernate.FlowQuery.Core;
@@ -23,8 +24,8 @@ namespace NHibernate.FlowQuery
         ///     The aggregated value.
         /// </returns>
         /// <exception cref="InvalidOperationException">
-        ///     Will always throw an <see cref="InvalidOperationException" /> when called outside a 
-        ///     <see cref="System.Linq.Expressions.LambdaExpression"/>.
+        ///     Will always throw an <see cref="InvalidOperationException" /> when called outside a
+        ///     <see cref="System.Linq.Expressions.LambdaExpression" />.
         /// </exception>
         public static double Average<TDestination>(TDestination property)
         {
@@ -44,8 +45,8 @@ namespace NHibernate.FlowQuery
         ///     The aggregated value.
         /// </returns>
         /// <exception cref="InvalidOperationException">
-        ///     Will always throw a <see cref="InvalidOperationException" /> if called outside a 
-        ///     <see cref="System.Linq.Expressions.Expression{Func}"/>.
+        ///     Will always throw a <see cref="InvalidOperationException" /> if called outside a
+        ///     <see cref="System.Linq.Expressions.Expression{Func}" />.
         /// </exception>
         public static double Average<TDestination>(TDestination? property)
             where TDestination : struct
@@ -66,8 +67,8 @@ namespace NHibernate.FlowQuery
         ///     The aggregated value.
         /// </returns>
         /// <exception cref="InvalidOperationException">
-        ///     Will always throw a <see cref="InvalidOperationException" /> if called outside a 
-        ///     <see cref="System.Linq.Expressions.Expression{Func}"/>.
+        ///     Will always throw a <see cref="InvalidOperationException" /> if called outside a
+        ///     <see cref="System.Linq.Expressions.Expression{Func}" />.
         /// </exception>
         public static int Count<TDestination>(TDestination property)
         {
@@ -87,8 +88,8 @@ namespace NHibernate.FlowQuery
         ///     The aggregated value.
         /// </returns>
         /// <exception cref="InvalidOperationException">
-        ///     Will always throw a <see cref="InvalidOperationException" /> if called outside a 
-        ///     <see cref="System.Linq.Expressions.Expression{Func}"/>.
+        ///     Will always throw a <see cref="InvalidOperationException" /> if called outside a
+        ///     <see cref="System.Linq.Expressions.Expression{Func}" />.
         /// </exception>
         public static int Count<TDestination>(TDestination? property)
             where TDestination : struct
@@ -109,8 +110,8 @@ namespace NHibernate.FlowQuery
         ///     The aggregated value.
         /// </returns>
         /// <exception cref="InvalidOperationException">
-        ///     Will always throw a <see cref="InvalidOperationException" /> if called outside a 
-        ///     <see cref="System.Linq.Expressions.Expression{Func}"/>.
+        ///     Will always throw a <see cref="InvalidOperationException" /> if called outside a
+        ///     <see cref="System.Linq.Expressions.Expression{Func}" />.
         /// </exception>
         public static int CountDistinct<TDestination>(TDestination property)
         {
@@ -130,13 +131,39 @@ namespace NHibernate.FlowQuery
         ///     The aggregated value.
         /// </returns>
         /// <exception cref="InvalidOperationException">
-        ///     Will always throw a <see cref="InvalidOperationException" /> if called outside a 
-        ///     <see cref="System.Linq.Expressions.Expression{Func}"/>.
+        ///     Will always throw a <see cref="InvalidOperationException" /> if called outside a
+        ///     <see cref="System.Linq.Expressions.Expression{Func}" />.
         /// </exception>
         public static int CountDistinct<TDestination>(TDestination? property)
             where TDestination : struct
         {
             throw Exception();
+        }
+
+        /// <summary>
+        ///     Provides a means to split up your projections into several expressions for re-use
+        ///     and testability.
+        /// </summary>
+        /// <typeparam name="TIn">
+        ///     The type of the root entity.
+        /// </typeparam>
+        /// <typeparam name="TOut">
+        ///     The type of the returned object.
+        /// </typeparam>
+        /// <param name="expression">
+        ///     The expression that does the projectioning.
+        /// </param>
+        /// <returns>
+        ///     Nothing. Will always throw a <see cref="InvalidOperationException" /> if called
+        ///     outside a <see cref="System.Linq.Expressions.Expression{Func}" />.
+        /// </returns>
+        /// <exception cref="InvalidOperationException">
+        ///     Will always throw a <see cref="InvalidOperationException" /> if called outside a
+        ///     <see cref="System.Linq.Expressions.Expression{Func}" />.
+        /// </exception>
+        public static TOut FromExpression<TIn, TOut>(Expression<Func<TIn, TOut>> expression)
+        {
+            throw new Exception();
         }
 
         /// <summary>
@@ -152,8 +179,8 @@ namespace NHibernate.FlowQuery
         ///     The aggregated value.
         /// </returns>
         /// <exception cref="InvalidOperationException">
-        ///     Will always throw a <see cref="InvalidOperationException" /> if called outside a 
-        ///     <see cref="System.Linq.Expressions.Expression{Func}"/>.
+        ///     Will always throw a <see cref="InvalidOperationException" /> if called outside a
+        ///     <see cref="System.Linq.Expressions.Expression{Func}" />.
         /// </exception>
         public static TDestination GroupBy<TDestination>(TDestination property)
         {
@@ -173,8 +200,8 @@ namespace NHibernate.FlowQuery
         ///     The aggregated value.
         /// </returns>
         /// <exception cref="InvalidOperationException">
-        ///     Will always throw a <see cref="InvalidOperationException" /> if called outside a 
-        ///     <see cref="System.Linq.Expressions.Expression{Func}"/>.
+        ///     Will always throw a <see cref="InvalidOperationException" /> if called outside a
+        ///     <see cref="System.Linq.Expressions.Expression{Func}" />.
         /// </exception>
         public static TDestination GroupBy<TDestination>(TDestination? property)
             where TDestination : struct
@@ -195,8 +222,8 @@ namespace NHibernate.FlowQuery
         ///     The aggregated value.
         /// </returns>
         /// <exception cref="InvalidOperationException">
-        ///     Will always throw a <see cref="InvalidOperationException" /> if called outside a 
-        ///     <see cref="System.Linq.Expressions.Expression{Func}"/>.
+        ///     Will always throw a <see cref="InvalidOperationException" /> if called outside a
+        ///     <see cref="System.Linq.Expressions.Expression{Func}" />.
         /// </exception>
         public static TDestination Max<TDestination>(TDestination property)
         {
@@ -216,8 +243,8 @@ namespace NHibernate.FlowQuery
         ///     The aggregated value.
         /// </returns>
         /// <exception cref="InvalidOperationException">
-        ///     Will always throw a <see cref="InvalidOperationException" /> if called outside a 
-        ///     <see cref="System.Linq.Expressions.Expression{Func}"/>.
+        ///     Will always throw a <see cref="InvalidOperationException" /> if called outside a
+        ///     <see cref="System.Linq.Expressions.Expression{Func}" />.
         /// </exception>
         public static TDestination Max<TDestination>(TDestination? property)
             where TDestination : struct
@@ -238,8 +265,8 @@ namespace NHibernate.FlowQuery
         ///     The aggregated value.
         /// </returns>
         /// <exception cref="InvalidOperationException">
-        ///     Will always throw a <see cref="InvalidOperationException" /> if called outside a 
-        ///     <see cref="System.Linq.Expressions.Expression{Func}"/>.
+        ///     Will always throw a <see cref="InvalidOperationException" /> if called outside a
+        ///     <see cref="System.Linq.Expressions.Expression{Func}" />.
         /// </exception>
         public static TDestination Min<TDestination>(TDestination property)
         {
@@ -259,8 +286,8 @@ namespace NHibernate.FlowQuery
         ///     The aggregated value.
         /// </returns>
         /// <exception cref="InvalidOperationException">
-        ///     Will always throw a <see cref="InvalidOperationException" /> if called outside a 
-        ///     <see cref="System.Linq.Expressions.Expression{Func}"/>.
+        ///     Will always throw a <see cref="InvalidOperationException" /> if called outside a
+        ///     <see cref="System.Linq.Expressions.Expression{Func}" />.
         /// </exception>
         public static TDestination Min<TDestination>(TDestination? property)
             where TDestination : struct
@@ -281,8 +308,8 @@ namespace NHibernate.FlowQuery
         ///     The aggregated value.
         /// </returns>
         /// <exception cref="InvalidOperationException">
-        ///     Will always throw a <see cref="InvalidOperationException" /> if called outside a 
-        ///     <see cref="System.Linq.Expressions.Expression{Func}"/>.
+        ///     Will always throw a <see cref="InvalidOperationException" /> if called outside a
+        ///     <see cref="System.Linq.Expressions.Expression{Func}" />.
         /// </exception>
         public static T Subquery<T>(IDetachedImmutableFlowQuery subquery)
         {
@@ -302,8 +329,8 @@ namespace NHibernate.FlowQuery
         ///     The aggregated value.
         /// </returns>
         /// <exception cref="InvalidOperationException">
-        ///     Will always throw a <see cref="InvalidOperationException" /> if called outside a 
-        ///     <see cref="System.Linq.Expressions.Expression{Func}"/>.
+        ///     Will always throw a <see cref="InvalidOperationException" /> if called outside a
+        ///     <see cref="System.Linq.Expressions.Expression{Func}" />.
         /// </exception>
         public static T Subquery<T>(DetachedCriteria subquery)
         {
@@ -323,8 +350,8 @@ namespace NHibernate.FlowQuery
         ///     The aggregated value.
         /// </returns>
         /// <exception cref="InvalidOperationException">
-        ///     Will always throw a <see cref="InvalidOperationException" /> if called outside a 
-        ///     <see cref="System.Linq.Expressions.Expression{Func}"/>.
+        ///     Will always throw a <see cref="InvalidOperationException" /> if called outside a
+        ///     <see cref="System.Linq.Expressions.Expression{Func}" />.
         /// </exception>
         public static TDestination Sum<TDestination>(TDestination property)
         {
@@ -344,8 +371,8 @@ namespace NHibernate.FlowQuery
         ///     The aggregated value.
         /// </returns>
         /// <exception cref="InvalidOperationException">
-        ///     Will always throw a <see cref="InvalidOperationException" /> if called outside a 
-        ///     <see cref="System.Linq.Expressions.Expression{Func}"/>.
+        ///     Will always throw a <see cref="InvalidOperationException" /> if called outside a
+        ///     <see cref="System.Linq.Expressions.Expression{Func}" />.
         /// </exception>
         public static TDestination Sum<TDestination>(TDestination? property)
             where TDestination : struct
@@ -360,9 +387,9 @@ namespace NHibernate.FlowQuery
         private static InvalidOperationException Exception()
         {
             return new InvalidOperationException
-            (
+                (
                 "This is only a helper method for the NHibernate.FlowQuery API and should not be executed directly"
-            );
+                );
         }
     }
 }
