@@ -7,7 +7,7 @@
     using Expression = System.Linq.Expressions.Expression;
 
     /// <summary>
-    ///     Defines the functionality required of a class used to resolve <see cref="IProjection" /> instances from 
+    ///     Defines the functionality required of a class used to resolve <see cref="IProjection" /> instances from
     ///     <see cref="MethodCallExpression" />.
     /// </summary>
     public abstract class MethodCallProjectionHandlerBase : IMethodCallProjectionHandler
@@ -43,7 +43,7 @@
         ///     The <see cref="QueryHelperData" />.
         /// </param>
         /// <returns>
-        ///     The <see cref="IProjection"/> or null if no <see cref="IProjection" /> could be resolved.
+        ///     The <see cref="IProjection" /> or null if no <see cref="IProjection" /> could be resolved.
         /// </returns>
         protected abstract IProjection HandleCore
             (

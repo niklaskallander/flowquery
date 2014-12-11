@@ -140,6 +140,8 @@
     <Compile Include="ExtensionHelpers\IsExtensions.cs" />
     <Compile Include="ExtensionHelpers\PropertyExtensions.cs" />
     <Compile Include="FlowQueryOptions.cs" />
+    <Compile Include="Helpers\ConstructionHandlers\MethodCalls\FromExpressionHandler.cs" />
+    <Compile Include="Helpers\ConstructionHandlers\MethodCalls\IMethodCallConstructionHandler.cs" />
     <Compile Include="Helpers\ConstructionHelper.cs" />
     <Compile Include="Helpers\ExpressionHelper.cs" />
     <Compile Include="Helpers\ParameterReplaceVisitor.cs" />
@@ -200,6 +202,7 @@
     <None Include="NHibernate.FlowQuery.snk" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="PostBuildMacros">
     <GetAssemblyIdentity AssemblyFiles="$(TargetPath)">
