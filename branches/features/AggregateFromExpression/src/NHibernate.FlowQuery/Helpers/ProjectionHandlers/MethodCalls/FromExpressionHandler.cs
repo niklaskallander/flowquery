@@ -6,31 +6,13 @@
 
     using Expression = System.Linq.Expressions.Expression;
 
+    /// <summary>
+    ///     Handles <see cref="MethodCallExpression" /> expressions representing calls to 
+    ///     <see cref="Aggregate.FromExpression{TIn,TOut}" />.
+    /// </summary>
     public class FromExpressionHandler : MethodCallProjectionHandlerBase
     {
-        /// <summary>
-        ///     Handles the given <see cref="MethodCallExpression" />.
-        /// </summary>
-        /// <param name="expression">
-        ///     The <see cref="MethodCallExpression" />.
-        /// </param>
-        /// <param name="subExpression">
-        ///     The sub-expression (normally the first argument of the method call or the property on
-        ///     which the call was made).
-        /// </param>
-        /// <param name="projection">
-        ///     The projection for the sub-expression (normally the first argument of the method call or the property on
-        ///     which the call was made).
-        /// </param>
-        /// <param name="root">
-        ///     The entity root name.
-        /// </param>
-        /// <param name="data">
-        ///     The <see cref="QueryHelperData" />.
-        /// </param>
-        /// <returns>
-        ///     The <see cref="IProjection" /> or null if no <see cref="IProjection" /> could be resolved.
-        /// </returns>
+        /// <inheritdoc />
         protected override IProjection HandleCore
             (
             MethodCallExpression expression,

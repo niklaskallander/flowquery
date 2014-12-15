@@ -2,6 +2,10 @@
 {
     using System.Linq.Expressions;
 
+    /// <summary>
+    ///     Handles <see cref="MethodCallExpression" /> expressions representing calls to 
+    ///     <see cref="Aggregate.FromExpression{TIn,TOut}" />.
+    /// </summary>
     public class FromExpressionHandler : IMethodCallConstructionHandler
     {
         /// <inheritdoc />
