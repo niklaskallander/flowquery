@@ -97,6 +97,9 @@
         /// <param name="index">
         ///     The index.
         /// </param>
+        /// <value>
+        ///     The <see cref="IProjection" /> at the given index.
+        /// </value>
         /// <returns>
         ///     The <see cref="IProjection" />.
         /// </returns>

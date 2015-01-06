@@ -177,5 +177,32 @@ namespace NHibernate.FlowQuery.Revealing.Conventions
     }
 }
 
-// TODO: DOC! NHibernate.FlowQuery.Helpers.ProjectionHandlers
-// TODO: DOC! NHibernate.FlowQuery.Helpers.ProjectionHandlers.MethodCalls
+namespace NHibernate.FlowQuery.Helpers.ProjectionHandlers.MethodCalls
+{
+    using System.Runtime.CompilerServices;
+
+    /// <summary>
+    ///     The <see cref="NHibernate.FlowQuery.Helpers.ProjectionHandlers.MethodCalls" /> namespace contains a set of
+    ///     default handlers for creating <see cref="NHibernate.Criterion.IProjection" /> from method calls in your 
+    ///     query projections.
+    /// </summary>
+    [CompilerGenerated]
+    internal class NamespaceDoc
+    {
+    }
+}
+
+namespace NHibernate.FlowQuery.Helpers.ConstructionHandlers.MethodCalls
+{
+    using System.Runtime.CompilerServices;
+
+    /// <summary>
+    ///     The <see cref="NHibernate.FlowQuery.Helpers.ConstructionHandlers.MethodCalls" /> namespace contains a set of
+    ///     default handlers for creating values/objects from query results using for method calls in your query 
+    ///     projections.
+    /// </summary>
+    [CompilerGenerated]
+    internal class NamespaceDoc
+    {
+    }
+}

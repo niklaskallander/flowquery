@@ -112,6 +112,9 @@
         }
 
         /// <inheritdoc />
+        /// <typeparam name="TDestination">
+        ///     The <see cref="System.Type" /> of the selection.
+        /// </typeparam>
         public virtual ISelectSetup<TSource, TDestination> Select<TDestination>()
         {
             return new SelectSetup<TSource, TDestination>(Select, Data);
@@ -142,6 +145,9 @@
         }
 
         /// <inheritdoc />
+        /// <typeparam name="TDestination">
+        ///     The <see cref="System.Type" /> of the selection.
+        /// </typeparam>
         public virtual FlowQuerySelection<TDestination> Select<TDestination>(params string[] properties)
         {
             Project<TDestination>(properties);
@@ -150,6 +156,9 @@
         }
 
         /// <inheritdoc />
+        /// <typeparam name="TDestination">
+        ///     The <see cref="System.Type" /> of the selection.
+        /// </typeparam>
         public virtual FlowQuerySelection<TDestination> Select<TDestination>(IProjection projection)
         {
             Project<TDestination>(projection);

@@ -151,7 +151,7 @@ namespace NHibernate.FlowQuery
         ///     The type of the returned object.
         /// </typeparam>
         /// <param name="expression">
-        ///     The expression that does the projectioning.
+        ///     The expression containing the projection.
         /// </param>
         /// <returns>
         ///     Nothing. Will always throw a <see cref="InvalidOperationException" /> if called

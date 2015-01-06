@@ -323,7 +323,7 @@
         public virtual IFetchBuilder<TSource, TQuery> Fetch
             (
             Expression<Func<TSource, object>> expression,
-            Expression<Func<object>> aliasProjection = null,
+            Expression<Func<object>> alias = null,
             IRevealConvention revealConvention = null
             )
         {
@@ -334,11 +334,11 @@
 
             string path = Reveal.ByConvention(expression, revealConvention);
 
-            string alias = aliasProjection != null
-                ? ExpressionHelper.GetPropertyName(aliasProjection)
+            string aliasValue = alias != null
+                ? ExpressionHelper.GetPropertyName(alias)
                 : path;
 
-            return FetchCore(path, alias);
+            return FetchCore(path, aliasValue);
         }
 
         /// <inheritdoc />
@@ -436,6 +436,9 @@
         }
 
         /// <inheritdoc />
+        /// <typeparam name="TProjection">
+        ///     The <see cref="System.Type" /> of the projection.
+        /// </typeparam>
         public virtual TQuery OrderBy<TProjection>(string property, bool ascending = true)
         {
             Orders.Add(new OrderByStatement
@@ -450,6 +453,9 @@
         }
 
         /// <inheritdoc />
+        /// <typeparam name="TProjection">
+        ///     The <see cref="System.Type" /> of the projection.
+        /// </typeparam>
         public virtual TQuery OrderBy<TProjection>
             (
             Expression<Func<TProjection, object>> property,
@@ -482,12 +488,18 @@
         }
 
         /// <inheritdoc />
+        /// <typeparam name="TProjection">
+        ///     The <see cref="System.Type" /> of the projection.
+        /// </typeparam>
         public virtual TQuery OrderByDescending<TProjection>(string property)
         {
             return OrderBy<TProjection>(property, false);
         }
 
         /// <inheritdoc />
+        /// <typeparam name="TProjection">
+        ///     The <see cref="System.Type" /> of the projection.
+        /// </typeparam>
         public virtual TQuery OrderByDescending<TProjection>(Expression<Func<TProjection, object>> property)
         {
             return OrderBy(property, false);

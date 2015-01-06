@@ -15,7 +15,7 @@
 
             wasHandled = true;
 
-            return ConstructionHelper.Construct(lambda, arguments, out value);
+            return ConstructionHelper.Invoke(lambda, arguments, out value);
         }
     }
 }

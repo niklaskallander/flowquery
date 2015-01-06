@@ -17,7 +17,7 @@
     public class ProjectionHelperTest : BaseTest
     {
         [Test]
-        public void AddMethodCallResolverReturnsFalseIfMethodNameAlreadyUsed()
+        public void AddMethodCallHandlerReturnsFalseIfMethodNameAlreadyUsed()
         {
             var resolver = new SimpleMethodCallHandler(Projections.Sum);
 
@@ -31,7 +31,7 @@
         }
 
         [Test]
-        public void AddMethodCallResolverThrowsIfMethodNameIsEmptyString()
+        public void AddMethodCallHandlerThrowsIfMethodNameIsEmptyString()
         {
             Assert
                 .That
@@ -44,7 +44,7 @@
         }
 
         [Test]
-        public void AddMethodCallResolverThrowsIfMethodNameIsNull()
+        public void AddMethodCallHandlerThrowsIfMethodNameIsNull()
         {
             Assert
                 .That
@@ -55,7 +55,7 @@
         }
 
         [Test]
-        public void AddMethodCallResolverThrowsIfMethodNameIsWhiteSpace()
+        public void AddMethodCallHandlerThrowsIfMethodNameIsWhiteSpace()
         {
             Assert
                 .That
@@ -68,7 +68,7 @@
         }
 
         [Test]
-        public void AddMethodCallResolverThrowsIfResolverIsNull()
+        public void AddMethodCallHandlerThrowsIfResolverIsNull()
         {
             Assert
                 .That
@@ -81,7 +81,7 @@
         }
 
         [Test]
-        public void SimpleMethodResolverThrowsIfDelegateIsNull()
+        public void SimpleMethodHandlerThrowsIfDelegateIsNull()
         {
             Assert
                 .That
@@ -92,7 +92,7 @@
         }
 
         [Test]
-        public void CanAddCustomResolverToOverrideDefaulImplementation()
+        public void CanAddCustomHandlerToOverrideDefaulImplementation()
         {
             var mockedResolver = new Mock<IMethodCallProjectionHandler>(MockBehavior.Loose);
 

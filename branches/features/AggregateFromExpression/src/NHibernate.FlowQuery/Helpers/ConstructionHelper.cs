@@ -43,7 +43,7 @@ namespace NHibernate.FlowQuery.Helpers
 
             AddMethodCallHandlerInternal("FromExpression", new FromExpressionHandler());
         }
-        
+
         /// <summary>
         ///     Adds a <see cref="IMethodCallConstructionHandler" /> to be used when handling method calls.
         /// </summary>
@@ -54,8 +54,8 @@ namespace NHibernate.FlowQuery.Helpers
         ///     The <see cref="IMethodCallConstructionHandler" />.
         /// </param>
         /// <returns>
-        ///     A value indicating whether the <see cref="IMethodCallConstructionHandler" /> was added (true) or not 
-        ///     (false). If another <see cref="IMethodCallConstructionHandler" /> with the same method name is already 
+        ///     A value indicating whether the <see cref="IMethodCallConstructionHandler" /> was added (true) or not
+        ///     (false). If another <see cref="IMethodCallConstructionHandler" /> with the same method name is already
         ///     added, false will be returned.
         /// </returns>
         /// <exception cref="ArgumentNullException">
@@ -67,66 +67,6 @@ namespace NHibernate.FlowQuery.Helpers
         public static bool AddMethodCallHandler(string methodName, IMethodCallConstructionHandler handler)
         {
             return AddMethodCallHandlerInternal(methodName, handler, false);
-        }
-
-        /// <summary>
-        ///     Adds a <see cref="IMethodCallConstructionHandler" /> to be used when handling method calls.
-        /// </summary>
-        /// <param name="methodName">
-        ///     The name of the method.
-        /// </param>
-        /// <param name="handler">
-        ///     The <see cref="IMethodCallConstructionHandler" />.
-        /// </param>
-        /// <param name="isDefaultHandler">
-        ///     A value indicating whether the handler is added internally (true) or externally using 
-        ///     <see cref="AddMethodCallHandler(string,IMethodCallConstructionHandler)" /> (false).
-        /// </param>
-        /// <returns>
-        ///     A value indicating whether the <see cref="IMethodCallConstructionHandler" /> was added (true) or not 
-        ///     (false). If another <see cref="IMethodCallConstructionHandler" /> with the same method name is already 
-        ///     added, false will be returned.
-        /// </returns>
-        /// <exception cref="ArgumentNullException">
-        ///     <paramref name="handler" /> is null.
-        /// </exception>
-        /// <exception cref="ArgumentException">
-        ///     <paramref name="methodName" /> is null or <see cref="string.Empty" />.
-        /// </exception>
-        internal static bool AddMethodCallHandlerInternal
-            (
-            string methodName,
-            IMethodCallConstructionHandler handler,
-            bool isDefaultHandler = true
-            )
-        {
-            lock (MethodHandlerLock)
-            {
-                if (handler == null)
-                {
-                    throw new ArgumentNullException("handler");
-                }
-
-                methodName = (methodName ?? string.Empty).Trim().ToLower();
-
-                if (methodName == string.Empty)
-                {
-                    throw new ArgumentException("key");
-                }
-
-                Dictionary<string, IMethodCallConstructionHandler> collection = isDefaultHandler
-                    ? DefaultMethodCallHandlers
-                    : CustomMethodCallHandlers;
-
-                if (collection.ContainsKey(methodName))
-                {
-                    return false;
-                }
-
-                collection.Add(methodName, handler);
-
-                return true;
-            }
         }
 
         /// <summary>
@@ -156,6 +96,44 @@ namespace NHibernate.FlowQuery.Helpers
 
             return expression.NodeType == ExpressionType.New
                 || expression.NodeType == ExpressionType.MemberInit;
+        }
+
+        /// <summary>
+        ///     Invokes the provided <see cref="Expression" /> with the provided arguments.
+        /// </summary>
+        /// <param name="expression">
+        ///     The <see cref="Expression" /> expression.
+        /// </param>
+        /// <param name="arguments">
+        ///     The constructor arguments.
+        /// </param>
+        /// <param name="value">
+        ///     The generated instance.
+        /// </param>
+        /// <returns>
+        ///     The number of arguments used.
+        /// </returns>
+        public static int Invoke(Expression expression, object[] arguments, out object value)
+        {
+            switch (expression.NodeType)
+            {
+                case ExpressionType.Lambda:
+                    return Invoke(((LambdaExpression)expression).Body, arguments, out value);
+
+                case ExpressionType.New:
+                    return Invoke(expression as NewExpression, arguments, out value);
+
+                case ExpressionType.MemberInit:
+                    return Invoke(expression as MemberInitExpression, arguments, out value);
+
+                case ExpressionType.Call:
+                    return Invoke(expression as MethodCallExpression, arguments, out value);
+
+                default:
+                    value = arguments[0];
+
+                    return 1;
+            }
         }
 
         /// <summary>
@@ -214,6 +192,66 @@ namespace NHibernate.FlowQuery.Helpers
         }
 
         /// <summary>
+        ///     Adds a <see cref="IMethodCallConstructionHandler" /> to be used when handling method calls.
+        /// </summary>
+        /// <param name="methodName">
+        ///     The name of the method.
+        /// </param>
+        /// <param name="handler">
+        ///     The <see cref="IMethodCallConstructionHandler" />.
+        /// </param>
+        /// <param name="isDefaultHandler">
+        ///     A value indicating whether the handler is added internally (true) or externally using
+        ///     <see cref="AddMethodCallHandler(string,IMethodCallConstructionHandler)" /> (false).
+        /// </param>
+        /// <returns>
+        ///     A value indicating whether the <see cref="IMethodCallConstructionHandler" /> was added (true) or not
+        ///     (false). If another <see cref="IMethodCallConstructionHandler" /> with the same method name is already
+        ///     added, false will be returned.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        ///     <paramref name="handler" /> is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        ///     <paramref name="methodName" /> is null or <see cref="string.Empty" />.
+        /// </exception>
+        internal static bool AddMethodCallHandlerInternal
+            (
+            string methodName,
+            IMethodCallConstructionHandler handler,
+            bool isDefaultHandler = true
+            )
+        {
+            lock (MethodHandlerLock)
+            {
+                if (handler == null)
+                {
+                    throw new ArgumentNullException("handler");
+                }
+
+                methodName = (methodName ?? string.Empty).Trim().ToLower();
+
+                if (methodName == string.Empty)
+                {
+                    throw new ArgumentException("key");
+                }
+
+                Dictionary<string, IMethodCallConstructionHandler> collection = isDefaultHandler
+                    ? DefaultMethodCallHandlers
+                    : CustomMethodCallHandlers;
+
+                if (collection.ContainsKey(methodName))
+                {
+                    return false;
+                }
+
+                collection.Add(methodName, handler);
+
+                return true;
+            }
+        }
+
+        /// <summary>
         ///     Creates a <see cref="IEnumerable{TDestination}" /> from the provided <see cref="MemberInitExpression" />
         ///     and <see cref="IEnumerable" />.
         /// </summary>
@@ -239,14 +277,14 @@ namespace NHibernate.FlowQuery.Helpers
 
             foreach (object o in list)
             {
+                object[] args = o as object[] ?? new[]
+                {
+                    o
+                };
+
                 object instance;
 
-                Invoke(expression,
-                    o as object[] ?? new[]
-                    {
-                        o
-                    },
-                    out instance);
+                Invoke(expression, args, out instance);
 
                 temp.Add((TDestination)instance);
             }
@@ -280,42 +318,19 @@ namespace NHibernate.FlowQuery.Helpers
 
             foreach (object o in list)
             {
+                object[] args = o as object[] ?? new[]
+                {
+                    o
+                };
+
                 object instance;
 
-                Invoke(expression,
-                    o as object[] ?? new[]
-                    {
-                        o
-                    },
-                    out instance);
+                Invoke(expression, args, out instance);
 
                 temp.Add((TDestination)instance);
             }
 
             return temp;
-        }
-
-        public static int Construct(Expression expression, object[] arguments, out object value)
-        {
-            switch (expression.NodeType)
-            {
-                case ExpressionType.Lambda:
-                    return Construct(((LambdaExpression)expression).Body, arguments, out value);
-
-                case ExpressionType.New:
-                    return Invoke(expression as NewExpression, arguments, out value);
-
-                case ExpressionType.MemberInit:
-                    return Invoke(expression as MemberInitExpression, arguments, out value);
-
-                case ExpressionType.Call:
-                    return Invoke(expression as MethodCallExpression, arguments, out value);
-
-                default:
-                    value = arguments[0];
-
-                    return 1;
-            }
         }
 
         /// <summary>
@@ -399,7 +414,7 @@ namespace NHibernate.FlowQuery.Helpers
             {
                 object value;
 
-                i += Construct(argument, arguments.Skip(i).ToArray(), out value);
+                i += Invoke(argument, arguments.Skip(i).ToArray(), out value);
 
                 list.Add(value);
             }
@@ -436,7 +451,7 @@ namespace NHibernate.FlowQuery.Helpers
                 {
                     object value;
 
-                    i += Construct(memberAssignment.Expression, arguments.Skip(i).ToArray(), out value);
+                    i += Invoke(memberAssignment.Expression, arguments.Skip(i).ToArray(), out value);
 
                     SetValue(binding.Member, instance, value);
                 }

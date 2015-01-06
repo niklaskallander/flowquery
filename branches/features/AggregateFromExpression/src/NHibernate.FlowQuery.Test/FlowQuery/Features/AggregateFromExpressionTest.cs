@@ -42,5 +42,18 @@
             Assert.That(users.ElementAt(2).Value.Fullname, Is.EqualTo(Fullnames[2]));
             Assert.That(users.ElementAt(3).Value.Fullname, Is.EqualTo(Fullnames[3]));
         }
+
+        [Test]
+        public void UsingAggregateFromExpressionWithNullExpressionThrows()
+        {
+            Expression<Func<UserEntity, UserDto>> expression = null;
+
+            Assert
+                .That
+                (
+                    () => Query<UserEntity>().Select(x => Aggregate.FromExpression(expression)),
+                    Throws.InstanceOf<NotSupportedException>()
+                );
+        }
     }
 }
