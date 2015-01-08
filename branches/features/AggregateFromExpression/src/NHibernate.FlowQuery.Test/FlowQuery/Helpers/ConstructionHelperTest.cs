@@ -6,8 +6,6 @@
     using System.Linq;
     using System.Linq.Expressions;
 
-    using Moq;
-
     using NHibernate.Criterion;
     using NHibernate.FlowQuery.Helpers;
     using NHibernate.FlowQuery.Helpers.ConstructionHandlers.MethodCalls;

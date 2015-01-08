@@ -163,7 +163,7 @@ namespace NHibernate.FlowQuery
         /// </exception>
         public static TOut FromExpression<TIn, TOut>(Expression<Func<TIn, TOut>> expression)
         {
-            throw new Exception();
+            throw Exception();
         }
 
         /// <summary>

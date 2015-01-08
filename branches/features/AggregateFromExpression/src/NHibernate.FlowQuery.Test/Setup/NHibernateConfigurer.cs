@@ -22,7 +22,7 @@
 
         public static void Configure()
         {
-            // HibernatingRhinos.Profiler.Appender.NHibernate.NHibernateProfiler.Initialize();
+             HibernatingRhinos.Profiler.Appender.NHibernate.NHibernateProfiler.Initialize();
             Configuration configuration = LoadFromFile();
 
             bool shouldAddData = false;

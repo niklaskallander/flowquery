@@ -13,5 +13,9 @@ using System.Security;
 [assembly: AssemblyFileVersion("2.3.0")]
 [assembly: AssemblyInformationalVersion("2.3.0-GA")]
 
+//[assembly: AssemblyVersion("2.3.5367.42625")]
+//[assembly: AssemblyFileVersion("2.3.0")]
+//[assembly: AssemblyInformationalVersion("2.3.0-GA")]
+
 [assembly: AllowPartiallyTrustedCallers]
 [assembly: CLSCompliant(true)]
