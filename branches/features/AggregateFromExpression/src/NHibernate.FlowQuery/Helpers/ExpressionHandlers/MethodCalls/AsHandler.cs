@@ -1,4 +1,4 @@
-﻿namespace NHibernate.FlowQuery.Helpers.ProjectionHandlers.MethodCalls
+﻿namespace NHibernate.FlowQuery.Helpers.ExpressionHandlers.MethodCalls
 {
     using System.Linq.Expressions;
 
@@ -9,19 +9,18 @@
     /// <summary>
     ///     Handles method calls to <see cref="NHibernate.FlowQuery.Property.As{TDestination}(string)" />.
     /// </summary>
-    public class AsHandler : MethodCallProjectionHandlerBase
+    public class AsHandler : MethodCallExpressionHandlerBase
     {
         /// <inheritdoc />
-        protected override IProjection HandleCore
+        protected override IProjection ProjectCore
             (
             MethodCallExpression expression,
             Expression subExpression,
             IProjection projection,
-            string root,
-            QueryHelperData data
+            HelperContext context
             )
         {
-            return Projections.Property(ExpressionHelper.GetPropertyName(subExpression, root));
+            return Projections.Property(ExpressionHelper.GetPropertyName(subExpression, context.RootAlias));
         }
     }
 }

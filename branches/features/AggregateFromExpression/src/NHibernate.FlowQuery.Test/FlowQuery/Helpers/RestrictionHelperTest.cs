@@ -26,6 +26,10 @@
         [Test]
         public void GetProjectionValueCriterionThrowsIfNodeTypeIsInvalid()
         {
+            var data = new QueryHelperData(new Dictionary<string, string>(), new List<Join>());
+
+            var context = new HelperContext(data, (string)null, HelperType.Filter);
+
             Assert
                 .That
                 (
@@ -37,8 +41,7 @@
                                 Expression.Equal(Expression.Constant(true), Expression.Constant(true)),
                                 true,
                                 ExpressionType.ListInit,
-                                null,
-                                new QueryHelperData(new Dictionary<string, string>(), new List<Join>()),
+                                context,
                                 false
                             );
                     },

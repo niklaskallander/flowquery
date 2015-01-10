@@ -70,7 +70,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
         {
             Expression<Func<UserDto, object>> x = u => "u.Username";
 
-            Assert.That(ExpressionHelper.GetPropertyName(x), Is.EqualTo("u.Username"));
+            Assert.That(ExpressionHelper.GetPropertyName(x.Body), Is.EqualTo("u.Username"));
         }
 
         [Test]
@@ -97,7 +97,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
         {
             Expression<Func<UserDto, object>> x = u => u.Username.GetHashCode();
 
-            Assert.That(ExpressionHelper.GetPropertyName(x), Is.EqualTo("u.Username"));
+            Assert.That(ExpressionHelper.GetPropertyName(x.Body), Is.EqualTo("u.Username"));
         }
 
         [Test]

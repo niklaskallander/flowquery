@@ -1,4 +1,4 @@
-﻿namespace NHibernate.FlowQuery.Helpers.ProjectionHandlers.MethodCalls
+﻿namespace NHibernate.FlowQuery.Helpers.ExpressionHandlers.MethodCalls
 {
     using System;
     using System.Linq.Expressions;
@@ -9,19 +9,18 @@
     using Expression = System.Linq.Expressions.Expression;
 
     /// <summary>
-    ///     Handles method calls to <see cref="Math.Round(double)" />, <see cref="Math.Round(double, int)" />, 
+    ///     Handles method calls to <see cref="Math.Round(double)" />, <see cref="Math.Round(double, int)" />,
     ///     <see cref="Math.Round(decimal)" />, or <see cref="Math.Round(decimal, int)" />.
     /// </summary>
-    public sealed class RoundHandler : MethodCallProjectionHandlerBase
+    public sealed class RoundHandler : MethodCallExpressionHandlerBase
     {
         /// <inheritdoc />
-        protected override IProjection HandleCore
+        protected override IProjection ProjectCore
             (
-            MethodCallExpression expression,
-            Expression subExpression,
-            IProjection projection,
-            string root,
-            QueryHelperData data
+            MethodCallExpression expression, 
+            Expression subExpression, 
+            IProjection projection, 
+            HelperContext context
             )
         {
             int digits = 0;
@@ -43,12 +42,12 @@
             }
 
             return new SqlFunctionProjection
-            (
-                "round",
-                numberType,
-                projection,
+                (
+                "round", 
+                numberType, 
+                projection, 
                 Projections.Constant(digits)
-            );
+                );
         }
     }
 }

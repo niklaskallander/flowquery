@@ -277,15 +277,14 @@
                 throw new ArgumentNullException("expression");
             }
 
-            ProjectionList list = ProjectionHelper
-                .GetProjectionListForExpression
+            IProjection list = ProjectionHelper
+                .GetProjection
                 (
-                    expression.Body,
-                    expression.Parameters[0].Name,
+                    expression,
                     Data
                 );
 
-            if (list == null || list.Length == 0)
+            if (list == null || (list is ProjectionList && ((ProjectionList)list).Length == 0))
             {
                 throw new NotSupportedException
                 (

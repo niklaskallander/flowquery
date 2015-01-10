@@ -6,112 +6,14 @@
 
     using NHibernate.FlowQuery.Test.Setup.Dtos;
     using NHibernate.FlowQuery.Test.Setup.Entities;
-    using NHibernate.Mapping;
-    using NHibernate.Properties;
 
     using NUnit.Framework;
 
     [TestFixture]
-    public class AggregateFromExpressionTest : BaseTest
+    public class FlowQueryHelperProjectTest : BaseTest
     {
-        public class SettingModel
-        {
-            public long Id { get; set; }
-        }
-
-        public class UserModel
-        {
-            public string Fullname { get; set; }
-
-            public long Id { get; set; }
-
-            public bool IsOnline { get; set; }
-
-            public SettingModel Setting { get; set; }
-
-            public string SomeValue { get; set; }
-
-            public string Username { get; set; }
-        }
-
-        public class SettingMapper
-        {
-            public Expression<Func<Setting, SettingModel>> Map
-            {
-                get
-                {
-                    Setting setting = null;
-
-                    return x => new SettingModel
-                    {
-                        Id = setting.Id
-                    };
-                }
-            }
-        }
-
-        public class UserMapper
-        {
-            public Expression<Func<UserEntity, UserModel>> Map
-            {
-                get
-                {
-                    var settingMapper = new SettingMapper();
-
-                    return x => new UserModel
-                    {
-                        Fullname = x.Firstname + " " + x.Lastname,
-                        Id = x.Id,
-                        IsOnline = x.IsOnline,
-                        Setting = Aggregate.FromExpression(settingMapper.Map),
-                        Username = x.Username
-                    };
-                }
-            }
-        }
-
         [Test]
-        public void CanUseAggregateFromExpressionWithMapperWithAliasOnRoot()
-        {
-            var settingMapper = new SettingMapper();
-
-            Setting setting = null;
-
-            SettingModel[] settings = Session.FlowQuery(() => setting)
-                .Select(settingMapper.Map);
-
-            for (int i = 0; i < settings.Length; i++)
-            {
-                Assert.That(settings[i].Id, Is.EqualTo(i + 1));
-            }
-        }
-
-        [Test]
-        public void CanUseAggregateFromExpressionWithMapper()
-        {
-            var userMapper = new UserMapper();
-
-            Setting setting = null;
-
-            UserModel[] users = Query<UserEntity>()
-                .Inner.Join(x => x.Setting, () => setting)
-                .Select(userMapper.Map);
-
-            Assert.That(users.Count(), Is.EqualTo(4));
-
-            for (int i = 0; i < users.Length; i++)
-            {
-                var user = users[i];
-
-                Assert.That(user, Is.Not.Null);
-                Assert.That(user.Setting, Is.Not.Null);
-                Assert.That(user.Setting.Id, Is.EqualTo(6));
-                Assert.That(user.Fullname, Is.EqualTo(Fullnames[i]));
-            }
-        }
-
-        [Test]
-        public void CanUseAggregateFromExpression()
+        public void CanUseFlowQueryHelperProject()
         {
             Expression<Func<UserEntity, UserDto>> expression = x => new UserDto
             {
@@ -122,10 +24,12 @@
                 Username = x.Username
             };
 
+            var helper = new FlowQueryHelper();
+
             var users = Query<UserEntity>()
                 .Select(x => new
                 {
-                    Value = Aggregate.FromExpression(expression)
+                    Value = helper.Project(x, expression)
                 });
 
             Assert.That(users.Count(), Is.EqualTo(4));
@@ -142,16 +46,131 @@
         }
 
         [Test]
-        public void UsingAggregateFromExpressionWithNullExpressionThrows()
+        public void CanUseFlowQueryHelperProjectWithMapper()
         {
-            Expression<Func<UserEntity, UserDto>> expression = null;
+            var userMapper = new UserMapper();
+
+            Setting setting = null;
+
+            UserModel[] users = Query<UserEntity>()
+                .Inner.Join(x => x.Setting, () => setting)
+                .Select(userMapper.Map);
+
+            Assert.That(users.Count(), Is.EqualTo(4));
+
+            for (int i = 0; i < users.Length; i++)
+            {
+                UserModel user = users[i];
+
+                Assert.That(user, Is.Not.Null);
+                Assert.That(user.Setting, Is.Not.Null);
+                Assert.That(user.Setting.Id, Is.EqualTo(6));
+                Assert.That(user.Fullname, Is.EqualTo(Fullnames[i]));
+            }
+        }
+
+        [Test]
+        public void CanUseFlowQueryHelperProjectWithMapperWithAliasOnRoot()
+        {
+            var settingMapper = new SettingMapper();
+
+            SettingModel[] settings = Session.FlowQuery<Setting>()
+                .Select(settingMapper.Map);
+
+            for (int i = 0; i < settings.Length; i++)
+            {
+                Assert.That(settings[i].Id, Is.EqualTo(i + 1));
+            }
+        }
+
+        [Test]
+        public void UsingFlowQueryHelperProjectDirectlyThrows()
+        {
+            Expression<Func<UserEntity, UserDto>> expression = x => new UserDto();
+
+            UserEntity y = null;
+
+            var helper = new FlowQueryHelper();
 
             Assert
                 .That
                 (
-                    () => Query<UserEntity>().Select(x => Aggregate.FromExpression(expression)),
+                    () => helper.Project(y, expression),
+                    Throws.InstanceOf<NotImplementedException>()
+                );
+        }
+
+        [Test]
+        public void UsingFlowQueryHelperProjectWithNullExpressionThrows()
+        {
+            Expression<Func<UserEntity, UserDto>> expression = null;
+
+            var helper = new FlowQueryHelper();
+
+            Assert
+                .That
+                (
+                    () => Query<UserEntity>().Select(x => helper.Project(x, expression)),
                     Throws.InstanceOf<NotSupportedException>()
                 );
+        }
+
+        public class SettingMapper
+        {
+            public Expression<Func<Setting, SettingModel>> Map
+            {
+                get
+                {
+                    return setting => new SettingModel
+                    {
+                        Id = setting.Id
+                    };
+                }
+            }
+        }
+
+        public class SettingModel
+        {
+            public long Id { get; set; }
+        }
+
+        public class UserMapper
+        {
+            public Expression<Func<UserEntity, UserModel>> Map
+            {
+                get
+                {
+                    Setting setting = null;
+
+                    var settingMapper = new SettingMapper();
+
+                    var helper = new FlowQueryHelper();
+
+                    return x => new UserModel
+                    {
+                        Fullname = x.Firstname + " " + x.Lastname,
+                        Id = x.Id,
+                        IsOnline = x.IsOnline,
+                        Setting = helper.Project(setting, settingMapper.Map),
+                        Username = x.Username
+                    };
+                }
+            }
+        }
+
+        public class UserModel
+        {
+            public string Fullname { get; set; }
+
+            public long Id { get; set; }
+
+            public bool IsOnline { get; set; }
+
+            public SettingModel Setting { get; set; }
+
+            public string SomeValue { get; set; }
+
+            public string Username { get; set; }
         }
     }
 }

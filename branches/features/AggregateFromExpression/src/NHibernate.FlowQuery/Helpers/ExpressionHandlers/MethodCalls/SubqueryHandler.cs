@@ -1,4 +1,4 @@
-﻿namespace NHibernate.FlowQuery.Helpers.ProjectionHandlers.MethodCalls
+﻿namespace NHibernate.FlowQuery.Helpers.ExpressionHandlers.MethodCalls
 {
     using System.Linq.Expressions;
 
@@ -11,16 +11,15 @@
     ///     Handles method calls to <see cref="Aggregate.Subquery{T}(IDetachedImmutableFlowQuery)" /> and
     ///     <see cref="Aggregate.Subquery{T}(DetachedCriteria)" />.
     /// </summary>
-    public class SubqueryHandler : MethodCallProjectionHandlerBase
+    public class SubqueryHandler : MethodCallExpressionHandlerBase
     {
         /// <inheritdoc />
-        protected override IProjection HandleCore
+        protected override IProjection ProjectCore
             (
             MethodCallExpression expression,
             Expression subExpression,
             IProjection projection,
-            string root,
-            QueryHelperData data
+            HelperContext context
             )
         {
             object value = ExpressionHelper.GetValue(expression.Arguments[0]);

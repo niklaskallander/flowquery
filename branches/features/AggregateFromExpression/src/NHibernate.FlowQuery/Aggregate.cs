@@ -141,32 +141,6 @@ namespace NHibernate.FlowQuery
         }
 
         /// <summary>
-        ///     Provides a means to split up your projections into several expressions for re-use
-        ///     and testability.
-        /// </summary>
-        /// <typeparam name="TIn">
-        ///     The type of the root entity.
-        /// </typeparam>
-        /// <typeparam name="TOut">
-        ///     The type of the returned object.
-        /// </typeparam>
-        /// <param name="expression">
-        ///     The expression containing the projection.
-        /// </param>
-        /// <returns>
-        ///     Nothing. Will always throw a <see cref="InvalidOperationException" /> if called
-        ///     outside a <see cref="System.Linq.Expressions.Expression{Func}" />.
-        /// </returns>
-        /// <exception cref="InvalidOperationException">
-        ///     Will always throw a <see cref="InvalidOperationException" /> if called outside a
-        ///     <see cref="System.Linq.Expressions.Expression{Func}" />.
-        /// </exception>
-        public static TOut FromExpression<TIn, TOut>(Expression<Func<TIn, TOut>> expression)
-        {
-            throw Exception();
-        }
-
-        /// <summary>
         ///     Specifies a Group By aggregation on the given property.
         /// </summary>
         /// <typeparam name="TDestination">

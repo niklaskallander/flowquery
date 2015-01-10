@@ -51,7 +51,7 @@
                 throw new ArgumentNullException("expression");
             }
 
-            string property = ExpressionHelper.GetPropertyName(expression.Body, expression.Parameters[0].Name);
+            string property = ExpressionHelper.GetPropertyName(expression);
 
             return Reveal(property, convention);
         }
@@ -84,9 +84,9 @@
                 throw new ArgumentNullException("alias");
             }
 
-            string property = ExpressionHelper.GetPropertyName(expression.Body, expression.Parameters[0].Name);
+            string property = ExpressionHelper.GetPropertyName(expression);
 
-            string aliasName = ExpressionHelper.GetPropertyName(alias.Body);
+            string aliasName = ExpressionHelper.GetPropertyName(alias);
 
             return Reveal(aliasName + "." + property, convention);
         }

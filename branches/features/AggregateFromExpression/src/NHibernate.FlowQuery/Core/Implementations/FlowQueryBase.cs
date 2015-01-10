@@ -350,8 +350,7 @@
                     .GetProjection
                     (
                         property.Body,
-                        property.Parameters[0].Name,
-                        Data
+                        new HelperContext(Data, property, HelperType.GroupBy)
                     );
 
                 if (projection != null)
@@ -430,7 +429,12 @@
         /// <inheritdoc />
         public virtual TQuery OrderBy(Expression<Func<TSource, object>> property, bool ascending = true)
         {
-            IProjection projection = ProjectionHelper.GetProjection(property.Body, property.Parameters[0].Name, Data);
+            IProjection projection = ProjectionHelper
+                .GetProjection
+                (
+                    property.Body,
+                    new HelperContext(Data, property, HelperType.Order)
+                );
 
             return OrderBy(projection, ascending);
         }
@@ -464,7 +468,7 @@
         {
             return OrderBy<TProjection>
             (
-                ExpressionHelper.GetPropertyName(property.Body, property.Parameters[0].Name),
+                ExpressionHelper.GetPropertyName(property),
                 ascending
             );
         }
@@ -568,19 +572,35 @@
         /// <inheritdoc />
         public virtual TQuery Where(Expression<Func<TSource, bool>> expression)
         {
-            return Where(RestrictionHelper.GetCriterion(expression, expression.Parameters[0].Name, Data));
+            return Where
+                (
+                RestrictionHelper
+                    .GetCriterion
+                    (
+                        expression,
+                        new HelperContext(Data, expression, HelperType.Filter)
+                    )
+                );
         }
 
         /// <inheritdoc />
         public virtual TQuery Where(Expression<Func<TSource, object>> property, IsExpression expression)
         {
-            return Where(ExpressionHelper.GetPropertyName(property.Body, property.Parameters[0].Name), expression);
+            return Where(ExpressionHelper.GetPropertyName(property), expression);
         }
 
         /// <inheritdoc />
         public virtual TQuery Where(Expression<Func<TSource, WhereDelegate, bool>> expression)
         {
-            return Where(RestrictionHelper.GetCriterion(expression, expression.Parameters[0].Name, Data));
+            return Where
+                (
+                RestrictionHelper
+                    .GetCriterion
+                    (
+                        expression,
+                        new HelperContext(Data, expression, HelperType.Filter)
+                    )
+                );
         }
 
         /// <inheritdoc />
