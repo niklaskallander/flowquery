@@ -1,4 +1,4 @@
-﻿namespace NHibernate.FlowQuery.Helpers.ProjectionHandlers.MethodCalls
+﻿namespace NHibernate.FlowQuery.Helpers.ExpressionHandlers.MethodCalls
 {
     using System;
     using System.Linq.Expressions;
@@ -11,7 +11,7 @@
     ///     Defines the functionality required of a class used to resolve <see cref="IProjection" /> instances from
     ///     simple <see cref="MethodCallExpression" />s.
     /// </summary>
-    public class SimpleMethodCallHandler : MethodCallProjectionHandlerBase
+    public class SimpleMethodCallHandler : MethodCallExpressionHandlerBase
     {
         /// <summary>
         ///     The resolver.
@@ -35,13 +35,12 @@
         }
 
         /// <inheritdoc />
-        protected override IProjection HandleCore
+        protected override IProjection ProjectCore
             (
-            MethodCallExpression expression,
-            Expression subExpression,
-            IProjection projection,
-            string root,
-            QueryHelperData data
+            MethodCallExpression expression, 
+            Expression subExpression, 
+            IProjection projection, 
+            HelperContext context
             )
         {
             return _resolver(projection);

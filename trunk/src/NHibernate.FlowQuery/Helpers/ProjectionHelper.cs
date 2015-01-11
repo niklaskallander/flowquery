@@ -7,7 +7,7 @@ namespace NHibernate.FlowQuery.Helpers
     using NHibernate.Criterion;
     using NHibernate.Dialect.Function;
     using NHibernate.FlowQuery.Core.CustomProjections;
-    using NHibernate.FlowQuery.Helpers.ProjectionHandlers.MethodCalls;
+    using NHibernate.FlowQuery.Helpers.ExpressionHandlers;
     using NHibernate.Type;
 
     using Expression = System.Linq.Expressions.Expression;
@@ -19,75 +19,112 @@ namespace NHibernate.FlowQuery.Helpers
     public static class ProjectionHelper
     {
         /// <summary>
-        ///     All custom method call handlers.
+        ///     Creates a <see cref="IProjection" /> for the given <see cref="Expression" />.
         /// </summary>
-        private static readonly Dictionary<string, IMethodCallProjectionHandler> CustomMethodCallHandlers;
-
-        /// <summary>
-        ///     All default method call handlers.
-        /// </summary>
-        private static readonly Dictionary<string, IMethodCallProjectionHandler> DefaultMethodCallHandlers;
-
-        /// <summary>
-        ///     The method call handler lock.
-        /// </summary>
-        private static readonly object MethodHandlerLock;
-
-        /// <summary>
-        ///     Initializes static members of the <see cref="ProjectionHelper" /> class.
-        /// </summary>
-        static ProjectionHelper()
+        /// <param name="expression">
+        ///     The expression.
+        /// </param>
+        /// <param name="context">
+        ///     The context for the projection.
+        /// </param>
+        /// <returns>
+        ///     The resolved <see cref="IProjection" /> instance.
+        /// </returns>
+        /// <exception cref="NotSupportedException">
+        ///     The <see cref="Expression" /> could not be resolved as it may contain unsupported features or similar.
+        /// </exception>
+        public static IProjection GetProjection
+            (
+            Expression expression,
+            HelperContext context
+            )
         {
-            MethodHandlerLock = new object();
+            switch (expression.NodeType)
+            {
+                case ExpressionType.AndAlso:
+                case ExpressionType.NotEqual:
+                case ExpressionType.OrElse:
+                case ExpressionType.Equal:
+                case ExpressionType.GreaterThan:
+                case ExpressionType.GreaterThanOrEqual:
+                case ExpressionType.LessThan:
+                case ExpressionType.LessThanOrEqual:
+                    return GetConditionalProjection
+                        (
+                            Expression.Condition(expression, Expression.Constant(true), Expression.Constant(false)),
+                            context
+                        );
 
-            var likeHandler = new LikeHandler();
+                case ExpressionType.Add:
+                case ExpressionType.Subtract:
+                case ExpressionType.Divide:
+                case ExpressionType.Multiply:
+                    return GetArithmeticProjection((BinaryExpression)expression, context);
 
-            CustomMethodCallHandlers = new Dictionary<string, IMethodCallProjectionHandler>();
+                case ExpressionType.Conditional:
+                    return GetConditionalProjection((ConditionalExpression)expression, context);
 
-            DefaultMethodCallHandlers = new Dictionary<string, IMethodCallProjectionHandler>();
+                case ExpressionType.Call:
+                    return GetMethodCallProjection((MethodCallExpression)expression, context);
 
-            AddMethodCallHandlerInternal("As", new AsHandler());
-            AddMethodCallHandlerInternal("Average", new SimpleMethodCallHandler(Projections.Avg));
-            AddMethodCallHandlerInternal("Contains", likeHandler);
-            AddMethodCallHandlerInternal("CountDistinct", new CountDistinctHandler());
-            AddMethodCallHandlerInternal("Count", new SimpleMethodCallHandler(Projections.Count));
-            AddMethodCallHandlerInternal("EndsWith", likeHandler);
-            AddMethodCallHandlerInternal("GroupBy", new SimpleMethodCallHandler(Projections.GroupProperty));
-            AddMethodCallHandlerInternal("Max", new SimpleMethodCallHandler(Projections.Max));
-            AddMethodCallHandlerInternal("Min", new SimpleMethodCallHandler(Projections.Min));
-            AddMethodCallHandlerInternal("Round", new RoundHandler());
-            AddMethodCallHandlerInternal("StartsWith", likeHandler);
-            AddMethodCallHandlerInternal("Subquery", new SubqueryHandler());
-            AddMethodCallHandlerInternal("Substring", new SubstringHandler());
-            AddMethodCallHandlerInternal("Sum", new SimpleMethodCallHandler(Projections.Sum));
-            AddMethodCallHandlerInternal("Trim", new TrimHandler());
-            AddMethodCallHandlerInternal("TrimEnd", new TrimEndHandler());
-            AddMethodCallHandlerInternal("TrimStart", new TrimStartHandler());
+                case ExpressionType.MemberAccess:
+                    return GetMemberProjection((MemberExpression)expression, context);
+
+                case ExpressionType.Convert:
+                    return GetConvertProjection((UnaryExpression)expression, context);
+
+                case ExpressionType.Coalesce:
+                    return GetCoalesceProjection((BinaryExpression)expression, context);
+
+                case ExpressionType.Lambda:
+                    return GetProjection(((LambdaExpression)expression).Body, context);
+
+                case ExpressionType.New:
+                    return ForNewExpression((NewExpression)expression, context);
+
+                case ExpressionType.MemberInit:
+                    return ForMemberInitExpression((MemberInitExpression)expression, context);
+
+                default:
+
+                    if (expression.NodeType == ExpressionType.Parameter && expression.ToString() == context.RootAlias)
+                    {
+                        throw new NotSupportedException
+                            (
+                            "Unable to select the root entity like 'x => x', select without an expression instead"
+                            );
+                    }
+
+                    return GetValueProjection(expression);
+            }
         }
 
         /// <summary>
-        ///     Adds a <see cref="IMethodCallProjectionHandler" /> to be used when handling method calls.
+        ///     Creates a <see cref="IProjection" /> for the given <see cref="Expression" />.
         /// </summary>
-        /// <param name="methodName">
-        ///     The name of the method.
+        /// <param name="expression">
+        ///     The expression.
         /// </param>
-        /// <param name="handler">
-        ///     The <see cref="IMethodCallProjectionHandler" />.
+        /// <param name="data">
+        ///     The <see cref="QueryHelperData" /> data.
+        /// </param>
+        /// <param name="type">
+        ///     The <see cref="HelperType" /> type.
         /// </param>
         /// <returns>
-        ///     A value indicating whether the <see cref="IMethodCallProjectionHandler" /> was added (true) or not 
-        ///     (false). If another <see cref="IMethodCallProjectionHandler" /> with the same method name is already 
-        ///     added, false will be returned.
+        ///     The resolved <see cref="IProjection" /> instance.
         /// </returns>
-        /// <exception cref="ArgumentNullException">
-        ///     <paramref name="handler" /> is null.
+        /// <exception cref="NotSupportedException">
+        ///     The <see cref="Expression" /> could not be resolved as it may contain unsupported features or similar.
         /// </exception>
-        /// <exception cref="ArgumentException">
-        ///     <paramref name="methodName" /> is null or <see cref="string.Empty" />.
-        /// </exception>
-        public static bool AddMethodCallHandler(string methodName, IMethodCallProjectionHandler handler)
+        public static IProjection GetProjection
+            (
+            LambdaExpression expression,
+            QueryHelperData data,
+            HelperType type = HelperType.Select
+            )
         {
-            return AddMethodCallHandlerInternal(methodName, handler, false);
+            return GetProjection(expression.Body, new HelperContext(data, expression.Parameters[0].Name, type));
         }
 
         /// <summary>
@@ -99,7 +136,7 @@ namespace NHibernate.FlowQuery.Helpers
         /// <returns>
         ///     The list of <see cref="Expression" />s.
         /// </returns>
-        public static IEnumerable<Expression> FlattenBinaryExpression(BinaryExpression expression)
+        private static IEnumerable<Expression> FlattenBinaryExpression(BinaryExpression expression)
         {
             var expressions = new List<Expression>();
 
@@ -125,35 +162,54 @@ namespace NHibernate.FlowQuery.Helpers
         }
 
         /// <summary>
-        ///     Creates <see cref="IProjection" />s for all <see cref="Expression" />s within the given
-        ///     <see cref="MemberInitExpression" /> and adds them to the given <see cref="ProjectionList" />
-        ///     <paramref name="list" /> and also to <paramref name="mappings" />.
+        ///     Creates <see cref="IProjection" />s for all <see cref="System.Linq.Expressions.Expression" />s within
+        ///     the given <see cref="MemberInitExpression" /> and returns them in a new <see cref="ProjectionList" />
+        ///     instance.
         /// </summary>
         /// <param name="expression">
         ///     The expression.
         /// </param>
-        /// <param name="root">
-        ///     The root name.
+        /// <param name="context">
+        ///     The context for the projection.
         /// </param>
-        /// <param name="data">
-        ///     The <see cref="QueryHelperData" /> info.
+        /// <returns>
+        ///     The resolved <see cref="ProjectionList" /> for the given <see cref="MemberInitExpression" /> expression.
+        /// </returns>
+        private static ProjectionList ForMemberInitExpression
+            (
+            MemberInitExpression expression,
+            HelperContext context
+            )
+        {
+            ProjectionList list = Projections.ProjectionList();
+
+            ForMemberInitExpression(expression, context, ref list);
+
+            return list;
+        }
+
+        /// <summary>
+        ///     Creates <see cref="IProjection" />s for all <see cref="System.Linq.Expressions.Expression" />s within
+        ///     the given <see cref="MemberInitExpression" /> and adds them to the given <see cref="ProjectionList" />
+        ///     <paramref name="list" />.
+        /// </summary>
+        /// <param name="expression">
+        ///     The expression.
+        /// </param>
+        /// <param name="context">
+        ///     The context for the projection.
         /// </param>
         /// <param name="list">
         ///     The <see cref="ProjectionList" /> instance.
         /// </param>
-        /// <param name="mappings">
-        ///     The mappings.
-        /// </param>
-        public static void ForMemberInitExpression
+        private static void ForMemberInitExpression
             (
             MemberInitExpression expression,
-            string root,
-            QueryHelperData data,
-            ref ProjectionList list,
-            ref Dictionary<string, IProjection> mappings
+            HelperContext context,
+            ref ProjectionList list
             )
         {
-            ForNewExpression(expression.NewExpression, root, data, ref list, ref mappings);
+            ForNewExpression(expression.NewExpression, context, ref list);
 
             foreach (MemberBinding memberBinding in expression.Bindings)
             {
@@ -166,40 +222,36 @@ namespace NHibernate.FlowQuery.Helpers
                         case ExpressionType.MemberInit:
 
                             ForMemberInitExpression
-                            (
-                                memberAssigment.Expression as MemberInitExpression,
-                                root,
-                                data,
-                                ref list,
-                                ref mappings
-                            );
+                                (
+                                    memberAssigment.Expression as MemberInitExpression,
+                                    context,
+                                    ref list
+                                );
 
                             break;
 
                         case ExpressionType.New:
 
                             ForNewExpression
-                            (
-                                memberAssigment.Expression as NewExpression,
-                                root,
-                                data,
-                                ref list,
-                                ref mappings
-                            );
+                                (
+                                    memberAssigment.Expression as NewExpression,
+                                    context,
+                                    ref list
+                                );
 
                             break;
 
                         default:
 
-                            IProjection projection = GetProjection(memberAssigment.Expression, root, data);
+                            IProjection projection = GetProjection(memberAssigment.Expression, context);
 
                             string member = memberAssigment.Member.Name;
 
                             list.Add(new FqAliasProjection(projection, member));
 
-                            if (!mappings.ContainsKey(member))
+                            if (!context.Data.Mappings.ContainsKey(member))
                             {
-                                mappings.Add(member, projection);
+                                context.Data.Mappings.Add(member, projection);
                             }
 
                             break;
@@ -209,32 +261,50 @@ namespace NHibernate.FlowQuery.Helpers
         }
 
         /// <summary>
-        ///     Creates <see cref="IProjection" />s for all <see cref="Expression" />s within the given
-        ///     <see cref="NewExpression" /> and adds them to the given <see cref="ProjectionList" />
-        ///     <paramref name="list" /> and also to <paramref name="mappings" />.
+        ///     Creates <see cref="IProjection" />s for all <see cref="System.Linq.Expressions.Expression" />s within
+        ///     the given <see cref="NewExpression" /> and returns them in a new <see cref="ProjectionList" /> instance.
         /// </summary>
         /// <param name="expression">
         ///     The expression.
         /// </param>
-        /// <param name="root">
-        ///     The root name.
+        /// <param name="context">
+        ///     The context for the projection.
         /// </param>
-        /// <param name="data">
-        ///     The <see cref="QueryHelperData" /> info.
+        /// <returns>
+        ///     The resolved <see cref="ProjectionList" /> for the given <see cref="NewExpression" /> expression.
+        /// </returns>
+        private static ProjectionList ForNewExpression
+            (
+            NewExpression expression,
+            HelperContext context
+            )
+        {
+            ProjectionList list = Projections.ProjectionList();
+
+            ForNewExpression(expression, context, ref list);
+
+            return list;
+        }
+
+        /// <summary>
+        ///     Creates <see cref="IProjection" />s for all <see cref="System.Linq.Expressions.Expression" />s within
+        ///     the given <see cref="NewExpression" /> and adds them to the given <see cref="ProjectionList" />
+        ///     <paramref name="list" />.
+        /// </summary>
+        /// <param name="expression">
+        ///     The expression.
+        /// </param>
+        /// <param name="context">
+        ///     The context for the projection.
         /// </param>
         /// <param name="list">
         ///     The <see cref="ProjectionList" /> instance.
         /// </param>
-        /// <param name="mappings">
-        ///     The mappings.
-        /// </param>
-        public static void ForNewExpression
+        private static void ForNewExpression
             (
             NewExpression expression,
-            string root,
-            QueryHelperData data,
-            ref ProjectionList list,
-            ref Dictionary<string, IProjection> mappings
+            HelperContext context,
+            ref ProjectionList list
             )
         {
             foreach (Expression argument in expression.Arguments)
@@ -243,236 +313,24 @@ namespace NHibernate.FlowQuery.Helpers
                 {
                     case ExpressionType.MemberInit:
 
-                        ForMemberInitExpression(argument as MemberInitExpression, root, data, ref list, ref mappings);
+                        ForMemberInitExpression(argument as MemberInitExpression, context, ref list);
 
                         break;
 
                     case ExpressionType.New:
 
-                        ForNewExpression(argument as NewExpression, root, data, ref list, ref mappings);
+                        ForNewExpression(argument as NewExpression, context, ref list);
 
                         break;
 
                     default:
 
-                        IProjection projection = GetProjection(argument, root, data);
+                        IProjection projection = GetProjection(argument, context);
 
                         list.Add(projection);
 
                         break;
                 }
-            }
-        }
-
-        /// <summary>
-        ///     Creates a <see cref="IProjection" /> for the given <see cref="Expression" />.
-        /// </summary>
-        /// <param name="expression">
-        ///     The expression.
-        /// </param>
-        /// <param name="root">
-        ///     The root name.
-        /// </param>
-        /// <param name="data">
-        ///     The <see cref="QueryHelperData" /> info.
-        /// </param>
-        /// <returns>
-        ///     The resolved <see cref="IProjection" /> instance.
-        /// </returns>
-        /// <exception cref="NotSupportedException">
-        ///     The <see cref="Expression" /> could not be resolved as it may contain unsupported features or similar.
-        /// </exception>
-        public static IProjection GetProjection(Expression expression, string root, QueryHelperData data)
-        {
-            switch (expression.NodeType)
-            {
-                case ExpressionType.AndAlso:
-                case ExpressionType.NotEqual:
-                case ExpressionType.OrElse:
-                case ExpressionType.Equal:
-                case ExpressionType.GreaterThan:
-                case ExpressionType.GreaterThanOrEqual:
-                case ExpressionType.LessThan:
-                case ExpressionType.LessThanOrEqual:
-                    return GetConditionalProjection
-                    (
-                        Expression.Condition(expression, Expression.Constant(true), Expression.Constant(false)),
-                        root,
-                        data
-                    );
-
-                case ExpressionType.Add:
-                case ExpressionType.Subtract:
-                case ExpressionType.Divide:
-                case ExpressionType.Multiply:
-                    return GetArithmeticProjection(expression as BinaryExpression, root, data);
-
-                case ExpressionType.Conditional:
-                    return GetConditionalProjection(expression as ConditionalExpression, root, data);
-
-                case ExpressionType.Call:
-                    return GetMethodCallProjection(expression as MethodCallExpression, root, data);
-
-                case ExpressionType.MemberAccess:
-
-                    if (ExpressionHelper.IsRooted(expression, root, data))
-                    {
-                        string property = ExpressionHelper.GetPropertyName(expression, root);
-
-                        return Projections.Property(property);
-                    }
-
-                    object value = ExpressionHelper.GetValue(expression);
-
-                    return Projections.Constant(value, TypeHelper.GuessType(expression.Type));
-
-                case ExpressionType.Convert:
-
-                    var unaryExpression = (UnaryExpression)expression;
-
-                    IProjection projection = GetProjection(unaryExpression.Operand, root, data);
-
-                    if (!unaryExpression.IsLiftedToNull)
-                    {
-                        IType type = TypeHelper.GuessType(unaryExpression.Type, true);
-
-                        if (type != null)
-                        {
-                            return new FqCastProjection(type, projection);
-                        }
-                    }
-
-                    return projection;
-
-                case ExpressionType.Coalesce:
-                    return GetCoalesceProjection(expression as BinaryExpression, root, data);
-
-                default:
-
-                    if (expression.NodeType == ExpressionType.Parameter && expression.ToString() == root)
-                    {
-                        throw new NotSupportedException
-                            (
-                            "Unable to select the root entity like 'x => x', select without an expression instead"
-                            );
-                    }
-
-                    value = ExpressionHelper.GetValue(expression);
-
-                    return Projections.Constant(value, TypeHelper.GuessType(expression.Type));
-            }
-        }
-
-        /// <summary>
-        ///     Creates a <see cref="ProjectionList" /> for the given <see cref="Expression" />.
-        /// </summary>
-        /// <param name="expression">
-        ///     The expression.
-        /// </param>
-        /// <param name="root">
-        ///     The root name.
-        /// </param>
-        /// <param name="data">
-        ///     The <see cref="QueryHelperData" /> info.
-        /// </param>
-        /// <param name="mappings">
-        ///     The mappings.
-        /// </param>
-        /// <returns>
-        ///     The resolved <see cref="IProjection" /> instance.
-        /// </returns>
-        /// <exception cref="NotSupportedException">
-        ///     The <see cref="Expression" /> could not be resolved as it may contain unsupported features or similar.
-        /// </exception>
-        public static ProjectionList GetProjectionListForExpression
-            (
-            Expression expression,
-            string root,
-            QueryHelperData data,
-            ref Dictionary<string, IProjection> mappings
-            )
-        {
-            ProjectionList list = Projections.ProjectionList();
-
-            switch (expression.NodeType)
-            {
-                case ExpressionType.New:
-                    ForNewExpression(expression as NewExpression, root, data, ref list, ref mappings);
-                    break;
-
-                case ExpressionType.MemberInit:
-                    ForMemberInitExpression(expression as MemberInitExpression, root, data, ref list, ref mappings);
-                    break;
-
-                default:
-
-                    IProjection projection = GetProjection(expression, root, data);
-
-                    list.Add(projection);
-
-                    break;
-            }
-
-            return list;
-        }
-
-        /// <summary>
-        ///     Adds a <see cref="IMethodCallProjectionHandler" /> to be used when handling method calls.
-        /// </summary>
-        /// <param name="methodName">
-        ///     The name of the method.
-        /// </param>
-        /// <param name="handler">
-        ///     The <see cref="IMethodCallProjectionHandler" />.
-        /// </param>
-        /// <param name="isDefaultHandler">
-        ///     A value indicating whether the handler is added internally (true) or externally using 
-        ///     <see cref="AddMethodCallHandler(string,IMethodCallProjectionHandler)" /> (false).
-        /// </param>
-        /// <returns>
-        ///     A value indicating whether the <see cref="IMethodCallProjectionHandler" /> was added (true) or not 
-        ///     (false). If another <see cref="IMethodCallProjectionHandler" /> with the same method name is already 
-        ///     added, false will be returned.
-        /// </returns>
-        /// <exception cref="ArgumentNullException">
-        ///     <paramref name="handler" /> is null.
-        /// </exception>
-        /// <exception cref="ArgumentException">
-        ///     <paramref name="methodName" /> is null or <see cref="string.Empty" />.
-        /// </exception>
-        internal static bool AddMethodCallHandlerInternal
-            (
-            string methodName,
-            IMethodCallProjectionHandler handler,
-            bool isDefaultHandler = true
-            )
-        {
-            lock (MethodHandlerLock)
-            {
-                if (handler == null)
-                {
-                    throw new ArgumentNullException("handler");
-                }
-
-                methodName = (methodName ?? string.Empty).Trim().ToLower();
-
-                if (methodName == string.Empty)
-                {
-                    throw new ArgumentException("key");
-                }
-
-                Dictionary<string, IMethodCallProjectionHandler> collection = isDefaultHandler
-                    ? DefaultMethodCallHandlers
-                    : CustomMethodCallHandlers;
-
-                if (collection.ContainsKey(methodName))
-                {
-                    return false;
-                }
-
-                collection.Add(methodName, handler);
-
-                return true;
             }
         }
 
@@ -509,11 +367,8 @@ namespace NHibernate.FlowQuery.Helpers
         /// <param name="expression">
         ///     The expression.
         /// </param>
-        /// <param name="root">
-        ///     The root name.
-        /// </param>
-        /// <param name="data">
-        ///     The <see cref="QueryHelperData" /> info.
+        /// <param name="context">
+        ///     The context for the projection.
         /// </param>
         /// <returns>
         ///     The created <see cref="IProjection" />.
@@ -521,24 +376,23 @@ namespace NHibernate.FlowQuery.Helpers
         private static IProjection GetArithmeticProjection
             (
             BinaryExpression expression,
-            string root,
-            QueryHelperData data
+            HelperContext context
             )
         {
             if (expression.NodeType == ExpressionType.Add && expression.Type == typeof(string))
             {
-                return GetConcatenationProjection(expression, root, data);
+                return GetConcatenationProjection(expression, context);
             }
 
             string operation = GetArithmeticOperation(expression.NodeType);
 
             return new SqlFunctionProjection
-            (
+                (
                 new VarArgsSQLFunction("(", operation, ")"),
                 NHibernateUtil.GuessType(expression.Left.Type),
-                GetProjection(expression.Left, root, data),
-                GetProjection(expression.Right, root, data)
-            );
+                GetProjection(expression.Left, context),
+                GetProjection(expression.Right, context)
+                );
         }
 
         /// <summary>
@@ -547,11 +401,8 @@ namespace NHibernate.FlowQuery.Helpers
         /// <param name="expression">
         ///     The expression.
         /// </param>
-        /// <param name="root">
-        ///     The root name.
-        /// </param>
-        /// <param name="data">
-        ///     The <see cref="QueryHelperData" /> info.
+        /// <param name="context">
+        ///     The context for the projection.
         /// </param>
         /// <returns>
         ///     The created <see cref="IProjection" />.
@@ -559,12 +410,11 @@ namespace NHibernate.FlowQuery.Helpers
         private static IProjection GetCoalesceProjection
             (
             BinaryExpression expression,
-            string root,
-            QueryHelperData data
+            HelperContext context
             )
         {
-            IProjection original = GetProjection(expression.Left, root, data);
-            IProjection fallback = GetProjection(expression.Right, root, data);
+            IProjection original = GetProjection(expression.Left, context);
+            IProjection fallback = GetProjection(expression.Right, context);
 
             return Projections.Conditional(Restrictions.IsNull(original), fallback, original);
         }
@@ -575,11 +425,8 @@ namespace NHibernate.FlowQuery.Helpers
         /// <param name="expression">
         ///     The expression.
         /// </param>
-        /// <param name="root">
-        ///     The root name.
-        /// </param>
-        /// <param name="data">
-        ///     The <see cref="QueryHelperData" /> info.
+        /// <param name="context">
+        ///     The context for the projection.
         /// </param>
         /// <returns>
         ///     The created <see cref="IProjection" />.
@@ -587,15 +434,14 @@ namespace NHibernate.FlowQuery.Helpers
         private static IProjection GetConcatenationProjection
             (
             BinaryExpression expression,
-            string root,
-            QueryHelperData data
+            HelperContext context
             )
         {
             var projections = new List<IProjection>();
 
             foreach (Expression expressionPart in FlattenBinaryExpression(expression))
             {
-                IProjection projection = GetProjection(expressionPart, root, data);
+                IProjection projection = GetProjection(expressionPart, context);
 
                 projections.Add(projection);
             }
@@ -609,11 +455,8 @@ namespace NHibernate.FlowQuery.Helpers
         /// <param name="expression">
         ///     The expression.
         /// </param>
-        /// <param name="root">
-        ///     The root name.
-        /// </param>
-        /// <param name="data">
-        ///     The <see cref="QueryHelperData" /> info.
+        /// <param name="context">
+        ///     The context for the projection.
         /// </param>
         /// <returns>
         ///     The created <see cref="IProjection" />.
@@ -621,17 +464,79 @@ namespace NHibernate.FlowQuery.Helpers
         private static IProjection GetConditionalProjection
             (
             ConditionalExpression expression,
-            string root,
-            QueryHelperData data
+            HelperContext context
             )
         {
             return Projections
                 .Conditional
                 (
-                    RestrictionHelper.GetCriterion(expression.Test, root, data),
-                    GetProjection(expression.IfTrue, root, data),
-                    GetProjection(expression.IfFalse, root, data)
+                    RestrictionHelper.GetCriterion(expression.Test, context),
+                    GetProjection(expression.IfTrue, context),
+                    GetProjection(expression.IfFalse, context)
                 );
+        }
+
+        /// <summary>
+        ///     Creates a <see cref="IProjection" /> for the given <see cref="UnaryExpression" />.
+        /// </summary>
+        /// <param name="expression">
+        ///     The expression.
+        /// </param>
+        /// <param name="context">
+        ///     The context for the projection.
+        /// </param>
+        /// <returns>
+        ///     The resolved <see cref="IProjection" /> instance.
+        /// </returns>
+        private static IProjection GetConvertProjection
+            (
+            UnaryExpression expression,
+            HelperContext context
+            )
+        {
+            IProjection projection = GetProjection(expression.Operand, context);
+
+            if (!expression.IsLiftedToNull)
+            {
+                IType type = TypeHelper.GuessType(expression.Type, true);
+
+                if (type != null)
+                {
+                    return new FqCastProjection(type, projection);
+                }
+            }
+
+            return projection;
+        }
+
+        /// <summary>
+        ///     Creates a <see cref="IProjection" /> for the given <see cref="MemberExpression" />.
+        /// </summary>
+        /// <param name="expression">
+        ///     The expression.
+        /// </param>
+        /// <param name="context">
+        ///     The context for the projection.
+        /// </param>
+        /// <returns>
+        ///     The resolved <see cref="IProjection" /> instance.
+        /// </returns>
+        private static IProjection GetMemberProjection
+            (
+            MemberExpression expression,
+            HelperContext context
+            )
+        {
+            if (ExpressionHelper.IsRooted(expression, context.RootAlias, context.Data))
+            {
+                string property = ExpressionHelper.GetPropertyName(expression, context.RootAlias);
+
+                return Projections.Property(property);
+            }
+
+            object value = ExpressionHelper.GetValue(expression);
+
+            return Projections.Constant(value, TypeHelper.GuessType(expression.Type));
         }
 
         /// <summary>
@@ -640,11 +545,8 @@ namespace NHibernate.FlowQuery.Helpers
         /// <param name="expression">
         ///     The expression.
         /// </param>
-        /// <param name="root">
-        ///     The root name.
-        /// </param>
-        /// <param name="data">
-        ///     The <see cref="QueryHelperData" /> info.
+        /// <param name="context">
+        ///     The context for the projection.
         /// </param>
         /// <returns>
         ///     The created <see cref="IProjection" />.
@@ -655,50 +557,49 @@ namespace NHibernate.FlowQuery.Helpers
         private static IProjection GetMethodCallProjection
             (
             MethodCallExpression expression,
-            string root,
-            QueryHelperData data
+            HelperContext context
             )
         {
-            string key = expression.Method.Name.ToLower();
+            IEnumerable<IMethodCallExpressionHandler> handlers = FlowQueryHelper
+                .GetMethodCallHandlers(expression.Method.Name.ToLower());
 
-            IMethodCallProjectionHandler handler;
-
-            IProjection projection;
-
-            // first, attempt with any found custom handler
-            bool found = CustomMethodCallHandlers.TryGetValue(key, out handler);
-
-            if (found)
+            foreach (IMethodCallExpressionHandler handler in handlers)
             {
-                projection = handler.Handle(expression, root, data);
-
-                if (projection != null)
+                if (handler.CanHandleProjection(expression, context))
                 {
-                    return projection;
-                }
-            }
+                    IProjection projection = handler.Project(expression, context);
 
-            // if no luck with a custom handler, attempt with a default handler (if found)
-            found = DefaultMethodCallHandlers.TryGetValue(key, out handler);
-
-            if (found)
-            {
-                projection = handler.Handle(expression, root, data);
-
-                if (projection != null)
-                {
-                    return projection;
+                    if (projection != null)
+                    {
+                        return projection;
+                    }
                 }
             }
 
             throw new NotSupportedException
-            (
-                string.Format
                 (
-                    "The expression contains unsupported features. Unable to resolve method call: '{0}'.",
-                    expression.Method.Name
-                )
-            );
+                string.Format
+                    (
+                        "The expression contains unsupported features. Unable to resolve method call: '{0}'.",
+                        expression.Method.Name
+                    )
+                );
+        }
+
+        /// <summary>
+        ///     Creates a <see cref="IProjection" /> for the evaluated value of the given <see cref="Expression" />.
+        /// </summary>
+        /// <param name="expression">
+        ///     The expression.
+        /// </param>
+        /// <returns>
+        ///     The resolved <see cref="IProjection" /> instance.
+        /// </returns>
+        private static IProjection GetValueProjection(Expression expression)
+        {
+            object value = ExpressionHelper.GetValue(expression);
+
+            return Projections.Constant(value, TypeHelper.GuessType(expression.Type));
         }
     }
 }

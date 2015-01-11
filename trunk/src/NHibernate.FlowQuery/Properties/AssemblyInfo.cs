@@ -9,9 +9,9 @@ using System.Security;
 [assembly: AssemblyProduct("NHibernate.FlowQuery")]
 [assembly: AssemblyTitle("NHibernate.FlowQuery")]
 
-[assembly: AssemblyVersion("2.3.*")]
-[assembly: AssemblyFileVersion("2.3.0")]
-[assembly: AssemblyInformationalVersion("2.3.0-GA")]
+[assembly: AssemblyVersion("3.0.*")]
+[assembly: AssemblyFileVersion("3.0.0")]
+[assembly: AssemblyInformationalVersion("3.0.0-preview")]
 
 [assembly: AllowPartiallyTrustedCallers]
 [assembly: CLSCompliant(true)]

@@ -2,6 +2,24 @@
     (a "!" in the left margin indicates a potential breaking change)
 
 >--------------
+> BUILD 3.0.0-preview
+>--------------
+
+    >-- IMPROVEMENTS
+        - Logic for constructing models/entities from a LambdaExpression needs some proper refactoring (lots of duplicated code)
+        - Logic for retrieving the property name of a LambdaExpression could be simplified/refactored for usage scenarios (lots of duplicated code)
+        - Helper methods should get a HelperContext that carries necessary data instead of getting new parameters for each new feature added
+        - Helper methods should get a scope indicator of its execution to determine possibilities (whether a projection is for a filter or select list, etc.)
+
+    >-- NEW FEATURES
+        - Add possibility to split projection into multiple expressions using FlowQueryHelper.Map<TIn, TOut>()
+        - Add possibility to add custom logic to resolve method call construction
+        - Add possibility to override default logic to resolve method call construction
+
+    >-- TEST SUITE CHANGES
+        - Add tests for new features and other changes in version 3.0.0-preview
+
+>--------------
 > BUILD 2.3.0
 >--------------
 
@@ -21,10 +39,10 @@
         - Upgrade to NHibernate 4.0
 
     >-- TEST SUITE CHANGES
-        - Add tests for new features and other changes in version 2.2
+        - Add tests for new features and other changes in version 2.3
 
     >-- DOCUMENTATION
-        - Update documentation to cover changes and new features in version 2.2
+        - Update documentation to cover changes and new features in version 2.3
 
 >--------------
 > BUILD 2.2.0

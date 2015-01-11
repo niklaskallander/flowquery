@@ -188,7 +188,7 @@
                 throw new ArgumentNullException("list");
             }
 
-            IProjection projection = ProjectionHelper.GetProjection(property.Body, property.Parameters[0].Name, data);
+            IProjection projection = ProjectionHelper.GetProjection(property, data);
 
             string alias = null;
 

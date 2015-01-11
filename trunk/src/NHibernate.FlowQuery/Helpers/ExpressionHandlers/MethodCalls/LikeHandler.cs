@@ -1,24 +1,27 @@
-﻿namespace NHibernate.FlowQuery.Helpers.ProjectionHandlers.MethodCalls
+﻿namespace NHibernate.FlowQuery.Helpers.ExpressionHandlers.MethodCalls
 {
     using System.Linq.Expressions;
 
     using NHibernate.Criterion;
 
+    using Expression = System.Linq.Expressions.Expression;
+
     /// <summary>
     ///     Handles method calls to <see cref="string.StartsWith(string)" />, <see cref="string.EndsWith(string)" />, or
     ///     <see cref="string.Contains(string)" />.
     /// </summary>
-    public class LikeHandler : IMethodCallProjectionHandler
+    public class LikeHandler : MethodCallExpressionHandlerBase
     {
         /// <inheritdoc />
-        public virtual IProjection Handle
+        protected override IProjection ProjectCore
             (
             MethodCallExpression expression,
-            string root,
-            QueryHelperData data
+            Expression subExpression,
+            IProjection projection,
+            HelperContext context
             )
         {
-            ICriterion criterion = RestrictionHelper.GetCriterionForMethodCall(expression, root, data);
+            ICriterion criterion = RestrictionHelper.GetCriterionForMethodCall(expression, context);
 
             return Projections
                 .Conditional

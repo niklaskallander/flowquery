@@ -121,7 +121,7 @@ namespace NHibernate.FlowQuery.Core.Implementations
             }
 
             IProjection projection = ProjectionHelper
-                .GetProjection(expression.Body, expression.Parameters[0].Name, Data);
+                .GetProjection(expression, Data);
 
             return Use(projection);
         }

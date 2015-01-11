@@ -2,6 +2,7 @@
 {
     using System.Collections.Generic;
 
+    using NHibernate.Criterion;
     using NHibernate.FlowQuery.Core.Structures;
 
     /// <summary>
@@ -26,6 +27,7 @@
         {
             Aliases = aliases;
             Joins = joins;
+            Mappings = new Dictionary<string, IProjection>();
         }
 
         /// <summary>
@@ -43,5 +45,13 @@
         ///     The joins for the query (if any).
         /// </value>
         public List<Join> Joins { get; private set; }
+
+        /// <summary>
+        ///     Gets the mappings for the query (if any).
+        /// </summary>
+        /// <value>
+        ///     The mappings for the query (if any).
+        /// </value>
+        public Dictionary<string, IProjection> Mappings { get; private set; }
     }
 }

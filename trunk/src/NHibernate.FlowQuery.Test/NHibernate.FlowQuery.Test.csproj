@@ -127,10 +127,13 @@
     <Compile Include="BaseTest.cs" />
     <Compile Include="FlowQuery\Core\IFlowQueryTest\CountTest.cs" />
     <Compile Include="FlowQuery\DetachedCriteriaExtensionsTest.cs" />
+    <Compile Include="FlowQuery\Features\AggregateFromExpressionTest.cs" />
+    <Compile Include="FlowQuery\FlowQueryHelperTest.cs" />
     <Compile Include="FlowQuery\Helpers\ConstructionHelperTest.cs" />
     <Compile Include="FlowQuery\Helpers\CriteriaHelperTest.cs" />
+    <Compile Include="FlowQuery\Helpers\ExpressionHandlers\MethodCalls\ProjectHandlerTest.cs" />
+    <Compile Include="FlowQuery\Helpers\ExpressionHandlers\MethodCalls\SimpleMethodCallHandlerTest.cs" />
     <Compile Include="FlowQuery\Helpers\ExpressionHelperTest.cs" />
-    <Compile Include="FlowQuery\Helpers\ProjectionHelperTest.cs" />
     <Compile Include="FlowQuery\Helpers\RestrictionHelperTest.cs" />
     <Compile Include="FlowQuery\Helpers\TypeHelperTest.cs" />
     <Compile Include="FlowQuery\ProjectionListExtensionsTest.cs" />
@@ -174,6 +177,7 @@
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

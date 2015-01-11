@@ -177,5 +177,33 @@ namespace NHibernate.FlowQuery.Revealing.Conventions
     }
 }
 
-// TODO: DOC! NHibernate.FlowQuery.Helpers.ProjectionHandlers
-// TODO: DOC! NHibernate.FlowQuery.Helpers.ProjectionHandlers.MethodCalls
+namespace NHibernate.FlowQuery.Helpers.ExpressionHandlers
+{
+    using System.Runtime.CompilerServices;
+
+    /// <summary>
+    ///     The <see cref="NHibernate.FlowQuery.Helpers.ExpressionHandlers" /> namespace contains a set of definitions
+    ///     describing the functionality for extending the handling of <see cref="System.Linq.Expressions.Expression" />
+    ///     expressions in the expression trees used when projecting with <see cref="FlowQuery" />.
+    /// </summary>
+    [CompilerGenerated]
+    internal class NamespaceDoc
+    {
+    }
+}
+
+namespace NHibernate.FlowQuery.Helpers.ExpressionHandlers.MethodCalls
+{
+    using System.Runtime.CompilerServices;
+
+    /// <summary>
+    ///     The <see cref="NHibernate.FlowQuery.Helpers.ExpressionHandlers" /> namespace contains a set of definitions
+    ///     describing the functionality (and corresponding implementations) for extending the handling of 
+    ///     <see cref="System.Linq.Expressions.MethodCallExpression" /> expressions in the expression trees used when 
+    ///     projecting with <see cref="FlowQuery" />.
+    /// </summary>
+    [CompilerGenerated]
+    internal class NamespaceDoc
+    {
+    }
+}

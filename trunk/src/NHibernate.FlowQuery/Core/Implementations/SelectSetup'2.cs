@@ -89,7 +89,7 @@ namespace NHibernate.FlowQuery.Core.Implementations
                 throw new ArgumentNullException("property");
             }
 
-            string propertyName = ExpressionHelper.GetPropertyName(property.Body, property.Parameters[0].Name);
+            string propertyName = ExpressionHelper.GetPropertyName(property);
 
             return For(propertyName);
         }
