@@ -22,7 +22,7 @@
 
         public static void Configure()
         {
-            // HibernatingRhinos.Profiler.Appender.NHibernate.NHibernateProfiler.Initialize();
+             HibernatingRhinos.Profiler.Appender.NHibernate.NHibernateProfiler.Initialize();
             Configuration configuration = LoadFromFile();
 
             bool shouldAddData = false;
@@ -46,10 +46,11 @@
                                     (
                                         t => t.Namespace == typeof(UserEntity).Namespace
                                     )
-                                    .Override<UserEntity>(
-                                        x =>
-                                            x.Map(FluentNHibernate.Reveal.Member<UserEntity>("m_TestValue"))
-                                                .Access.Field())
+                                    .Override<UserEntity>
+                                    (
+                                        x => x.Map(FluentNHibernate.Reveal.Member<UserEntity>("m_TestValue"))
+                                              .Access.Field()
+                                    )
                             )
                     )
                     .BuildConfiguration();

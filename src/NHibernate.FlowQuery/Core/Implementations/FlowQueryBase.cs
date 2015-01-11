@@ -323,7 +323,7 @@
         public virtual IFetchBuilder<TSource, TQuery> Fetch
             (
             Expression<Func<TSource, object>> expression,
-            Expression<Func<object>> aliasProjection = null,
+            Expression<Func<object>> alias = null,
             IRevealConvention revealConvention = null
             )
         {
@@ -334,11 +334,11 @@
 
             string path = Reveal.ByConvention(expression, revealConvention);
 
-            string alias = aliasProjection != null
-                ? ExpressionHelper.GetPropertyName(aliasProjection)
+            string aliasValue = alias != null
+                ? ExpressionHelper.GetPropertyName(alias)
                 : path;
 
-            return FetchCore(path, alias);
+            return FetchCore(path, aliasValue);
         }
 
         /// <inheritdoc />
@@ -350,8 +350,7 @@
                     .GetProjection
                     (
                         property.Body,
-                        property.Parameters[0].Name,
-                        Data
+                        new HelperContext(Data, property, HelperType.GroupBy)
                     );
 
                 if (projection != null)
@@ -430,12 +429,20 @@
         /// <inheritdoc />
         public virtual TQuery OrderBy(Expression<Func<TSource, object>> property, bool ascending = true)
         {
-            IProjection projection = ProjectionHelper.GetProjection(property.Body, property.Parameters[0].Name, Data);
+            IProjection projection = ProjectionHelper
+                .GetProjection
+                (
+                    property.Body,
+                    new HelperContext(Data, property, HelperType.Order)
+                );
 
             return OrderBy(projection, ascending);
         }
 
         /// <inheritdoc />
+        /// <typeparam name="TProjection">
+        ///     The <see cref="System.Type" /> of the projection.
+        /// </typeparam>
         public virtual TQuery OrderBy<TProjection>(string property, bool ascending = true)
         {
             Orders.Add(new OrderByStatement
@@ -450,6 +457,9 @@
         }
 
         /// <inheritdoc />
+        /// <typeparam name="TProjection">
+        ///     The <see cref="System.Type" /> of the projection.
+        /// </typeparam>
         public virtual TQuery OrderBy<TProjection>
             (
             Expression<Func<TProjection, object>> property,
@@ -458,7 +468,7 @@
         {
             return OrderBy<TProjection>
             (
-                ExpressionHelper.GetPropertyName(property.Body, property.Parameters[0].Name),
+                ExpressionHelper.GetPropertyName(property),
                 ascending
             );
         }
@@ -482,12 +492,18 @@
         }
 
         /// <inheritdoc />
+        /// <typeparam name="TProjection">
+        ///     The <see cref="System.Type" /> of the projection.
+        /// </typeparam>
         public virtual TQuery OrderByDescending<TProjection>(string property)
         {
             return OrderBy<TProjection>(property, false);
         }
 
         /// <inheritdoc />
+        /// <typeparam name="TProjection">
+        ///     The <see cref="System.Type" /> of the projection.
+        /// </typeparam>
         public virtual TQuery OrderByDescending<TProjection>(Expression<Func<TProjection, object>> property)
         {
             return OrderBy(property, false);
@@ -556,19 +572,35 @@
         /// <inheritdoc />
         public virtual TQuery Where(Expression<Func<TSource, bool>> expression)
         {
-            return Where(RestrictionHelper.GetCriterion(expression, expression.Parameters[0].Name, Data));
+            return Where
+                (
+                RestrictionHelper
+                    .GetCriterion
+                    (
+                        expression,
+                        new HelperContext(Data, expression, HelperType.Filter)
+                    )
+                );
         }
 
         /// <inheritdoc />
         public virtual TQuery Where(Expression<Func<TSource, object>> property, IsExpression expression)
         {
-            return Where(ExpressionHelper.GetPropertyName(property.Body, property.Parameters[0].Name), expression);
+            return Where(ExpressionHelper.GetPropertyName(property), expression);
         }
 
         /// <inheritdoc />
         public virtual TQuery Where(Expression<Func<TSource, WhereDelegate, bool>> expression)
         {
-            return Where(RestrictionHelper.GetCriterion(expression, expression.Parameters[0].Name, Data));
+            return Where
+                (
+                RestrictionHelper
+                    .GetCriterion
+                    (
+                        expression,
+                        new HelperContext(Data, expression, HelperType.Filter)
+                    )
+                );
         }
 
         /// <inheritdoc />

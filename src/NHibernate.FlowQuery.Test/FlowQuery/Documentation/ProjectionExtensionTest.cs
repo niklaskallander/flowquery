@@ -1,11 +1,12 @@
 ﻿namespace NHibernate.FlowQuery.Test.FlowQuery.Documentation
 {
+    using System;
     using System.Linq;
     using System.Linq.Expressions;
 
     using NHibernate.Criterion;
     using NHibernate.FlowQuery.Helpers;
-    using NHibernate.FlowQuery.Helpers.ProjectionHandlers.MethodCalls;
+    using NHibernate.FlowQuery.Helpers.ExpressionHandlers;
     using NHibernate.FlowQuery.Test.Setup.Entities;
 
     using NUnit.Framework;
@@ -17,7 +18,7 @@
         public void Example1()
         {
             // add the handler
-            ProjectionHelper.AddMethodCallHandler("ToString", new ToStringHandler());
+            FlowQueryHelper.AddMethodCallHandler("ToString", new ToStringHandler());
 
             var userIds = Session.FlowQuery<UserEntity>()
                 .Select(x => new
@@ -33,13 +34,27 @@
         }
     }
 
-    public class ToStringHandler : IMethodCallProjectionHandler
+    public class ToStringHandler : IMethodCallExpressionHandler
     {
-        public IProjection Handle
+        public bool CanHandleConstruction(MethodCallExpression expression)
+        {
+            return false;
+        }
+
+        public bool CanHandleProjection(MethodCallExpression expression, HelperContext context)
+        {
+            return true;
+        }
+
+        public int Construct(MethodCallExpression expression, object[] arguments, out object value, out bool wasHandled)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IProjection Project
             (
             MethodCallExpression expression,
-            string root,
-            QueryHelperData data
+            HelperContext context
             )
         {
             // return null if called statically
@@ -56,7 +71,7 @@
 
             // resolve a projection for the property
             IProjection property = ProjectionHelper
-                .GetProjection(expression.Object, root, data);
+                .GetProjection(expression.Object, context);
 
             // return null if no projection could be resolved
             if (property == null)

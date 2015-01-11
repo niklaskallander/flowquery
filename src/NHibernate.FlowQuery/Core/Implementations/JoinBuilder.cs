@@ -201,7 +201,12 @@
 
             if (joinOnClause != null)
             {
-                withCriterion = RestrictionHelper.GetCriterion(joinOnClause, null, _implementor.Data);
+                withCriterion = RestrictionHelper
+                    .GetCriterion
+                    (
+                        joinOnClause,
+                        new HelperContext(_implementor.Data, joinOnClause, HelperType.Filter)
+                    );
             }
 
             _implementor.Joins.Add(new Join(property, alias, _joinType, withCriterion, isCollection));
@@ -234,7 +239,7 @@
             Expression<Func<bool>> joinOnClause = null
             )
         {
-            string property = ExpressionHelper.GetPropertyName(projection.Body, projection.Parameters[0].Name);
+            string property = ExpressionHelper.GetPropertyName(projection);
 
             return JoinBase(property, alias, typeof(IEnumerable).IsAssignableFrom(projection.Body.Type), joinOnClause);
         }

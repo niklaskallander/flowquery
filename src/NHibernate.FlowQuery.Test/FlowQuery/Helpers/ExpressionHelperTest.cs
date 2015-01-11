@@ -70,7 +70,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
         {
             Expression<Func<UserDto, object>> x = u => "u.Username";
 
-            Assert.That(ExpressionHelper.GetPropertyName(x), Is.EqualTo("u.Username"));
+            Assert.That(ExpressionHelper.GetPropertyName(x.Body), Is.EqualTo("u.Username"));
         }
 
         [Test]
@@ -97,7 +97,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
         {
             Expression<Func<UserDto, object>> x = u => u.Username.GetHashCode();
 
-            Assert.That(ExpressionHelper.GetPropertyName(x), Is.EqualTo("u.Username"));
+            Assert.That(ExpressionHelper.GetPropertyName(x.Body), Is.EqualTo("u.Username"));
         }
 
         [Test]
@@ -283,7 +283,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
         {
             Expression<Func<UserDto, object>> expression = u => u.Username;
 
-            Assert.That(() => { ExpressionHelper.GetPropertyName(expression.Body, string.Empty); }, Throws.Nothing);
+            Assert.That(() => ExpressionHelper.GetPropertyName(expression.Body, string.Empty), Throws.Nothing);
         }
 
         [Test]
@@ -291,7 +291,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
         {
             Expression<Func<UserDto, object>> expression = u => u.Username;
 
-            Assert.That(() => { ExpressionHelper.GetPropertyName(expression.Body, null); }, Throws.Nothing);
+            Assert.That(() => ExpressionHelper.GetPropertyName(expression.Body, null), Throws.Nothing);
         }
 
         [Test]
@@ -300,26 +300,37 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
             Assert
                 .That
                 (
-                    () => { ExpressionHelper.GetPropertyName(null, "u"); },
+                    () => ExpressionHelper.GetPropertyName(null, "u"),
                     Throws.InstanceOf<ArgumentNullException>()
                 );
         }
 
         [Test]
-        public void GetPropertyNameFromExpressionThrowsWhenExpressionIsNotSupported()
+        public void GetPropertyNameFromExpressionThrowsWhenExpressionIsNull()
         {
-            Expression<Func<object>> x = () => true;
-
-            Assert.That(() => { ExpressionHelper.GetPropertyName(x); }, Throws.InstanceOf<NotSupportedException>());
+            Assert
+                .That
+                (
+                    () => ExpressionHelper.GetPropertyName((Expression)null),
+                    Throws.InstanceOf<ArgumentNullException>()
+                );
         }
 
         [Test]
-        public void GetPropertyNameFromExpressionThrowsWhenExpressionIsNull()
+        public void GetPropertyNameFromLambdaExpressionThrowsWhenExpressionIsNotSupported()
+        {
+            Expression<Func<object>> x = () => true;
+
+            Assert.That(() => ExpressionHelper.GetPropertyName(x), Throws.InstanceOf<NotSupportedException>());
+        }
+
+        [Test]
+        public void GetPropertyNameFromLambdaExpressionThrowsWhenExpressionIsNull()
         {
             Expression<Func<UserDto, object>> x = null;
 
             // ReSharper disable once ExpressionIsAlwaysNull
-            Assert.That(() => { ExpressionHelper.GetPropertyName(x); }, Throws.InstanceOf<ArgumentNullException>());
+            Assert.That(() => ExpressionHelper.GetPropertyName(x), Throws.InstanceOf<ArgumentNullException>());
         }
 
         [Test]
@@ -328,7 +339,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
             MemberExpression x = null;
 
             // ReSharper disable once ExpressionIsAlwaysNull
-            Assert.That(() => { ExpressionHelper.GetPropertyName(x); }, Throws.InstanceOf<ArgumentNullException>());
+            Assert.That(() => ExpressionHelper.GetPropertyName(x), Throws.InstanceOf<ArgumentNullException>());
         }
 
         [Test]
@@ -342,7 +353,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
         [Test]
         public void GetRootThrowsIfExpressionIsNull()
         {
-            Assert.That(() => { ExpressionHelper.GetRoot(null); }, Throws.InstanceOf<ArgumentNullException>());
+            Assert.That(() => ExpressionHelper.GetRoot(null), Throws.InstanceOf<ArgumentNullException>());
         }
 
         [Test]
@@ -354,7 +365,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Helpers
 
             object value = 1;
 
-            Assert.That(() => { value = ExpressionHelper.GetValue(expression.Body); }, Throws.Nothing);
+            Assert.That(() => value = ExpressionHelper.GetValue(expression.Body), Throws.Nothing);
 
             Assert.That(value, Is.Null);
         }

@@ -1,4 +1,4 @@
-﻿namespace NHibernate.FlowQuery.Helpers.ProjectionHandlers.MethodCalls
+﻿namespace NHibernate.FlowQuery.Helpers.ExpressionHandlers.MethodCalls
 {
     using System.Linq.Expressions;
 
@@ -9,19 +9,18 @@
     /// <summary>
     ///     Handles method calls to <see cref="Aggregate.CountDistinct{TDestination}(TDestination)" />.
     /// </summary>
-    public class CountDistinctHandler : MethodCallProjectionHandlerBase
+    public class CountDistinctHandler : MethodCallExpressionHandlerBase
     {
         /// <inheritdoc />
-        protected override IProjection HandleCore
+        protected override IProjection ProjectCore
             (
             MethodCallExpression expression,
             Expression subExpression,
             IProjection projection,
-            string root,
-            QueryHelperData data
+            HelperContext context
             )
         {
-            return Projections.CountDistinct(ExpressionHelper.GetPropertyName(subExpression, root));
+            return Projections.CountDistinct(ExpressionHelper.GetPropertyName(subExpression, context.RootAlias));
         }
     }
 }

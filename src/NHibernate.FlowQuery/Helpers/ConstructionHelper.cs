@@ -7,6 +7,8 @@ namespace NHibernate.FlowQuery.Helpers
     using System.Linq.Expressions;
     using System.Reflection;
 
+    using NHibernate.FlowQuery.Helpers.ExpressionHandlers;
+
     /// <summary>
     ///     A static utility class providing methods to build a <see cref="IEnumerable{T}" /> from a
     ///     <see cref="LambdaExpression" />.
@@ -98,6 +100,44 @@ namespace NHibernate.FlowQuery.Helpers
         }
 
         /// <summary>
+        ///     Invokes the provided <see cref="Expression" /> with the provided arguments.
+        /// </summary>
+        /// <param name="expression">
+        ///     The <see cref="Expression" /> expression.
+        /// </param>
+        /// <param name="arguments">
+        ///     The constructor arguments.
+        /// </param>
+        /// <param name="value">
+        ///     The generated instance.
+        /// </param>
+        /// <returns>
+        ///     The number of arguments used.
+        /// </returns>
+        public static int Invoke(Expression expression, object[] arguments, out object value)
+        {
+            switch (expression.NodeType)
+            {
+                case ExpressionType.Lambda:
+                    return Invoke(((LambdaExpression)expression).Body, arguments, out value);
+
+                case ExpressionType.New:
+                    return Invoke(expression as NewExpression, arguments, out value);
+
+                case ExpressionType.MemberInit:
+                    return Invoke(expression as MemberInitExpression, arguments, out value);
+
+                case ExpressionType.Call:
+                    return Invoke(expression as MethodCallExpression, arguments, out value);
+
+                default:
+                    value = arguments[0];
+
+                    return 1;
+            }
+        }
+
+        /// <summary>
         ///     Creates a <see cref="IEnumerable{TDestination}" /> from the provided <see cref="MemberInitExpression" />
         ///     and <see cref="IEnumerable" />.
         /// </summary>
@@ -123,9 +163,14 @@ namespace NHibernate.FlowQuery.Helpers
 
             foreach (object o in list)
             {
+                object[] args = o as object[] ?? new[]
+                {
+                    o
+                };
+
                 object instance;
 
-                Invoke(expression, o as object[] ?? new[] { o }, out instance);
+                Invoke(expression, args, out instance);
 
                 temp.Add((TDestination)instance);
             }
@@ -159,14 +204,59 @@ namespace NHibernate.FlowQuery.Helpers
 
             foreach (object o in list)
             {
+                object[] args = o as object[] ?? new[]
+                {
+                    o
+                };
+
                 object instance;
 
-                Invoke(expression, o as object[] ?? new[] { o }, out instance);
+                Invoke(expression, args, out instance);
 
                 temp.Add((TDestination)instance);
             }
 
             return temp;
+        }
+
+        /// <summary>
+        ///     Invokes the provided <see cref="MethodCallExpression" /> with the provided arguments.
+        /// </summary>
+        /// <param name="expression">
+        ///     The <see cref="MethodCallExpression" /> expression.
+        /// </param>
+        /// <param name="arguments">
+        ///     The constructor arguments.
+        /// </param>
+        /// <param name="value">
+        ///     The generated instance.
+        /// </param>
+        /// <returns>
+        ///     The number of arguments used.
+        /// </returns>
+        private static int Invoke(MethodCallExpression expression, object[] arguments, out object value)
+        {
+            IEnumerable<IMethodCallExpressionHandler> handlers = FlowQueryHelper
+                .GetMethodCallHandlers(expression.Method.Name.ToLower());
+
+            foreach (IMethodCallExpressionHandler handler in handlers)
+            {
+                if (handler.CanHandleConstruction(expression))
+                {
+                    bool wasHandled;
+
+                    int i = handler.Construct(expression, arguments, out value, out wasHandled);
+
+                    if (wasHandled)
+                    {
+                        return i;
+                    }
+                }
+            }
+
+            value = arguments[0];
+
+            return 1;
         }
 
         /// <summary>
@@ -194,24 +284,7 @@ namespace NHibernate.FlowQuery.Helpers
             {
                 object value;
 
-                switch (argument.NodeType)
-                {
-                    case ExpressionType.New:
-                        i += Invoke(argument as NewExpression, arguments.Skip(i).ToArray(), out value);
-                        break;
-
-                    case ExpressionType.MemberInit:
-                        i += Invoke(argument as MemberInitExpression, arguments.Skip(i).ToArray(), out value);
-                        break;
-
-                    default:
-
-                        value = arguments[i];
-
-                        i++;
-
-                        break;
-                }
+                i += Invoke(argument, arguments.Skip(i).ToArray(), out value);
 
                 list.Add(value);
             }
@@ -248,38 +321,7 @@ namespace NHibernate.FlowQuery.Helpers
                 {
                     object value;
 
-                    switch (memberAssignment.Expression.NodeType)
-                    {
-                        case ExpressionType.New:
-
-                            i += Invoke
-                            (
-                                memberAssignment.Expression as NewExpression,
-                                arguments.Skip(i).ToArray(),
-                                out value
-                            );
-
-                            break;
-
-                        case ExpressionType.MemberInit:
-
-                            i += Invoke
-                            (
-                                memberAssignment.Expression as MemberInitExpression,
-                                arguments.Skip(i).ToArray(),
-                                out value
-                            );
-
-                            break;
-
-                        default:
-
-                            value = arguments[i];
-
-                            i++;
-
-                            break;
-                    }
+                    i += Invoke(memberAssignment.Expression, arguments.Skip(i).ToArray(), out value);
 
                     SetValue(binding.Member, instance, value);
                 }

@@ -1,4 +1,4 @@
-﻿namespace NHibernate.FlowQuery.Helpers.ProjectionHandlers.MethodCalls
+﻿namespace NHibernate.FlowQuery.Helpers.ExpressionHandlers.MethodCalls
 {
     using System.Linq.Expressions;
 
@@ -10,16 +10,15 @@
     ///     Handles method calls to <see cref="string.Substring(int)" /> and
     ///     <see cref="string.Substring(int, int)" />.
     /// </summary>
-    public class SubstringHandler : MethodCallProjectionHandlerBase
+    public class SubstringHandler : MethodCallExpressionHandlerBase
     {
         /// <inheritdoc />
-        protected override IProjection HandleCore
+        protected override IProjection ProjectCore
             (
             MethodCallExpression expression,
             Expression subExpression,
             IProjection projection,
-            string root,
-            QueryHelperData data
+            HelperContext context
             )
         {
             int start = ExpressionHelper.GetValue<int>(expression.Arguments[0]) + 1;

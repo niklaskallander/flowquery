@@ -221,7 +221,7 @@ namespace NHibernate.FlowQuery.Helpers
                     return GetPropertyName(((LambdaExpression)expression).Body);
 
                 case ExpressionType.MemberAccess:
-                    return GetPropertyName(expression as MemberExpression);
+                    return GetPropertyName((MemberExpression)expression);
 
                 case ExpressionType.Constant:
 
@@ -237,7 +237,29 @@ namespace NHibernate.FlowQuery.Helpers
         }
 
         /// <summary>
-        ///     Gets the property name for the provided <see cref="Expression" />.
+        ///     Gets the property name for the given <see cref="LambdaExpression" />.
+        /// </summary>
+        /// <param name="expression">
+        ///     The expression.
+        /// </param>
+        /// <returns>
+        ///     The property name.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        ///     <paramref name="expression" /> is null.
+        /// </exception>
+        public static string GetPropertyName(LambdaExpression expression)
+        {
+            if (expression == null)
+            {
+                throw new ArgumentNullException("expression");
+            }
+
+            return GetPropertyName(expression.Body, expression.Parameters.Any() ? expression.Parameters[0].Name : null);
+        }
+
+        /// <summary>
+        ///     Gets the property name for the given <see cref="Expression" />.
         /// </summary>
         /// <param name="expression">
         ///     The expression.

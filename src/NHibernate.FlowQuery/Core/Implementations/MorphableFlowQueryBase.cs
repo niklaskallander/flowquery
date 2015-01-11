@@ -277,18 +277,14 @@
                 throw new ArgumentNullException("expression");
             }
 
-            var mappings = new Dictionary<string, IProjection>();
-
-            ProjectionList list = ProjectionHelper
-                .GetProjectionListForExpression
+            IProjection list = ProjectionHelper
+                .GetProjection
                 (
-                    expression.Body,
-                    expression.Parameters[0].Name,
-                    Data,
-                    ref mappings
+                    expression,
+                    Data
                 );
 
-            if (list == null || list.Length == 0)
+            if (list == null || (list is ProjectionList && ((ProjectionList)list).Length == 0))
             {
                 throw new NotSupportedException
                 (
@@ -296,7 +292,7 @@
                 );
             }
 
-            return ProjectionBase<TDestination>(list, mappings, expression, false);
+            return ProjectionBase<TDestination>(list, Data.Mappings, expression, false);
         }
 
         /// <summary>

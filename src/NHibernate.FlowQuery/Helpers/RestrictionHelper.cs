@@ -23,16 +23,13 @@ namespace NHibernate.FlowQuery.Helpers
         /// <param name="expression">
         ///     The expression.
         /// </param>
-        /// <param name="root">
-        ///     The root name.
-        /// </param>
-        /// <param name="data">
-        ///     The <see cref="QueryHelperData" /> info.
+        /// <param name="context">
+        ///     The helper context.
         /// </param>
         /// <returns>
         ///     The created <see cref="ICriterion" />.
         /// </returns>
-        public static ICriterion GetCriterion(Expression expression, string root, QueryHelperData data)
+        public static ICriterion GetCriterion(Expression expression, HelperContext context)
         {
             switch (expression.NodeType)
             {
@@ -45,22 +42,22 @@ namespace NHibernate.FlowQuery.Helpers
                 case ExpressionType.GreaterThanOrEqual:
                 case ExpressionType.LessThan:
                 case ExpressionType.LessThanOrEqual:
-                    return GetCriterionForBinary(expression as BinaryExpression, root, data);
+                    return GetCriterionForBinary(expression as BinaryExpression, context);
 
                 case ExpressionType.Call:
-                    return GetCriterionForMethodCall(expression as MethodCallExpression, root, data);
+                    return GetCriterionForMethodCall(expression as MethodCallExpression, context);
 
                 case ExpressionType.Lambda:
-                    return GetCriterion(((LambdaExpression)expression).Body, root, data);
+                    return GetCriterion(((LambdaExpression)expression).Body, context);
 
                 case ExpressionType.Not:
-                    return Restrictions.Not(GetCriterion(((UnaryExpression)expression).Operand, root, data));
+                    return Restrictions.Not(GetCriterion(((UnaryExpression)expression).Operand, context));
 
                 case ExpressionType.MemberAccess:
-                    return Restrictions.Eq(ExpressionHelper.GetPropertyName(expression, root), true);
+                    return Restrictions.Eq(ExpressionHelper.GetPropertyName(expression, context.RootAlias), true);
 
                 case ExpressionType.Invoke:
-                    return GetCriterionForInvoke(expression as InvocationExpression, root, data);
+                    return GetCriterionForInvoke(expression as InvocationExpression, context);
 
                 default:
                     return Restrictions.Eq(Projections.Constant(ExpressionHelper.GetValue<bool>(expression)), true);
@@ -73,18 +70,15 @@ namespace NHibernate.FlowQuery.Helpers
         /// <param name="expression">
         ///     The expression.
         /// </param>
-        /// <param name="root">
-        ///     The root name.
-        /// </param>
-        /// <param name="data">
-        ///     The <see cref="QueryHelperData" /> info.
+        /// <param name="context">
+        ///     The helper context.
         /// </param>
         /// <returns>
         ///     The created <see cref="ICriterion" />.
         /// </returns>
-        public static ICriterion GetCriterionForBinary(BinaryExpression expression, string root, QueryHelperData data)
+        public static ICriterion GetCriterionForBinary(BinaryExpression expression, HelperContext context)
         {
-            return GetCriterionForBinary(expression.Left, expression.Right, expression.NodeType, root, data);
+            return GetCriterionForBinary(expression.Left, expression.Right, expression.NodeType, context);
         }
 
         /// <summary>
@@ -99,11 +93,8 @@ namespace NHibernate.FlowQuery.Helpers
         /// <param name="type">
         ///     The operation type.
         /// </param>
-        /// <param name="root">
-        ///     The root name.
-        /// </param>
-        /// <param name="data">
-        ///     The <see cref="QueryHelperData" /> info.
+        /// <param name="context">
+        ///     The helper context.
         /// </param>
         /// <returns>
         ///     The created <see cref="ICriterion" />.
@@ -113,32 +104,31 @@ namespace NHibernate.FlowQuery.Helpers
             Expression a,
             Expression b,
             ExpressionType type,
-            string root,
-            QueryHelperData data
+            HelperContext context
             )
         {
             if (a.NodeType == ExpressionType.Convert)
             {
-                return GetCriterionForBinary(((UnaryExpression)a).Operand, b, type, root, data);
+                return GetCriterionForBinary(((UnaryExpression)a).Operand, b, type, context);
             }
 
             if (b.NodeType == ExpressionType.Convert)
             {
-                return GetCriterionForBinary(a, ((UnaryExpression)b).Operand, type, root, data);
+                return GetCriterionForBinary(a, ((UnaryExpression)b).Operand, type, context);
             }
 
             switch (type)
             {
                 case ExpressionType.AndAlso:
-                    return Restrictions.And(GetCriterion(a, root, data), GetCriterion(b, root, data));
+                    return Restrictions.And(GetCriterion(a, context), GetCriterion(b, context));
 
                 case ExpressionType.OrElse:
-                    return Restrictions.Or(GetCriterion(a, root, data), GetCriterion(b, root, data));
+                    return Restrictions.Or(GetCriterion(a, context), GetCriterion(b, context));
 
                 case ExpressionType.ExclusiveOr:
 
-                    ICriterion criterionA = GetCriterion(a, root, data);
-                    ICriterion criterionB = GetCriterion(b, root, data);
+                    ICriterion criterionA = GetCriterion(a, context);
+                    ICriterion criterionB = GetCriterion(b, context);
 
                     return Restrictions
                         .Or
@@ -148,26 +138,26 @@ namespace NHibernate.FlowQuery.Helpers
                         );
             }
 
-            bool isProjectedA = IsProjected(a, root, data);
-            bool isProjectedB = IsProjected(b, root, data);
+            bool isProjectedA = IsProjected(a, context);
+            bool isProjectedB = IsProjected(b, context);
 
-            // Projection Projection
+            // Projection-Projection
             if (isProjectedA && isProjectedB)
             {
                 return GetProjectionProjectionCriterion
                 (
-                    ProjectionHelper.GetProjection(a, root, data),
-                    ProjectionHelper.GetProjection(b, root, data),
+                    ProjectionHelper.GetProjection(a, context),
+                    ProjectionHelper.GetProjection(b, context),
                     type
                 );
             }
 
             if (isProjectedA || !isProjectedB)
             {
-                return GetProjectionValueCriterion(a, ExpressionHelper.GetValue(b), type, root, data, false);
+                return GetProjectionValueCriterion(a, ExpressionHelper.GetValue(b), type, context, false);
             }
 
-            return GetProjectionValueCriterion(b, ExpressionHelper.GetValue(a), type, root, data, true);
+            return GetProjectionValueCriterion(b, ExpressionHelper.GetValue(a), type, context, true);
         }
 
         /// <summary>
@@ -176,11 +166,8 @@ namespace NHibernate.FlowQuery.Helpers
         /// <param name="expression">
         ///     The expression.
         /// </param>
-        /// <param name="root">
-        ///     The root name.
-        /// </param>
-        /// <param name="data">
-        ///     The <see cref="QueryHelperData" /> info.
+        /// <param name="context">
+        ///     The helper context.
         /// </param>
         /// <returns>
         ///     The created <see cref="ICriterion" />.
@@ -188,13 +175,12 @@ namespace NHibernate.FlowQuery.Helpers
         public static ICriterion GetCriterionForInvoke
             (
             InvocationExpression expression,
-            string root,
-            QueryHelperData data
+            HelperContext context
             )
         {
             if (expression.Expression.Type == typeof(WhereDelegate))
             {
-                string property = ExpressionHelper.GetPropertyName(expression.Arguments[0], root);
+                string property = ExpressionHelper.GetPropertyName(expression.Arguments[0], context.RootAlias);
 
                 var isExpression = ExpressionHelper.GetValue<IsExpression>(expression.Arguments[1]);
 
@@ -212,11 +198,8 @@ namespace NHibernate.FlowQuery.Helpers
         /// <param name="expression">
         ///     The expression.
         /// </param>
-        /// <param name="root">
-        ///     The root name.
-        /// </param>
-        /// <param name="data">
-        ///     The <see cref="QueryHelperData" /> info.
+        /// <param name="context">
+        ///     The helper context.
         /// </param>
         /// <returns>
         ///     The created <see cref="ICriterion" />.
@@ -224,19 +207,17 @@ namespace NHibernate.FlowQuery.Helpers
         public static ICriterion GetCriterionForMethodCall
             (
             MethodCallExpression expression,
-            string root,
-            QueryHelperData data
+            HelperContext context
             )
         {
-            if (IsProjected(expression, root, data))
+            if (IsProjected(expression, context))
             {
                 // Not a value expression
                 IProjection projection = ProjectionHelper
                     .GetProjection
                     (
                         expression.Object ?? expression.Arguments[0],
-                        root,
-                        data
+                        context
                     );
 
                 int i = expression.Object == null ? 1 : 0;
@@ -272,7 +253,7 @@ namespace NHibernate.FlowQuery.Helpers
                                 return Subqueries
                                     .PropertyIn
                                     (
-                                        ExpressionHelper.GetPropertyName(expression, root),
+                                        ExpressionHelper.GetPropertyName(expression, context.RootAlias),
                                         (value as IDetachedImmutableFlowQuery).Criteria
                                     );
                             }
@@ -473,11 +454,8 @@ namespace NHibernate.FlowQuery.Helpers
         /// <param name="type">
         ///     The comparison type.
         /// </param>
-        /// <param name="root">
-        ///     The root name.
-        /// </param>
-        /// <param name="data">
-        ///     The <see cref="QueryHelperData" /> info.
+        /// <param name="context">
+        ///     The helper context.
         /// </param>
         /// <param name="overTurned">
         ///     Indicates whether the comparison has been reversed to simplify other code.
@@ -493,8 +471,7 @@ namespace NHibernate.FlowQuery.Helpers
             Expression expression,
             object value,
             ExpressionType type,
-            string root,
-            QueryHelperData data,
+            HelperContext context,
             bool overTurned
             )
         {
@@ -520,7 +497,7 @@ namespace NHibernate.FlowQuery.Helpers
                 }
             }
 
-            IProjection projection = ProjectionHelper.GetProjection(expression, root, data);
+            IProjection projection = ProjectionHelper.GetProjection(expression, context);
 
             switch (type)
             {
@@ -533,7 +510,7 @@ namespace NHibernate.FlowQuery.Helpers
 
                     if (value is bool)
                     {
-                        return GetCriterion((bool)value ? expression : Expression.Not(expression), root, data);
+                        return GetCriterion((bool)value ? expression : Expression.Not(expression), context);
                     }
 
                     return Restrictions.Eq(projection, value);
@@ -547,7 +524,7 @@ namespace NHibernate.FlowQuery.Helpers
 
                     if (value is bool)
                     {
-                        return GetCriterion(!(bool)value ? expression : Expression.Not(expression), root, data);
+                        return GetCriterion(!(bool)value ? expression : Expression.Not(expression), context);
                     }
 
                     return Restrictions.Not(Restrictions.Eq(projection, value));
@@ -578,21 +555,20 @@ namespace NHibernate.FlowQuery.Helpers
         /// <param name="expression">
         ///     The expression.
         /// </param>
-        /// <param name="root">
-        ///     The root name.
-        /// </param>
-        /// <param name="data">
-        ///     The <see cref="QueryHelperData" /> info.
+        /// <param name="context">
+        ///     The helper context.
         /// </param>
         /// <returns>
         ///     True if the <see cref="Expression" /> is considered to be projected; false otherwise.
         /// </returns>
-        public static bool IsProjected(Expression expression, string root, QueryHelperData data)
+        public static bool IsProjected(Expression expression, HelperContext context)
         {
             string expressionRoot = ExpressionHelper.GetRoot(expression);
 
             return expression is BinaryExpression
-                || (expressionRoot != null && (expressionRoot == root || data.Aliases.ContainsValue(expressionRoot)));
+                || (expressionRoot != null
+                    && (expressionRoot == context.RootAlias
+                        || context.Data.Aliases.ContainsValue(expressionRoot)));
         }
     }
 }
