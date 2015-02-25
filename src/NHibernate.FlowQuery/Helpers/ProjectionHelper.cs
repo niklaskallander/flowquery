@@ -529,7 +529,7 @@ namespace NHibernate.FlowQuery.Helpers
         {
             if (ExpressionHelper.IsRooted(expression, context.RootAlias, context.Data))
             {
-                string property = ExpressionHelper.GetPropertyName(expression, context.RootAlias);
+                string property = ExpressionHelper.GetPropertyName(expression, context.RootAlias, true, context);
 
                 return Projections.Property(property);
             }

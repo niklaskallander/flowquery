@@ -90,6 +90,12 @@
         }
 
         [Test]
+        public void CanUseParameterAsAliasForJoin()
+        {
+            CanUseParameterAsAliasForJoin(null);
+        }
+
+        [Test]
         public void CanUsePrivateFieldAsAliasForJoin()
         {
             UserGroupLinkEntity groupLink = null;
@@ -137,6 +143,18 @@
                 .Inner.Join(x => x.Groups, () => groupLink)
                 .Inner.Join(x => groupLink.Group, () => StaticGroupProperty)
                 .Select(x => StaticGroupProperty.Id);
+
+            Assert.That(groupIds.Any());
+        }
+
+        private void CanUseParameterAsAliasForJoin(GroupEntity group)
+        {
+            UserGroupLinkEntity groupLink = null;
+
+            FlowQuerySelection<long> groupIds = Query<UserEntity>()
+                .Inner.Join(x => x.Groups, () => groupLink)
+                .Inner.Join(x => groupLink.Group, () => group)
+                .Select(x => group.Id);
 
             Assert.That(groupIds.Any());
         }
