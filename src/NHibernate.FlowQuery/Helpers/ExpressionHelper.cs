@@ -52,10 +52,10 @@ namespace NHibernate.FlowQuery.Helpers
             if (!allAreMemberInit)
             {
                 throw new ArgumentException
-                (
+                    (
                     "All expressions must be MemberInitExpression except the first which can also be a NewExpression",
                     "expressions"
-                );
+                    );
             }
 
             Expression first = expressions[0].Body;
@@ -79,10 +79,10 @@ namespace NHibernate.FlowQuery.Helpers
             else
             {
                 throw new ArgumentException
-                (
+                    (
                     "The first expression is not a MemberInitExpression, nor is it a NewExpression",
                     "expressions"
-                );
+                    );
             }
 
             ParameterExpression parameter = expressions[0].Parameters[0];
@@ -242,20 +242,38 @@ namespace NHibernate.FlowQuery.Helpers
         /// <param name="expression">
         ///     The expression.
         /// </param>
+        /// <param name="isJoinAlias">
+        ///     Indicates whether the property name resolution is for a join-alias.
+        /// </param>
         /// <returns>
         ///     The property name.
         /// </returns>
         /// <exception cref="ArgumentNullException">
         ///     <paramref name="expression" /> is null.
         /// </exception>
-        public static string GetPropertyName(LambdaExpression expression)
+        public static string GetPropertyName
+            (
+            LambdaExpression expression,
+            bool isJoinAlias = false
+            )
         {
             if (expression == null)
             {
                 throw new ArgumentNullException("expression");
             }
 
-            return GetPropertyName(expression.Body, expression.Parameters.Any() ? expression.Parameters[0].Name : null);
+            string name =
+                GetPropertyName(expression.Body, expression.Parameters.Any() ? expression.Parameters[0].Name : null);
+
+            if (isJoinAlias)
+            {
+                if (name.Contains("."))
+                {
+                    name = name.Replace(".", "_");
+                }
+            }
+
+            return name;
         }
 
         /// <summary>
@@ -267,13 +285,26 @@ namespace NHibernate.FlowQuery.Helpers
         /// <param name="expectedRoot">
         ///     The expected root.
         /// </param>
+        /// <param name="isRooted">
+        ///     Indicates whether the property is rooted on an alias or not.
+        /// </param>
+        /// <param name="context">
+        ///     The <see cref="HelperContext" /> context, used only (and required) when <paramref name="isRooted" /> is
+        ///     set to true.
+        /// </param>
         /// <returns>
         ///     The property name.
         /// </returns>
         /// <exception cref="ArgumentNullException">
         ///     <paramref name="expression" /> is null.
         /// </exception>
-        public static string GetPropertyName(Expression expression, string expectedRoot)
+        public static string GetPropertyName
+            (
+            Expression expression,
+            string expectedRoot,
+            bool isRooted = false,
+            HelperContext context = null
+            )
         {
             if (expression == null)
             {
@@ -294,6 +325,17 @@ namespace NHibernate.FlowQuery.Helpers
                 }
 
                 return string.Join(".", parts);
+            }
+
+            if (isRooted && context != null && splits.Length >= 2)
+            {
+                string root = string.Join("_", splits.Take(splits.Length - 1));
+
+                // only modify |property| if there is in fact an alias matching |root|.
+                if (context.Data.Aliases.ContainsValue(root))
+                {
+                    property = root + "." + splits.Last();
+                }
             }
 
             return property;
@@ -466,7 +508,12 @@ namespace NHibernate.FlowQuery.Helpers
         /// <exception cref="ArgumentNullException">
         ///     <paramref name="expression" /> is null.
         /// </exception>
-        public static bool IsRooted(Expression expression, string expectedRoot, QueryHelperData data)
+        public static bool IsRooted
+            (
+            Expression expression,
+            string expectedRoot,
+            QueryHelperData data
+            )
         {
             if (expression == null)
             {
@@ -482,9 +529,24 @@ namespace NHibernate.FlowQuery.Helpers
                 return false;
             }
 
-            return splits[0] == expectedRoot
+            bool isRooted = splits[0] == expectedRoot
                 || data.Aliases
                     .ContainsValue(splits[0]);
+
+            if (isRooted)
+            {
+                return true;
+            }
+
+            if (splits.Length >= 2)
+            {
+                string tempAlias = string.Join("_", splits.Take(splits.Length - 1));
+
+                return data.Aliases
+                    .ContainsValue(tempAlias);
+            }
+
+            return false;
         }
     }
 }

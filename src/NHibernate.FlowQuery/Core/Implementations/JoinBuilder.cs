@@ -177,7 +177,7 @@
             Expression<Func<bool>> joinOnClause = null
             )
         {
-            string alias = ExpressionHelper.GetPropertyName(aliasProjection);
+            string alias = ExpressionHelper.GetPropertyName(aliasProjection, true);
 
             if (_implementor.Aliases.ContainsKey(property))
             {
