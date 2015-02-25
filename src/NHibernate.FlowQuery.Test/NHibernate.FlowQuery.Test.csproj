@@ -128,6 +128,8 @@
     <Compile Include="FlowQuery\Core\IFlowQueryTest\CountTest.cs" />
     <Compile Include="FlowQuery\DetachedCriteriaExtensionsTest.cs" />
     <Compile Include="FlowQuery\Features\AggregateFromExpressionTest.cs" />
+    <Compile Include="FlowQuery\Features\NhFq5\NhFq5Test.cs" />
+    <Compile Include="FlowQuery\Features\NhFq5\NhFq5Aliases.cs" />
     <Compile Include="FlowQuery\FlowQueryHelperTest.cs" />
     <Compile Include="FlowQuery\Helpers\ConstructionHelperTest.cs" />
     <Compile Include="FlowQuery\Helpers\CriteriaHelperTest.cs" />
