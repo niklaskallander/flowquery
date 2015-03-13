@@ -91,6 +91,16 @@
         FlowQuerySelection<TSource> Select();
 
         /// <summary>
+        ///     Creates a selection from the query and streams it into the specified
+        ///     <see cref="IResultStream{TSource}" /> stream.
+        /// </summary>
+        /// <param name="stream">
+        ///     The <see cref="IResultStream{TSource}" /> stream.
+        /// </param>
+        /// <seealso cref="IResultStream{T}" />
+        void Select(IResultStream<TSource> stream);
+
+        /// <summary>
         ///     Creates a utility to make a per-property-mapped selection.
         /// </summary>
         /// <typeparam name="TDestination">
@@ -113,6 +123,23 @@
         FlowQuerySelection<TSource> Select(params string[] properties);
 
         /// <summary>
+        ///     Creates a selection from the query using the specified properties and streams it into the specified
+        ///     <see cref="IResultStream{TSource}" /> stream.
+        /// </summary>
+        /// <param name="stream">
+        ///     The <see cref="IResultStream{TSource}" /> stream.
+        /// </param>
+        /// <param name="properties">
+        ///     The properties to select.
+        /// </param>
+        /// <seealso cref="IResultStream{T}" />
+        void Select
+            (
+            IResultStream<TSource> stream,
+            params string[] properties
+            );
+
+        /// <summary>
         ///     Creates a selection from the query using the specified projection.
         /// </summary>
         /// <param name="projection">
@@ -122,6 +149,23 @@
         ///     The created <see cref="FlowQuerySelection{TSource}" /> instance.
         /// </returns>
         FlowQuerySelection<TSource> Select(IProjection projection);
+
+        /// <summary>
+        ///     Creates a selection from the query using the specified projection and streams it into the specified
+        ///     <see cref="IResultStream{TSource}" /> stream.
+        /// </summary>
+        /// <param name="stream">
+        ///     The <see cref="IResultStream{TSource}" /> stream.
+        /// </param>
+        /// <param name="projection">
+        ///     The projection to select.
+        /// </param>
+        /// <seealso cref="IResultStream{T}" />
+        void Select
+            (
+            IResultStream<TSource> stream,
+            IProjection projection
+            );
 
         /// <summary>
         ///     Creates a selection from the query using the specified properties.
@@ -138,6 +182,26 @@
         FlowQuerySelection<TDestination> Select<TDestination>(params string[] properties);
 
         /// <summary>
+        ///     Creates a selection from the query using the specified properties and streams it into the specified
+        ///     <see cref="IResultStream{TDestination}" /> stream.
+        /// </summary>
+        /// <param name="stream">
+        ///     The <see cref="IResultStream{TDestination}" /> stream.
+        /// </param>
+        /// <param name="properties">
+        ///     The properties to select.
+        /// </param>
+        /// <typeparam name="TDestination">
+        ///     The <see cref="System.Type" /> of the selection.
+        /// </typeparam>
+        /// <seealso cref="IResultStream{T}" />
+        void Select<TDestination>
+            (
+            IResultStream<TDestination> stream,
+            params string[] properties
+            );
+
+        /// <summary>
         ///     Creates a selection from the query using the specified projection.
         /// </summary>
         /// <param name="projection">
@@ -152,6 +216,26 @@
         FlowQuerySelection<TDestination> Select<TDestination>(IProjection projection);
 
         /// <summary>
+        ///     Creates a selection from the query using the specified projection and streams it into the specified
+        ///     <see cref="IResultStream{TDestination}" /> stream.
+        /// </summary>
+        /// <param name="stream">
+        ///     The <see cref="IResultStream{TDestination}" /> stream.
+        /// </param>
+        /// <param name="projection">
+        ///     The projection to select.
+        /// </param>
+        /// <typeparam name="TDestination">
+        ///     The <see cref="System.Type" /> of the selection.
+        /// </typeparam>
+        /// <seealso cref="IResultStream{T}" />
+        void Select<TDestination>
+            (
+            IResultStream<TDestination> stream,
+            IProjection projection
+            );
+
+        /// <summary>
         ///     Creates a selection from the query using the specified properties.
         /// </summary>
         /// <param name="properties">
@@ -161,6 +245,23 @@
         ///     The created <see cref="FlowQuerySelection{TSource}" /> instance.
         /// </returns>
         FlowQuerySelection<TSource> Select(params Expression<Func<TSource, object>>[] properties);
+
+        /// <summary>
+        ///     Creates a selection from the query using the specified properties and streams it into the specified
+        ///     <see cref="IResultStream{TSource}" /> stream.
+        /// </summary>
+        /// <param name="stream">
+        ///     The <see cref="IResultStream{TSource}" /> stream.
+        /// </param>
+        /// <param name="properties">
+        ///     The properties to select.
+        /// </param>
+        /// <seealso cref="IResultStream{T}" />
+        void Select
+            (
+            IResultStream<TSource> stream,
+            params Expression<Func<TSource, object>>[] properties
+            );
 
         /// <summary>
         ///     Creates a selection from the query using the specified projection.
@@ -177,6 +278,26 @@
         FlowQuerySelection<TDestination> Select<TDestination>(Expression<Func<TSource, TDestination>> projection);
 
         /// <summary>
+        ///     Creates a selection from the query using the specified projection and streams it into the specified
+        ///     <see cref="IResultStream{TDestination}" /> stream.
+        /// </summary>
+        /// <param name="stream">
+        ///     The <see cref="IResultStream{TDestination}" /> stream.
+        /// </param>
+        /// <param name="projection">
+        ///     The projection to select.
+        /// </param>
+        /// <typeparam name="TDestination">
+        ///     The <see cref="System.Type" /> of the selection.
+        /// </typeparam>
+        /// <seealso cref="IResultStream{T}" />
+        void Select<TDestination>
+            (
+            IResultStream<TDestination> stream,
+            Expression<Func<TSource, TDestination>> projection
+            );
+
+        /// <summary>
         ///     Creates a selection from the specified <see cref="ISelectSetup{TSource, TDestination}" /> instance.
         /// </summary>
         /// <param name="setup">
@@ -191,6 +312,26 @@
         FlowQuerySelection<TDestination> Select<TDestination>(ISelectSetup<TSource, TDestination> setup);
 
         /// <summary>
+        ///     Creates a selection from the specified <see cref="ISelectSetup{TSource, TDestination}" /> instance and 
+        ///     streams it into the specified <see cref="IResultStream{TDestination}" /> stream.
+        /// </summary>
+        /// <param name="stream">
+        ///     The <see cref="IResultStream{TDestination}" /> stream.
+        /// </param>
+        /// <param name="setup">
+        ///     The <see cref="ISelectSetup{TSource, TDestination}" /> instance from which to create a selection.
+        /// </param>
+        /// <typeparam name="TDestination">
+        ///     The <see cref="System.Type" /> of the selection.
+        /// </typeparam>
+        /// <seealso cref="IResultStream{T}" />
+        void Select<TDestination>
+            (
+            IResultStream<TDestination> stream,
+            ISelectSetup<TSource, TDestination> setup
+            );
+
+        /// <summary>
         ///     Creates a selection from the specified <see cref="PartialSelection{TSource, TDestination}" /> instance.
         /// </summary>
         /// <param name="combiner">
@@ -203,6 +344,26 @@
         ///     The created <see cref="FlowQuerySelection{TDestination}" /> instance.
         /// </returns>
         FlowQuerySelection<TDestination> Select<TDestination>(IPartialSelection<TSource, TDestination> combiner);
+
+        /// <summary>
+        ///     Creates a selection from the specified <see cref="PartialSelection{TSource, TDestination}" /> instance 
+        ///     and streams it into the specified <see cref="IResultStream{TDestination}" /> stream.
+        /// </summary>
+        /// <param name="stream">
+        ///     The <see cref="IResultStream{TDestination}" /> stream.
+        /// </param>
+        /// <param name="combiner">
+        ///     The <see cref="PartialSelection{TSource, TDestination}" /> instance from which to create a selection.
+        /// </param>
+        /// <typeparam name="TDestination">
+        ///     The <see cref="System.Type" /> of the selection.
+        /// </typeparam>
+        /// <seealso cref="IResultStream{T}" />
+        void Select<TDestination>
+            (
+            IResultStream<TDestination> stream,
+            IPartialSelection<TSource, TDestination> combiner
+            );
 
         /// <summary>
         ///     Specifies a timeout for the query. You can use <see cref="ClearTimeout" /> to clear any previously set

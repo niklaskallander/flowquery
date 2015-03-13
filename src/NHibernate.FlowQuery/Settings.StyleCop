@@ -1,6 +1,8 @@
 <StyleCopSettings Version="105">
   <GlobalSettings>
     <CollectionProperty Name="RecognizedWords">
+      <Value>asc</Value>
+      <Value>desc</Value>
       <Value>linq</Value>
       <Value>sql</Value>
       <Value>subquery</Value>

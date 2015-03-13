@@ -79,9 +79,53 @@ namespace NHibernate.FlowQuery.Helpers
                 return GetListByExpression<TDestination>(((LambdaExpression)expression).Body, list);
             }
 
-            if (list == null)
+            if (list != null)
             {
-                return null;
+                bool canHandle = CanHandle(expression);
+
+                if (canHandle)
+                {
+                    if (expression.NodeType == ExpressionType.New)
+                    {
+                        return ForNewExpression<TDestination>(expression as NewExpression, list);
+                    }
+
+                    return ForMemberInitExpression<TDestination>(expression as MemberInitExpression, list);
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        ///     Creates a <see cref="System.Func{T,TResult}" /> conversion delegate for the 
+        ///     provided <see cref="Expression" />
+        /// </summary>
+        /// <param name="expression">
+        ///     The <see cref="Expression" /> constructor.
+        /// </param>
+        /// <typeparam name="TDestination">
+        ///     The <see cref="System.Type" /> of the result.
+        /// </typeparam>
+        /// <returns>
+        ///     The created <see cref="System.Func{T,TResult}" /> delegate.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        ///     <paramref name="expression" /> is null.
+        /// </exception>
+        public static Func<object, TDestination> GetObjectByExpressionConverter<TDestination>
+            (
+            Expression expression
+            )
+        {
+            if (expression == null)
+            {
+                throw new ArgumentNullException("expression");
+            }
+
+            if (expression.NodeType == ExpressionType.Lambda)
+            {
+                return GetObjectByExpressionConverter<TDestination>(((LambdaExpression)expression).Body);
             }
 
             bool canHandle = CanHandle(expression);
@@ -90,10 +134,10 @@ namespace NHibernate.FlowQuery.Helpers
             {
                 if (expression.NodeType == ExpressionType.New)
                 {
-                    return ForNewExpression<TDestination>(expression as NewExpression, list);
+                    return x => ForNewExpression<TDestination>(expression as NewExpression, x);
                 }
 
-                return ForMemberInitExpression<TDestination>(expression as MemberInitExpression, list);
+                return x => ForMemberInitExpression<TDestination>(expression as MemberInitExpression, x);
             }
 
             return null;
@@ -114,7 +158,12 @@ namespace NHibernate.FlowQuery.Helpers
         /// <returns>
         ///     The number of arguments used.
         /// </returns>
-        public static int Invoke(Expression expression, object[] arguments, out object value)
+        public static int Invoke
+            (
+            Expression expression,
+            object[] arguments,
+            out object value
+            )
         {
             switch (expression.NodeType)
             {
@@ -161,21 +210,48 @@ namespace NHibernate.FlowQuery.Helpers
         {
             var temp = new List<TDestination>();
 
-            foreach (object o in list)
+            foreach (object item in list)
             {
-                object[] args = o as object[] ?? new[]
-                {
-                    o
-                };
+                var destinationItem = ForMemberInitExpression<TDestination>(expression, item);
 
-                object instance;
-
-                Invoke(expression, args, out instance);
-
-                temp.Add((TDestination)instance);
+                temp.Add(destinationItem);
             }
 
             return temp;
+        }
+
+        /// <summary>
+        ///     Creates a <see cref="T:TDestination" /> from the provided <see cref="MemberInitExpression" />
+        ///     and <see cref="object" />.
+        /// </summary>
+        /// <param name="expression">
+        ///     The <see cref="MemberInitExpression" /> constructor.
+        /// </param>
+        /// <param name="item">
+        ///     The <see cref="object" /> data item.
+        /// </param>
+        /// <typeparam name="TDestination">
+        ///     The <see cref="System.Type" /> of the result.
+        /// </typeparam>
+        /// <returns>
+        ///     The created <see cref="T:TDestination" /> instance.
+        /// </returns>
+        private static TDestination ForMemberInitExpression<TDestination>
+            (
+            MemberInitExpression expression,
+            object item
+            )
+        {
+            object[] args = item as object[] ?? new[]
+            {
+                item
+            };
+
+            object instance;
+
+            Invoke(expression, args, out instance);
+
+            return (TDestination)instance;
         }
 
         /// <summary>
@@ -202,21 +278,48 @@ namespace NHibernate.FlowQuery.Helpers
         {
             var temp = new List<TDestination>();
 
-            foreach (object o in list)
+            foreach (object item in list)
             {
-                object[] args = o as object[] ?? new[]
-                {
-                    o
-                };
+                var destinationItem = ForNewExpression<TDestination>(expression, item);
 
-                object instance;
-
-                Invoke(expression, args, out instance);
-
-                temp.Add((TDestination)instance);
+                temp.Add(destinationItem);
             }
 
             return temp;
+        }
+
+        /// <summary>
+        ///     Creates a <see cref="T:TDestination" /> from the provided <see cref="NewExpression" />
+        ///     and <see cref="object" />.
+        /// </summary>
+        /// <param name="expression">
+        ///     The <see cref="NewExpression" /> constructor.
+        /// </param>
+        /// <param name="item">
+        ///     The <see cref="object" /> data item.
+        /// </param>
+        /// <typeparam name="TDestination">
+        ///     The <see cref="System.Type" /> of the result.
+        /// </typeparam>
+        /// <returns>
+        ///     The created <see cref="T:TDestination" /> instance.
+        /// </returns>
+        private static TDestination ForNewExpression<TDestination>
+            (
+            NewExpression expression,
+            object item
+            )
+        {
+            object[] args = item as object[] ?? new[]
+            {
+                item
+            };
+
+            object instance;
+
+            Invoke(expression, args, out instance);
+
+            return (TDestination)instance;
         }
 
         /// <summary>
@@ -234,7 +337,12 @@ namespace NHibernate.FlowQuery.Helpers
         /// <returns>
         ///     The number of arguments used.
         /// </returns>
-        private static int Invoke(MethodCallExpression expression, object[] arguments, out object value)
+        private static int Invoke
+            (
+            MethodCallExpression expression,
+            object[] arguments,
+            out object value
+            )
         {
             IEnumerable<IMethodCallExpressionHandler> handlers = FlowQueryHelper
                 .GetMethodCallHandlers(expression.Method.Name.ToLower());
@@ -274,7 +382,12 @@ namespace NHibernate.FlowQuery.Helpers
         /// <returns>
         ///     The number of arguments used.
         /// </returns>
-        private static int Invoke(NewExpression expression, object[] arguments, out object instance)
+        private static int Invoke
+            (
+            NewExpression expression,
+            object[] arguments,
+            out object instance
+            )
         {
             int i = 0;
 
@@ -309,7 +422,12 @@ namespace NHibernate.FlowQuery.Helpers
         /// <returns>
         ///     The number of arguments used.
         /// </returns>
-        private static int Invoke(MemberInitExpression expression, object[] arguments, out object instance)
+        private static int Invoke
+            (
+            MemberInitExpression expression,
+            object[] arguments,
+            out object instance
+            )
         {
             int i = Invoke(expression.NewExpression, arguments, out instance);
 
@@ -346,7 +464,12 @@ namespace NHibernate.FlowQuery.Helpers
         /// <remarks>
         ///     Borrowed from Linq to NHibernate.
         /// </remarks>
-        private static void SetValue(MemberInfo memberInfo, object instance, object value)
+        private static void SetValue
+            (
+            MemberInfo memberInfo,
+            object instance,
+            object value
+            )
         {
             var field = memberInfo as FieldInfo;
 

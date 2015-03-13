@@ -75,7 +75,9 @@
     <Compile Include="Core\ILockBuilder.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Helpers\ResultStreamer.cs" />
     <Compile Include="Core\IPartialSelection%272.cs" />
+    <Compile Include="Core\IResultStream%271.cs" />
     <Compile Include="Core\Structures\Lock.cs" />
     <Compile Include="Core\CustomProjections\FqAliasProjection.cs" />
     <Compile Include="Core\CustomProjections\FqCastProjection.cs" />

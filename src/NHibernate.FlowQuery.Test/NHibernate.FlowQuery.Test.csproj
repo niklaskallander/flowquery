@@ -128,6 +128,9 @@
     <Compile Include="FlowQuery\Core\IFlowQueryTest\CountTest.cs" />
     <Compile Include="FlowQuery\DetachedCriteriaExtensionsTest.cs" />
     <Compile Include="FlowQuery\Features\AggregateFromExpressionTest.cs" />
+    <Compile Include="FlowQuery\Features\ResultStreaming\DummyResultStream%272.cs" />
+    <Compile Include="FlowQuery\Features\ResultStreaming\DummyResultStream.cs" />
+    <Compile Include="FlowQuery\Features\ResultStreaming\ResultStreamingTest.cs" />
     <Compile Include="FlowQuery\Features\NhFq5\NhFq5Test.cs" />
     <Compile Include="FlowQuery\Features\NhFq5\NhFq5Aliases.cs" />
     <Compile Include="FlowQuery\FlowQueryHelperTest.cs" />
@@ -137,6 +140,7 @@
     <Compile Include="FlowQuery\Helpers\ExpressionHandlers\MethodCalls\SimpleMethodCallHandlerTest.cs" />
     <Compile Include="FlowQuery\Helpers\ExpressionHelperTest.cs" />
     <Compile Include="FlowQuery\Helpers\RestrictionHelperTest.cs" />
+    <Compile Include="FlowQuery\Helpers\ResultStreamerTest.cs" />
     <Compile Include="FlowQuery\Helpers\TypeHelperTest.cs" />
     <Compile Include="FlowQuery\ProjectionListExtensionsTest.cs" />
     <Compile Include="Setup\Entities\CacheableUser.cs" />
