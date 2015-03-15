@@ -190,5 +190,10 @@
         {
             return Indistinct();
         }
+
+        IStreamedFlowQuery<TSource> IDelayedFlowQuery<TSource>.Streamed()
+        {
+            return Streamed();
+        }
     }
 }

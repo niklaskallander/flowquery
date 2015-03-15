@@ -538,15 +538,10 @@ namespace NHibernate.FlowQuery.Helpers
                 return true;
             }
 
-            if (splits.Length >= 2)
-            {
-                string tempAlias = string.Join("_", splits.Take(splits.Length - 1));
+            string tempAlias = string.Join("_", splits.Take(splits.Length - 1));
 
-                return data.Aliases
-                    .ContainsValue(tempAlias);
-            }
-
-            return false;
+            return data.Aliases
+                .ContainsValue(tempAlias);
         }
     }
 }

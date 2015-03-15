@@ -4,6 +4,7 @@
     using System.Linq;
 
     using NHibernate.FlowQuery.Core;
+    using NHibernate.FlowQuery.Test.FlowQuery.Features.ResultStreaming;
     using NHibernate.FlowQuery.Test.Setup.Dtos;
     using NHibernate.FlowQuery.Test.Setup.Entities;
 
@@ -102,6 +103,25 @@
         }
 
         [Test]
+        public virtual void TestStreamedCopy()
+        {
+            IStreamedFlowQuery<UserEntity> query1 = Query<UserEntity>()
+                .Streamed();
+
+            IStreamedFlowQuery<UserEntity> query2 = query1.Copy()
+                .Where(x => x.IsOnline);
+
+            var users1 = new DummyResultStream<UserEntity, UserEntity>();
+            var users2 = new DummyResultStream<UserEntity, UserEntity>();
+
+            query1.Select(users1);
+            query2.Select(users2);
+
+            Assert.That(users1.Items.Count(), Is.EqualTo(4));
+            Assert.That(users2.Items.Count(), Is.EqualTo(3));
+        }
+
+        [Test]
         public virtual void TestReuseAsSubqueryForRootQuery()
         {
             IImmediateFlowQuery<UserEntity> query = Query<UserEntity>()
@@ -131,11 +151,11 @@
             {
                 User = new UserDto(x.Firstname + " " + x.Lastname)
                 {
-                    Id = x.Id, 
-                    IsOnline = x.IsOnline, 
-                    SettingId = x.Setting.Id, 
+                    Id = x.Id,
+                    IsOnline = x.IsOnline,
+                    SettingId = x.Setting.Id,
                     Username = x.Username
-                }, 
+                },
                 x.LastLoggedInStamp
             });
 
@@ -157,11 +177,11 @@
             {
                 User = new UserDto(x.Firstname + " " + x.Lastname)
                 {
-                    Id = x.Id, 
-                    IsOnline = x.IsOnline, 
-                    SettingId = x.Setting.Id, 
+                    Id = x.Id,
+                    IsOnline = x.IsOnline,
+                    SettingId = x.Setting.Id,
                     Username = x.Username
-                }, 
+                },
                 x.LastLoggedInStamp
             });
 
@@ -185,11 +205,11 @@
             {
                 User = new UserDto(x.Firstname + " " + x.Lastname)
                 {
-                    Id = x.Id, 
-                    IsOnline = x.IsOnline, 
-                    SettingId = x.Setting.Id, 
+                    Id = x.Id,
+                    IsOnline = x.IsOnline,
+                    SettingId = x.Setting.Id,
                     Username = x.Username
-                }, 
+                },
                 x.LastLoggedInStamp
             });
 

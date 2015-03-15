@@ -20,7 +20,7 @@
     public abstract class QueryableFlowQueryBase<TSource, TQuery>
         : MorphableFlowQueryBase<TSource, TQuery>, IQueryableFlowQuery<TSource, TQuery>, IQueryableFlowQuery
         where TSource : class
-        where TQuery : class, IQueryableFlowQuery<TSource, TQuery>
+        where TQuery : class, IQueryableFlowQueryBase<TSource, TQuery>
     {
         /// <summary>
         ///     Initializes a new instance of the <see cref="QueryableFlowQueryBase{TSource,TQuery}" /> class.
@@ -129,9 +129,13 @@
         }
 
         /// <inheritdoc />
-        public virtual FlowQuerySelection<TSource> Select(params string[] properties)
+        public virtual FlowQuerySelection<TSource> Select
+            (
+            string property,
+            params string[] properties
+            )
         {
-            Project(properties);
+            Project(property, properties);
 
             return SelectList<TSource>();
         }
@@ -148,9 +152,13 @@
         /// <typeparam name="TDestination">
         ///     The <see cref="System.Type" /> of the selection.
         /// </typeparam>
-        public virtual FlowQuerySelection<TDestination> Select<TDestination>(params string[] properties)
+        public virtual FlowQuerySelection<TDestination> Select<TDestination>
+            (
+            string property,
+            params string[] properties
+            )
         {
-            Project<TDestination>(properties);
+            Project<TDestination>(property, properties);
 
             return SelectList<TDestination>();
         }

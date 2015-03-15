@@ -6,6 +6,7 @@
     using System.Linq;
 
     using NHibernate.FlowQuery.Core;
+    using NHibernate.FlowQuery.Core.Implementations;
     using NHibernate.FlowQuery.Core.Structures;
 
     /// <summary>
@@ -87,10 +88,55 @@
         }
 
         /// <summary>
+        ///     Populates the given <see cref="IResultStream{TDestination}" /> with the results, from the execution of
+        ///     the given <see cref="IQueryableFlowQuery" />, in a streamed fashion.
+        /// </summary>
+        /// <typeparam name="TSource">
+        ///     The <see cref="System.Type" /> of the source entity.
+        /// </typeparam>
+        /// <typeparam name="TDestination">
+        ///     The <see cref="System.Type" /> of the result.
+        /// </typeparam>
+        /// <param name="query">
+        ///     The query.
+        /// </param>
+        /// <param name="resultStream">
+        ///     The <see cref="IResultStream{TDestination}" /> to stream the results into.
+        /// </param>
+        public static void SelectStream<TSource, TDestination>
+            (
+            IQueryableFlowQuery query,
+            IResultStream<TDestination> resultStream
+            )
+        {
+            Func<object, TDestination> converter = null;
+
+            if (query.Constructor != null)
+            {
+                converter = ConstructionHelper.GetObjectByExpressionConverter<TDestination>(query.Constructor);
+            }
+
+            if (converter == null)
+            {
+                converter = x => (TDestination)x;
+            }
+
+            var streamer = new ResultStreamer<TDestination>(resultStream, converter);
+
+            ICriteriaBuilder criteriaBuilder = GetCriteriaBuilder(query);
+
+            ICriteria criteria = criteriaBuilder.Build<TSource, TDestination>(query);
+
+            criteria.List(streamer);
+
+            resultStream.EndOfStream();
+        }
+
+        /// <summary>
         ///     Creates a value query selection.
         /// </summary>
         /// <param name="query">
-        /// The query.
+        ///     The query.
         /// </param>
         /// <typeparam name="TSource">
         ///     The <see cref="System.Type" /> of the source entity.
@@ -119,14 +165,14 @@
         }
 
         /// <summary>
-        ///     Resolves an appropriate <see cref="ICriteriaBuilder" /> for the given 
+        ///     Resolves an appropriate <see cref="ICriteriaBuilder" /> for the given
         ///     <see cref="IQueryableFlowQuery" />.
         /// </summary>
         /// <param name="query">
         ///     The <see cref="IQueryableFlowQuery" />.
         /// </param>
         /// <returns>
-        ///     The <see cref="ICriteriaBuilder"/>.
+        ///     The <see cref="ICriteriaBuilder" />.
         /// </returns>
         private static ICriteriaBuilder GetCriteriaBuilder(IQueryableFlowQuery query)
         {

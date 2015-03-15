@@ -489,6 +489,57 @@
                 throw new NotImplementedException();
             }
 
+            /// <summary>
+            ///     Returns a copy of this <see cref="IDetachedFlowQuery{TSource}" /> but in the form of a
+            ///     <see cref="IStreamedFlowQuery{TSource}" /> instead.
+            /// </summary>
+            /// <returns>
+            ///     A copy of this <see cref="IDetachedFlowQuery{TSource}" /> but in the form of a
+            ///     <see cref="IStreamedFlowQuery{TSource}" /> instead.
+            /// </returns>
+            public IStreamedFlowQuery<UserEntity> Streamed()
+            {
+                throw new NotImplementedException();
+            }
+
+            /// <summary>
+            ///     Returns a copy of this <see cref="IDetachedFlowQuery{TSource}" /> but in the form of a
+            ///     <see cref="IStreamedFlowQuery{TSource}" /> instead.
+            /// </summary>
+            /// <param name="session">
+            ///     The session.
+            /// </param>
+            /// <returns>
+            ///     A copy of this <see cref="IDetachedFlowQuery{TSource}" /> but in the form of a
+            ///     <see cref="IStreamedFlowQuery{TSource}" /> instead.
+            /// </returns>
+            /// <exception cref="ArgumentNullException">
+            ///     <paramref name="session" /> is null.
+            /// </exception>
+            public IStreamedFlowQuery<UserEntity> Streamed(ISession session)
+            {
+                throw new NotImplementedException();
+            }
+
+            /// <summary>
+            ///     Returns a copy of this <see cref="IDetachedFlowQuery{TSource}" /> but in the form of a
+            ///     <see cref="IStreamedFlowQuery{TSource}" /> instead.
+            /// </summary>
+            /// <param name="session">
+            ///     The session.
+            /// </param>
+            /// <returns>
+            ///     A copy of this <see cref="IDetachedFlowQuery{TSource}" /> but in the form of a
+            ///     <see cref="IStreamedFlowQuery{TSource}" /> instead.
+            /// </returns>
+            /// <exception cref="ArgumentNullException">
+            ///     <paramref name="session" /> is null.
+            /// </exception>
+            public IStreamedFlowQuery<UserEntity> Streamed(IStatelessSession session)
+            {
+                throw new NotImplementedException();
+            }
+
             public IDetachedFlowQuery<UserEntity> Skip(int skip)
             {
                 throw new NotImplementedException();

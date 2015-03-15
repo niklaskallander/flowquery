@@ -1251,7 +1251,7 @@
                 string.Empty
             };
 
-            Assert.That(() => DummyQuery<UserEntity>().Select(strings), Throws.ArgumentException);
+            Assert.That(() => DummyQuery<UserEntity>().Select("IsOnline", strings), Throws.ArgumentException);
         }
 
         [Test]
@@ -1263,16 +1263,16 @@
                 null
             };
 
-            Assert.That(() => DummyQuery<UserEntity>().Select(strings), Throws.ArgumentException);
+            Assert.That(() => DummyQuery<UserEntity>().Select("IsOnline", strings), Throws.ArgumentException);
         }
 
         [Test]
-        public void SelectUsingStringsThrowsIfStringArrayIsNull()
+        public void SelectUsingStringsThrowsIfStringIsNull()
         {
             Assert
                 .That
                 (
-                    () => DummyQuery<UserEntity>().Select((string[])null),
+                    () => DummyQuery<UserEntity>().Select((string)null),
                     Throws.InstanceOf<ArgumentNullException>()
                 );
         }
@@ -1416,9 +1416,13 @@
                 .ToArray();
 
             Assert.That(stuff.Length, Is.EqualTo(4));
+            Assert.That(stuff[0].Name, Is.EqualTo(Firstnames[3]));
             Assert.That(stuff[0].NumberOfGroups, Is.EqualTo(0));
+            Assert.That(stuff[1].Name, Is.EqualTo(Firstnames[1]));
             Assert.That(stuff[1].NumberOfGroups, Is.EqualTo(1));
+            Assert.That(stuff[2].Name, Is.EqualTo(Firstnames[2]));
             Assert.That(stuff[2].NumberOfGroups, Is.EqualTo(2));
+            Assert.That(stuff[3].Name, Is.EqualTo(Firstnames[0]));
             Assert.That(stuff[3].NumberOfGroups, Is.EqualTo(2));
         }
 
@@ -1470,14 +1474,14 @@
             Assert.That(stuff[3].NumberOfGroups, Is.EqualTo(2));
         }
 
-        public class PuffClass
+        private class PuffClass
         {
             [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:FieldsMustBePrivate",
                 Justification = "Reviewed. Suppression is OK here.")]
             public string Puff;
         }
 
-        public class TestCastingModel
+        private class TestCastingModel
         {
             public long? Test1 { get; set; }
 
@@ -1492,11 +1496,11 @@
             public object Test6 { get; set; }
         }
 
-        public class TestSelectSubqueryModel
+        private class TestSelectSubqueryModel
         {
-            public virtual string Name { get; set; }
+            public string Name { get; set; }
 
-            public virtual int NumberOfGroups { get; set; }
+            public int NumberOfGroups { get; set; }
         }
     }
 }

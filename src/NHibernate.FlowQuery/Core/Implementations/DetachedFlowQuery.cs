@@ -239,5 +239,43 @@
         {
             return Indistinct();
         }
+
+        /// <inheritdoc />
+        public override IStreamedFlowQuery<TSource> Streamed()
+        {
+            if (CriteriaFactory == null)
+            {
+                throw new InvalidOperationException
+                (
+                    "This DetachedFlowQuery instance was not created from a ISession instance and cannot be " +
+                        "transformed to a ImmediateFlowQuery instance without a ISession being specified. Use the " +
+                        "overload taking an ISession instance instead."
+                );
+            }
+
+            return base.Streamed();
+        }
+
+        /// <inheritdoc />
+        public IStreamedFlowQuery<TSource> Streamed(ISession session)
+        {
+            if (session == null)
+            {
+                throw new ArgumentNullException("session");
+            }
+
+            return new StreamedFlowQuery<TSource>(session.CreateCriteria, Alias, Options, this);
+        }
+
+        /// <inheritdoc />
+        public IStreamedFlowQuery<TSource> Streamed(IStatelessSession session)
+        {
+            if (session == null)
+            {
+                throw new ArgumentNullException("session");
+            }
+
+            return new StreamedFlowQuery<TSource>(session.CreateCriteria, Alias, Options, this);
+        }
     }
 }

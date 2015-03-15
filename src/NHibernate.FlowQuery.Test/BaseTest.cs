@@ -10,15 +10,15 @@ namespace NHibernate.FlowQuery.Test
 
     public class BaseTest
     {
-        public static readonly string[] Firstnames;
+        protected static readonly string[] Firstnames;
 
-        public static readonly string[] Fullnames;
+        protected static readonly string[] Fullnames;
 
-        public static readonly long[] Ids;
+        protected static readonly long[] Ids;
 
-        public static readonly string[] Lastnames;
+        protected static readonly string[] Lastnames;
 
-        public static readonly string[] Usernames;
+        protected static readonly string[] Usernames;
 
         private ISession _session;
 
@@ -71,7 +71,7 @@ namespace NHibernate.FlowQuery.Test
             };
         }
 
-        public ISession Session
+        protected ISession Session
         {
             get
             {
@@ -84,7 +84,7 @@ namespace NHibernate.FlowQuery.Test
             }
         }
 
-        public ISessionFactory SessionFactory
+        protected ISessionFactory SessionFactory
         {
             get
             {
@@ -92,7 +92,7 @@ namespace NHibernate.FlowQuery.Test
             }
         }
 
-        public IStatelessSession StatelessSession
+        protected IStatelessSession StatelessSession
         {
             get
             {
@@ -103,38 +103,6 @@ namespace NHibernate.FlowQuery.Test
 
                 return _statelessSession;
             }
-        }
-
-        public IDetachedFlowQuery<TSource> DetachedDummyQuery<TSource>()
-            where TSource : class
-        {
-            return new DetachedQueryClass<TSource>((x, y) => null);
-        }
-
-        public IDetachedFlowQuery<TSource> DetachedQuery<TSource>()
-            where TSource : class
-        {
-            return new DetachedQueryClass<TSource>(Session.CreateCriteria);
-        }
-
-        public IImmediateFlowQuery<TSource> DummyQuery<TSource>()
-            where TSource : class
-        {
-            return new QueryClass<TSource>((x, y) => null);
-        }
-
-        public virtual void OnSetup()
-        {
-        }
-
-        public virtual void OnTearDown()
-        {
-        }
-
-        public IImmediateFlowQuery<TSource> Query<TSource>()
-            where TSource : class
-        {
-            return new QueryClass<TSource>(Session.CreateCriteria);
         }
 
         [SetUp]
@@ -163,7 +131,41 @@ namespace NHibernate.FlowQuery.Test
             }
         }
 
-        public class DetachedQueryClass<TSource> : DetachedFlowQuery<TSource>
+        protected static IDetachedFlowQuery<TSource> DetachedDummyQuery<TSource>()
+            where TSource : class
+        {
+            return new DetachedQueryClass<TSource>((x,
+                y) => null);
+        }
+
+        protected IDetachedFlowQuery<TSource> DetachedQuery<TSource>()
+            where TSource : class
+        {
+            return new DetachedQueryClass<TSource>(Session.CreateCriteria);
+        }
+
+        protected IImmediateFlowQuery<TSource> DummyQuery<TSource>()
+            where TSource : class
+        {
+            return new QueryClass<TSource>((x,
+                y) => null);
+        }
+
+        protected virtual void OnSetup()
+        {
+        }
+
+        protected virtual void OnTearDown()
+        {
+        }
+
+        protected IImmediateFlowQuery<TSource> Query<TSource>()
+            where TSource : class
+        {
+            return new QueryClass<TSource>(Session.CreateCriteria);
+        }
+
+        private class DetachedQueryClass<TSource> : DetachedFlowQuery<TSource>
             where TSource : class
         {
             public DetachedQueryClass
@@ -173,7 +175,7 @@ namespace NHibernate.FlowQuery.Test
             }
         }
 
-        public class QueryClass<TSource> : ImmediateFlowQuery<TSource>
+        private class QueryClass<TSource> : ImmediateFlowQuery<TSource>
             where TSource : class
         {
             public QueryClass

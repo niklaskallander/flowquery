@@ -911,6 +911,280 @@
         }
 
         /// <summary>
+        ///     Creates a new <see cref="IStreamedFlowQuery{TSource}" /> query.
+        /// </summary>
+        /// <param name="session">
+        ///     The <see cref="ISession" /> instance.
+        /// </param>
+        /// <typeparam name="TSource">
+        ///     The <see cref="System.Type" /> of the source entity.
+        /// </typeparam>
+        /// <returns>
+        ///     The created <see cref="IStreamedFlowQuery{TSource}" /> query.
+        /// </returns>
+        /// <remarks>
+        ///     Streamed queries are executed by <see cref="NHibernate" /> immediately (just like 
+        ///     <see cref="IImmediateFlowQuery{TSource}" />), with a separate round-trip to the database for each query.
+        ///     To reduce the number of round-trips to the database you should use delayed queries instead 
+        ///     (<see cref="IDelayedFlowQuery{TSource}" />). The difference between a 
+        ///     <see cref="IStreamedFlowQuery{TSource}" /> and a <see cref="IImmediateFlowQuery{TSource}" /> is that the
+        ///     entire result set for a <see cref="IStreamedFlowQuery{TSource}" /> never will be buffered into memory 
+        ///     before it reaches user-code. It's entirely up to user-code to load it into memory, if it is deemed 
+        ///     necessary for the particular situation.
+        /// </remarks>
+        public static IStreamedFlowQuery<TSource> StreamedFlowQuery<TSource>(this ISession session)
+            where TSource : class
+        {
+            return StreamedFlowQuery<TSource>(session, options: null);
+        }
+
+        /// <summary>
+        ///     Creates a new <see cref="IStreamedFlowQuery{TSource}" /> query.
+        /// </summary>
+        /// <param name="session">
+        ///     The <see cref="ISession" /> instance.
+        /// </param>
+        /// <param name="alias">
+        ///     The alias.
+        /// </param>
+        /// <typeparam name="TSource">
+        ///     The <see cref="System.Type" /> of the source entity.
+        /// </typeparam>
+        /// <returns>
+        ///     The created <see cref="IStreamedFlowQuery{TSource}" /> query.
+        /// </returns>
+        /// <remarks>
+        ///     Streamed queries are executed by <see cref="NHibernate" /> immediately (just like 
+        ///     <see cref="IImmediateFlowQuery{TSource}" />), with a separate round-trip to the database for each query.
+        ///     To reduce the number of round-trips to the database you should use delayed queries instead 
+        ///     (<see cref="IDelayedFlowQuery{TSource}" />). The difference between a 
+        ///     <see cref="IStreamedFlowQuery{TSource}" /> and a <see cref="IImmediateFlowQuery{TSource}" /> is that the
+        ///     entire result set for a <see cref="IStreamedFlowQuery{TSource}" /> never will be buffered into memory 
+        ///     before it reaches user-code. It's entirely up to user-code to load it into memory, if it is deemed 
+        ///     necessary for the particular situation.
+        /// </remarks>
+        public static IStreamedFlowQuery<TSource> StreamedFlowQuery<TSource>
+            (
+            this ISession session,
+            Expression<Func<TSource>> alias
+            )
+            where TSource : class
+        {
+            return StreamedFlowQuery(session, alias, null);
+        }
+
+        /// <summary>
+        ///     Creates a new <see cref="IStreamedFlowQuery{TSource}" /> query.
+        /// </summary>
+        /// <param name="session">
+        ///     The <see cref="ISession" /> instance.
+        /// </param>
+        /// <param name="options">
+        ///     The options.
+        /// </param>
+        /// <typeparam name="TSource">
+        ///     The <see cref="System.Type" /> of the source entity.
+        /// </typeparam>
+        /// <returns>
+        ///     The created <see cref="IStreamedFlowQuery{TSource}" /> query.
+        /// </returns>
+        /// <remarks>
+        ///     Streamed queries are executed by <see cref="NHibernate" /> immediately (just like 
+        ///     <see cref="IImmediateFlowQuery{TSource}" />), with a separate round-trip to the database for each query.
+        ///     To reduce the number of round-trips to the database you should use delayed queries instead 
+        ///     (<see cref="IDelayedFlowQuery{TSource}" />). The difference between a 
+        ///     <see cref="IStreamedFlowQuery{TSource}" /> and a <see cref="IImmediateFlowQuery{TSource}" /> is that the
+        ///     entire result set for a <see cref="IStreamedFlowQuery{TSource}" /> never will be buffered into memory 
+        ///     before it reaches user-code. It's entirely up to user-code to load it into memory, if it is deemed 
+        ///     necessary for the particular situation.
+        /// </remarks>
+        public static IStreamedFlowQuery<TSource> StreamedFlowQuery<TSource>
+            (
+            this ISession session,
+            FlowQueryOptions options
+            )
+            where TSource : class
+        {
+            return StreamedFlowQuery<TSource>(session, null, options);
+        }
+
+        /// <summary>
+        ///     Creates a new <see cref="IStreamedFlowQuery{TSource}" /> query.
+        /// </summary>
+        /// <param name="session">
+        ///     The <see cref="ISession" /> instance.
+        /// </param>
+        /// <param name="alias">
+        ///     The alias.
+        /// </param>
+        /// <param name="options">
+        ///     The options.
+        /// </param>
+        /// <typeparam name="TSource">
+        ///     The <see cref="System.Type" /> of the source entity.
+        /// </typeparam>
+        /// <returns>
+        ///     The created <see cref="IStreamedFlowQuery{TSource}" /> query.
+        /// </returns>
+        /// <remarks>
+        ///     Streamed queries are executed by <see cref="NHibernate" /> immediately (just like 
+        ///     <see cref="IImmediateFlowQuery{TSource}" />), with a separate round-trip to the database for each query.
+        ///     To reduce the number of round-trips to the database you should use delayed queries instead 
+        ///     (<see cref="IDelayedFlowQuery{TSource}" />). The difference between a 
+        ///     <see cref="IStreamedFlowQuery{TSource}" /> and a <see cref="IImmediateFlowQuery{TSource}" /> is that the
+        ///     entire result set for a <see cref="IStreamedFlowQuery{TSource}" /> never will be buffered into memory 
+        ///     before it reaches user-code. It's entirely up to user-code to load it into memory, if it is deemed 
+        ///     necessary for the particular situation.
+        /// </remarks>
+        public static IStreamedFlowQuery<TSource> StreamedFlowQuery<TSource>
+            (
+            this ISession session,
+            Expression<Func<TSource>> alias,
+            FlowQueryOptions options
+            )
+            where TSource : class
+        {
+            return StreamedFlowQuery(session.CreateCriteria, alias, options);
+        }
+
+        /// <summary>
+        ///     Creates a new <see cref="IStreamedFlowQuery{TSource}" /> query.
+        /// </summary>
+        /// <param name="session">
+        ///     The <see cref="IStatelessSession" /> instance.
+        /// </param>
+        /// <typeparam name="TSource">
+        ///     The <see cref="System.Type" /> of the source entity.
+        /// </typeparam>
+        /// <returns>
+        ///     The created <see cref="IStreamedFlowQuery{TSource}" /> query.
+        /// </returns>
+        /// <remarks>
+        ///     Streamed queries are executed by <see cref="NHibernate" /> immediately (just like 
+        ///     <see cref="IImmediateFlowQuery{TSource}" />), with a separate round-trip to the database for each query.
+        ///     To reduce the number of round-trips to the database you should use delayed queries instead 
+        ///     (<see cref="IDelayedFlowQuery{TSource}" />). The difference between a 
+        ///     <see cref="IStreamedFlowQuery{TSource}" /> and a <see cref="IImmediateFlowQuery{TSource}" /> is that the
+        ///     entire result set for a <see cref="IStreamedFlowQuery{TSource}" /> never will be buffered into memory 
+        ///     before it reaches user-code. It's entirely up to user-code to load it into memory, if it is deemed 
+        ///     necessary for the particular situation.
+        /// </remarks>
+        public static IStreamedFlowQuery<TSource> StreamedFlowQuery<TSource>(this IStatelessSession session)
+            where TSource : class
+        {
+            return StreamedFlowQuery<TSource>(session, options: null);
+        }
+
+        /// <summary>
+        ///     Creates a new <see cref="IStreamedFlowQuery{TSource}" /> query.
+        /// </summary>
+        /// <param name="session">
+        ///     The <see cref="IStatelessSession" /> instance.
+        /// </param>
+        /// <param name="alias">
+        ///     The alias.
+        /// </param>
+        /// <typeparam name="TSource">
+        ///     The <see cref="System.Type" /> of the source entity.
+        /// </typeparam>
+        /// <returns>
+        ///     The created <see cref="IStreamedFlowQuery{TSource}" /> query.
+        /// </returns>
+        /// <remarks>
+        ///     Streamed queries are executed by <see cref="NHibernate" /> immediately (just like 
+        ///     <see cref="IImmediateFlowQuery{TSource}" />), with a separate round-trip to the database for each query.
+        ///     To reduce the number of round-trips to the database you should use delayed queries instead 
+        ///     (<see cref="IDelayedFlowQuery{TSource}" />). The difference between a 
+        ///     <see cref="IStreamedFlowQuery{TSource}" /> and a <see cref="IImmediateFlowQuery{TSource}" /> is that the
+        ///     entire result set for a <see cref="IStreamedFlowQuery{TSource}" /> never will be buffered into memory 
+        ///     before it reaches user-code. It's entirely up to user-code to load it into memory, if it is deemed 
+        ///     necessary for the particular situation.
+        /// </remarks>
+        public static IStreamedFlowQuery<TSource> StreamedFlowQuery<TSource>
+            (
+            this IStatelessSession session,
+            Expression<Func<TSource>> alias
+            )
+            where TSource : class
+        {
+            return StreamedFlowQuery(session, alias, null);
+        }
+
+        /// <summary>
+        ///     Creates a new <see cref="IStreamedFlowQuery{TSource}" /> query.
+        /// </summary>
+        /// <param name="session">
+        ///     The <see cref="IStatelessSession" /> instance.
+        /// </param>
+        /// <param name="options">
+        ///     The options.
+        /// </param>
+        /// <typeparam name="TSource">
+        ///     The <see cref="System.Type" /> of the source entity.
+        /// </typeparam>
+        /// <returns>
+        ///     The created <see cref="IStreamedFlowQuery{TSource}" /> query.
+        /// </returns>
+        /// <remarks>
+        ///     Streamed queries are executed by <see cref="NHibernate" /> immediately (just like 
+        ///     <see cref="IImmediateFlowQuery{TSource}" />), with a separate round-trip to the database for each query.
+        ///     To reduce the number of round-trips to the database you should use delayed queries instead 
+        ///     (<see cref="IDelayedFlowQuery{TSource}" />). The difference between a 
+        ///     <see cref="IStreamedFlowQuery{TSource}" /> and a <see cref="IImmediateFlowQuery{TSource}" /> is that the
+        ///     entire result set for a <see cref="IStreamedFlowQuery{TSource}" /> never will be buffered into memory 
+        ///     before it reaches user-code. It's entirely up to user-code to load it into memory, if it is deemed 
+        ///     necessary for the particular situation.
+        /// </remarks>
+        public static IStreamedFlowQuery<TSource> StreamedFlowQuery<TSource>
+            (
+            this IStatelessSession session,
+            FlowQueryOptions options
+            )
+            where TSource : class
+        {
+            return StreamedFlowQuery<TSource>(session, null, options);
+        }
+
+        /// <summary>
+        ///     Creates a new <see cref="IStreamedFlowQuery{TSource}" /> query.
+        /// </summary>
+        /// <param name="session">
+        ///     The <see cref="IStatelessSession" /> instance.
+        /// </param>
+        /// <param name="alias">
+        ///     The alias.
+        /// </param>
+        /// <param name="options">
+        ///     The options.
+        /// </param>
+        /// <typeparam name="TSource">
+        ///     The <see cref="System.Type" /> of the source entity.
+        /// </typeparam>
+        /// <returns>
+        ///     The created <see cref="IStreamedFlowQuery{TSource}" /> query.
+        /// </returns>
+        /// <remarks>
+        ///     Streamed queries are executed by <see cref="NHibernate" /> immediately (just like 
+        ///     <see cref="IImmediateFlowQuery{TSource}" />), with a separate round-trip to the database for each query.
+        ///     To reduce the number of round-trips to the database you should use delayed queries instead 
+        ///     (<see cref="IDelayedFlowQuery{TSource}" />). The difference between a 
+        ///     <see cref="IStreamedFlowQuery{TSource}" /> and a <see cref="IImmediateFlowQuery{TSource}" /> is that the
+        ///     entire result set for a <see cref="IStreamedFlowQuery{TSource}" /> never will be buffered into memory 
+        ///     before it reaches user-code. It's entirely up to user-code to load it into memory, if it is deemed 
+        ///     necessary for the particular situation.
+        /// </remarks>
+        public static IStreamedFlowQuery<TSource> StreamedFlowQuery<TSource>
+            (
+            this IStatelessSession session,
+            Expression<Func<TSource>> alias,
+            FlowQueryOptions options
+            )
+            where TSource : class
+        {
+            return StreamedFlowQuery(session.CreateCriteria, alias, options);
+        }
+
+        /// <summary>
         ///     Generates a <see cref="string" /> representation of the provided alias expression.
         /// </summary>
         /// <param name="alias">
@@ -1063,6 +1337,40 @@
             where TSource : class
         {
             return new ImmediateFlowQuery<TSource>
+            (
+                criteriaFactory,
+                Alias(alias) ?? RootAlias,
+                options
+            );
+        }
+
+        /// <summary>
+        ///     Creates a <see cref="IStreamedFlowQuery{TSource}" /> query.
+        /// </summary>
+        /// <param name="criteriaFactory">
+        ///     The criteria factory.
+        /// </param>
+        /// <param name="alias">
+        ///     The alias.
+        /// </param>
+        /// <param name="options">
+        ///     The options.
+        /// </param>
+        /// <typeparam name="TSource">
+        ///     The <see cref="System.Type" /> of the source entity.
+        /// </typeparam>
+        /// <returns>
+        ///     The created <see cref="IStreamedFlowQuery{TSource}" /> query.
+        /// </returns>
+        private static IStreamedFlowQuery<TSource> StreamedFlowQuery<TSource>
+            (
+            Func<Type, string, ICriteria> criteriaFactory,
+            Expression<Func<TSource>> alias,
+            FlowQueryOptions options
+            )
+            where TSource : class
+        {
+            return new StreamedFlowQuery<TSource>
             (
                 criteriaFactory,
                 Alias(alias) ?? RootAlias,
