@@ -19,7 +19,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
     [TestFixture]
     public class CacheableTest : BaseTest
     {
-        public override void OnSetup()
+        protected override void OnSetup()
         {
             using (ISession session = SessionFactory.OpenSession())
             {
@@ -36,7 +36,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
             }
         }
 
-        public override void OnTearDown()
+        protected override void OnTearDown()
         {
             using (ISession session = SessionFactory.OpenSession())
             {

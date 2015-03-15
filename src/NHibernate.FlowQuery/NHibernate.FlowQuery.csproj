@@ -70,11 +70,16 @@
     <Compile Include="AutoMapping\DefaultMapper.cs" />
     <Compile Include="AutoMapping\IMapper.cs" />
     <Compile Include="Core\ICriteriaBuilder%271.cs" />
+    <Compile Include="Core\IImmediateFlowQuery%271.cs" />
     <Compile Include="Core\Implementations\CriteriaBuilder.cs" />
+    <Compile Include="Core\Implementations\ImmediateFlowQueryBase%272.cs" />
     <Compile Include="Core\Implementations\LockBuilder.cs" />
     <Compile Include="Core\ILockBuilder.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Core\Implementations\StreamedFlowQuery.cs" />
+    <Compile Include="Core\IQueryableFlowQueryBase%271.cs" />
+    <Compile Include="Core\IStreamedFlowQuery%271.cs" />
     <Compile Include="Helpers\ResultStreamer.cs" />
     <Compile Include="Core\IPartialSelection%272.cs" />
     <Compile Include="Core\IResultStream%271.cs" />
@@ -97,9 +102,9 @@
     <Compile Include="Core\IMorphableFlowQuery%272.cs" />
     <Compile Include="Core\IDetachedFlowQuery%271.cs" />
     <Compile Include="Core\IDelayedFlowQuery%271.cs" />
-    <Compile Include="Core\IImmediateFlowQuery%271.cs" />
+    <Compile Include="Core\IImmediateFlowQueryBase%272.cs" />
     <Compile Include="Core\Implementations\DetachedFlowQuery.cs" />
-    <Compile Include="Core\Implementations\ImmediateFlowQuery.cs" />
+    <Compile Include="Core\Implementations\ImmediateFlowQuery%271.cs" />
     <Compile Include="Core\Implementations\DelayedFlowQuery.cs" />
     <Compile Include="Core\Implementations\FlowQueryBase.cs" />
     <Compile Include="Core\Structures\Join.cs" />

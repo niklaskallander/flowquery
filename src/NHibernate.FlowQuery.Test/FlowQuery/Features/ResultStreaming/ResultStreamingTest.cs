@@ -23,6 +23,7 @@
             var stream = new DummyResultStream<UserEntity, UserDto>();
 
             Query<UserEntity>()
+                .Streamed()
                 .Select(stream, Projections.Alias(Projections.Property("Id"), "Id"));
 
             Assert.That(stream.Items.Count, Is.EqualTo(4));
@@ -41,6 +42,7 @@
             var stream = new DummyResultStream<UserEntity, UserDto>();
 
             Query<UserEntity>()
+                .Streamed()
                 .Select(stream, "Id", "IsOnline");
 
             Assert.That(stream.Items.Count, Is.EqualTo(4));
@@ -61,6 +63,7 @@
             var stream = new DummyResultStream<UserEntity, UserEntity>();
 
             Query<UserEntity>()
+                .Streamed()
                 .Select(stream, x => x.Id, x => x.Firstname, x => x.Lastname);
 
             Assert.That(stream.Items.Count, Is.EqualTo(4));
@@ -81,6 +84,7 @@
             var stream = new DummyResultStream<UserEntity, UserDto>();
 
             Query<UserEntity>()
+                .Streamed()
                 .Select
                 (
                     stream,
@@ -104,6 +108,7 @@
             var stream = new DummyResultStream<UserEntity, UserDto>();
 
             Query<UserEntity>()
+                .Streamed()
                 .Select
                 (
                     stream,
@@ -119,6 +124,7 @@
             var stream = new DummyResultStream<UserEntity, UserEntity>();
 
             Query<UserEntity>()
+                .Streamed()
                 .Select(stream);
 
             Assert.That(stream.Items.Count, Is.EqualTo(4));
@@ -130,6 +136,7 @@
             DummyResultStream<UserEntity, RoleEnum> stream = DummyResultStream<UserEntity>.CreateFrom(x => x.Role);
 
             Query<UserEntity>()
+                .Streamed()
                 .Select(stream, stream.Expression);
 
             Assert.That(stream.Items.Count, Is.EqualTo(4));
@@ -154,6 +161,7 @@
                 });
 
             Query<UserEntity>()
+                .Streamed()
                 .Select(stream, selection);
 
             Assert.That(stream.Items.Count, Is.EqualTo(4));
@@ -174,6 +182,7 @@
             var stream = new DummyResultStream<UserEntity, UserEntity>();
 
             Query<UserEntity>()
+                .Streamed()
                 .Select(stream, Projections.Alias(Projections.Property("Id"), "Id"));
 
             Assert.That(stream.Items.Count, Is.EqualTo(4));
@@ -200,7 +209,9 @@
                 .For(x => x.Fullname).Use(x => x.Firstname + " " + x.Lastname)
                 .For(x => x.Id).Use(x => x.Id);
 
-            query.Select(stream, setup);
+            query
+                .Streamed()
+                .Select(stream, setup);
 
             Assert.That(stream.Items.Count, Is.EqualTo(4));
         }
@@ -211,6 +222,7 @@
             var stream = new DummyResultStream<UserEntity, UserEntity>();
 
             Query<UserEntity>()
+                .Streamed()
                 .Select(stream, "Id", "Firstname", "Lastname");
 
             Assert.That(stream.Items.Count, Is.EqualTo(4));
@@ -231,7 +243,9 @@
             Assert
                 .That
                 (
-                    () => Query<UserEntity>().Select((IResultStream<UserEntity>)null),
+                    () => Query<UserEntity>()
+                        .Streamed()
+                        .Select(null),
                     Throws.InstanceOf<ArgumentNullException>()
                 );
         }
@@ -246,7 +260,9 @@
             Assert
                 .That
                 (
-                    () => Query<UserEntity>().Select(stream, selection),
+                    () => Query<UserEntity>()
+                        .Streamed()
+                        .Select(stream, selection),
                     Throws.ArgumentException
                 );
         }
@@ -259,7 +275,9 @@
             Assert
                 .That
                 (
-                    () => Query<UserEntity>().Select(stream, (IPartialSelection<UserEntity, UserDto>)null),
+                    () => Query<UserEntity>()
+                        .Streamed()
+                        .Select(stream, (IPartialSelection<UserEntity, UserDto>)null),
                     Throws.InstanceOf<ArgumentNullException>()
                 );
         }

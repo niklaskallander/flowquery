@@ -232,5 +232,22 @@
             Expression<Func<TSource, TKey>> key,
             Expression<Func<TSource, TValue>> value
             );
+
+        /// <summary>
+        ///     Transform this query into a <see cref="IStreamedFlowQuery{TSource}" /> query instance.
+        /// </summary>
+        /// <returns>
+        ///     A new <see cref="IStreamedFlowQuery{TSource}" /> instance created from this query.
+        /// </returns>
+        /// <remarks>
+        ///     Streamed queries are executed by <see cref="NHibernate" /> immediately (just like 
+        ///     <see cref="IImmediateFlowQuery{TSource}" />), with a separate round-trip to the database for each query.
+        ///     The difference between a <see cref="IStreamedFlowQuery{TSource}" /> and a 
+        ///     <see cref="IImmediateFlowQuery{TSource}" /> is that the entire result set for a 
+        ///     <see cref="IStreamedFlowQuery{TSource}" /> never will be buffered into memory before it reaches 
+        ///     user-code. It's entirely up to user-code to load it into memory, if it is deemed necessary for the 
+        ///     particular situation.
+        /// </remarks>
+        IStreamedFlowQuery<TSource> Streamed();
     }
 }

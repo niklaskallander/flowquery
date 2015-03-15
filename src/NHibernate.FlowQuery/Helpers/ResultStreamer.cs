@@ -162,6 +162,9 @@
         /// <returns>
         ///     The element at the specified index.
         /// </returns>
+        /// <value>
+        ///     The element.
+        /// </value>
         public object this[int index]
         {
             get

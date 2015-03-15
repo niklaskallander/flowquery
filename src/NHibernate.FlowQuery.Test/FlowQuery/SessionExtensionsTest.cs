@@ -197,5 +197,81 @@ namespace NHibernate.FlowQuery.Test.FlowQuery
 
             Assert.That(query != null);
         }
+
+        [Test]
+        public void CanCreateStreamedFlowQuery()
+        {
+            Assert.That(() => Session.StreamedFlowQuery<UserEntity>(), Throws.Nothing);
+
+            IStreamedFlowQuery<UserEntity> query = Session.StreamedFlowQuery<UserEntity>();
+
+            Assert.That(query != null);
+        }
+
+        [Test]
+        public void CanCreateStreamedFlowQueryWithAlias()
+        {
+            UserEntity alias = null;
+
+            Assert.That(() => Session.StreamedFlowQuery(() => alias), Throws.Nothing);
+
+            IStreamedFlowQuery<UserEntity> query = Session.StreamedFlowQuery(() => alias);
+
+            Assert.That(query != null);
+
+            ICriteria criteria = new CriteriaBuilder()
+                .Build<UserEntity, UserEntity>(QuerySelection.Create(query as IQueryableFlowQuery));
+
+            Assert.That(criteria.Alias, Is.EqualTo("alias"));
+        }
+
+        [Test]
+        public void CanCreateStreamedFlowQueryWithOptions()
+        {
+            Assert.That(() => Session.StreamedFlowQuery<UserEntity>(new FlowQueryOptions()), Throws.Nothing);
+
+            IStreamedFlowQuery<UserEntity> query =
+                Session.StreamedFlowQuery<UserEntity>(new FlowQueryOptions());
+
+            Assert.That(query != null);
+        }
+
+        [Test]
+        public void CanCreateStatelessStreamedFlowQuery()
+        {
+            Assert.That(() => StatelessSession.StreamedFlowQuery<UserEntity>(), Throws.Nothing);
+
+            IStreamedFlowQuery<UserEntity> query = StatelessSession.StreamedFlowQuery<UserEntity>();
+
+            Assert.That(query != null);
+        }
+
+        [Test]
+        public void CanCreateStatelessStreamedFlowQueryWithAlias()
+        {
+            UserEntity alias = null;
+
+            Assert.That(() => StatelessSession.StreamedFlowQuery(() => alias), Throws.Nothing);
+
+            IStreamedFlowQuery<UserEntity> query = StatelessSession.StreamedFlowQuery(() => alias);
+
+            Assert.That(query != null);
+
+            ICriteria criteria = new CriteriaBuilder()
+                .Build<UserEntity, UserEntity>(QuerySelection.Create(query as IQueryableFlowQuery));
+
+            Assert.That(criteria.Alias, Is.EqualTo("alias"));
+        }
+
+        [Test]
+        public void CanCreateStatelessStreamedFlowQueryWithOptions()
+        {
+            Assert.That(() => StatelessSession.StreamedFlowQuery<UserEntity>(new FlowQueryOptions()), Throws.Nothing);
+
+            IStreamedFlowQuery<UserEntity> query =
+                StatelessSession.StreamedFlowQuery<UserEntity>(new FlowQueryOptions());
+
+            Assert.That(query != null);
+        }
     }
 }

@@ -43,7 +43,7 @@
         ///     The property to count.
         /// </param>
         /// <returns>
-        ///     This <see cref="IDetachedFlowQuery{TSource}"/> query.
+        ///     This <see cref="IDetachedFlowQuery{TSource}" /> query.
         /// </returns>
         IDetachedFlowQuery<TSource> Count(string property);
 
@@ -55,7 +55,7 @@
         ///     The projection to count.
         /// </param>
         /// <returns>
-        ///     This <see cref="IDetachedFlowQuery{TSource}"/> query.
+        ///     This <see cref="IDetachedFlowQuery{TSource}" /> query.
         /// </returns>
         IDetachedFlowQuery<TSource> Count(IProjection projection);
 
@@ -67,7 +67,7 @@
         ///     The property to count.
         /// </param>
         /// <returns>
-        ///     This <see cref="IDetachedFlowQuery{TSource}"/> query.
+        ///     This <see cref="IDetachedFlowQuery{TSource}" /> query.
         /// </returns>
         IDetachedFlowQuery<TSource> Count(Expression<Func<TSource, object>> property);
 
@@ -81,25 +81,25 @@
         IDetachedFlowQuery<TSource> CountLong();
 
         /// <summary>
-        ///     Returns a copy of this <see cref="IDetachedFlowQuery{TSource}" /> but in the form of a 
+        ///     Returns a copy of this <see cref="IDetachedFlowQuery{TSource}" /> but in the form of a
         ///     <see cref="IDelayedFlowQuery{TSource}" /> instead.
         /// </summary>
         /// <returns>
-        ///     A copy of this <see cref="IDetachedFlowQuery{TSource}" /> but in the form of a 
+        ///     A copy of this <see cref="IDetachedFlowQuery{TSource}" /> but in the form of a
         ///     <see cref="IDelayedFlowQuery{TSource}" /> instead.
         /// </returns>
         IDelayedFlowQuery<TSource> Delayed();
 
         /// <summary>
-        ///     Returns a copy of this <see cref="IDetachedFlowQuery{TSource}"/> but in the form of a 
-        ///     <see cref="IDelayedFlowQuery{TSource}"/> instead.
+        ///     Returns a copy of this <see cref="IDetachedFlowQuery{TSource}" /> but in the form of a
+        ///     <see cref="IDelayedFlowQuery{TSource}" /> instead.
         /// </summary>
         /// <param name="session">
         ///     The session.
         /// </param>
         /// <returns>
-        ///     A copy of this <see cref="IDetachedFlowQuery{TSource}"/> but in the form of a 
-        ///     <see cref="IDelayedFlowQuery{TSource}"/> instead.
+        ///     A copy of this <see cref="IDetachedFlowQuery{TSource}" /> but in the form of a
+        ///     <see cref="IDelayedFlowQuery{TSource}" /> instead.
         /// </returns>
         /// <exception cref="ArgumentNullException">
         ///     <paramref name="session" /> is null.
@@ -107,15 +107,15 @@
         IDelayedFlowQuery<TSource> Delayed(ISession session);
 
         /// <summary>
-        ///     Returns a copy of this <see cref="IDetachedFlowQuery{TSource}"/> but in the form of a 
-        ///     <see cref="IDelayedFlowQuery{TSource}"/> instead.
+        ///     Returns a copy of this <see cref="IDetachedFlowQuery{TSource}" /> but in the form of a
+        ///     <see cref="IDelayedFlowQuery{TSource}" /> instead.
         /// </summary>
         /// <param name="session">
         ///     The session.
         /// </param>
         /// <returns>
-        ///     A copy of this <see cref="IDetachedFlowQuery{TSource}"/> but in the form of a 
-        ///     <see cref="IDelayedFlowQuery{TSource}"/> instead.
+        ///     A copy of this <see cref="IDetachedFlowQuery{TSource}" /> but in the form of a
+        ///     <see cref="IDelayedFlowQuery{TSource}" /> instead.
         /// </returns>
         /// <exception cref="ArgumentNullException">
         ///     <paramref name="session" /> is null.
@@ -131,24 +131,24 @@
         IDetachedFlowQuery<TSource> Distinct();
 
         /// <summary>
-        ///     Returns a copy of this <see cref="IDetachedFlowQuery{TSource}" /> but in the form of a 
+        ///     Returns a copy of this <see cref="IDetachedFlowQuery{TSource}" /> but in the form of a
         ///     <see cref="IImmediateFlowQuery{TSource}" /> instead.
         /// </summary>
         /// <returns>
-        ///     A copy of this <see cref="IDetachedFlowQuery{TSource}" /> but in the form of a 
+        ///     A copy of this <see cref="IDetachedFlowQuery{TSource}" /> but in the form of a
         ///     <see cref="IImmediateFlowQuery{TSource}" /> instead.
         /// </returns>
         IImmediateFlowQuery<TSource> Immediate();
 
         /// <summary>
-        ///     Returns a copy of this <see cref="IDetachedFlowQuery{TSource}" /> but in the form of a 
+        ///     Returns a copy of this <see cref="IDetachedFlowQuery{TSource}" /> but in the form of a
         ///     <see cref="IImmediateFlowQuery{TSource}" /> instead.
         /// </summary>
         /// <param name="session">
         ///     The session.
         /// </param>
         /// <returns>
-        ///     A copy of this <see cref="IDetachedFlowQuery{TSource}" /> but in the form of a 
+        ///     A copy of this <see cref="IDetachedFlowQuery{TSource}" /> but in the form of a
         ///     <see cref="IImmediateFlowQuery{TSource}" /> instead.
         /// </returns>
         /// <exception cref="ArgumentNullException">
@@ -157,14 +157,14 @@
         IImmediateFlowQuery<TSource> Immediate(ISession session);
 
         /// <summary>
-        ///     Returns a copy of this <see cref="IDetachedFlowQuery{TSource}" /> but in the form of a 
+        ///     Returns a copy of this <see cref="IDetachedFlowQuery{TSource}" /> but in the form of a
         ///     <see cref="IImmediateFlowQuery{TSource}" /> instead.
         /// </summary>
         /// <param name="session">
         ///     The session.
         /// </param>
         /// <returns>
-        ///     A copy of this <see cref="IDetachedFlowQuery{TSource}" /> but in the form of a 
+        ///     A copy of this <see cref="IDetachedFlowQuery{TSource}" /> but in the form of a
         ///     <see cref="IImmediateFlowQuery{TSource}" /> instead.
         /// </returns>
         /// <exception cref="ArgumentNullException">
@@ -227,5 +227,47 @@
         /// </returns>
         IDetachedFlowQuery<TSource> SetRootAlias<TAlias>(Expression<Func<TAlias>> alias)
             where TAlias : class;
+
+        /// <summary>
+        ///     Returns a copy of this <see cref="IDetachedFlowQuery{TSource}" /> but in the form of a
+        ///     <see cref="IStreamedFlowQuery{TSource}" /> instead.
+        /// </summary>
+        /// <returns>
+        ///     A copy of this <see cref="IDetachedFlowQuery{TSource}" /> but in the form of a
+        ///     <see cref="IStreamedFlowQuery{TSource}" /> instead.
+        /// </returns>
+        IStreamedFlowQuery<TSource> Streamed();
+
+        /// <summary>
+        ///     Returns a copy of this <see cref="IDetachedFlowQuery{TSource}" /> but in the form of a
+        ///     <see cref="IStreamedFlowQuery{TSource}" /> instead.
+        /// </summary>
+        /// <param name="session">
+        ///     The session.
+        /// </param>
+        /// <returns>
+        ///     A copy of this <see cref="IDetachedFlowQuery{TSource}" /> but in the form of a
+        ///     <see cref="IStreamedFlowQuery{TSource}" /> instead.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        ///     <paramref name="session" /> is null.
+        /// </exception>
+        IStreamedFlowQuery<TSource> Streamed(ISession session);
+
+        /// <summary>
+        ///     Returns a copy of this <see cref="IDetachedFlowQuery{TSource}" /> but in the form of a
+        ///     <see cref="IStreamedFlowQuery{TSource}" /> instead.
+        /// </summary>
+        /// <param name="session">
+        ///     The session.
+        /// </param>
+        /// <returns>
+        ///     A copy of this <see cref="IDetachedFlowQuery{TSource}" /> but in the form of a
+        ///     <see cref="IStreamedFlowQuery{TSource}" /> instead.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        ///     <paramref name="session" /> is null.
+        /// </exception>
+        IStreamedFlowQuery<TSource> Streamed(IStatelessSession session);
     }
 }

@@ -20,7 +20,7 @@
     public abstract class QueryableFlowQueryBase<TSource, TQuery>
         : MorphableFlowQueryBase<TSource, TQuery>, IQueryableFlowQuery<TSource, TQuery>, IQueryableFlowQuery
         where TSource : class
-        where TQuery : class, IQueryableFlowQuery<TSource, TQuery>
+        where TQuery : class, IQueryableFlowQueryBase<TSource, TQuery>
     {
         /// <summary>
         ///     Initializes a new instance of the <see cref="QueryableFlowQueryBase{TSource,TQuery}" /> class.
@@ -112,17 +112,6 @@
         }
 
         /// <inheritdoc />
-        public virtual void Select(IResultStream<TSource> resultStream)
-        {
-            Constructor = null;
-            Mappings = null;
-            Projection = null;
-            ResultTransformer = null;
-
-            SelectStream(resultStream);
-        }
-
-        /// <inheritdoc />
         /// <typeparam name="TDestination">
         ///     The <see cref="System.Type" /> of the selection.
         /// </typeparam>
@@ -140,35 +129,15 @@
         }
 
         /// <inheritdoc />
-        public virtual void Select<TDestination>
+        public virtual FlowQuerySelection<TSource> Select
             (
-            IResultStream<TDestination> resultStream,
-            ISelectSetup<TSource, TDestination> setup
-            )
-        {
-            Project(setup);
-
-            SelectStream(resultStream);
-        }
-
-        /// <inheritdoc />
-        public virtual FlowQuerySelection<TSource> Select(params string[] properties)
-        {
-            Project(properties);
-
-            return SelectList<TSource>();
-        }
-
-        /// <inheritdoc />
-        public virtual void Select
-            (
-            IResultStream<TSource> resultStream,
+            string property,
             params string[] properties
             )
         {
-            Project(properties);
+            Project(property, properties);
 
-            SelectStream(resultStream);
+            return SelectList<TSource>();
         }
 
         /// <inheritdoc />
@@ -180,41 +149,18 @@
         }
 
         /// <inheritdoc />
-        public virtual void Select
-            (
-            IResultStream<TSource> resultStream,
-            IProjection projection
-            )
-        {
-            Project(projection);
-
-            SelectStream(resultStream);
-        }
-
-        /// <inheritdoc />
         /// <typeparam name="TDestination">
         ///     The <see cref="System.Type" /> of the selection.
         /// </typeparam>
-        public virtual FlowQuerySelection<TDestination> Select<TDestination>(params string[] properties)
-        {
-            Project<TDestination>(properties);
-
-            return SelectList<TDestination>();
-        }
-
-        /// <inheritdoc />
-        /// <typeparam name="TDestination">
-        ///     The <see cref="System.Type" /> of the selection.
-        /// </typeparam>
-        public virtual void Select<TDestination>
+        public virtual FlowQuerySelection<TDestination> Select<TDestination>
             (
-            IResultStream<TDestination> resultStream,
+            string property,
             params string[] properties
             )
         {
-            Project<TDestination>(properties);
+            Project<TDestination>(property, properties);
 
-            SelectStream(resultStream);
+            return SelectList<TDestination>();
         }
 
         /// <inheritdoc />
@@ -229,38 +175,11 @@
         }
 
         /// <inheritdoc />
-        /// <typeparam name="TDestination">
-        ///     The <see cref="System.Type" /> of the selection.
-        /// </typeparam>
-        public virtual void Select<TDestination>
-            (
-            IResultStream<TDestination> resultStream,
-            IProjection projection
-            )
-        {
-            Project<TDestination>(projection);
-
-            SelectStream(resultStream);
-        }
-
-        /// <inheritdoc />
         public virtual FlowQuerySelection<TSource> Select(params Expression<Func<TSource, object>>[] properties)
         {
             Project(properties);
 
             return SelectList<TSource>();
-        }
-
-        /// <inheritdoc />
-        public virtual void Select
-            (
-            IResultStream<TSource> resultStream,
-            params Expression<Func<TSource, object>>[] properties
-            )
-        {
-            Project(properties);
-
-            SelectStream(resultStream);
         }
 
         /// <inheritdoc />
@@ -272,18 +191,6 @@
             Project(projection);
 
             return SelectList<TDestination>();
-        }
-
-        /// <inheritdoc />
-        public virtual void Select<TDestination>
-            (
-            IResultStream<TDestination> resultStream,
-            Expression<Func<TSource, TDestination>> projection
-            )
-        {
-            Project(projection);
-
-            SelectStream(resultStream);
         }
 
         /// <inheritdoc />
@@ -305,28 +212,6 @@
             Expression<Func<TSource, TDestination>> expression = combiner.Compile();
 
             return Select(expression);
-        }
-
-        /// <inheritdoc />
-        public virtual void Select<TDestination>
-            (
-            IResultStream<TDestination> resultStream,
-            IPartialSelection<TSource, TDestination> combiner
-            )
-        {
-            if (combiner == null)
-            {
-                throw new ArgumentNullException("combiner");
-            }
-
-            if (combiner.Count == 0)
-            {
-                throw new ArgumentException("No projection is made in ExpressionCombiner'2", "combiner");
-            }
-
-            Expression<Func<TSource, TDestination>> expression = combiner.Compile();
-
-            Select(resultStream, expression);
         }
 
         /// <inheritdoc />
@@ -436,21 +321,6 @@
         protected virtual FlowQuerySelection<TDestination> SelectList<TDestination>()
         {
             return SelectionHelper.SelectList<TSource, TDestination>(QuerySelection.Create(this));
-        }
-
-        /// <summary>
-        ///     Populates the given <see cref="IResultStream{TDestination}" /> with the results of this query in a
-        ///     streamed fashion.
-        /// </summary>
-        /// <param name="resultStream">
-        ///     The <see cref="IResultStream{TDestination}" /> to stream the results into.
-        /// </param>
-        /// <typeparam name="TDestination">
-        ///     The <see cref="System.Type" /> of the selection.
-        /// </typeparam>
-        protected virtual void SelectStream<TDestination>(IResultStream<TDestination> resultStream)
-        {
-            SelectionHelper.SelectStream<TSource, TDestination>(QuerySelection.Create(this), resultStream);
         }
 
         /// <summary>

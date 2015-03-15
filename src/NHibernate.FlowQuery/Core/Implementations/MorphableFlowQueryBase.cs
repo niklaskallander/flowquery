@@ -47,7 +47,7 @@
         ///     <paramref name="criteriaFactory" /> is null and the specific query alteration is not an implementation
         ///     of <see cref="T:IDetachedFlowQuery{TSource}" />.
         /// </exception>
-        protected internal MorphableFlowQueryBase
+        protected MorphableFlowQueryBase
             (
             Func<Type, string, ICriteria> criteriaFactory,
             string alias = null,
@@ -142,9 +142,9 @@
         }
 
         /// <inheritdoc />
-        public virtual TQuery Project(params string[] properties)
+        public virtual TQuery Project(string property, params string[] properties)
         {
-            return Project<TSource>(properties);
+            return Project<TSource>(property, properties);
         }
 
         /// <inheritdoc />
@@ -197,8 +197,11 @@
         /// <summary>
         ///     Specifies a list of properties to project.
         /// </summary>
+        /// <param name="property">
+        ///     The property to select.
+        /// </param>
         /// <param name="properties">
-        ///     The properties to project.
+        ///     Additional properties to select.
         /// </param>
         /// <typeparam name="TDestination">
         ///     The <see cref="System.Type" /> of the result.
@@ -209,18 +212,19 @@
         /// <exception cref="ArgumentNullException">
         ///     <paramref name="properties" /> is null.
         /// </exception>
-        protected virtual TQuery Project<TDestination>(params string[] properties)
+        protected virtual TQuery Project<TDestination>(string property, params string[] properties)
         {
-            if (properties == null)
+            if (property == null)
             {
-                throw new ArgumentNullException("properties");
+                throw new ArgumentNullException("property");
             }
 
             return Project<TDestination>
             (
                 Projections
                     .ProjectionList()
-                    .AddProperties(properties)
+                    .AddProperty(property)
+                    .AddProperties(properties ?? new string[0])
             );
         }
 
@@ -336,6 +340,12 @@
             }
 
             return Query;
+        }
+
+        /// <inheritdoc />
+        public virtual IStreamedFlowQuery<TSource> Streamed()
+        {
+            return new StreamedFlowQuery<TSource>(CriteriaFactory, Alias, Options, this);
         }
     }
 }

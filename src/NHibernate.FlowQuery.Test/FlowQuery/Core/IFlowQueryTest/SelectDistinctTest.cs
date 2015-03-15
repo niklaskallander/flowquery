@@ -61,7 +61,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                 .Distinct()
                 .Select(u => new
                 {
-                    Count = Aggregate.Count(u.Id), 
+                    Count = Aggregate.Count(u.Id),
                     Role = Aggregate.GroupBy(u.Role)
                 });
 
@@ -158,7 +158,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                 .Distinct()
                 .Select(x => new UserEntity
                 {
-                    Id = x.Id, 
+                    Id = x.Id,
                     Setting = new Setting()
                 });
 
@@ -305,7 +305,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                         DummyQuery<UserEntity>()
                             .Distinct().Select<UserDto>()
                             .For(c => c.Fullname).Use(x);
-                    }, 
+                    },
                     Throws.InstanceOf<ArgumentNullException>()
                 );
         }
@@ -323,7 +323,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                         DummyQuery<UserEntity>()
                             .Distinct().Select<UserDto>()
                             .For(x);
-                    }, 
+                    },
                     Throws.InstanceOf<ArgumentNullException>()
                 );
         }
@@ -339,7 +339,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                         DummyQuery<UserEntity>()
                             .Distinct().Select<UserDto>()
                             .Select();
-                    }, 
+                    },
                     Throws.InstanceOf<InvalidOperationException>()
                 );
         }
@@ -354,7 +354,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                     {
                         DummyQuery<UserEntity>()
                             .Distinct().Select(x => new { });
-                    }, 
+                    },
                     Throws.InstanceOf<NotSupportedException>()
                 );
         }
@@ -371,7 +371,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                     {
                         DummyQuery<UserEntity>()
                             .Distinct().Select(e);
-                    }, 
+                    },
                     Throws.InstanceOf<ArgumentNullException>()
                 );
         }
@@ -388,7 +388,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                     {
                         DummyQuery<UserEntity>()
                             .Distinct().Select(e);
-                    }, 
+                    },
                     Throws.InstanceOf<ArgumentNullException>()
                 );
         }
@@ -405,7 +405,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                     {
                         DummyQuery<UserEntity>()
                             .Distinct().Select(p);
-                    }, 
+                    },
                     Throws.InstanceOf<ArgumentNullException>()
                 );
 
@@ -416,7 +416,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                     {
                         DummyQuery<UserEntity>()
                             .Distinct().Select<UserDto>(p);
-                    }, 
+                    },
                     Throws.InstanceOf<ArgumentNullException>()
                 );
         }
@@ -433,7 +433,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                     {
                         DummyQuery<UserEntity>()
                             .Distinct().Select(p);
-                    }, 
+                    },
                     Throws.InstanceOf<ArgumentNullException>()
                 );
 
@@ -445,7 +445,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                         DummyQuery<UserEntity>()
                             .Distinct()
                             .Select<UserDto>(p);
-                    }, 
+                    },
                     Throws.InstanceOf<ArgumentNullException>()
                 );
         }
@@ -462,24 +462,22 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                             .Distinct()
                             .Select<UserEntity>()
                             .Select();
-                    }, 
+                    },
                     Throws.InvalidOperationException
                 );
         }
 
         [Test]
-        public void SelectUsingStringsThrowsIfStringArrayIsNull()
+        public void SelectUsingStringsThrowsIfStringIsNull()
         {
-            string[] strings = null;
-
             Assert
                 .That
                 (
                     () =>
                     {
                         DummyQuery<UserEntity>()
-                            .Distinct().Select(strings);
-                    }, 
+                            .Distinct().Select((string)null);
+                    },
                     Throws.InstanceOf<ArgumentNullException>()
                 );
         }

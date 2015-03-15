@@ -8,122 +8,172 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core
 
     using NUnit.Framework;
 
-    using Is = NUnit.Framework.Is;
-
     [TestFixture]
     public class MorphabilityTest : BaseTest
     {
         [Test]
-        public void CanMorphQueries()
+        public void CanMorphDelayedToDetached()
         {
-            IImmediateFlowQuery<UserEntity> immediateQuery = DummyQuery<UserEntity>();
-
-            Assert.That(immediateQuery, Is.Not.Null);
-
-            IDelayedFlowQuery<UserEntity> delayedQuery = immediateQuery
+            IDelayedFlowQuery<UserEntity> query = DummyQuery<UserEntity>()
                 .Delayed();
 
-            Assert.That(delayedQuery, Is.Not.Null);
+            Assert.That(query, Is.Not.Null);
 
-            IDetachedFlowQuery<UserEntity> detachedQuery = delayedQuery
+            IDetachedFlowQuery<UserEntity> morphed = query
                 .Detached();
 
-            Assert.That(detachedQuery, Is.Not.Null);
+            Assert.That(morphed, Is.Not.Null);
+        }
 
-            immediateQuery = delayedQuery
-                .Immediate();
-
-            Assert.That(immediateQuery, Is.Not.Null);
-
-            delayedQuery = detachedQuery
+        [Test]
+        public void CanMorphDelayedToImmediate()
+        {
+            IDelayedFlowQuery<UserEntity> query = DummyQuery<UserEntity>()
                 .Delayed();
 
-            Assert.That(delayedQuery, Is.Not.Null);
+            Assert.That(query, Is.Not.Null);
 
-            immediateQuery = detachedQuery
+            IImmediateFlowQuery<UserEntity> morphed = query
                 .Immediate();
 
-            Assert.That(immediateQuery, Is.Not.Null);
+            Assert.That(morphed, Is.Not.Null);
         }
 
         [Test]
-        public void TransformingTrulyDetachedQueryToImmediateThrowsWhenNotProvidingSession()
+        public void CanMorphDelayedToStreamed()
         {
-            var query = new DummyDetachedQuery();
+            IDelayedFlowQuery<UserEntity> query = DummyQuery<UserEntity>()
+                .Delayed();
 
-            Assert.That(query.CriteriaFactory, Is.Null);
+            Assert.That(query, Is.Not.Null);
 
-            Assert.That(() => query.Immediate(), Throws.InvalidOperationException);
+            IStreamedFlowQuery<UserEntity> morphed = query
+                .Streamed();
+
+            Assert.That(morphed, Is.Not.Null);
         }
 
         [Test]
-        public void TransformingTrulyDetachedQueryToDelayedThrowsWhenNotProvidingSession()
+        public void CanMorphDetachedToDelayed()
         {
-            var query = new DummyDetachedQuery();
+            IDetachedFlowQuery<UserEntity> query = DummyQuery<UserEntity>()
+                .Detached();
 
-            Assert.That(query.CriteriaFactory, Is.Null);
+            Assert.That(query, Is.Not.Null);
 
-            Assert.That(() => query.Delayed(), Throws.InvalidOperationException);
+            IDelayedFlowQuery<UserEntity> morphed = query
+                .Delayed();
+
+            Assert.That(morphed, Is.Not.Null);
         }
 
         [Test]
-        public void TransformingTrulyDetachedQueryToImmediateThrowsWhenNotProvidingNullSession()
+        public void CanMorphDetachedToImmediate()
         {
-            var query = new DummyDetachedQuery();
+            IDetachedFlowQuery<UserEntity> query = DummyQuery<UserEntity>()
+                .Detached();
 
-            Assert.That(query.CriteriaFactory, Is.Null);
+            Assert.That(query, Is.Not.Null);
 
-            Assert.That(() => query.Immediate((ISession)null), Throws.InstanceOf<ArgumentNullException>());
+            IImmediateFlowQuery<UserEntity> morphed = query
+                .Immediate();
+
+            Assert.That(morphed, Is.Not.Null);
         }
 
         [Test]
-        public void TransformingTrulyDetachedQueryToDelayedThrowsWhenNotProvidingNullSession()
+        public void CanMorphDetachedToStreamed()
         {
-            var query = new DummyDetachedQuery();
+            IDetachedFlowQuery<UserEntity> query = DummyQuery<UserEntity>()
+                .Detached();
 
-            Assert.That(query.CriteriaFactory, Is.Null);
+            Assert.That(query, Is.Not.Null);
 
-            Assert.That(() => query.Delayed((ISession)null), Throws.InstanceOf<ArgumentNullException>());
+            IStreamedFlowQuery<UserEntity> morphed = query
+                .Streamed();
+
+            Assert.That(morphed, Is.Not.Null);
         }
 
         [Test]
-        public void TransformingTrulyDetachedQueryToImmediateThrowsWhenNotProvidingNullStatelessSession()
+        public void CanMorphImmediateToDelayed()
         {
-            var query = new DummyDetachedQuery();
+            IImmediateFlowQuery<UserEntity> query = DummyQuery<UserEntity>();
 
-            Assert.That(query.CriteriaFactory, Is.Null);
+            Assert.That(query, Is.Not.Null);
 
-            Assert.That(() => query.Immediate((IStatelessSession)null), Throws.InstanceOf<ArgumentNullException>());
+            IDelayedFlowQuery<UserEntity> morphed = query
+                .Delayed();
+
+            Assert.That(morphed, Is.Not.Null);
         }
 
         [Test]
-        public void TransformingTrulyDetachedQueryToDelayedThrowsWhenNotProvidingNullStatelessSession()
+        public void CanMorphImmediateToDetached()
         {
-            var query = new DummyDetachedQuery();
+            IImmediateFlowQuery<UserEntity> query = DummyQuery<UserEntity>();
 
-            Assert.That(query.CriteriaFactory, Is.Null);
+            Assert.That(query, Is.Not.Null);
 
-            Assert.That(() => query.Delayed((IStatelessSession)null), Throws.InstanceOf<ArgumentNullException>());
+            IDetachedFlowQuery<UserEntity> morphed = query
+                .Detached();
+
+            Assert.That(morphed, Is.Not.Null);
         }
 
         [Test]
-        public void TransformingTrulyDetachedQueryToImmediateDoesNotThrowWhenProvidingSession()
+        public void CanMorphImmediateToStreamed()
         {
-            var query = new DummyDetachedQuery();
+            IImmediateFlowQuery<UserEntity> query = DummyQuery<UserEntity>();
 
-            Assert.That(query.CriteriaFactory, Is.Null);
+            Assert.That(query, Is.Not.Null);
 
-            IImmediateFlowQuery<UserEntity> immediate = null;
+            IStreamedFlowQuery<UserEntity> morphed = query
+                .Streamed();
 
-            Assert.That(() => immediate = query.Immediate(Session), Throws.Nothing);
+            Assert.That(morphed, Is.Not.Null);
+        }
 
-            Assert.That(immediate, Is.Not.Null);
+        [Test]
+        public void CanMorphStreamedToDelayed()
+        {
+            IStreamedFlowQuery<UserEntity> query = DummyQuery<UserEntity>()
+                .Streamed();
 
-            var queryInfo = immediate as IFlowQuery;
+            Assert.That(query, Is.Not.Null);
 
-            Assert.That(queryInfo, Is.Not.Null);
+            IDelayedFlowQuery<UserEntity> morphed = query
+                .Delayed();
 
-            Assert.That(queryInfo.CriteriaFactory, Is.Not.Null);
+            Assert.That(morphed, Is.Not.Null);
+        }
+
+        [Test]
+        public void CanMorphStreamedToDetached()
+        {
+            IStreamedFlowQuery<UserEntity> query = DummyQuery<UserEntity>()
+                .Streamed();
+
+            Assert.That(query, Is.Not.Null);
+
+            IDetachedFlowQuery<UserEntity> morphed = query
+                .Detached();
+
+            Assert.That(morphed, Is.Not.Null);
+        }
+
+        [Test]
+        public void CanMorphStreamedToImmediate()
+        {
+            IStreamedFlowQuery<UserEntity> query = DummyQuery<UserEntity>()
+                .Streamed();
+
+            Assert.That(query, Is.Not.Null);
+
+            IImmediateFlowQuery<UserEntity> morphed = query
+                .Immediate();
+
+            Assert.That(morphed, Is.Not.Null);
         }
 
         [Test]
@@ -141,29 +191,14 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core
 
             var queryInfo = delayed as IFlowQuery;
 
-            Assert.That(queryInfo, Is.Not.Null);
-
-            Assert.That(queryInfo.CriteriaFactory, Is.Not.Null);
-        }
-
-        [Test]
-        public void TransformingTrulyDetachedQueryToImmediateDoesNotThrowWhenProvidingStatelessSession()
-        {
-            var query = new DummyDetachedQuery();
-
-            Assert.That(query.CriteriaFactory, Is.Null);
-
-            IImmediateFlowQuery<UserEntity> immediate = null;
-
-            Assert.That(() => immediate = query.Immediate(StatelessSession), Throws.Nothing);
-
-            Assert.That(immediate, Is.Not.Null);
-
-            var queryInfo = immediate as IFlowQuery;
-
-            Assert.That(queryInfo, Is.Not.Null);
-
-            Assert.That(queryInfo.CriteriaFactory, Is.Not.Null);
+            if (queryInfo == null)
+            {
+                Assert.Fail("queryInfo was null");
+            }
+            else
+            {
+                Assert.That(queryInfo.CriteriaFactory, Is.Not.Null);
+            }
         }
 
         [Test]
@@ -181,9 +216,204 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core
 
             var queryInfo = delayed as IFlowQuery;
 
-            Assert.That(queryInfo, Is.Not.Null);
+            if (queryInfo == null)
+            {
+                Assert.Fail("queryInfo was null");
+            }
+            else
+            {
+                Assert.That(queryInfo.CriteriaFactory, Is.Not.Null);
+            }
+        }
 
-            Assert.That(queryInfo.CriteriaFactory, Is.Not.Null);
+        [Test]
+        public void TransformingTrulyDetachedQueryToDelayedThrowsWhenNotProvidingNullSession()
+        {
+            var query = new DummyDetachedQuery();
+
+            Assert.That(query.CriteriaFactory, Is.Null);
+
+            Assert.That(() => query.Delayed((ISession)null), Throws.InstanceOf<ArgumentNullException>());
+        }
+
+        [Test]
+        public void TransformingTrulyDetachedQueryToDelayedThrowsWhenNotProvidingNullStatelessSession()
+        {
+            var query = new DummyDetachedQuery();
+
+            Assert.That(query.CriteriaFactory, Is.Null);
+
+            Assert.That(() => query.Delayed((IStatelessSession)null), Throws.InstanceOf<ArgumentNullException>());
+        }
+
+        [Test]
+        public void TransformingTrulyDetachedQueryToDelayedThrowsWhenNotProvidingSession()
+        {
+            var query = new DummyDetachedQuery();
+
+            Assert.That(query.CriteriaFactory, Is.Null);
+
+            Assert.That(() => query.Delayed(), Throws.InvalidOperationException);
+        }
+
+        [Test]
+        public void TransformingTrulyDetachedQueryToImmediateDoesNotThrowWhenProvidingSession()
+        {
+            var query = new DummyDetachedQuery();
+
+            Assert.That(query.CriteriaFactory, Is.Null);
+
+            IImmediateFlowQuery<UserEntity> immediate = null;
+
+            Assert.That(() => immediate = query.Immediate(Session), Throws.Nothing);
+
+            Assert.That(immediate, Is.Not.Null);
+
+            var queryInfo = immediate as IFlowQuery;
+
+            if (queryInfo == null)
+            {
+                Assert.Fail("queryInfo was null");
+            }
+            else
+            {
+                Assert.That(queryInfo.CriteriaFactory, Is.Not.Null);
+            }
+        }
+
+        [Test]
+        public void TransformingTrulyDetachedQueryToImmediateDoesNotThrowWhenProvidingStatelessSession()
+        {
+            var query = new DummyDetachedQuery();
+
+            Assert.That(query.CriteriaFactory, Is.Null);
+
+            IImmediateFlowQuery<UserEntity> immediate = null;
+
+            Assert.That(() => immediate = query.Immediate(StatelessSession), Throws.Nothing);
+
+            Assert.That(immediate, Is.Not.Null);
+
+            var queryInfo = immediate as IFlowQuery;
+
+            if (queryInfo == null)
+            {
+                Assert.Fail("queryInfo was null");
+            }
+            else
+            {
+                Assert.That(queryInfo.CriteriaFactory, Is.Not.Null);
+            }
+        }
+
+        [Test]
+        public void TransformingTrulyDetachedQueryToImmediateThrowsWhenNotProvidingNullSession()
+        {
+            var query = new DummyDetachedQuery();
+
+            Assert.That(query.CriteriaFactory, Is.Null);
+
+            Assert.That(() => query.Immediate((ISession)null), Throws.InstanceOf<ArgumentNullException>());
+        }
+
+        [Test]
+        public void TransformingTrulyDetachedQueryToImmediateThrowsWhenNotProvidingNullStatelessSession()
+        {
+            var query = new DummyDetachedQuery();
+
+            Assert.That(query.CriteriaFactory, Is.Null);
+
+            Assert.That(() => query.Immediate((IStatelessSession)null), Throws.InstanceOf<ArgumentNullException>());
+        }
+
+        [Test]
+        public void TransformingTrulyDetachedQueryToImmediateThrowsWhenNotProvidingSession()
+        {
+            var query = new DummyDetachedQuery();
+
+            Assert.That(query.CriteriaFactory, Is.Null);
+
+            Assert.That(() => query.Immediate(), Throws.InvalidOperationException);
+        }
+
+        [Test]
+        public void TransformingTrulyDetachedQueryToStreamedDoesNotThrowWhenProvidingSession()
+        {
+            var query = new DummyDetachedQuery();
+
+            Assert.That(query.CriteriaFactory, Is.Null);
+
+            IStreamedFlowQuery<UserEntity> streamed = null;
+
+            Assert.That(() => streamed = query.Streamed(Session), Throws.Nothing);
+
+            Assert.That(streamed, Is.Not.Null);
+
+            var queryInfo = streamed as IFlowQuery;
+
+            if (queryInfo == null)
+            {
+                Assert.Fail("queryInfo was null");
+            }
+            else
+            {
+                Assert.That(queryInfo.CriteriaFactory, Is.Not.Null);
+            }
+        }
+
+        [Test]
+        public void TransformingTrulyDetachedQueryToStreamedDoesNotThrowWhenProvidingStatelessSession()
+        {
+            var query = new DummyDetachedQuery();
+
+            Assert.That(query.CriteriaFactory, Is.Null);
+
+            IStreamedFlowQuery<UserEntity> streamed = null;
+
+            Assert.That(() => streamed = query.Streamed(StatelessSession), Throws.Nothing);
+
+            Assert.That(streamed, Is.Not.Null);
+
+            var queryInfo = streamed as IFlowQuery;
+
+            if (queryInfo == null)
+            {
+                Assert.Fail("queryInfo was null");
+            }
+            else
+            {
+                Assert.That(queryInfo.CriteriaFactory, Is.Not.Null);
+            }
+        }
+
+        [Test]
+        public void TransformingTrulyDetachedQueryToStreamedThrowsWhenNotProvidingSession()
+        {
+            var query = new DummyDetachedQuery();
+
+            Assert.That(query.CriteriaFactory, Is.Null);
+
+            Assert.That(() => query.Streamed(), Throws.InvalidOperationException);
+        }
+
+        [Test]
+        public void TransformingTrulyDetachedQueryToStreamedThrowsWhenProvidingNullSession()
+        {
+            var query = new DummyDetachedQuery();
+
+            Assert.That(query.CriteriaFactory, Is.Null);
+
+            Assert.That(() => query.Streamed((ISession)null), Throws.InstanceOf<ArgumentNullException>());
+        }
+
+        [Test]
+        public void TransformingTrulyDetachedQueryToStreamedThrowsWhenProvidingNullStatelessSession()
+        {
+            var query = new DummyDetachedQuery();
+
+            Assert.That(query.CriteriaFactory, Is.Null);
+
+            Assert.That(() => query.Streamed((IStatelessSession)null), Throws.InstanceOf<ArgumentNullException>());
         }
 
         private class DummyDetachedQuery : DetachedFlowQuery<UserEntity>
