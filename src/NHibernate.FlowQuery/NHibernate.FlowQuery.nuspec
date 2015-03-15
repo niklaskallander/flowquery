@@ -12,7 +12,7 @@
         <description>$description$</description>
         <summary>$description$</summary>
         <language>en-US</language>
-        <copyright>Copyright © $author$ 2010-2014</copyright>
+        <copyright>Copyright © $author$ 2010-2015</copyright>
         <tags>nhibernate flowquery icriteria criteria queryover fq nh</tags>
     </metadata>
     <files>
