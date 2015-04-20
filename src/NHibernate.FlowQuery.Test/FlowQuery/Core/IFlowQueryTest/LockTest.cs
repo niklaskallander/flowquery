@@ -36,7 +36,7 @@
         [Test]
         public void CanGetLockBuilder()
         {
-            ILockBuilder<UserEntity, IImmediateFlowQuery<UserEntity>> builder = DummyQuery<UserEntity>()
+            ILockBuilder<IImmediateFlowQuery<UserEntity>> builder = DummyQuery<UserEntity>()
                 .Lock();
 
             Assert.That(builder, Is.Not.Null);
@@ -47,7 +47,7 @@
         {
             UserEntity user = null;
 
-            ILockBuilder<UserEntity, IImmediateFlowQuery<UserEntity>> builder = DummyQuery<UserEntity>()
+            ILockBuilder<IImmediateFlowQuery<UserEntity>> builder = DummyQuery<UserEntity>()
                 .Lock(() => user);
 
             Assert.That(builder, Is.Not.Null);
@@ -56,7 +56,7 @@
         [Test]
         public void CanGetLockBuilderUsingStringAlias()
         {
-            ILockBuilder<UserEntity, IImmediateFlowQuery<UserEntity>> builder = DummyQuery<UserEntity>()
+            ILockBuilder<IImmediateFlowQuery<UserEntity>> builder = DummyQuery<UserEntity>()
                 .Lock("user");
 
             Assert.That(builder, Is.Not.Null);
@@ -67,7 +67,7 @@
         {
             UserEntity user = null;
 
-            ILockBuilder<UserEntity, IImmediateFlowQuery<UserEntity>> builder = DummyQuery<UserEntity>()
+            ILockBuilder<IImmediateFlowQuery<UserEntity>> builder = DummyQuery<UserEntity>()
                 .Lock(() => user);
 
             Assert.That(builder, Is.Not.Null);
@@ -85,7 +85,7 @@
         [Test]
         public void CanSetLockModeWithAliasUsingString()
         {
-            ILockBuilder<UserEntity, IImmediateFlowQuery<UserEntity>> builder = DummyQuery<UserEntity>()
+            ILockBuilder<IImmediateFlowQuery<UserEntity>> builder = DummyQuery<UserEntity>()
                 .Lock("user");
 
             Assert.That(builder, Is.Not.Null);
@@ -103,7 +103,7 @@
         [Test]
         public void CanSetLockModeWithoutAlias()
         {
-            ILockBuilder<UserEntity, IImmediateFlowQuery<UserEntity>> builder = DummyQuery<UserEntity>()
+            ILockBuilder<IImmediateFlowQuery<UserEntity>> builder = DummyQuery<UserEntity>()
                 .Lock();
 
             Assert.That(builder, Is.Not.Null);
@@ -206,7 +206,7 @@
         {
             UserEntity user = null;
 
-            ILockBuilder<UserEntity, IImmediateFlowQuery<UserEntity>> builder = DummyQuery<UserEntity>()
+            ILockBuilder<IImmediateFlowQuery<UserEntity>> builder = DummyQuery<UserEntity>()
                 .Lock(() => user);
 
             Assert.That(builder, Is.Not.Null);
@@ -233,7 +233,7 @@
         [Test]
         public void CanUpdateLockModeWithAliasUsingString()
         {
-            ILockBuilder<UserEntity, IImmediateFlowQuery<UserEntity>> builder = DummyQuery<UserEntity>()
+            ILockBuilder<IImmediateFlowQuery<UserEntity>> builder = DummyQuery<UserEntity>()
                 .Lock("user");
 
             Assert.That(builder, Is.Not.Null);
@@ -260,7 +260,7 @@
         [Test]
         public void CanUpdateLockModeWithoutAlias()
         {
-            ILockBuilder<UserEntity, IImmediateFlowQuery<UserEntity>> builder = DummyQuery<UserEntity>()
+            ILockBuilder<IImmediateFlowQuery<UserEntity>> builder = DummyQuery<UserEntity>()
                 .Lock();
 
             Assert.That(builder, Is.Not.Null);

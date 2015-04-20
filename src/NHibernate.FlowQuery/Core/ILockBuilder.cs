@@ -3,17 +3,11 @@
     /// <summary>
     ///     A helper utility used to build locking strategies with a nice syntax.
     /// </summary>
-    /// <typeparam name="TSource">
-    ///     The <see cref="System.Type" /> of the source for the <see cref="IFlowQuery{TSource, TQuery}" /> query
-    ///     used to create this <see cref="ILockBuilder{TSource, TQuery}" /> instance.
-    /// </typeparam>
     /// <typeparam name="TQuery">
-    ///     The <see cref="System.Type" /> of the underlying <see cref="IFlowQuery{TSource, TQuery}" /> query for this
-    ///     <see cref="ILockBuilder{TSource, TQuery}" /> instance.
+    ///     The <see cref="System.Type" /> of the underlying query for this <see cref="ILockBuilder{TQuery}" /> 
+    ///     instance.
     /// </typeparam>
-    public interface ILockBuilder<TSource, out TQuery>
-        where TSource : class
-        where TQuery : class, IFlowQuery<TSource, TQuery>
+    public interface ILockBuilder<out TQuery>
     {
         /// <summary>
         ///     Specifies a forced lock. Corresponds to <see cref="NHibernate" />'s <see cref="LockMode.Force" /> mode.

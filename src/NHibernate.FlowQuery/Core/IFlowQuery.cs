@@ -7,7 +7,6 @@
     using NHibernate.FlowQuery.Core.CustomProjections;
     using NHibernate.FlowQuery.Core.Structures;
     using NHibernate.FlowQuery.Helpers;
-    using NHibernate.Metadata;
 
     /// <summary>
     ///     An interface defining the base structure of a <see cref="NHibernate.FlowQuery" /> query.

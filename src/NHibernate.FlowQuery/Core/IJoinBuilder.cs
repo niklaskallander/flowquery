@@ -9,16 +9,14 @@
     ///     A helper utility used to create joins with a nice syntax.
     /// </summary>
     /// <typeparam name="TSource">
-    ///     The <see cref="System.Type" /> of the source for the <see cref="IFlowQuery{TSource, TQuery}" /> query
-    ///     used to create this <see cref="IJoinBuilder{TSource, TQuery}" /> instance.
-    /// </typeparam>
-    /// <typeparam name="TQuery">
-    ///     The <see cref="System.Type" /> of the underlying <see cref="IFlowQuery{TSource, TQuery}" /> query for this
+    ///     The <see cref="System.Type" /> of the source for the query used to create this 
     ///     <see cref="IJoinBuilder{TSource, TQuery}" /> instance.
     /// </typeparam>
+    /// <typeparam name="TQuery">
+    ///     The <see cref="System.Type" /> of the underlying query for this <see cref="IJoinBuilder{TSource, TQuery}" />
+    ///     instance.
+    /// </typeparam>
     public interface IJoinBuilder<TSource, out TQuery>
-        where TSource : class
-        where TQuery : class, IFlowQuery<TSource, TQuery>
     {
         /// <summary>
         ///     Joins the specified property or association path with the provided alias.

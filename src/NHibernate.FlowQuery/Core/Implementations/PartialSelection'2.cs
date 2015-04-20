@@ -16,7 +16,6 @@
     ///     The <see cref="System.Type" /> of the selection.
     /// </typeparam>
     public class PartialSelection<TSource, TDestination> : IPartialSelection<TSource, TDestination>
-        where TSource : class
     {
         /// <summary>
         ///     The partial selection builder.

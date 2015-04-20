@@ -165,7 +165,7 @@
             Assert
                 .That
                 (
-                    () => new FetchBuilder<UserEntity, IImmediateFlowQuery<UserEntity>>
+                    () => new FetchBuilder<IImmediateFlowQuery<UserEntity>>
                     (
                         query1,
                         query2,
@@ -184,7 +184,7 @@
             Assert
                 .That
                 (
-                    () => new FetchBuilder<UserEntity, IImmediateFlowQuery<UserEntity>>
+                    () => new FetchBuilder<IImmediateFlowQuery<UserEntity>>
                     (
                         query as IFlowQuery,
                         query,

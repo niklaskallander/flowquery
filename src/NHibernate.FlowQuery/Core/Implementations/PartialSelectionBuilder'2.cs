@@ -19,6 +19,5 @@
     public delegate FlowQuerySelection<TDestination> PartialSelectionBuilder<TSource, TDestination>
         (
         IPartialSelection<TSource, TDestination> partialSelection
-        )
-        where TSource : class;
+        );
 }

@@ -17,7 +17,6 @@ namespace NHibernate.FlowQuery.Core
     ///     The <see cref="System.Type" /> of the selection.
     /// </typeparam>
     public interface ISelectSetup<TSource, TDestination>
-        where TSource : class
     {
         /// <summary>
         ///     Gets a dictionary containing all the mapped properties with their corresponding projections.

@@ -317,12 +317,12 @@
                 throw new NotImplementedException();
             }
 
-            public IFetchBuilder<UserEntity, IDetachedFlowQuery<UserEntity>> Fetch(string path)
+            public IFetchBuilder<IDetachedFlowQuery<UserEntity>> Fetch(string path)
             {
                 throw new NotImplementedException();
             }
 
-            public IFetchBuilder<UserEntity, IDetachedFlowQuery<UserEntity>> Fetch
+            public IFetchBuilder<IDetachedFlowQuery<UserEntity>> Fetch
                 (
                 Expression<Func<UserEntity, object>> expression,
                 Expression<Func<object>> alias = null,
@@ -394,17 +394,17 @@
                 throw new NotImplementedException();
             }
 
-            public ILockBuilder<UserEntity, IDetachedFlowQuery<UserEntity>> Lock(Expression<Func<object>> alias)
+            public ILockBuilder<IDetachedFlowQuery<UserEntity>> Lock(Expression<Func<object>> alias)
             {
                 throw new NotImplementedException();
             }
 
-            public ILockBuilder<UserEntity, IDetachedFlowQuery<UserEntity>> Lock(string alias)
+            public ILockBuilder<IDetachedFlowQuery<UserEntity>> Lock(string alias)
             {
                 throw new NotImplementedException();
             }
 
-            public ILockBuilder<UserEntity, IDetachedFlowQuery<UserEntity>> Lock()
+            public ILockBuilder<IDetachedFlowQuery<UserEntity>> Lock()
             {
                 throw new NotImplementedException();
             }
@@ -727,12 +727,12 @@
                 throw new NotImplementedException();
             }
 
-            public new IFetchBuilder<UserEntity, IDummyQuery3> Fetch(string path)
+            public new IFetchBuilder<IDummyQuery3> Fetch(string path)
             {
                 throw new NotImplementedException();
             }
 
-            public new IFetchBuilder<UserEntity, IDummyQuery3> Fetch
+            public new IFetchBuilder<IDummyQuery3> Fetch
                 (
                 Expression<Func<UserEntity, object>> expression,
                 Expression<Func<object>> alias = null,
@@ -751,17 +751,17 @@
                 throw new NotImplementedException();
             }
 
-            public new ILockBuilder<UserEntity, IDummyQuery3> Lock(Expression<Func<object>> alias)
+            public new ILockBuilder<IDummyQuery3> Lock(Expression<Func<object>> alias)
             {
                 throw new NotImplementedException();
             }
 
-            public new ILockBuilder<UserEntity, IDummyQuery3> Lock(string alias)
+            public new ILockBuilder<IDummyQuery3> Lock(string alias)
             {
                 throw new NotImplementedException();
             }
 
-            public new ILockBuilder<UserEntity, IDummyQuery3> Lock()
+            public new ILockBuilder<IDummyQuery3> Lock()
             {
                 throw new NotImplementedException();
             }
@@ -819,23 +819,23 @@
                 throw new NotImplementedException();
             }
 
-            IDummyQuery3 IFlowQuery<UserEntity, IDummyQuery3>.And(string property, IsExpression expression)
+            IDummyQuery3 IFilterableQuery<UserEntity, IDummyQuery3>.And(string property, IsExpression expression)
             {
                 throw new NotImplementedException();
             }
 
-            IDummyQuery3 IFlowQuery<UserEntity, IDummyQuery3>.And(Expression<Func<UserEntity, bool>> expression)
+            IDummyQuery3 IFilterableQuery<UserEntity, IDummyQuery3>.And(Expression<Func<UserEntity, bool>> expression)
             {
                 throw new NotImplementedException();
             }
 
-            IDummyQuery3 IFlowQuery<UserEntity, IDummyQuery3>.And
+            IDummyQuery3 IFilterableQuery<UserEntity, IDummyQuery3>.And
                 (Expression<Func<UserEntity, object>> property, IsExpression expression)
             {
                 throw new NotImplementedException();
             }
 
-            IDummyQuery3 IFlowQuery<UserEntity, IDummyQuery3>.And
+            IDummyQuery3 IFilterableQuery<UserEntity, IDummyQuery3>.And
                 (Expression<Func<UserEntity, WhereDelegate, bool>> expression)
             {
                 throw new NotImplementedException();
@@ -878,23 +878,23 @@
                 throw new NotImplementedException();
             }
 
-            IDummyQuery3 IFlowQuery<UserEntity, IDummyQuery3>.Where(string property, IsExpression expression)
+            IDummyQuery3 IFilterableQuery<UserEntity, IDummyQuery3>.Where(string property, IsExpression expression)
             {
                 throw new NotImplementedException();
             }
 
-            IDummyQuery3 IFlowQuery<UserEntity, IDummyQuery3>.Where(Expression<Func<UserEntity, bool>> expression)
+            IDummyQuery3 IFilterableQuery<UserEntity, IDummyQuery3>.Where(Expression<Func<UserEntity, bool>> expression)
             {
                 throw new NotImplementedException();
             }
 
-            IDummyQuery3 IFlowQuery<UserEntity, IDummyQuery3>.Where
+            IDummyQuery3 IFilterableQuery<UserEntity, IDummyQuery3>.Where
                 (Expression<Func<UserEntity, object>> property, IsExpression expression)
             {
                 throw new NotImplementedException();
             }
 
-            IDummyQuery3 IFlowQuery<UserEntity, IDummyQuery3>.Where
+            IDummyQuery3 IFilterableQuery<UserEntity, IDummyQuery3>.Where
                 (Expression<Func<UserEntity, WhereDelegate, bool>> expression)
             {
                 throw new NotImplementedException();

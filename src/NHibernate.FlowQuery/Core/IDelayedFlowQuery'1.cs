@@ -22,7 +22,6 @@
     /// <seealso cref="IDetachedImmutableFlowQuery" />
     /// <seealso cref="IImmediateFlowQuery{TSource}" />
     public interface IDelayedFlowQuery<TSource> : IQueryableFlowQuery<TSource, IDelayedFlowQuery<TSource>>
-        where TSource : class
     {
         /// <summary>
         ///     Returns a value indicating whether any objects in the underlying data source matches the filters

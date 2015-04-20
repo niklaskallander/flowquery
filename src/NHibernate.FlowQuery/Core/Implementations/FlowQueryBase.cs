@@ -188,7 +188,7 @@
         /// <value>
         ///     The query.
         /// </value>
-        protected internal TQuery Query { get; private set; }
+        protected TQuery Query { get; private set; }
 
         /// <inheritdoc />
         public virtual TQuery And(IDetachedImmutableFlowQuery subquery, IsEmptyExpression expression)
@@ -314,13 +314,13 @@
         }
 
         /// <inheritdoc />
-        public virtual IFetchBuilder<TSource, TQuery> Fetch(string path)
+        public virtual IFetchBuilder<TQuery> Fetch(string path)
         {
             return FetchCore(path, path);
         }
 
         /// <inheritdoc />
-        public virtual IFetchBuilder<TSource, TQuery> Fetch
+        public virtual IFetchBuilder<TQuery> Fetch
             (
             Expression<Func<TSource, object>> expression,
             Expression<Func<object>> alias = null,
@@ -381,21 +381,21 @@
         }
 
         /// <inheritdoc />
-        public virtual ILockBuilder<TSource, TQuery> Lock()
+        public virtual ILockBuilder<TQuery> Lock()
         {
             return Lock(null as string);
         }
 
         /// <inheritdoc />
-        public virtual ILockBuilder<TSource, TQuery> Lock(Expression<Func<object>> alias)
+        public virtual ILockBuilder<TQuery> Lock(Expression<Func<object>> alias)
         {
             return Lock(ExpressionHelper.GetPropertyName(alias));
         }
 
         /// <inheritdoc />
-        public virtual ILockBuilder<TSource, TQuery> Lock(string alias)
+        public virtual ILockBuilder<TQuery> Lock(string alias)
         {
-            return new LockBuilder<TSource, TQuery>(this, Query, alias);
+            return new LockBuilder<TQuery>(this, Query, alias);
         }
 
         /// <inheritdoc />
@@ -653,9 +653,9 @@
         ///     The alias.
         /// </param>
         /// <returns>
-        ///     A <see cref="IFetchBuilder{TSource, TQuery}" /> instance.
+        ///     A <see cref="IFetchBuilder{TQuery}" /> instance.
         /// </returns>
-        protected virtual IFetchBuilder<TSource, TQuery> FetchCore(string path, string alias)
+        protected virtual IFetchBuilder<TQuery> FetchCore(string path, string alias)
         {
             if (Fetches.Count > 0 && Fetches.Any(x => x.HasAlias))
             {
@@ -678,7 +678,7 @@
                 }
             }
 
-            return new FetchBuilder<TSource, TQuery>(this, Query, path, alias);
+            return new FetchBuilder<TQuery>(this, Query, path, alias);
         }
     }
 }
