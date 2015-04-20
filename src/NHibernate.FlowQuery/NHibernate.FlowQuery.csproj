@@ -70,6 +70,8 @@
     <Compile Include="AutoMapping\DefaultMapper.cs" />
     <Compile Include="AutoMapping\IMapper.cs" />
     <Compile Include="Core\ICriteriaBuilder%271.cs" />
+    <Compile Include="Core\IFilterableQuery%272.cs" />
+    <Compile Include="Core\IFilterableQuery%271.cs" />
     <Compile Include="Core\IImmediateFlowQuery%271.cs" />
     <Compile Include="Core\Implementations\CriteriaBuilder.cs" />
     <Compile Include="Core\Implementations\ImmediateFlowQueryBase%272.cs" />
@@ -79,6 +81,7 @@
     </Compile>
     <Compile Include="Core\Implementations\StreamedFlowQuery.cs" />
     <Compile Include="Core\IQueryableFlowQueryBase%271.cs" />
+    <Compile Include="Core\IQueryFilter%271.cs" />
     <Compile Include="Core\IStreamedFlowQuery%271.cs" />
     <Compile Include="Helpers\ResultStreamer.cs" />
     <Compile Include="Core\IPartialSelection%272.cs" />
