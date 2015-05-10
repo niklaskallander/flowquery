@@ -27,7 +27,7 @@
         /// <summary>
         ///     The query instance.
         /// </summary>
-        private readonly IFlowQuery _implementor;
+        private readonly IFilterableQuery _implementor;
 
         /// <summary>
         ///     The join type.
@@ -59,7 +59,7 @@
         /// </exception>
         protected internal JoinBuilder
             (
-            IFlowQuery implementor,
+            IFilterableQuery implementor,
             TQuery query,
             JoinType joinType
             )

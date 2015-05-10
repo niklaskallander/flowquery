@@ -18,6 +18,20 @@
     public interface IFlowQuery<TSource, out TQuery> : IFilterableQuery<TSource, TQuery>
     {
         /// <summary>
+        ///     Adds one or more filters to the query.
+        /// </summary>
+        /// <param name="criterions">
+        ///     The filters.
+        /// </param>
+        /// <returns>
+        ///     The <see cref="T:TQuery" /> instance.
+        /// </returns>
+        /// <remarks>
+        ///     An alias for <see cref="Where(ICriterion[])" />.
+        /// </remarks>
+        TQuery And(params ICriterion[] criterions);
+
+        /// <summary>
         ///     Determines whether this query should take advantage of second-level caching.
         /// </summary>
         /// <param name="isCacheable">
@@ -448,5 +462,16 @@
         ///     The <see cref="T:TQuery" /> instance.
         /// </returns>
         TQuery Take(int take);
+
+        /// <summary>
+        ///     Adds one or more filters to the query.
+        /// </summary>
+        /// <param name="criterions">
+        ///     The filters.
+        /// </param>
+        /// <returns>
+        ///     The <see cref="T:TQuery" /> instance.
+        /// </returns>
+        TQuery Where(params ICriterion[] criterions);
     }
 }

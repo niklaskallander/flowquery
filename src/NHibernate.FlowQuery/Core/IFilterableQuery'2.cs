@@ -65,20 +65,6 @@
         IJoinBuilder<TSource, TQuery> RightOuter { get; }
 
         /// <summary>
-        ///     Adds one or more filters to the query.
-        /// </summary>
-        /// <param name="criterions">
-        ///     The filters.
-        /// </param>
-        /// <returns>
-        ///     The <see cref="T:TQuery" /> instance.
-        /// </returns>
-        /// <remarks>
-        ///     An alias for <see cref="Where(ICriterion[])" />.
-        /// </remarks>
-        TQuery And(params ICriterion[] criterions);
-
-        /// <summary>
         ///     Adds a filter to the query.
         /// </summary>
         /// <param name="property">
@@ -191,15 +177,39 @@
             );
 
         /// <summary>
-        ///     Adds one or more filters to the query.
+        ///     Applies the given <see cref="IQueryFilter{T}" /> to the root entity of this query.
         /// </summary>
-        /// <param name="criterions">
-        ///     The filters.
+        /// <param name="filter">
+        ///     The <see cref="IQueryFilter{T}" /> filter to apply.
         /// </param>
         /// <returns>
-        ///     The <see cref="T:TQuery" /> instance.
+        ///     The query instance.
         /// </returns>
-        TQuery Where(params ICriterion[] criterions);
+        TQuery ApplyFilter
+            (
+            IQueryFilter<TSource> filter
+            );
+
+        /// <summary>
+        ///     Applies the given <see cref="IQueryFilter{T}" /> to the given alias of this query.
+        /// </summary>
+        /// <param name="alias">
+        ///     The alias on which to apply the given <see cref="IQueryFilter{T}" /> filter.
+        /// </param>
+        /// <param name="filter">
+        ///     The <see cref="IQueryFilter{T}" /> filter to apply.
+        /// </param>
+        /// <typeparam name="TAlias">
+        ///     The <see cref="System.Type" /> of the given alias.
+        /// </typeparam>
+        /// <returns>
+        ///     The query instance.
+        /// </returns>
+        TQuery ApplyFilterOn<TAlias>
+            (
+            Expression<Func<TAlias>> alias,
+            IQueryFilter<TAlias> filter
+            );
 
         /// <summary>
         ///     Adds a filter to the query.
