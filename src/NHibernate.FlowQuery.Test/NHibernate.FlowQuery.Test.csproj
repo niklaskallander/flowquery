@@ -128,7 +128,12 @@
     <Compile Include="FlowQuery\Core\IFlowQueryTest\CountTest.cs" />
     <Compile Include="FlowQuery\DetachedCriteriaExtensionsTest.cs" />
     <Compile Include="FlowQuery\Features\AggregateFromExpressionTest.cs" />
-    <Compile Include="FlowQuery\Features\NhFq7\NhFq7Test.cs" />
+    <Compile Include="FlowQuery\Features\NhFq7\NhFq7TestBase.cs" />
+    <Compile Include="FlowQuery\Features\NhFq7\Where.cs" />
+    <Compile Include="FlowQuery\Features\NhFq7\QueryFilter%271.cs" />
+    <Compile Include="FlowQuery\Features\NhFq7\GeneralTests.cs" />
+    <Compile Include="FlowQuery\Features\NhFq7\WrappedQueryFilterTests.cs" />
+    <Compile Include="FlowQuery\Features\NhFq7\DelegatedQueryFilterTests.cs" />
     <Compile Include="FlowQuery\Features\ResultStreaming\DummyResultStream%272.cs" />
     <Compile Include="FlowQuery\Features\ResultStreaming\DummyResultStream.cs" />
     <Compile Include="FlowQuery\Features\ResultStreaming\ResultStreamingTest.cs" />

@@ -131,12 +131,25 @@
         }
 
         /// <inheritdoc />
+        /// <exception cref="ArgumentNullException">
+        ///     <paramref name="alias" /> or <paramref name="filter" /> is null.
+        /// </exception>
         public TQuery ApplyFilterOn<TAlias>
             (
             Expression<Func<TAlias>> alias,
             IQueryFilter<TAlias> filter
             )
         {
+            if (alias == null)
+            {
+                throw new ArgumentNullException("alias");
+            }
+
+            if (filter == null)
+            {
+                throw new ArgumentNullException("filter");
+            }
+
             string aliasName = ExpressionHelper.GetPropertyName(alias);
 
             IFilterableQuery<TAlias> filterableQuery =
@@ -148,6 +161,9 @@
         }
 
         /// <inheritdoc />
+        /// <exception cref="ArgumentNullException">
+        ///     <paramref name="filter" /> is null.
+        /// </exception>
         public TQuery ApplyFilter(IQueryFilter<TSource> filter)
         {
             if (filter == null)
