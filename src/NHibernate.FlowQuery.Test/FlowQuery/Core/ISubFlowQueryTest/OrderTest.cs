@@ -116,7 +116,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
             Assert.That(users.ElementAt(0).Firstname, Is.EqualTo("Lotta"));
         }
 
-        [Test]
+        [Test, Category("MySqlUnsupported")]
         public void DoesNotSkipOrderByStatementsIfNecessaryInSubqueryTest1()
         {
             IDetachedFlowQuery<UserEntity> detached = Query<UserEntity>()
@@ -133,7 +133,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
             Assert.That(users.All(x => x.IsOnline));
         }
 
-        [Test]
+        [Test, Category("MySqlUnsupported")]
         public void DoesNotSkipOrderByStatementsIfNecessaryInSubqueryTest2()
         {
             IDetachedFlowQuery<UserEntity> detached = Query<UserEntity>()
@@ -153,12 +153,12 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
 
                         Assert.That(users.Count(), Is.EqualTo(1));
                         Assert.That(users.All(x => !x.IsOnline));
-                    }, 
+                    },
                     Throws.Nothing
                 );
         }
 
-        [Test]
+        [Test, Category("MySqlUnsupported")]
         public void DoesNotSkipOrderByStatementsIfNecessaryInSubqueryTest3()
         {
             IDetachedFlowQuery<UserEntity> detached = Query<UserEntity>()
@@ -178,7 +178,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
 
                         Assert.That(users.Count(), Is.EqualTo(2));
                         Assert.That(users.All(x => x.IsOnline), Is.False);
-                    }, 
+                    },
                     Throws.Nothing
                 );
         }

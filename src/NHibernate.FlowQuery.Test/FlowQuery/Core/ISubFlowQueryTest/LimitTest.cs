@@ -12,7 +12,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
     [TestFixture]
     public class LimitTest : BaseTest
     {
-        [Test]
+        [Test, Category("MySqlUnsupported")]
         public void CanConstrainFirstAndMaxResultsWithTakeAndSkip()
         {
             IDetachedFlowQuery<UserEntity> query = DetachedQuery<UserEntity>()
@@ -28,7 +28,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
             Assert.That(users.First().Id, Is.EqualTo(2));
         }
 
-        [Test]
+        [Test, Category("MySqlUnsupported")]
         public void CanConstrainFirstResultWithLimit()
         {
             IDetachedFlowQuery<UserEntity> query = DetachedQuery<UserEntity>()
@@ -43,7 +43,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
             Assert.That(users.First().Id, Is.EqualTo(2));
         }
 
-        [Test]
+        [Test, Category("MySqlUnsupported")]
         public void CanConstrainMaxResultsWithLimit()
         {
             IDetachedFlowQuery<UserEntity> query = DetachedQuery<UserEntity>()
