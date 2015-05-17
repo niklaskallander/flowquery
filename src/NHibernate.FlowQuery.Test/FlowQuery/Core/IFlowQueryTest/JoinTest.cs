@@ -14,7 +14,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
     [TestFixture]
     public class JoinTest : BaseTest
     {
-        [Test]
+        [Test, Category("MySqlUnsupported")]
         public void CanFullJoin()
         {
             UserGroupLinkEntity link = null;
@@ -32,7 +32,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
             Assert.That(groups2.Count(), Is.EqualTo(9));
         }
 
-        [Test]
+        [Test, Category("MySqlUnsupported")]
         public void CanFullJoinCollectionWithRevealAndLambdas()
         {
             Reveal.SetDefaultConvention(x => x);
@@ -63,7 +63,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
             Reveal.ClearDefaultConvention();
         }
 
-        [Test]
+        [Test, Category("MySqlUnsupported")]
         public void CanFullJoinNonCollection()
         {
             Setting setting = null;
@@ -81,7 +81,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
             Assert.That(settings2.Count(), Is.EqualTo(10));
         }
 
-        [Test]
+        [Test, Category("MySqlUnsupported")]
         public void CanFullJoinUsingString()
         {
             UserGroupLinkEntity link = null;
@@ -99,7 +99,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
             Assert.That(groups2.Count(), Is.EqualTo(9));
         }
 
-        [Test]
+        [Test, Category("MySqlUnsupported")]
         public void CanFullJoinWithProvidedRevealConvention()
         {
             UserGroupLinkEntity link = null;
@@ -120,7 +120,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
             Assert.That(groups2.Count(), Is.EqualTo(11));
         }
 
-        [Test]
+        [Test, Category("MySqlUnsupported")]
         public void CanFullJoinWithRevealAndLambdas()
         {
             Reveal.SetDefaultConvention(x => x);
@@ -798,7 +798,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                             .Inner.Join(x => x.Groups, () => link)
                             .Inner.Join(x => x.Groups, () => link)
                             .Select();
-                    }, 
+                    },
                     Throws.Nothing
                 );
         }
@@ -817,7 +817,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                             .Inner.Join(x => x.Groups, () => link)
                             .Inner.Join(x => x.Groups, () => link2)
                             .Select();
-                    }, 
+                    },
                     Throws.InstanceOf<InvalidOperationException>()
                 );
         }
@@ -836,7 +836,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                         DummyQuery<UserEntity>()
                             .Inner.Join(u => u.Groups, () => link)
                             .Inner.Join(u => link.Group, () => group, (IRevealConvention)null);
-                    }, 
+                    },
                     Throws.Nothing
                 );
 
@@ -848,7 +848,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                         DummyQuery<UserEntity>()
                             .Inner.Join(u => u.Groups, () => link)
                             .Inner.Join(u => link.Group, () => group, (IRevealConvention)null);
-                    }, 
+                    },
                     Throws.Nothing
                 );
 
@@ -860,7 +860,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                         DummyQuery<UserEntity>()
                             .Full.Join(u => u.Groups, () => link)
                             .Full.Join(u => link.Group, () => group, (IRevealConvention)null);
-                    }, 
+                    },
                     Throws.Nothing
                 );
 
@@ -872,7 +872,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                         DummyQuery<UserEntity>()
                             .RightOuter.Join(u => u.Groups, () => link)
                             .RightOuter.Join(u => link.Group, () => group, (IRevealConvention)null);
-                    }, 
+                    },
                     Throws.Nothing
                 );
 
@@ -884,7 +884,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                         DummyQuery<UserEntity>()
                             .LeftOuter.Join(u => u.Groups, () => link)
                             .LeftOuter.Join(u => link.Group, () => group, (IRevealConvention)null);
-                    }, 
+                    },
                     Throws.Nothing
                 );
         }
@@ -903,7 +903,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                             .Inner.Join("Groups", () => link)
                             .Inner.Join("Setting", () => link)
                             .Select();
-                    }, 
+                    },
                     Throws.InstanceOf<InvalidOperationException>()
                 );
         }
