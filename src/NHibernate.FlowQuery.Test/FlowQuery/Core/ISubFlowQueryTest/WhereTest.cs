@@ -358,7 +358,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
         public void WhereWithConcatenation()
         {
             IDetachedFlowQuery<UserEntity> query = DetachedQuery<UserEntity>()
-                .Where(u => u.Firstname + " " + u.Lastname == "Niklas Källander")
+                .Where(u => u.Firstname + " " + u.Lastname == "Niklas Kallander")
                 .Select(x => x.Id);
 
             FlowQuerySelection<UserEntity> users = Query<UserEntity>()
@@ -366,7 +366,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
                 .Select();
 
             Assert.That(users.Count(), Is.EqualTo(1));
-            Assert.That(users.First().Firstname + " " + users.First().Lastname, Is.EqualTo("Niklas Källander"));
+            Assert.That(users.First().Firstname + " " + users.First().Lastname, Is.EqualTo("Niklas Kallander"));
         }
 
         [Test]
@@ -398,7 +398,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
                             .Detached()
                             .Where((ICriterion[])null)
                             .Select(x => x.Id);
-                    }, 
+                    },
                     Throws.InstanceOf<ArgumentNullException>()
                 );
         }
@@ -422,13 +422,13 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
                             .Detached()
                             .Where(c)
                             .Select(x => x.Id);
-                    }, 
+                    },
                     Throws.Nothing
                 );
         }
 
         [Test]
-        [SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1003:SymbolsMustBeSpacedCorrectly", 
+        [SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1003:SymbolsMustBeSpacedCorrectly",
             Justification = "Reviewed. Suppression is OK here.")]
         public void WhereWithDoubleNegation()
         {

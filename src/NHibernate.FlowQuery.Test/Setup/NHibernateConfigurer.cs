@@ -10,6 +10,7 @@
 
     using NHibernate.Cache;
     using NHibernate.Cfg;
+    using NHibernate.Dialect;
     using NHibernate.FlowQuery.Test.Setup.Entities;
     using NHibernate.Mapping;
     using NHibernate.Tool.hbm2ddl;
@@ -22,8 +23,22 @@
 
         public static void Configure()
         {
-             HibernatingRhinos.Profiler.Appender.NHibernate.NHibernateProfiler.Initialize();
-            Configuration configuration = LoadFromFile();
+            Configuration configuration = null;
+
+            IPersistenceConfigurer databaseConfigurer;
+
+#if !TRAVIS
+            HibernatingRhinos.Profiler.Appender.NHibernate.NHibernateProfiler.Initialize();
+
+            configuration = LoadFromFile();
+
+            databaseConfigurer = MsSqlConfiguration.MsSql2008
+                .ConnectionString(@"Data Source=.; Initial Catalog=flowquery; Integrated Security=SSPI;");
+#else
+            databaseConfigurer = MySQLConfiguration.Standard
+                .Dialect<MySQL5Dialect>()
+                .ConnectionString(@"Server=127.0.0.1;Database=flowquery_test;Uid=root;Pwd=;");
+#endif
 
             bool shouldAddData = false;
 
@@ -32,9 +47,7 @@
                 shouldAddData = true;
 
                 configuration = Fluently.Configure()
-                    .Database(
-                        MsSqlConfiguration.MsSql2008.ConnectionString(
-                            @"Data Source=.; Initial Catalog=flowquery; Integrated Security=SSPI;"))
+                    .Database(databaseConfigurer)
                     .Mappings
                     (
                         m => m.AutoMappings
@@ -58,8 +71,9 @@
                 BuildSchema(configuration);
 
                 SetCaching(configuration);
-
+#if !TRAVIS
                 SaveToFile(configuration);
+#endif
             }
 
             _factory = configuration
@@ -111,7 +125,7 @@
                         "Wimpy",
                         "Cool01",
                         "Niklas",
-                        "Källander",
+                        "Kallander",
                         new DateTime(2001, 9, 11),
                         RoleEnum.Administrator,
                         "1"
@@ -157,7 +171,7 @@
                         NumberOfLogOns = 12
                     };
 
-                    var u4 = new UserEntity("Lajsa", null, "Lotta", "Bråk", DateTime.Now, RoleEnum.Standard, "4")
+                    var u4 = new UserEntity("Lajsa", null, "Lotta", "Brak", DateTime.Now, RoleEnum.Standard, "4")
                     {
                         Setting = s6,
                         NumberOfLogOns = 4

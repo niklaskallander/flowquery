@@ -40,10 +40,10 @@ namespace NHibernate.FlowQuery.Test
 
             Fullnames = new[]
             {
-                "Niklas Källander", 
+                "Niklas Kallander", 
                 "Lars Wilk", 
                 "Kossan Muu", 
-                "Lotta Bråk"
+                "Lotta Brak"
             };
 
             Firstnames = new[]
@@ -56,10 +56,10 @@ namespace NHibernate.FlowQuery.Test
 
             Lastnames = new[]
             {
-                "Källander", 
+                "Kallander", 
                 "Wilk", 
                 "Muu", 
-                "Bråk"
+                "Brak"
             };
 
             Ids = new long[]

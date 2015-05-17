@@ -15,7 +15,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
     [TestFixture]
     public class JoinTest : BaseTest
     {
-        [Test]
+        [Test, Category("MySqlUnsupported")]
         public void CanFullJoin()
         {
             UserGroupLinkEntity link = null;
@@ -31,7 +31,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
             Assert.That(groups.Count(), Is.EqualTo(2));
         }
 
-        [Test]
+        [Test, Category("MySqlUnsupported")]
         public void CanFullJoinCollectionWithRevealAndLambdas()
         {
             Reveal.SetDefaultConvention(x => x);
@@ -70,7 +70,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
             Reveal.ClearDefaultConvention();
         }
 
-        [Test]
+        [Test, Category("MySqlUnsupported")]
         public void CanFullJoinNonCollection()
         {
             Setting setting = null;
@@ -86,7 +86,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
             Assert.That(settings.Count(), Is.EqualTo(6));
         }
 
-        [Test]
+        [Test, Category("MySqlUnsupported")]
         public void CanFullJoinUsingString()
         {
             UserGroupLinkEntity link = null;
@@ -102,7 +102,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
             Assert.That(groups.Count(), Is.EqualTo(2));
         }
 
-        [Test]
+        [Test, Category("MySqlUnsupported")]
         public void CanFullJoinWithProvidedRevealConvention()
         {
             UserGroupLinkEntity link = null;
@@ -120,7 +120,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
             Assert.That(groups.Count(), Is.EqualTo(2));
         }
 
-        [Test]
+        [Test, Category("MySqlUnsupported")]
         public void CanFullJoinWithRevealAndLambdas()
         {
             Reveal.SetDefaultConvention(x => x);
@@ -142,7 +142,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.ISubFlowQueryTest
             Reveal.ClearDefaultConvention();
         }
 
-        [Test]
+        [Test, Category("MySqlUnsupported")]
         public void CanFullJoinWithSpecifiedOnClause()
         {
             UserGroupLinkEntity link = null;

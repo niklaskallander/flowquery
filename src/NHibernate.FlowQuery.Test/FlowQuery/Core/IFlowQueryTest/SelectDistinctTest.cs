@@ -224,6 +224,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void CanSelectDistinctUsingPropertyProjectionTyped()
         {
             FlowQuerySelection<bool> bools = Query<UserEntity>()
+                .OrderBy(x => x.IsOnline)
                 .Distinct()
                 .Select<bool>(Projections.Property("IsOnline"));
 
@@ -236,6 +237,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void CanSelectDistinctUsingSelectSetup()
         {
             FlowQuerySelection<UserDto> users = Query<UserEntity>()
+                .OrderBy(x => x.IsOnline)
                 .Distinct().Select<UserDto>()
                 .For(x => x.IsOnline).Use(x => x.IsOnline)
                 .Select();
@@ -249,6 +251,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void CanSelectDistinctUsingSelectSetupWithProjections()
         {
             FlowQuerySelection<UserEntity> users = Query<UserEntity>()
+                .OrderBy(x => x.IsOnline)
                 .Distinct()
                 .Select<UserEntity>()
                 .For(x => x.IsOnline).Use(Projections.Property("IsOnline"))
@@ -263,6 +266,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void CanSelectDistinctUsingSelectSetupWithStrings()
         {
             FlowQuerySelection<UserDto> users = Query<UserEntity>()
+                .OrderBy(x => x.IsOnline)
                 .Distinct().Select<UserDto>()
                 .For("IsOnline").Use(x => x.IsOnline)
                 .Select();

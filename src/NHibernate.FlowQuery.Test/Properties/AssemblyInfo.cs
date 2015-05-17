@@ -5,7 +5,7 @@
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Niklas Källander")]
 [assembly: AssemblyProduct("NHibernate.FlowQuery.Test")]
-[assembly: AssemblyCopyright("Copyright © Niklas Källander 2010-2014")]
+[assembly: AssemblyCopyright("Copyright © Niklas Källander 2010-2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: AssemblyVersion("1.0.0.0")]

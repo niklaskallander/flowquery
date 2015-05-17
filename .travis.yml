@@ -1,0 +1,10 @@
+language: csharp
+solution: ./src/NHibernate.FlowQuery.sln
+install:
+  - nuget restore ./src/NHibernate.FlowQuery.sln
+  - nuget install NUnit.Runners -Version 2.6.4 -OutputDirectory testrunner
+before_script:
+  - mysql -e 'create database flowquery_test;'
+script:
+  - xbuild /p:Configuration=Travis "./src/NHibernate.FlowQuery.sln"
+  - mono "./testrunner/NUnit.Runners.2.6.4/tools/nunit-console.exe" "./src/NHibernate.FlowQuery.Test/bin/Travis/NHibernate.FlowQuery.Test.dll" "-exclude:MySqlUnsupported"
