@@ -22,8 +22,21 @@
 
         public static void Configure()
         {
-             HibernatingRhinos.Profiler.Appender.NHibernate.NHibernateProfiler.Initialize();
-            Configuration configuration = LoadFromFile();
+            Configuration configuration = null;
+
+            IPersistenceConfigurer databaseConfigurer;
+
+#if !TRAVIS
+            HibernatingRhinos.Profiler.Appender.NHibernate.NHibernateProfiler.Initialize();
+
+            configuration = LoadFromFile();
+
+            databaseConfigurer = MsSqlConfiguration.MsSql2008
+                .ConnectionString(@"Data Source=.; Initial Catalog=flowquery; Integrated Security=SSPI;");
+#else
+            databaseConfigurer = MySQLConfiguration.Standard
+                .ConnectionString(@"Server=127.0.0.1;Database=flowquery_test;Uid=root;Pwd=;");
+#endif
 
             bool shouldAddData = false;
 
@@ -32,9 +45,7 @@
                 shouldAddData = true;
 
                 configuration = Fluently.Configure()
-                    .Database(
-                        MsSqlConfiguration.MsSql2008.ConnectionString(
-                            @"Data Source=.; Initial Catalog=flowquery; Integrated Security=SSPI;"))
+                    .Database(databaseConfigurer)
                     .Mappings
                     (
                         m => m.AutoMappings
@@ -58,8 +69,9 @@
                 BuildSchema(configuration);
 
                 SetCaching(configuration);
-
+#if !TRAVIS
                 SaveToFile(configuration);
+#endif
             }
 
             _factory = configuration
