@@ -59,9 +59,7 @@
         [Test]
         public void ExpresionRebaserThrowsIfExpressionHasMoreThanTwoParameters()
         {
-            Expression<Func<Setting, string, string, bool>> filter = (x,
-                y,
-                z) => x.Id == 1;
+            Expression<Func<Setting, string, string, bool>> filter = (x, y, z) => x.Id == 1;
 
             var visitor = new ExpressionRebaser(typeof(Setting), "setting");
 
@@ -71,8 +69,7 @@
         [Test]
         public void ExpresionRebaserThrowsIfExpressionHasTwoParametersAndSecondParamterIsNotWhereDelegate()
         {
-            Expression<Func<Setting, string, bool>> filter = (x,
-                y) => x.Id == 1;
+            Expression<Func<Setting, string, bool>> filter = (x, y) => x.Id == 1;
 
             var visitor = new ExpressionRebaser(typeof(Setting), "setting");
 
@@ -90,8 +87,7 @@
         [Test]
         public void ExpresionRebaserThrowsNothingIfExpressionHasTwoParametersAndSecondParamterIsWhereDelegate()
         {
-            Expression<Func<Setting, WhereDelegate, bool>> filter = (x,
-                y) => x.Id == 1;
+            Expression<Func<Setting, WhereDelegate, bool>> filter = (x, y) => x.Id == 1;
 
             var visitor = new ExpressionRebaser(typeof(Setting), "setting");
 

@@ -6,6 +6,7 @@
     using NHibernate.FlowQuery.Core.Implementations;
     using NHibernate.FlowQuery.Test.Setup.Dtos;
     using NHibernate.FlowQuery.Test.Setup.Entities;
+    using NHibernate.SqlCommand;
 
     using NUnit.Framework;
 
@@ -92,6 +93,144 @@
         public void Given_UserFilter_When_FilterJoinsAssociation_Then_ReturnsUsersMatchingJoinsAndInnerFilter()
         {
             TestUserEntityFilter(Where.Id_Of_JoinedSetting_FilteredInJoin_Is);
+        }
+
+        [Test]
+        public void Given_UserFilter_When_FilterJoinsAssociation_And_UsingIsHelper_Then_ReturnsUsersMatchingJoinsAndInnerFilter()
+        {
+            TestUserEntityFilter(Where.Id_Of_JoinedSetting_UsingIsHelper_Is);
+        }
+
+        [Test]
+        public void Given_UserFilter_When_FilterJoinsAssociation_And_UsingWhereHelper_Then_ReturnsUsersMatchingJoinsAndInnerFilter()
+        {
+            TestUserEntityFilter(Where.Id_Of_JoinedSetting_UsingWhereHelper_Is);
+        }
+
+        [Test]
+        public void Given_UserFilter_When_FilterWrapsOtherFilter_Then_ReturnsUsersMatchingInnerFilter()
+        {
+            Setting setting = null;
+
+            var wrappedFilter =
+                new QueryFilter<Setting>(query => query.ApplyFilter(Where.Id_Of_Setting_Is(0)));
+
+            UserEntity[] users = Query<UserEntity>()
+                .Inner.Join(x => x.Setting, () => setting)
+                .ApplyFilterOn(() => setting, wrappedFilter)
+                .Select();
+
+            Assert.That(users.Length, Is.EqualTo(0));
+
+            wrappedFilter =
+                new QueryFilter<Setting>(query => query.ApplyFilter(Where.Id_Of_Setting_Is(6)));
+
+            users = Query<UserEntity>()
+                .Inner.Join(x => x.Setting, () => setting)
+                .ApplyFilterOn(() => setting, wrappedFilter)
+                .Select();
+
+            Assert.That(users.Length, Is.EqualTo(4));
+        }
+
+        [Test]
+        public void Given_SettingFilter_And_Subquery_When_FilterChecksWhetherSubqueryReturnsNothing_Then_ReturnsUsersMatchingFilter()
+        {
+            Setting setting = null;
+
+            var subquery = Query<Setting>()
+                .Detached()
+                .Where(x => x.Id == 6)
+                .Select(x => x.Id);
+
+            var filter = Where.Subquery_Returns_Nothing<Setting>(subquery);
+
+            UserEntity[] users = Query<UserEntity>()
+                .Inner.Join(x => x.Setting, () => setting)
+                .ApplyFilterOn(() => setting, filter)
+                .Select();
+
+            Assert.That(users.Length, Is.EqualTo(0));
+
+            subquery = Query<Setting>()
+                .Detached()
+                .Where(x => x.Id == 0)
+                .Select(x => x.Id);
+
+            filter = Where.Subquery_Returns_Nothing<Setting>(subquery);
+
+            users = Query<UserEntity>()
+                .Inner.Join(x => x.Setting, () => setting)
+                .ApplyFilterOn(() => setting, filter)
+                .Select();
+
+            Assert.That(users.Length, Is.EqualTo(4));
+        }
+
+        [Test]
+        public void Given_SettingFilter_And_DetachedCriteria_When_FilterChecksWhetherDetachedCriteriaReturnsNothing_Then_ReturnsUsersMatchingFilter()
+        {
+            Setting setting = null;
+
+            var subquery = Query<Setting>()
+                .Detached()
+                .Where(x => x.Id == 6)
+                .Select(x => x.Id);
+
+            var filter = Where.Subquery_Returns_Nothing<Setting>(subquery.Criteria);
+
+            UserEntity[] users = Query<UserEntity>()
+                .Inner.Join(x => x.Setting, () => setting)
+                .ApplyFilterOn(() => setting, filter)
+                .Select();
+
+            Assert.That(users.Length, Is.EqualTo(0));
+
+            subquery = Query<Setting>()
+                .Detached()
+                .Where(x => x.Id == 0)
+                .Select(x => x.Id);
+
+            filter = Where.Subquery_Returns_Nothing<Setting>(subquery.Criteria);
+
+            users = Query<UserEntity>()
+                .Inner.Join(x => x.Setting, () => setting)
+                .ApplyFilterOn(() => setting, filter)
+                .Select();
+
+            Assert.That(users.Length, Is.EqualTo(4));
+        }
+
+        [Test]
+        public void InnerJoinsWrapCorrectJoinBuilder()
+        {
+            JoinType type = GetJoinTypeFrom(query => query.Inner);
+
+            Assert.That(type, Is.EqualTo(JoinType.InnerJoin));
+        }
+
+        [Test]
+        public void FullJoinsWrapCorrectJoinBuilder()
+        {
+            JoinType type = GetJoinTypeFrom(query => query.Full);
+
+            Assert.That(type, Is.EqualTo(JoinType.FullJoin));
+        }
+
+        [Test]
+        public void RightOuterJoinsWrapCorrectJoinBuilder()
+        {
+            JoinType type = GetJoinTypeFrom(query => query.RightOuter);
+
+            Assert.That(type, Is.EqualTo(JoinType.RightOuterJoin));
+        }
+
+        [Test]
+        public void LeftOuterJoinsWrapCorrectJoinBuilder()
+        {
+            JoinType type = GetJoinTypeFrom(query => query.LeftOuter);
+
+            Assert.That(type, Is.EqualTo(JoinType.LeftOuterJoin));
         }
 
         [Test]
@@ -197,12 +336,22 @@
             return Query<GroupEntity>()
                 .Inner.Join(x => x.Users, () => userGroupLink)
                 .Inner.Join(x => userGroupLink.User, () => user)
-                .Where(x => x.Name == "A1")
+                .And(x => x.Name == "A1")
                 .ApplyFilterOn(() => user, userFilter)
                 .Select(x => new UserDto
                 {
                     Id = user.Id
                 });
+        }
+
+        private JoinType GetJoinTypeFrom(Func<DelegatedFilterableQuery<Setting, UserEntity, IImmediateFlowQuery<UserEntity>>, IJoinBuilder<Setting, IFilterableQuery<Setting>>> builder)
+        {
+            var query =
+                new DelegatedFilterableQuery<Setting, UserEntity, IImmediateFlowQuery<UserEntity>>(DummyQuery<UserEntity>(), "setting");
+
+            var helper = builder(query);
+
+            return GetJoinTypeFrom(helper);
         }
 
         private void TestUserEntityFilter

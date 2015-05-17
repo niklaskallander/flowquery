@@ -116,24 +116,13 @@
             IsExpression expression
             )
         {
-            if (!property.Contains("."))
-            {
-                property = _alias + "." + property;
-            }
-
-            _query.And(property, expression);
-
-            return this;
+            return Where(property, expression);
         }
 
         /// <inheritdoc />
         public IFilterableQuery<T> And(Expression<Func<T, bool>> expression)
         {
-            Expression<Func<TSource, bool>> temp = _rebaser.RebaseTo<TSource, bool>(expression);
-
-            _query.And(temp);
-
-            return this;
+            return Where(expression);
         }
 
         /// <inheritdoc />
@@ -143,22 +132,13 @@
             IsExpression expression
             )
         {
-            Expression<Func<TSource, object>> temp = _rebaser.RebaseTo<TSource, object>(property);
-
-            _query.And(temp, expression);
-
-            return this;
+            return Where(property, expression);
         }
 
         /// <inheritdoc />
         public IFilterableQuery<T> And(Expression<Func<T, WhereDelegate, bool>> expression)
         {
-            Expression<Func<TSource, WhereDelegate, bool>> temp =
-                _rebaser.RebaseTo<TSource, WhereDelegate, bool>(expression);
-
-            _query.And(temp);
-
-            return this;
+            return Where(expression);
         }
 
         /// <inheritdoc />
@@ -168,9 +148,7 @@
             IsEmptyExpression expression
             )
         {
-            _query.And(subquery, expression);
-
-            return this;
+            return Where(subquery, expression);
         }
 
         /// <inheritdoc />
@@ -180,9 +158,7 @@
             IsEmptyExpression expression
             )
         {
-            _query.And(subquery, expression);
-
-            return this;
+            return Where(subquery, expression);
         }
 
         /// <inheritdoc />

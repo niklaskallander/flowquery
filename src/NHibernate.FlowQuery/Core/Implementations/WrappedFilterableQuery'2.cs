@@ -87,17 +87,13 @@
             IsExpression expression
             )
         {
-            _query.And(property, expression);
-
-            return this;
+            return Where(property, expression);
         }
 
         /// <inheritdoc />
         public IFilterableQuery<TSource> And(Expression<Func<TSource, bool>> expression)
         {
-            _query.And(expression);
-
-            return this;
+            return Where(expression);
         }
 
         /// <inheritdoc />
@@ -107,17 +103,13 @@
             IsExpression expression
             )
         {
-            _query.And(property, expression);
-
-            return this;
+            return Where(property, expression);
         }
 
         /// <inheritdoc />
         public IFilterableQuery<TSource> And(Expression<Func<TSource, WhereDelegate, bool>> expression)
         {
-            _query.And(expression);
-
-            return this;
+            return Where(expression);
         }
 
         /// <inheritdoc />
@@ -127,9 +119,7 @@
             IsEmptyExpression expression
             )
         {
-            _query.And(subquery, expression);
-
-            return this;
+            return Where(subquery, expression);
         }
 
         /// <inheritdoc />
@@ -139,9 +129,7 @@
             IsEmptyExpression expression
             )
         {
-            _query.And(subquery, expression);
-
-            return this;
+            return Where(subquery, expression);
         }
 
         /// <inheritdoc />
