@@ -22,7 +22,6 @@
     public interface IImmediateFlowQuery<TSource>
         : IQueryableFlowQuery<TSource, IImmediateFlowQuery<TSource>>,
           IImmediateFlowQueryBase<TSource, IImmediateFlowQuery<TSource>>
-        where TSource : class
     {
         /// <summary>
         ///     Returns a dictionary representing the objects in the underlying data source that matches the filters

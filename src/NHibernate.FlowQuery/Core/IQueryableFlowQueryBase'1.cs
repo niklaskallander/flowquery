@@ -20,8 +20,6 @@
     /// <seealso cref="IStreamedFlowQuery{TSource}" />
     /// <seealso cref="IQueryableFlowQuery{TSource,TQuery}" />
     public interface IQueryableFlowQueryBase<TSource, out TQuery> : IFlowQuery<TSource, TQuery>
-        where TSource : class
-        where TQuery : class, IQueryableFlowQueryBase<TSource, TQuery>
     {
         /// <summary>
         ///     Removes any previously specified timeout value.

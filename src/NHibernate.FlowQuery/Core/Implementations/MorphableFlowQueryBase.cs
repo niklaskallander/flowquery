@@ -40,7 +40,7 @@
         ///     The query.
         /// </param>
         /// <exception cref="ArgumentException">
-        ///     The "this" reference is not of the type <see cref="T:TQuery" /> as specified by 
+        ///     The "this" reference is not of the type <see cref="T:TQuery" /> as specified by
         ///     <typeparamref name="TQuery" />.
         /// </exception>
         /// <exception cref="ArgumentNullException">
@@ -142,7 +142,10 @@
         }
 
         /// <inheritdoc />
-        public virtual TQuery Project(string property, params string[] properties)
+        public virtual TQuery Project
+            (
+            string property,
+            params string[] properties)
         {
             return Project<TSource>(property, properties);
         }
@@ -162,11 +165,17 @@
             }
 
             return Project
-            (
-                Projections
-                    .ProjectionList()
-                    .AddProperties(Data, properties)
-            );
+                (
+                    Projections
+                        .ProjectionList()
+                        .AddProperties(Data, properties)
+                );
+        }
+
+        /// <inheritdoc />
+        public virtual IStreamedFlowQuery<TSource> Streamed()
+        {
+            return new StreamedFlowQuery<TSource>(CriteriaFactory, Alias, Options, this);
         }
 
         /// <summary>
@@ -212,7 +221,10 @@
         /// <exception cref="ArgumentNullException">
         ///     <paramref name="properties" /> is null.
         /// </exception>
-        protected virtual TQuery Project<TDestination>(string property, params string[] properties)
+        protected virtual TQuery Project<TDestination>
+            (
+            string property,
+            params string[] properties)
         {
             if (property == null)
             {
@@ -220,12 +232,12 @@
             }
 
             return Project<TDestination>
-            (
-                Projections
-                    .ProjectionList()
-                    .AddProperty(property)
-                    .AddProperties(properties ?? new string[0])
-            );
+                (
+                    Projections
+                        .ProjectionList()
+                        .AddProperty(property)
+                        .AddProperties(properties ?? new string[0])
+                );
         }
 
         /// <summary>
@@ -253,10 +265,10 @@
             Type type = typeof(TDestination);
 
             return ProjectionBase<TDestination>
-            (
-                projection,
-                setResultTransformer: !(type.IsValueType || type == typeof(string))
-            );
+                (
+                    projection,
+                    setResultTransformer: !(type.IsValueType || type == typeof(string))
+                );
         }
 
         /// <summary>
@@ -291,9 +303,9 @@
             if (list == null || (list is ProjectionList && ((ProjectionList)list).Length == 0))
             {
                 throw new NotSupportedException
-                (
+                    (
                     "The provided expression contains unsupported features please revise your code."
-                );
+                    );
             }
 
             return ProjectionBase<TDestination>(list, Data.Mappings, expression, false);
@@ -340,12 +352,6 @@
             }
 
             return Query;
-        }
-
-        /// <inheritdoc />
-        public virtual IStreamedFlowQuery<TSource> Streamed()
-        {
-            return new StreamedFlowQuery<TSource>(CriteriaFactory, Alias, Options, this);
         }
     }
 }

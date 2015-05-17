@@ -16,7 +16,6 @@ namespace NHibernate.FlowQuery.Core
     ///     The <see cref="System.Type" /> of the selection.
     /// </typeparam>
     public interface IPartialSelection<TSource, TDestination>
-        where TSource : class
     {
         /// <summary>
         ///     Gets the number of partial selections.

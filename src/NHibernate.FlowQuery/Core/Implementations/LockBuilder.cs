@@ -7,17 +7,10 @@
     /// <summary>
     ///     A helper utility used to build locking strategies with a nice syntax.
     /// </summary>
-    /// <typeparam name="TSource">
-    ///     The <see cref="System.Type" /> of the source for the <see cref="IFlowQuery{TSource, TQuery}" /> query
-    ///     used to create this <see cref="LockBuilder{TSource, TQuery}" /> instance.
-    /// </typeparam>
     /// <typeparam name="TQuery">
-    ///     The <see cref="System.Type" /> of the underlying <see cref="IFlowQuery{TSource, TQuery}" /> query for this
-    ///     <see cref="LockBuilder{TSource, TQuery}" /> instance.
+    ///     The <see cref="System.Type" /> of the underlying query for this <see cref="LockBuilder{TQuery}" /> instance.
     /// </typeparam>
-    public class LockBuilder<TSource, TQuery> : ILockBuilder<TSource, TQuery>
-        where TSource : class
-        where TQuery : class, IFlowQuery<TSource, TQuery>
+    public class LockBuilder<TQuery> : ILockBuilder<TQuery>
     {
         /// <summary>
         ///     The alias for this lock.
@@ -35,7 +28,7 @@
         private readonly TQuery _query;
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="LockBuilder{TSource, TQuery}" /> class.
+        ///     Initializes a new instance of the <see cref="LockBuilder{TQuery}" /> class.
         /// </summary>
         /// <param name="implementor">
         ///     The query instance.

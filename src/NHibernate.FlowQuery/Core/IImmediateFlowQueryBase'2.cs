@@ -1,7 +1,6 @@
 ﻿namespace NHibernate.FlowQuery.Core
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq.Expressions;
 
     using NHibernate.Criterion;
@@ -25,8 +24,6 @@
     /// <seealso cref="IDetachedFlowQuery{TSource}" />
     /// <seealso cref="IDetachedImmutableFlowQuery" />
     public interface IImmediateFlowQueryBase<TSource, out TQuery> : IQueryableFlowQueryBase<TSource, TQuery>
-        where TSource : class
-        where TQuery : class, IImmediateFlowQueryBase<TSource, TQuery>
     {
         /// <summary>
         ///     Returns a value indicating whether any objects in the underlying data source matches the filters

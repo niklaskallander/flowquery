@@ -16,7 +16,6 @@
     /// <seealso cref="IImmediateFlowQuery{TSource}" />
     public interface IDetachedFlowQuery<TSource>
         : IFlowQuery<TSource, IDetachedFlowQuery<TSource>>, IDetachedImmutableFlowQuery
-        where TSource : class
     {
         /// <summary>
         ///     Returns a copy of this <see cref="IDetachedFlowQuery{TSource}" /> instance.

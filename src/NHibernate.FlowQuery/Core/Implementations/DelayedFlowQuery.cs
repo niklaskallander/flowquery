@@ -191,6 +191,7 @@
             return Indistinct();
         }
 
+        /// <inheritdoc />
         IStreamedFlowQuery<TSource> IDelayedFlowQuery<TSource>.Streamed()
         {
             return Streamed();

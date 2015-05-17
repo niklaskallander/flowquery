@@ -52,7 +52,7 @@
         [Test]
         public void FlowQueryImplementorCreatesNewReferencesForUsedCollectionsWhenMorphing()
         {
-            var query = new DummyQuery2(Session.CreateCriteria);
+            var query = new DummyQuery1(Session.CreateCriteria);
 
             query.XProject(x => new UserDto
             {
@@ -83,7 +83,7 @@
         [Test]
         public void FlowQueryImplementorThrowsIfCriteriaFactoryIsNull()
         {
-            Assert.That(() => new DummyQuery2(null), Throws.InstanceOf<ArgumentNullException>());
+            Assert.That(() => new DummyQuery1(null), Throws.InstanceOf<ArgumentNullException>());
         }
 
         [Test]
@@ -92,7 +92,7 @@
             Assert
                 .That
                 (
-                    () => new DummyQuery3(Session.CreateCriteria),
+                    () => new DummyQuery2(Session.CreateCriteria),
                     Throws.ArgumentException
                 );
         }
@@ -100,7 +100,7 @@
         [Test]
         public void MorphableQueryImplementorPopulatesMappingsIfSet()
         {
-            var query = new DummyQuery2(Session.CreateCriteria);
+            var query = new DummyQuery1(Session.CreateCriteria);
 
             query.XProject(x => new UserDto
             {
@@ -129,498 +129,34 @@
             Assert.That(() => QuerySelection.Create(null), Throws.InstanceOf<ArgumentNullException>());
         }
 
-        internal class DummyQuery : IDetachedFlowQuery<UserEntity>
+        private sealed class DummyQuery1 : MorphableFlowQueryBase<UserEntity, IDummyQuery2>, IDummyQuery2
         {
-            public DetachedCriteria Criteria
-            {
-                get
-                {
-                    throw new NotImplementedException();
-                }
-            }
-
-            public IJoinBuilder<UserEntity, IDetachedFlowQuery<UserEntity>> Full
-            {
-                get
-                {
-                    throw new NotImplementedException();
-                }
-            }
-
-            public IJoinBuilder<UserEntity, IDetachedFlowQuery<UserEntity>> Inner
-            {
-                get
-                {
-                    throw new NotImplementedException();
-                }
-            }
-
-            public IJoinBuilder<UserEntity, IDetachedFlowQuery<UserEntity>> LeftOuter
-            {
-                get
-                {
-                    throw new NotImplementedException();
-                }
-            }
-
-            public IJoinBuilder<UserEntity, IDetachedFlowQuery<UserEntity>> RightOuter
-            {
-                get
-                {
-                    throw new NotImplementedException();
-                }
-            }
-
-            public IDetachedFlowQuery<UserEntity> And(params ICriterion[] criterions)
-            {
-                throw new NotImplementedException();
-            }
-
-            public IDetachedFlowQuery<UserEntity> And(string property, IsExpression expression)
-            {
-                throw new NotImplementedException();
-            }
-
-            public IDetachedFlowQuery<UserEntity> And(Expression<Func<UserEntity, bool>> expression)
-            {
-                throw new NotImplementedException();
-            }
-
-            public IDetachedFlowQuery<UserEntity> And
-                (Expression<Func<UserEntity, object>> property, IsExpression expression)
-            {
-                throw new NotImplementedException();
-            }
-
-            public IDetachedFlowQuery<UserEntity> And(Expression<Func<UserEntity, WhereDelegate, bool>> expression)
-            {
-                throw new NotImplementedException();
-            }
-
-            public IDetachedFlowQuery<UserEntity> And(IDetachedImmutableFlowQuery subquery, IsEmptyExpression expresson)
-            {
-                throw new NotImplementedException();
-            }
-
-            public IDetachedFlowQuery<UserEntity> And(DetachedCriteria subquery, IsEmptyExpression expresson)
-            {
-                throw new NotImplementedException();
-            }
-
-            public IDetachedFlowQuery<UserEntity> Cacheable(bool b = true)
-            {
-                throw new NotImplementedException();
-            }
-
-            public IDetachedFlowQuery<UserEntity> Cacheable(string region)
-            {
-                throw new NotImplementedException();
-            }
-
-            public IDetachedFlowQuery<UserEntity> Cacheable(string region, CacheMode cacheMode)
-            {
-                throw new NotImplementedException();
-            }
-
-            public IDetachedFlowQuery<UserEntity> Cacheable(CacheMode cacheMode)
-            {
-                throw new NotImplementedException();
-            }
-
-            public IDetachedFlowQuery<UserEntity> ClearFetches()
-            {
-                throw new NotImplementedException();
-            }
-
-            public IDetachedFlowQuery<UserEntity> ClearGroupBys()
-            {
-                throw new NotImplementedException();
-            }
-
-            public IDetachedFlowQuery<UserEntity> ClearJoins()
-            {
-                throw new NotImplementedException();
-            }
-
-            public IDetachedFlowQuery<UserEntity> ClearLimit()
-            {
-                throw new NotImplementedException();
-            }
-
-            public IDetachedFlowQuery<UserEntity> ClearLocks()
-            {
-                throw new NotImplementedException();
-            }
-
-            public IDetachedFlowQuery<UserEntity> ClearOrders()
-            {
-                throw new NotImplementedException();
-            }
-
-            public IDetachedFlowQuery<UserEntity> ClearRestrictions()
-            {
-                throw new NotImplementedException();
-            }
-
-            public IDetachedFlowQuery<UserEntity> ClearTimeout()
-            {
-                throw new NotImplementedException();
-            }
-
-            public IDetachedFlowQuery<UserEntity> Copy()
-            {
-                throw new NotImplementedException();
-            }
-
-            public IDetachedFlowQuery<UserEntity> Count()
-            {
-                throw new NotImplementedException();
-            }
-
-            public IDetachedFlowQuery<UserEntity> Count(string property)
-            {
-                throw new NotImplementedException();
-            }
-
-            public IDetachedFlowQuery<UserEntity> Count(IProjection projection)
-            {
-                throw new NotImplementedException();
-            }
-
-            public IDetachedFlowQuery<UserEntity> Count(Expression<Func<UserEntity, object>> property)
-            {
-                throw new NotImplementedException();
-            }
-
-            public IDetachedFlowQuery<UserEntity> CountLong()
-            {
-                throw new NotImplementedException();
-            }
-
-            public IDelayedFlowQuery<UserEntity> Delayed()
-            {
-                throw new NotImplementedException();
-            }
-
-            public IDelayedFlowQuery<UserEntity> Delayed(ISession session)
-            {
-                throw new NotImplementedException();
-            }
-
-            public IDelayedFlowQuery<UserEntity> Delayed(IStatelessSession session)
-            {
-                throw new NotImplementedException();
-            }
-
-            public IDetachedFlowQuery<UserEntity> Distinct()
-            {
-                throw new NotImplementedException();
-            }
-
-            public IFetchBuilder<UserEntity, IDetachedFlowQuery<UserEntity>> Fetch(string path)
-            {
-                throw new NotImplementedException();
-            }
-
-            public IFetchBuilder<UserEntity, IDetachedFlowQuery<UserEntity>> Fetch
-                (
-                Expression<Func<UserEntity, object>> expression,
-                Expression<Func<object>> alias = null,
-                IRevealConvention revealConvention = null)
-            {
-                throw new NotImplementedException();
-            }
-
-            public IDetachedFlowQuery<UserEntity> GroupBy(Expression<Func<UserEntity, object>> property)
-            {
-                throw new NotImplementedException();
-            }
-
-            public IImmediateFlowQuery<UserEntity> Immediate()
-            {
-                throw new NotImplementedException();
-            }
-
-            /// <summary>
-            ///     Returns a copy of this <see cref="IDetachedFlowQuery{TSource}" /> but in the form of a 
-            ///     <see cref="IImmediateFlowQuery{TSource}" /> instead.
-            /// </summary>
-            /// <param name="session">
-            ///     The session.
-            /// </param>
-            /// <returns>
-            ///     A copy of this <see cref="IDetachedFlowQuery{TSource}" /> but in the form of a 
-            ///     <see cref="IImmediateFlowQuery{TSource}" /> instead.
-            /// </returns>
-            /// <exception cref="ArgumentNullException">
-            ///     <paramref name="session" /> is null.
-            /// </exception>
-            public IImmediateFlowQuery<UserEntity> Immediate(ISession session)
-            {
-                throw new NotImplementedException();
-            }
-
-            /// <summary>
-            ///     Returns a copy of this <see cref="IDetachedFlowQuery{TSource}" /> but in the form of a 
-            ///     <see cref="IImmediateFlowQuery{TSource}" /> instead.
-            /// </summary>
-            /// <param name="session">
-            ///     The session.
-            /// </param>
-            /// <returns>
-            ///     A copy of this <see cref="IDetachedFlowQuery{TSource}" /> but in the form of a 
-            ///     <see cref="IImmediateFlowQuery{TSource}" /> instead.
-            /// </returns>
-            /// <exception cref="ArgumentNullException">
-            ///     <paramref name="session" /> is null.
-            /// </exception>
-            public IImmediateFlowQuery<UserEntity> Immediate(IStatelessSession session)
-            {
-                throw new NotImplementedException();
-            }
-
-            public IDetachedFlowQuery<UserEntity> Indistinct()
-            {
-                throw new NotImplementedException();
-            }
-
-            public IDetachedFlowQuery<UserEntity> Limit(int limit)
-            {
-                throw new NotImplementedException();
-            }
-
-            public IDetachedFlowQuery<UserEntity> Limit(int limit, int offset)
-            {
-                throw new NotImplementedException();
-            }
-
-            public ILockBuilder<UserEntity, IDetachedFlowQuery<UserEntity>> Lock(Expression<Func<object>> alias)
-            {
-                throw new NotImplementedException();
-            }
-
-            public ILockBuilder<UserEntity, IDetachedFlowQuery<UserEntity>> Lock(string alias)
-            {
-                throw new NotImplementedException();
-            }
-
-            public ILockBuilder<UserEntity, IDetachedFlowQuery<UserEntity>> Lock()
-            {
-                throw new NotImplementedException();
-            }
-
-            public IDetachedFlowQuery<UserEntity> OrderBy(string property, bool ascending = true)
-            {
-                throw new NotImplementedException();
-            }
-
-            public IDetachedFlowQuery<UserEntity> OrderBy(IProjection projection, bool ascending = true)
-            {
-                throw new NotImplementedException();
-            }
-
-            public IDetachedFlowQuery<UserEntity> OrderBy
-                (Expression<Func<UserEntity, object>> property, bool ascending = true)
-            {
-                throw new NotImplementedException();
-            }
-
-            public IDetachedFlowQuery<UserEntity> OrderBy<TProjection>
-                (Expression<Func<TProjection, object>> property, bool ascending = true)
-            {
-                throw new NotImplementedException();
-            }
-
-            public IDetachedFlowQuery<UserEntity> OrderBy<TProjection>(string property, bool ascending = true)
-            {
-                throw new NotImplementedException();
-            }
-
-            public IDetachedFlowQuery<UserEntity> OrderByDescending(string property)
-            {
-                throw new NotImplementedException();
-            }
-
-            public IDetachedFlowQuery<UserEntity> OrderByDescending(IProjection projection)
-            {
-                throw new NotImplementedException();
-            }
-
-            public IDetachedFlowQuery<UserEntity> OrderByDescending(Expression<Func<UserEntity, object>> property)
-            {
-                throw new NotImplementedException();
-            }
-
-            public IDetachedFlowQuery<UserEntity> OrderByDescending<TProjection>
-                (Expression<Func<TProjection, object>> property)
-            {
-                throw new NotImplementedException();
-            }
-
-            public IDetachedFlowQuery<UserEntity> OrderByDescending<TProjection>(string property)
-            {
-                throw new NotImplementedException();
-            }
-
-            public IDetachedFlowQuery<UserEntity> RestrictByExample
-                (UserEntity exampleInstance, Action<IExampleWrapper<UserEntity>> example)
-            {
-                throw new NotImplementedException();
-            }
-
-            public IDetachedFlowQuery<UserEntity> Select(string property)
-            {
-                throw new NotImplementedException();
-            }
-
-            public IDetachedFlowQuery<UserEntity> Select(IProjection projection)
-            {
-                throw new NotImplementedException();
-            }
-
-            public IDetachedFlowQuery<UserEntity> Select(Expression<Func<UserEntity, object>> expression)
-            {
-                throw new NotImplementedException();
-            }
-
-            public IDetachedFlowQuery<UserEntity> SetRootAlias<TAlias>(Expression<Func<TAlias>> alias)
-                where TAlias : class
-            {
-                throw new NotImplementedException();
-            }
-
-            /// <summary>
-            ///     Returns a copy of this <see cref="IDetachedFlowQuery{TSource}" /> but in the form of a
-            ///     <see cref="IStreamedFlowQuery{TSource}" /> instead.
-            /// </summary>
-            /// <returns>
-            ///     A copy of this <see cref="IDetachedFlowQuery{TSource}" /> but in the form of a
-            ///     <see cref="IStreamedFlowQuery{TSource}" /> instead.
-            /// </returns>
-            public IStreamedFlowQuery<UserEntity> Streamed()
-            {
-                throw new NotImplementedException();
-            }
-
-            /// <summary>
-            ///     Returns a copy of this <see cref="IDetachedFlowQuery{TSource}" /> but in the form of a
-            ///     <see cref="IStreamedFlowQuery{TSource}" /> instead.
-            /// </summary>
-            /// <param name="session">
-            ///     The session.
-            /// </param>
-            /// <returns>
-            ///     A copy of this <see cref="IDetachedFlowQuery{TSource}" /> but in the form of a
-            ///     <see cref="IStreamedFlowQuery{TSource}" /> instead.
-            /// </returns>
-            /// <exception cref="ArgumentNullException">
-            ///     <paramref name="session" /> is null.
-            /// </exception>
-            public IStreamedFlowQuery<UserEntity> Streamed(ISession session)
-            {
-                throw new NotImplementedException();
-            }
-
-            /// <summary>
-            ///     Returns a copy of this <see cref="IDetachedFlowQuery{TSource}" /> but in the form of a
-            ///     <see cref="IStreamedFlowQuery{TSource}" /> instead.
-            /// </summary>
-            /// <param name="session">
-            ///     The session.
-            /// </param>
-            /// <returns>
-            ///     A copy of this <see cref="IDetachedFlowQuery{TSource}" /> but in the form of a
-            ///     <see cref="IStreamedFlowQuery{TSource}" /> instead.
-            /// </returns>
-            /// <exception cref="ArgumentNullException">
-            ///     <paramref name="session" /> is null.
-            /// </exception>
-            public IStreamedFlowQuery<UserEntity> Streamed(IStatelessSession session)
-            {
-                throw new NotImplementedException();
-            }
-
-            public IDetachedFlowQuery<UserEntity> Skip(int skip)
-            {
-                throw new NotImplementedException();
-            }
-
-            public IDetachedFlowQuery<UserEntity> Take(int take)
-            {
-                throw new NotImplementedException();
-            }
-
-            public IDetachedFlowQuery<UserEntity> Timeout(int seconds)
-            {
-                throw new NotImplementedException();
-            }
-
-            public IDetachedFlowQuery<UserEntity> Where(params ICriterion[] criterions)
-            {
-                throw new NotImplementedException();
-            }
-
-            public IDetachedFlowQuery<UserEntity> Where(string property, IsExpression expression)
-            {
-                throw new NotImplementedException();
-            }
-
-            public IDetachedFlowQuery<UserEntity> Where(Expression<Func<UserEntity, bool>> expression)
-            {
-                throw new NotImplementedException();
-            }
-
-            public IDetachedFlowQuery<UserEntity> Where
-                (Expression<Func<UserEntity, object>> property, IsExpression expression)
-            {
-                throw new NotImplementedException();
-            }
-
-            public IDetachedFlowQuery<UserEntity> Where(Expression<Func<UserEntity, WhereDelegate, bool>> expression)
-            {
-                throw new NotImplementedException();
-            }
-
-            public IDetachedFlowQuery<UserEntity> Where
-                (IDetachedImmutableFlowQuery subquery, IsEmptyExpression expresson)
-            {
-                throw new NotImplementedException();
-            }
-
-            public IDetachedFlowQuery<UserEntity> Where(DetachedCriteria subquery, IsEmptyExpression expresson)
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        internal class DummyQuery2 : MorphableFlowQueryBase<UserEntity, IDummyQuery2>, IDummyQuery2
-        {
-            protected internal DummyQuery2
+            internal DummyQuery1
                 (
                 Func<Type, string, ICriteria> criteriaFactory,
                 string alias = null,
                 FlowQueryOptions options = null,
-                IMorphableFlowQuery query = null)
+                IMorphableFlowQuery query = null
+                )
                 : base(criteriaFactory, alias, options, query)
             {
             }
 
-            internal virtual DummyQuery2 XProject<TDestination>(Expression<Func<UserEntity, TDestination>> expression)
+            internal void XProject<TDestination>(Expression<Func<UserEntity, TDestination>> expression)
             {
                 Project(expression);
-
-                return this;
             }
         }
 
-        internal class DummyQuery3 : MorphableFlowQueryBase<UserEntity, IDummyQuery2>, IDummyQuery3
+        private class DummyQuery2 : MorphableFlowQueryBase<UserEntity, IDummyQuery2>, IDummyQuery3
         {
-            protected internal DummyQuery3
+            internal DummyQuery2
                 (
                 Func<Type, string, ICriteria> criteriaFactory,
                 string alias = null,
                 FlowQueryOptions options = null,
-                IMorphableFlowQuery query = null)
+                IMorphableFlowQuery query = null
+                )
                 : base(criteriaFactory, alias, options, query)
             {
             }
@@ -668,6 +204,20 @@
             }
 
             public new IDummyQuery3 And(DetachedCriteria subquery, IsEmptyExpression expresson)
+            {
+                throw new NotImplementedException();
+            }
+
+            public new IDummyQuery3 ApplyFilter(IQueryFilter<UserEntity> filter)
+            {
+                throw new NotImplementedException();
+            }
+
+            public new IDummyQuery3 ApplyFilterOn<TAlias>
+                (
+                Expression<Func<TAlias>> alias,
+                IQueryFilter<TAlias> filter
+                )
             {
                 throw new NotImplementedException();
             }
@@ -727,16 +277,17 @@
                 throw new NotImplementedException();
             }
 
-            public new IFetchBuilder<UserEntity, IDummyQuery3> Fetch(string path)
+            public new IFetchBuilder<IDummyQuery3> Fetch(string path)
             {
                 throw new NotImplementedException();
             }
 
-            public new IFetchBuilder<UserEntity, IDummyQuery3> Fetch
+            public new IFetchBuilder<IDummyQuery3> Fetch
                 (
                 Expression<Func<UserEntity, object>> expression,
                 Expression<Func<object>> alias = null,
-                IRevealConvention revealConvention = null)
+                IRevealConvention revealConvention = null
+                )
             {
                 throw new NotImplementedException();
             }
@@ -751,17 +302,17 @@
                 throw new NotImplementedException();
             }
 
-            public new ILockBuilder<UserEntity, IDummyQuery3> Lock(Expression<Func<object>> alias)
+            public new ILockBuilder<IDummyQuery3> Lock(Expression<Func<object>> alias)
             {
                 throw new NotImplementedException();
             }
 
-            public new ILockBuilder<UserEntity, IDummyQuery3> Lock(string alias)
+            public new ILockBuilder<IDummyQuery3> Lock(string alias)
             {
                 throw new NotImplementedException();
             }
 
-            public new ILockBuilder<UserEntity, IDummyQuery3> Lock()
+            public new ILockBuilder<IDummyQuery3> Lock()
             {
                 throw new NotImplementedException();
             }
@@ -819,23 +370,23 @@
                 throw new NotImplementedException();
             }
 
-            IDummyQuery3 IFlowQuery<UserEntity, IDummyQuery3>.And(string property, IsExpression expression)
+            IDummyQuery3 IFilterableQuery<UserEntity, IDummyQuery3>.And(string property, IsExpression expression)
             {
                 throw new NotImplementedException();
             }
 
-            IDummyQuery3 IFlowQuery<UserEntity, IDummyQuery3>.And(Expression<Func<UserEntity, bool>> expression)
+            IDummyQuery3 IFilterableQuery<UserEntity, IDummyQuery3>.And(Expression<Func<UserEntity, bool>> expression)
             {
                 throw new NotImplementedException();
             }
 
-            IDummyQuery3 IFlowQuery<UserEntity, IDummyQuery3>.And
+            IDummyQuery3 IFilterableQuery<UserEntity, IDummyQuery3>.And
                 (Expression<Func<UserEntity, object>> property, IsExpression expression)
             {
                 throw new NotImplementedException();
             }
 
-            IDummyQuery3 IFlowQuery<UserEntity, IDummyQuery3>.And
+            IDummyQuery3 IFilterableQuery<UserEntity, IDummyQuery3>.And
                 (Expression<Func<UserEntity, WhereDelegate, bool>> expression)
             {
                 throw new NotImplementedException();
@@ -878,23 +429,23 @@
                 throw new NotImplementedException();
             }
 
-            IDummyQuery3 IFlowQuery<UserEntity, IDummyQuery3>.Where(string property, IsExpression expression)
+            IDummyQuery3 IFilterableQuery<UserEntity, IDummyQuery3>.Where(string property, IsExpression expression)
             {
                 throw new NotImplementedException();
             }
 
-            IDummyQuery3 IFlowQuery<UserEntity, IDummyQuery3>.Where(Expression<Func<UserEntity, bool>> expression)
+            IDummyQuery3 IFilterableQuery<UserEntity, IDummyQuery3>.Where(Expression<Func<UserEntity, bool>> expression)
             {
                 throw new NotImplementedException();
             }
 
-            IDummyQuery3 IFlowQuery<UserEntity, IDummyQuery3>.Where
+            IDummyQuery3 IFilterableQuery<UserEntity, IDummyQuery3>.Where
                 (Expression<Func<UserEntity, object>> property, IsExpression expression)
             {
                 throw new NotImplementedException();
             }
 
-            IDummyQuery3 IFlowQuery<UserEntity, IDummyQuery3>.Where
+            IDummyQuery3 IFilterableQuery<UserEntity, IDummyQuery3>.Where
                 (Expression<Func<UserEntity, WhereDelegate, bool>> expression)
             {
                 throw new NotImplementedException();

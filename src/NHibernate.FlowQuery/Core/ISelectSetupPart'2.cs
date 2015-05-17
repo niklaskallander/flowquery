@@ -16,7 +16,6 @@ namespace NHibernate.FlowQuery.Core
     ///     The <see cref="System.Type" /> of the selection.
     /// </typeparam>
     public interface ISelectSetupPart<TSource, TDestination>
-        where TSource : class
     {
         /// <summary>
         ///     Specifies a property on the source type to use for the destination type's property.

@@ -23,7 +23,6 @@
     /// <seealso cref="IImmediateFlowQuery{TSource}" />
     public interface IStreamedFlowQuery<TSource>
         : IImmediateFlowQueryBase<TSource, IStreamedFlowQuery<TSource>>
-        where TSource : class
     {
         /// <summary>
         ///     Returns a copy of this <see cref="IStreamedFlowQuery{TSource}" /> but in the form of a

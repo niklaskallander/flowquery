@@ -1478,7 +1478,7 @@
         {
             [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:FieldsMustBePrivate",
                 Justification = "Reviewed. Suppression is OK here.")]
-            public string Puff;
+            public string Puff = string.Empty;
         }
 
         private class TestCastingModel

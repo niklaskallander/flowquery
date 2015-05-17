@@ -20,8 +20,6 @@
     /// <seealso cref="IDetachedImmutableFlowQuery" />
     /// <seealso cref="IImmediateFlowQuery{TSource}" />
     public interface IMorphableFlowQuery<TSource, out TQuery> : IFlowQuery<TSource, TQuery>
-        where TSource : class
-        where TQuery : class, IFlowQuery<TSource, TQuery>
     {
         /// <summary>
         ///     Transform this query into a <see cref="IDelayedFlowQuery{TSource}" /> query instance.

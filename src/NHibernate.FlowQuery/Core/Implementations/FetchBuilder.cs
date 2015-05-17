@@ -8,27 +8,21 @@
     /// <summary>
     ///     A helper class used to build fetching strategies with a nice syntax.
     /// </summary>
-    /// <typeparam name="TSource">
-    ///     The <see cref="System.Type" /> of the source for the <see cref="IFlowQuery{TSource, TQuery}" /> query
-    ///     used to create this <see cref="FetchBuilder{TSource, TQuery}" /> instance.
-    /// </typeparam>
     /// <typeparam name="TQuery">
-    ///     The <see cref="System.Type" /> of the <see cref="IFlowQuery{TSource, TQuery}" /> query this
-    ///     <see cref="FetchBuilder{TSource, TQuery}" /> instance is created from.
+    ///     The <see cref="System.Type" /> of the query this <see cref="FetchBuilder{TQuery}" /> instance is created 
+    ///     from.
     /// </typeparam>
-    public class FetchBuilder<TSource, TQuery> : IFetchBuilder<TSource, TQuery>
-        where TSource : class
-        where TQuery : class, IFlowQuery<TSource, TQuery>
+    public class FetchBuilder<TQuery> : IFetchBuilder<TQuery>
     {
         /// <summary>
-        ///     The alias used for the fetching strategy this <see cref="FetchBuilder{TSource, TQuery}" /> instance
+        ///     The alias used for the fetching strategy this <see cref="FetchBuilder{TQuery}" /> instance
         ///     represents.
         /// </summary>
         private readonly string _alias;
 
         /// <summary>
         ///     The <see cref="FlowQueryBase{TSource, TQuery}" /> query that created this
-        ///     <see cref="FetchBuilder{TSource, TQuery}" /> instance.
+        ///     <see cref="FetchBuilder{TQuery}" /> instance.
         /// </summary>
         /// <remarks>
         ///     Should be the same object reference as <see cref="_query" />.
@@ -36,14 +30,14 @@
         private readonly IFlowQuery _implementor;
 
         /// <summary>
-        ///     The association path on <typeparamref name="TSource" /> used for the fetching strategy this
-        ///     <see cref="FetchBuilder{TSource, TQuery}" /> instance represents.
+        ///     The association path used for the fetching strategy this <see cref="FetchBuilder{TQuery}" /> instance 
+        ///     represents.
         /// </summary>
         private readonly string _path;
 
         /// <summary>
         ///     The <see cref="IFlowQuery{TSource, TQuery}" /> query that created this
-        ///     <see cref="FetchBuilder{TSource, TQuery}" /> instance.
+        ///     <see cref="FetchBuilder{TQuery}" /> instance.
         /// </summary>
         /// <remarks>
         ///     Should be the same object reference as <see cref="_implementor" />.
@@ -51,22 +45,22 @@
         private readonly TQuery _query;
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="FetchBuilder{TSource, TQuery}" /> class.
+        ///     Initializes a new instance of the <see cref="FetchBuilder{TQuery}" /> class.
         /// </summary>
         /// <param name="implementor">
         ///     The <see cref="FlowQueryBase{TSource, TQuery}" /> query that creates this
-        ///     <see cref="FetchBuilder{TSource, TQuery}" /> instance.
+        ///     <see cref="FetchBuilder{TQuery}" /> instance.
         /// </param>
         /// <param name="query">
         ///     The <see cref="IFlowQuery{TSource, TQuery}" /> query that creates this
-        ///     <see cref="FetchBuilder{TSource, TQuery}" /> instance.
+        ///     <see cref="FetchBuilder{TQuery}" /> instance.
         /// </param>
         /// <param name="path">
-        ///     The association path on <typeparamref name="TSource" /> used for the fetching strategy this
-        ///     <see cref="FetchBuilder{TSource, TQuery}" /> instance should represent.
+        ///     The association path used for the fetching strategy this <see cref="FetchBuilder{TQuery}" /> instance 
+        ///     should represent.
         /// </param>
         /// <param name="alias">
-        ///     The alias used for the fetching strategy this <see cref="FetchBuilder{TSource, TQuery}" /> instance
+        ///     The alias used for the fetching strategy this <see cref="FetchBuilder{TQuery}" /> instance
         ///     should represent.
         /// </param>
         /// <exception cref="ArgumentException">
@@ -116,7 +110,7 @@
         ///     The <see cref="FetchMode" /> value to use for the built fetching strategy.
         /// </param>
         /// <returns>
-        ///     The <see cref="T:TQuery"/> query this <see cref="FetchBuilder{TSource, TQuery}" /> was created with.
+        ///     The <see cref="T:TQuery"/> query this <see cref="FetchBuilder{TQuery}" /> was created with.
         /// </returns>
         /// <exception cref="InvalidOperationException">
         ///     The alias (<see cref="_alias" />) is already used for another fetching strategy.

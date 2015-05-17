@@ -14,21 +14,20 @@
     ///     A helper utility used to create joins with a nice syntax.
     /// </summary>
     /// <typeparam name="TSource">
-    ///     The <see cref="System.Type" /> of the source for the <see cref="IFlowQuery{TSource, TQuery}" /> query
-    ///     used to create this <see cref="JoinBuilder{TSource, TQuery}" /> instance.
-    /// </typeparam>
-    /// <typeparam name="TQuery">
-    ///     The <see cref="System.Type" /> of the underlying <see cref="IFlowQuery{TSource, TQuery}" /> query for this
+    ///     The <see cref="System.Type" /> of the source for the query used to create this 
     ///     <see cref="JoinBuilder{TSource, TQuery}" /> instance.
     /// </typeparam>
+    /// <typeparam name="TQuery">
+    ///     The <see cref="System.Type" /> of the underlying query for this <see cref="JoinBuilder{TSource, TQuery}" /> 
+    ///     instance.
+    /// </typeparam>
     public class JoinBuilder<TSource, TQuery> : IJoinBuilder<TSource, TQuery>
-        where TSource : class
-        where TQuery : class, IFlowQuery<TSource, TQuery>
+        where TQuery : class
     {
         /// <summary>
         ///     The query instance.
         /// </summary>
-        private readonly IFlowQuery _implementor;
+        private readonly IFilterableQuery _implementor;
 
         /// <summary>
         ///     The join type.
@@ -60,7 +59,7 @@
         /// </exception>
         protected internal JoinBuilder
             (
-            IFlowQuery implementor,
+            IFilterableQuery implementor,
             TQuery query,
             JoinType joinType
             )

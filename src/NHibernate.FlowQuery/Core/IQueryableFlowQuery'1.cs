@@ -20,8 +20,6 @@
     /// <seealso cref="IImmediateFlowQuery{TSource}" />
     /// <seealso cref="IStreamedFlowQuery{TSource}" />
     public interface IQueryableFlowQuery<TSource, out TQuery> : IQueryableFlowQueryBase<TSource, TQuery>
-        where TSource : class
-        where TQuery : class, IQueryableFlowQueryBase<TSource, TQuery>
     {
         /// <summary>
         ///     Creates a selection from the query.
