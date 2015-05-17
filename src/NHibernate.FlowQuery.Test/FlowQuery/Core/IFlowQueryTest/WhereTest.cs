@@ -908,11 +908,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void WhereWithConcatenation()
         {
             FlowQuerySelection<UserEntity> users = Query<UserEntity>()
-                .Where(u => u.Firstname + " " + u.Lastname == "Niklas Källander")
+                .Where(u => u.Firstname + " " + u.Lastname == "Niklas Kallander")
                 .Select();
 
             Assert.That(users.Count(), Is.EqualTo(1));
-            Assert.That(users.First().Firstname + " " + users.First().Lastname, Is.EqualTo("Niklas Källander"));
+            Assert.That(users.First().Firstname + " " + users.First().Lastname, Is.EqualTo("Niklas Kallander"));
         }
 
         [Test]
@@ -1216,7 +1216,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         [Test]
         public void WhereWithWhereDelegateHelper()
         {
-            var lastNames = new object[] { "Nilsson", "Källander" };
+            var lastNames = new object[] { "Nilsson", "Kallander" };
 
             FlowQuerySelection<UserEntity> users = Query<UserEntity>()
                 .Where((u, where) => u.Firstname == "Niklas"
@@ -1230,7 +1230,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         [Test]
         public void WhereWithWhereDelegateUsingString()
         {
-            var lastNames = new object[] { "Nilsson", "Källander" };
+            var lastNames = new object[] { "Nilsson", "Kallander" };
 
             FlowQuerySelection<UserEntity> users = Query<UserEntity>()
                 .Where((u, where) => u.Firstname == "Niklas"

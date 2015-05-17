@@ -26,7 +26,7 @@
         [Test]
         public void AnyWithWhereDelegateHelper()
         {
-            var lastNames = new object[] { "Nilsson", "Källander" };
+            var lastNames = new object[] { "Nilsson", "Kallander" };
 
             bool any = Query<UserEntity>()
                 .Any((u, where) => u.Firstname == "Niklas"
@@ -79,7 +79,7 @@
         [Test]
         public void DelayedAnyWithWhereDelegateHelper()
         {
-            var lastNames = new object[] { "Nilsson", "Källander" };
+            var lastNames = new object[] { "Nilsson", "Kallander" };
 
             Lazy<bool> any = Query<UserEntity>()
                 .Delayed()

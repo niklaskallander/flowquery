@@ -115,7 +115,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
             FlowQuerySelection<UserEntity> users = Query<UserEntity>()
                 .And
                 (
-                    u => u.Id, 
+                    u => u.Id,
                     FqIs.In(subquery)
                 )
                 .Select();
@@ -221,11 +221,11 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         public void AndWithConcatenation()
         {
             FlowQuerySelection<UserEntity> users = Query<UserEntity>()
-                .And(u => u.Firstname + " " + u.Lastname == "Niklas Källander")
+                .And(u => u.Firstname + " " + u.Lastname == "Niklas Kallander")
                 .Select();
 
             Assert.That(users.Count(), Is.EqualTo(1));
-            Assert.That(users.First().Firstname + " " + users.First().Lastname, Is.EqualTo("Niklas Källander"));
+            Assert.That(users.First().Firstname + " " + users.First().Lastname, Is.EqualTo("Niklas Kallander"));
         }
 
         [Test]
@@ -241,7 +241,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         }
 
         [Test]
-        [SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1003:SymbolsMustBeSpacedCorrectly", 
+        [SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1003:SymbolsMustBeSpacedCorrectly",
             Justification = "Reviewed. Suppression is OK here.")]
         public void AndWithDoubleNegation()
         {
@@ -392,7 +392,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
         [Test]
         public void AndWithWhereDelegateHelper()
         {
-            var lastNames = new object[] { "Nilsson", "Källander" };
+            var lastNames = new object[] { "Nilsson", "Kallander" };
 
             FlowQuerySelection<UserEntity> users = Query<UserEntity>()
                 .And((u, where) => u.Firstname == "Niklas"

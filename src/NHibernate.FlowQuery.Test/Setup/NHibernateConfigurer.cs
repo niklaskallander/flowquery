@@ -125,7 +125,7 @@
                         "Wimpy",
                         "Cool01",
                         "Niklas",
-                        "Källander",
+                        "Kallander",
                         new DateTime(2001, 9, 11),
                         RoleEnum.Administrator,
                         "1"
@@ -171,7 +171,7 @@
                         NumberOfLogOns = 12
                     };
 
-                    var u4 = new UserEntity("Lajsa", null, "Lotta", "Bråk", DateTime.Now, RoleEnum.Standard, "4")
+                    var u4 = new UserEntity("Lajsa", null, "Lotta", "Brak", DateTime.Now, RoleEnum.Standard, "4")
                     {
                         Setting = s6,
                         NumberOfLogOns = 4

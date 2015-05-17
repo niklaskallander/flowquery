@@ -68,8 +68,8 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
             Assert.That(users.Count(), Is.EqualTo(4));
             Assert.That(users.ElementAt(0).SomeValue, Is.EqualTo("Kossan Muu"));
             Assert.That(users.ElementAt(1).SomeValue, Is.EqualTo("Lars Wilk"));
-            Assert.That(users.ElementAt(2).SomeValue, Is.EqualTo("Lotta Bråk"));
-            Assert.That(users.ElementAt(3).SomeValue, Is.EqualTo("Niklas Källander"));
+            Assert.That(users.ElementAt(2).SomeValue, Is.EqualTo("Lotta Brak"));
+            Assert.That(users.ElementAt(3).SomeValue, Is.EqualTo("Niklas Kallander"));
         }
 
         [Test]
@@ -135,8 +135,8 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                 });
 
             Assert.That(users.Count(), Is.EqualTo(4));
-            Assert.That(users.ElementAt(0).SomeValue, Is.EqualTo("Niklas Källander | Wimpy"));
-            Assert.That(users.ElementAt(1).SomeValue, Is.EqualTo("Lotta Bråk | Lajsa"));
+            Assert.That(users.ElementAt(0).SomeValue, Is.EqualTo("Niklas Kallander | Wimpy"));
+            Assert.That(users.ElementAt(1).SomeValue, Is.EqualTo("Lotta Brak | Lajsa"));
             Assert.That(users.ElementAt(2).SomeValue, Is.EqualTo("Lars Wilk | Izmid"));
             Assert.That(users.ElementAt(3).SomeValue, Is.EqualTo("Kossan Muu | Empor"));
         }
@@ -229,7 +229,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                             {
                                 Username = x.Firstname
                             });
-                    }, 
+                    },
                     Throws.InstanceOf<InvalidOperationException>()
                 );
         }
@@ -250,7 +250,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                             {
                                 Username = x.Firstname
                             });
-                    }, 
+                    },
                     Throws.Nothing
                 );
 
@@ -274,7 +274,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                             {
                                 Username = x.Firstname
                             });
-                    }, 
+                    },
                     Throws.Nothing
                 );
         }
@@ -293,7 +293,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                             {
                                 Username = x.Firstname
                             });
-                    }, 
+                    },
                     Throws.InstanceOf<InvalidOperationException>()
                 );
         }
@@ -314,7 +314,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core.IFlowQueryTest
                             {
                                 Username = x.Firstname
                             });
-                    }, 
+                    },
                     Throws.Nothing
                 );
 
