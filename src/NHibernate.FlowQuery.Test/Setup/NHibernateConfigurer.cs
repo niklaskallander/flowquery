@@ -10,6 +10,7 @@
 
     using NHibernate.Cache;
     using NHibernate.Cfg;
+    using NHibernate.Dialect;
     using NHibernate.FlowQuery.Test.Setup.Entities;
     using NHibernate.Mapping;
     using NHibernate.Tool.hbm2ddl;
@@ -35,6 +36,7 @@
                 .ConnectionString(@"Data Source=.; Initial Catalog=flowquery; Integrated Security=SSPI;");
 #else
             databaseConfigurer = MySQLConfiguration.Standard
+                .Dialect<MySQL5Dialect>()
                 .ConnectionString(@"Server=127.0.0.1;Database=flowquery_test;Uid=root;Pwd=;");
 #endif
 
