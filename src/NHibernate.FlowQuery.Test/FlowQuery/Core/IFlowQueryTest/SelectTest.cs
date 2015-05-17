@@ -1395,7 +1395,7 @@
             Assert.That(() => DummyQuery<UserEntity>().Select(x => x), Throws.InstanceOf<NotSupportedException>());
         }
 
-        [Test]
+        [Test, Category("MySqlUnsupported")]
         public void TestSelectSubquery()
         {
             UserEntity root = null;

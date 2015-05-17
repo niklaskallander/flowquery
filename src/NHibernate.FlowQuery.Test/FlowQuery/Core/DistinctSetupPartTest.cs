@@ -30,6 +30,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core
         public void CanUseExpressionInUseCall()
         {
             FlowQuerySelection<UserDto> users = Query<UserEntity>()
+                .OrderBy(x => x.IsOnline)
                 .Distinct()
                 .Select<UserDto>()
                 .For(x => x.IsOnline).Use(x => x.IsOnline)
@@ -44,6 +45,7 @@ namespace NHibernate.FlowQuery.Test.FlowQuery.Core
         public void CanUseProjectionInUseCall()
         {
             FlowQuerySelection<UserDto> users = Query<UserEntity>()
+                .OrderBy(x => x.IsOnline)
                 .Distinct()
                 .Select<UserDto>()
                 .For(x => x.IsOnline).Use(Projections.Property("IsOnline"))
