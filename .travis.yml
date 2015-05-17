@@ -7,4 +7,4 @@ before_script:
   - mysql -e 'create database flowquery_test;'
 script:
   - xbuild /p:Configuration=Travis "./src/NHibernate.FlowQuery.sln"
-  - mono ./testrunner/NUnit.Runners.2.6.4/tools/nunit-console.exe ./src/NHibernate.FlowQuery.Test/bin/Travis/NHibernate.FlowQuery.Test.dll /exclude:MySqlUnsupported
+  - mono "./testrunner/NUnit.Runners.2.6.4/tools/nunit-console.exe ./src/NHibernate.FlowQuery.Test/bin/Travis/NHibernate.FlowQuery.Test.dll /exclude:MySqlUnsupported"
