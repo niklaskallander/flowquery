@@ -301,56 +301,6 @@
             );
 
         /// <summary>
-        ///     Specify a sort order on a property in your query projection.
-        /// </summary>
-        /// <param name="property">
-        ///     The property to sort on.
-        /// </param>
-        /// <param name="ascending">
-        ///     Indicates whether to sort ascending (true, default) or descending (false).
-        /// </param>
-        /// <typeparam name="TProjection">
-        ///     The <see cref="System.Type" /> of the projection.
-        /// </typeparam>
-        /// <returns>
-        ///     The <see cref="T:TQuery" /> instance.
-        /// </returns>
-        /// <remarks>
-        ///     Only works when projecting using <see cref="MemberInitExpression" />s or <see cref="NewExpression" />s,
-        ///     or when projecting using <see cref="ISelectSetup{TSource,TDestination}" />.
-        /// </remarks>
-        TQuery OrderBy<TProjection>
-            (
-            Expression<Func<TProjection, object>> property,
-            bool ascending = true
-            );
-
-        /// <summary>
-        ///     Specify a sort order on a property in your query projection.
-        /// </summary>
-        /// <param name="property">
-        ///     The property to sort on.
-        /// </param>
-        /// <param name="ascending">
-        ///     Indicates whether to sort ascending (true, default) or descending (false).
-        /// </param>
-        /// <typeparam name="TProjection">
-        ///     The <see cref="System.Type" /> of the projection.
-        /// </typeparam>
-        /// <returns>
-        ///     The <see cref="T:TQuery" /> instance.
-        /// </returns>
-        /// <remarks>
-        ///     Only works when projecting using <see cref="MemberInitExpression" />s or <see cref="NewExpression" />s,
-        ///     or when projecting using <see cref="ISelectSetup{TSource, TDestination}" />.
-        /// </remarks>
-        TQuery OrderBy<TProjection>
-            (
-            string property,
-            bool ascending = true
-            );
-
-        /// <summary>
         ///     Specify a sort order on a property (always sorting descending).
         /// </summary>
         /// <param name="property">
@@ -382,42 +332,6 @@
         ///     The <see cref="T:TQuery" /> instance.
         /// </returns>
         TQuery OrderByDescending(Expression<Func<TSource, object>> property);
-
-        /// <summary>
-        ///     Specify a sort order on a property in your query projection (always sorting descending).
-        /// </summary>
-        /// <param name="property">
-        ///     The property to sort on.
-        /// </param>
-        /// <typeparam name="TProjection">
-        ///     The <see cref="System.Type" /> of the projection.
-        /// </typeparam>
-        /// <returns>
-        ///     The <see cref="T:TQuery" /> instance.
-        /// </returns>
-        /// <remarks>
-        ///     Only works when projecting using <see cref="MemberInitExpression" />s or <see cref="NewExpression" />s,
-        ///     or when projecting using <see cref="ISelectSetup{TSource, TDestination}" />.
-        /// </remarks>
-        TQuery OrderByDescending<TProjection>(Expression<Func<TProjection, object>> property);
-
-        /// <summary>
-        ///     Specify a sort order on a property in your query projection (always sorting descending).
-        /// </summary>
-        /// <param name="property">
-        ///     The property to sort on.
-        /// </param>
-        /// <typeparam name="TProjection">
-        ///     The <see cref="System.Type" /> of the projection.
-        /// </typeparam>
-        /// <returns>
-        ///     The <see cref="T:TQuery" /> instance.
-        /// </returns>
-        /// <remarks>
-        ///     Only works when projecting using <see cref="MemberInitExpression" />s or <see cref="NewExpression" />s,
-        ///     or when projecting using <see cref="ISelectSetup{TSource, TDestination}" />.
-        /// </remarks>
-        TQuery OrderByDescending<TProjection>(string property);
 
         /// <summary>
         ///     Filters the query by an example instance of <see cref="T:TQuery" />.
