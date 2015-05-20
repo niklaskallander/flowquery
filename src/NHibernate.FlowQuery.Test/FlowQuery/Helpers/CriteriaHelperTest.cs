@@ -322,19 +322,7 @@
                 throw new NotImplementedException();
             }
 
-            public new IDummyQuery3 OrderBy<TProjection>
-                (Expression<Func<TProjection, object>> property, bool ascending)
-            {
-                throw new NotImplementedException();
-            }
-
             public new IDummyQuery3 OrderByDescending(string property)
-            {
-                throw new NotImplementedException();
-            }
-
-            public new IDummyQuery3 OrderByDescending<TProjection>
-                (Expression<Func<TProjection, object>> property)
             {
                 throw new NotImplementedException();
             }
@@ -408,11 +396,6 @@
                 throw new NotImplementedException();
             }
 
-            IDummyQuery3 IFlowQuery<UserEntity, IDummyQuery3>.OrderBy<TProjection>(string property, bool ascending)
-            {
-                throw new NotImplementedException();
-            }
-
             IDummyQuery3 IFlowQuery<UserEntity, IDummyQuery3>.OrderByDescending(IProjection projection)
             {
                 throw new NotImplementedException();
@@ -420,11 +403,6 @@
 
             IDummyQuery3 IFlowQuery<UserEntity, IDummyQuery3>.OrderByDescending
                 (Expression<Func<UserEntity, object>> property)
-            {
-                throw new NotImplementedException();
-            }
-
-            IDummyQuery3 IFlowQuery<UserEntity, IDummyQuery3>.OrderByDescending<TProjection>(string property)
             {
                 throw new NotImplementedException();
             }

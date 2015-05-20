@@ -65,15 +65,15 @@ namespace NHibernate.FlowQuery
 
         /// <summary>
         ///     Gets or sets a value indicating whether errors found for an order by statement set using any of 
-        ///     <see cref="IFlowQuery{TSource,TQuery}.OrderBy{TProjection}(string,bool)"/> and 
-        ///     <see cref="IFlowQuery{TSource,TQuery}.OrderByDescending{TProjection}(string)"/> should be suppressed 
-        ///     (Globally).
+        ///     <see cref="IQueryableFlowQueryBase{TSource,TQuery}.OrderBy{TProjection}(string,bool)"/> and 
+        ///     <see cref="IQueryableFlowQueryBase{TSource,TQuery}.OrderByDescending{TProjection}(string)"/> should be 
+        ///     suppressed (Globally).
         /// </summary>
         /// <value>
         ///     A value indicating whether errors found for an order by statement set using any of 
-        ///     <see cref="IFlowQuery{TSource,TQuery}.OrderBy{TProjection}(string,bool)"/> and 
-        ///     <see cref="IFlowQuery{TSource,TQuery}.OrderByDescending{TProjection}(string)"/> should be suppressed 
-        ///     (Globally).
+        ///     <see cref="IQueryableFlowQueryBase{TSource,TQuery}.OrderBy{TProjection}(string,bool)"/> and 
+        ///     <see cref="IQueryableFlowQueryBase{TSource,TQuery}.OrderByDescending{TProjection}(string)"/> should be 
+        ///     suppressed (Globally).
         /// </value>
         /// <remarks>
         ///     The potential errors you can suppress are: a) the order by projection is not used
@@ -92,13 +92,15 @@ namespace NHibernate.FlowQuery
 
         /// <summary>
         ///     Gets or sets a value indicating whether errors found for an order by statement set using any of 
-        ///     <see cref="IFlowQuery{TSource,TQuery}.OrderBy{TProjection}(string,bool)" /> and 
-        ///     <see cref="IFlowQuery{TSource,TQuery}.OrderByDescending{TProjection}(string)" /> should be suppressed.
+        ///     <see cref="IQueryableFlowQueryBase{TSource,TQuery}.OrderBy{TProjection}(string,bool)" /> and 
+        ///     <see cref="IQueryableFlowQueryBase{TSource,TQuery}.OrderByDescending{TProjection}(string)" /> should be 
+        ///     suppressed.
         /// </summary>
         /// <value>
         ///     A value indicating whether errors found for an order by statement set using any of 
-        ///     <see cref="IFlowQuery{TSource,TQuery}.OrderBy{TProjection}(string,bool)" /> and 
-        ///     <see cref="IFlowQuery{TSource,TQuery}.OrderByDescending{TProjection}(string)" /> should be suppressed.
+        ///     <see cref="IQueryableFlowQueryBase{TSource,TQuery}.OrderBy{TProjection}(string,bool)" /> and 
+        ///     <see cref="IQueryableFlowQueryBase{TSource,TQuery}.OrderByDescending{TProjection}(string)" /> should be 
+        ///     suppressed.
         /// </value>
         /// <remarks>
         ///     The potential errors you can suppress are: a) the order by projection is not used when executing the 
@@ -128,8 +130,9 @@ namespace NHibernate.FlowQuery
 
         /// <summary>
         ///     Specify whether errors found for order by statements set using any of 
-        ///     <see cref="IFlowQuery{TSource,TQuery}.OrderBy{TProjection}(string,bool)" /> and 
-        ///     <see cref="IFlowQuery{TSource,TQuery}.OrderByDescending{TProjection}(string)" /> should be suppressed.
+        ///     <see cref="IQueryableFlowQueryBase{TSource,TQuery}.OrderBy{TProjection}(string,bool)" /> and 
+        ///     <see cref="IQueryableFlowQueryBase{TSource,TQuery}.OrderByDescending{TProjection}(string)" /> should be 
+        ///     suppressed.
         /// </summary>
         /// <remarks>
         ///     The potential errors you can suppress are: a) the order by projection is not used when executing the 
