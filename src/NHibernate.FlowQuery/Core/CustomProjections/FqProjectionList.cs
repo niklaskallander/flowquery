@@ -78,40 +78,6 @@
         }
 
         /// <summary>
-        ///     Gets the length.
-        /// </summary>
-        /// <value>
-        ///     The length.
-        /// </value>
-        public int Length
-        {
-            get
-            {
-                return _elements.Count;
-            }
-        }
-
-        /// <summary>
-        ///     Gets the <see cref="IProjection" /> at the given index.
-        /// </summary>
-        /// <param name="index">
-        ///     The index.
-        /// </param>
-        /// <value>
-        ///     The <see cref="IProjection" /> at the given index.
-        /// </value>
-        /// <returns>
-        ///     The <see cref="IProjection" />.
-        /// </returns>
-        public IProjection this[int index]
-        {
-            get
-            {
-                return _elements[index];
-            }
-        }
-
-        /// <summary>
         ///     Adds the provided <see cref="IProjection" /> object to this <see cref="FqProjectionList" />.
         /// </summary>
         /// <param name="projection">
@@ -150,7 +116,13 @@
         /// <returns>
         ///     The columns aliases.
         /// </returns>
-        public string[] GetColumnAliases(string alias, int position, ICriteria criteria, ICriteriaQuery criteriaQuery)
+        public string[] GetColumnAliases
+            (
+            string alias,
+            int position,
+            ICriteria criteria,
+            ICriteriaQuery criteriaQuery
+            )
         {
             return _list.GetColumnAliases(alias, position, criteria, criteriaQuery);
         }
@@ -173,7 +145,12 @@
         /// <returns>
         ///     The columns aliases.
         /// </returns>
-        public string[] GetColumnAliases(int position, ICriteria criteria, ICriteriaQuery criteriaQuery)
+        public string[] GetColumnAliases
+            (
+            int position,
+            ICriteria criteria,
+            ICriteriaQuery criteriaQuery
+            )
         {
             return _list.GetColumnAliases(position, criteria, criteriaQuery);
         }
@@ -190,7 +167,11 @@
         /// <returns>
         ///     The typed values.
         /// </returns>
-        public TypedValue[] GetTypedValues(ICriteria criteria, ICriteriaQuery criteriaQuery)
+        public TypedValue[] GetTypedValues
+            (
+            ICriteria criteria,
+            ICriteriaQuery criteriaQuery
+            )
         {
             return _list.GetTypedValues(criteria, criteriaQuery);
         }
@@ -210,7 +191,12 @@
         /// <returns>
         ///     The types.
         /// </returns>
-        public IType[] GetTypes(string alias, ICriteria criteria, ICriteriaQuery criteriaQuery)
+        public IType[] GetTypes
+            (
+            string alias,
+            ICriteria criteria,
+            ICriteriaQuery criteriaQuery
+            )
         {
             return _list.GetTypes(alias, criteria, criteriaQuery);
         }
@@ -227,7 +213,11 @@
         /// <returns>
         ///     The types.
         /// </returns>
-        public IType[] GetTypes(ICriteria criteria, ICriteriaQuery criteriaQuery)
+        public IType[] GetTypes
+            (
+            ICriteria criteria,
+            ICriteriaQuery criteriaQuery
+            )
         {
             return _list.GetTypes(criteria, criteriaQuery);
         }
@@ -289,10 +279,8 @@
 
             bool lastHadValue = false;
 
-            for (int i = 0; i < _list.Length; i++)
+            foreach (IProjection projection in _elements)
             {
-                IProjection projection = this[i];
-
                 SqlString value = projection.ToSqlString(criteria, position, criteriaQuery, enabledFilters);
 
                 bool hasValue = value.Length > 0;
