@@ -1,6 +1,7 @@
 ﻿namespace NHibernate.FlowQuery.Core.Implementations
 {
     using System;
+    using System.Linq;
     using System.Linq.Expressions;
 
     using NHibernate.Criterion;
@@ -40,6 +41,17 @@
             )
             : base(criteriaFactory, alias, options, query)
         {
+            if (Constructor != null)
+            {
+                if (Orders.Any(x => !x.IsBasedOnSource))
+                {
+                    var newOrders = OrderHelper.GetSourceBasedOrdersFrom(Orders.ToArray(), Constructor, Data);
+
+                    Orders.Clear();
+
+                    Orders.AddRange(newOrders);
+                }
+            }
         }
 
         /// <inheritdoc />
