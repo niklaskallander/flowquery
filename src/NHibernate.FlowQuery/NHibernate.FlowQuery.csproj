@@ -95,6 +95,7 @@
     <Compile Include="Core\IQueryFilter%271.cs" />
     <Compile Include="Core\IStreamedFlowQuery%271.cs" />
     <Compile Include="Helpers\ExpressionRebaser.cs" />
+    <Compile Include="Helpers\OrderHelper.cs" />
     <Compile Include="Helpers\ResultStreamer.cs" />
     <Compile Include="Core\IPartialSelection%272.cs" />
     <Compile Include="Core\IResultStream%271.cs" />
