@@ -53,7 +53,7 @@
         }
 
         [Test]
-        public void Given_AllSourceBasedListOfOrderByStatements_When_AskedToTransformOrders_OrderHelperReturnsGivenRefernce()
+        public void Given_AllSourceBasedListOfOrderByStatements_When_AskedToTransformOrders_OrderHelperReturnsGivenReference()
         {
             var data = new QueryHelperData(new Dictionary<string, string>(), new List<Join>());
 
@@ -71,7 +71,7 @@
         }
 
         [Test]
-        public void Given_MixedListOfOrderByStatements_When_AskedToTransformOrders_OrderHelperAlreadySourceBasedOrdersAreAlsoReturnedAndInCorrectOrder()
+        public void Given_MixedListOfOrderByStatements_When_AskedToTransformOrders_OrderHelperReturnsAlreadySourceBasedOrdersAndInCorrectOrder()
         {
             var data = new QueryHelperData(new Dictionary<string, string>(), new List<Join>());
 
