@@ -96,7 +96,7 @@
             Assert.That(newOrders.ElementAt(1).Order, Is.Not.Null);
         }
 
-        [Test]
+        [Test, Category("MySqlUnsupported")]
         public void Given_DelayedQueryWithModelBasedOrders_When_LaterUsedAsSubquery_IsSortedByAppropriateSourceProjection()
         {
             IDelayedFlowQuery<UserEntity> query = Query<UserEntity>()
@@ -122,7 +122,7 @@
             Assert.That(subsetOfUsers.ElementAt(1).SomeValue, Is.EqualTo("Lotta Brak"));
         }
 
-        [Test]
+        [Test, Category("MySqlUnsupported")]
         public void Given_SubQueryWithModelBasedOrders_When_UsingUglyHack_Then_IsSortedByAppropriateSourceProjection()
         {
             IDetachedFlowQuery<UserEntity> subquery = Query<UserEntity>()
