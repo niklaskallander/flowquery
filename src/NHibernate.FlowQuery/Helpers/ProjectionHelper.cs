@@ -560,12 +560,12 @@ namespace NHibernate.FlowQuery.Helpers
             HelperContext context
             )
         {
-            IEnumerable<IMethodCallExpressionHandler> handlers = FlowQueryHelper
-                .GetMethodCallHandlers(expression.Method.Name.ToLower());
+            IEnumerable<IExpressionHandler> handlers = FlowQueryHelper
+                .GetExpressionHandlers(ExpressionType.Call);
 
-            foreach (IMethodCallExpressionHandler handler in handlers)
+            foreach (IExpressionHandler handler in handlers)
             {
-                if (handler.CanHandleProjection(expression, context))
+                if (handler.CanHandleProjectionOf(expression, context))
                 {
                     IProjection projection = handler.Project(expression, context);
 

@@ -344,12 +344,12 @@ namespace NHibernate.FlowQuery.Helpers
             out object value
             )
         {
-            IEnumerable<IMethodCallExpressionHandler> handlers = FlowQueryHelper
-                .GetMethodCallHandlers(expression.Method.Name.ToLower());
+            IEnumerable<IExpressionHandler> handlers = FlowQueryHelper
+                .GetExpressionHandlers(ExpressionType.Call);
 
-            foreach (IMethodCallExpressionHandler handler in handlers)
+            foreach (IExpressionHandler handler in handlers)
             {
-                if (handler.CanHandleConstruction(expression))
+                if (handler.CanHandleConstructionOf(expression))
                 {
                     bool wasHandled;
 

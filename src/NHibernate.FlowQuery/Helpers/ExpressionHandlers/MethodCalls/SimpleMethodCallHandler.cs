@@ -24,7 +24,20 @@
         /// <param name="resolver">
         ///     The resolver.
         /// </param>
-        public SimpleMethodCallHandler(Func<IProjection, IProjection> resolver)
+        /// <param name="supportedMethodNames">
+        ///     The supported method names.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        ///     <paramref name="resolver" /> is null.
+        /// </exception>
+        /// <exception cref="ArgumentNullException">
+        ///     <paramref name="supportedMethodNames" /> is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        ///     <paramref name="supportedMethodNames" /> is empty.
+        /// </exception>
+        public SimpleMethodCallHandler(Func<IProjection, IProjection> resolver, params string[] supportedMethodNames)
+            : base(supportedMethodNames)
         {
             if (resolver == null)
             {
@@ -37,9 +50,9 @@
         /// <inheritdoc />
         protected override IProjection ProjectCore
             (
-            MethodCallExpression expression, 
-            Expression subExpression, 
-            IProjection projection, 
+            MethodCallExpression expression,
+            Expression subExpression,
+            IProjection projection,
             HelperContext context
             )
         {

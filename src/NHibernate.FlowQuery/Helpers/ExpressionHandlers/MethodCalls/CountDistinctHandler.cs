@@ -11,6 +11,14 @@
     /// </summary>
     public class CountDistinctHandler : MethodCallExpressionHandlerBase
     {
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="CountDistinctHandler" /> class.
+        /// </summary>
+        public CountDistinctHandler()
+            : base(supportedMethodNames: "CountDistinct")
+        {
+        }
+
         /// <inheritdoc />
         protected override IProjection ProjectCore
             (

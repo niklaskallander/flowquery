@@ -11,6 +11,14 @@
     /// </summary>
     public class AsHandler : MethodCallExpressionHandlerBase
     {
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="AsHandler" /> class.
+        /// </summary>
+        public AsHandler()
+            : base(supportedMethodNames: "As")
+        {
+        }
+
         /// <inheritdoc />
         protected override IProjection ProjectCore
             (

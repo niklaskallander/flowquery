@@ -13,6 +13,14 @@
     /// </summary>
     public class SubqueryHandler : MethodCallExpressionHandlerBase
     {
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="SubqueryHandler" /> class.
+        /// </summary>
+        public SubqueryHandler()
+            : base(supportedMethodNames: "Subquery")
+        {
+        }
+
         /// <inheritdoc />
         protected override IProjection ProjectCore
             (

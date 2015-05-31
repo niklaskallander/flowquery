@@ -12,6 +12,15 @@
     /// </summary>
     public class LikeHandler : MethodCallExpressionHandlerBase
     {
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="LikeHandler"/> class.
+        /// </summary>
+        public LikeHandler()
+            : base(supportedMethodNames: new[] { "Contains", "EndsWith", "StartsWith" })
+        {
+
+        }
+
         /// <inheritdoc />
         protected override IProjection ProjectCore
             (

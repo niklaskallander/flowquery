@@ -12,6 +12,14 @@
     /// </summary>
     public class SubstringHandler : MethodCallExpressionHandlerBase
     {
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="SubstringHandler" /> class.
+        /// </summary>
+        public SubstringHandler()
+            : base(supportedMethodNames: "Substring")
+        {
+        }
+
         /// <inheritdoc />
         protected override IProjection ProjectCore
             (

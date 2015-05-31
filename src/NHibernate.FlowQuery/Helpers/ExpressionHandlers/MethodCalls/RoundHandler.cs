@@ -14,12 +14,20 @@
     /// </summary>
     public sealed class RoundHandler : MethodCallExpressionHandlerBase
     {
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="RoundHandler" /> class.
+        /// </summary>
+        public RoundHandler()
+            : base(supportedMethodNames: "Round")
+        {
+        }
+
         /// <inheritdoc />
         protected override IProjection ProjectCore
             (
-            MethodCallExpression expression, 
-            Expression subExpression, 
-            IProjection projection, 
+            MethodCallExpression expression,
+            Expression subExpression,
+            IProjection projection,
             HelperContext context
             )
         {
@@ -43,9 +51,9 @@
 
             return new SqlFunctionProjection
                 (
-                "round", 
-                numberType, 
-                projection, 
+                "round",
+                numberType,
+                projection,
                 Projections.Constant(digits)
                 );
         }

@@ -14,77 +14,18 @@
 
     using NUnit.Framework;
 
+    using Expression = System.Linq.Expressions.Expression;
+
     [TestFixture]
     public class FlowQueryHelperTest : BaseTest
     {
-        [Test]
-        public void AddMethodCallHandlerReturnsFalseIfMethodNameAlreadyUsed()
-        {
-            var handler = new SimpleMethodCallHandler();
-
-            bool attempt1 = FlowQueryHelper.AddMethodCallHandler("TestName1", handler);
-
-            Assert.That(attempt1, Is.True);
-
-            bool attempt2 = FlowQueryHelper.AddMethodCallHandler("TestName1", handler);
-
-            Assert.That(attempt2, Is.False);
-        }
-
-        [Test]
-        public void AddMethodCallHandlerReturnsTrueIfMethodNameAlreadyUsedButWithForceSpecified()
-        {
-            var handler = new SimpleMethodCallHandler();
-
-            bool attempt1 = FlowQueryHelper.AddMethodCallHandler("TestName2", handler);
-
-            Assert.That(attempt1, Is.True);
-
-            bool attempt2 = FlowQueryHelper.AddMethodCallHandler("TestName2", handler, true);
-
-            Assert.That(attempt2, Is.True);
-        }
-
-        [Test]
-        public void AddMethodCallHandlerThrowsIfMethodNameIsEmptyString()
-        {
-            Assert
-                .That
-                (
-                    () => FlowQueryHelper.AddMethodCallHandler(string.Empty, new SimpleMethodCallHandler()),
-                    Throws.ArgumentException
-                );
-        }
-
-        [Test]
-        public void AddMethodCallHandlerThrowsIfMethodNameIsNull()
-        {
-            Assert
-                .That
-                (
-                    () => FlowQueryHelper.AddMethodCallHandler(null, new SimpleMethodCallHandler()),
-                    Throws.ArgumentException
-                );
-        }
-
-        [Test]
-        public void AddMethodCallHandlerThrowsIfMethodNameIsWhiteSpace()
-        {
-            Assert
-                .That
-                (
-                    () => FlowQueryHelper.AddMethodCallHandler("   ", new SimpleMethodCallHandler()),
-                    Throws.ArgumentException
-                );
-        }
-
         [Test]
         public void AddMethodCallHandlerThrowsIfResolverIsNull()
         {
             Assert
                 .That
                 (
-                    () => FlowQueryHelper.AddMethodCallHandler("Test", null),
+                    () => FlowQueryHelper.AddExpressionHandler(ExpressionType.Call, null),
                     Throws.InstanceOf<ArgumentNullException>()
                 );
         }
@@ -92,7 +33,7 @@
         [Test]
         public void CanAddCustomHandlerToOverrideDefaulImplementationProjectionOnly()
         {
-            var mockedResolver = new Mock<IMethodCallExpressionHandler>(MockBehavior.Loose);
+            var mockedResolver = new Mock<IExpressionHandler>(MockBehavior.Loose);
 
             mockedResolver
                 .Setup
@@ -108,13 +49,11 @@
                 (
                     resolver =>
                         resolver
-                            .CanHandleProjection(It.IsAny<MethodCallExpression>(), It.IsAny<HelperContext>())
+                            .CanHandleProjectionOf(It.IsAny<MethodCallExpression>(), It.IsAny<HelperContext>())
                 )
                 .Returns(true);
 
-            bool added = FlowQueryHelper.AddMethodCallHandler("GetHashCode", mockedResolver.Object);
-
-            Assert.That(added, Is.True);
+            FlowQueryHelper.AddExpressionHandler(ExpressionType.Call, mockedResolver.Object);
 
             var users = Query<UserEntity>()
                 .Select(x => new
@@ -135,9 +74,7 @@
         [Test]
         public void CanAddCustomHandlerToOverrideDefaulImplementationWithConstruction()
         {
-            bool added = FlowQueryHelper.AddMethodCallHandler("ToString", new SimpleMethodCallHandler(), true);
-
-            Assert.That(added, Is.True);
+            FlowQueryHelper.AddExpressionHandler(ExpressionType.Call, new SimpleMethodCallHandler());
 
             var users = Query<UserEntity>()
                 .Select(x => new
@@ -159,47 +96,47 @@
             var handler = new SimpleMethodCallHandler();
 
             // add one and assert added
-            bool attempt1 = FlowQueryHelper.AddMethodCallHandler("TestName3", handler);
+            FlowQueryHelper.AddExpressionHandler(ExpressionType.Call, handler);
 
-            IEnumerable<IMethodCallExpressionHandler> handlers = FlowQueryHelper.GetMethodCallHandlers("TestName3");
+            IEnumerable<IExpressionHandler> handlers = FlowQueryHelper
+                .GetExpressionHandlers(ExpressionType.Call);
 
-            Assert.That(attempt1, Is.True);
-            Assert.That(handlers.Any());
+            Assert.That(handlers, Has.Member(handler));
 
             // clear the list and assert empty
-            FlowQueryHelper.ClearMethodCallHandlers();
+            FlowQueryHelper.ClearExpressionHandlers();
 
-            handlers = FlowQueryHelper.GetMethodCallHandlers("TestName3");
+            handlers = FlowQueryHelper.GetExpressionHandlers(ExpressionType.Call);
 
-            Assert.That(!handlers.Any());
+            Assert.That(handlers, Has.No.Member(handler));
 
             // add again and assert added
-            bool attempt2 = FlowQueryHelper.AddMethodCallHandler("TestName3", handler);
+            FlowQueryHelper.AddExpressionHandler(ExpressionType.Call, handler);
 
-            handlers = FlowQueryHelper.GetMethodCallHandlers("TestName3");
+            handlers = FlowQueryHelper.GetExpressionHandlers(ExpressionType.Call);
 
-            Assert.That(attempt2, Is.True);
-            Assert.That(handlers.Any());
+            Assert.That(handlers, Has.Member(handler));
         }
 
         private class SimpleMethodCallHandler : IMethodCallExpressionHandler
         {
-            public bool CanHandleConstruction(MethodCallExpression expression)
+            public bool CanHandleConstructionOf(Expression expression)
             {
                 return true;
             }
 
-            public bool CanHandleProjection
+            public bool CanHandleProjectionOf
                 (
-                MethodCallExpression expression,
-                HelperContext context)
+                Expression expression,
+                HelperContext context
+                )
             {
                 return true;
             }
 
             public int Construct
                 (
-                MethodCallExpression expression,
+                Expression expression,
                 object[] arguments,
                 out object value,
                 out bool wasHandled
@@ -213,11 +150,13 @@
 
             public IProjection Project
                 (
-                MethodCallExpression expression,
+                Expression expression,
                 HelperContext context
                 )
             {
-                return ProjectionHelper.GetProjection(expression.Object, context);
+                var methodCall = (MethodCallExpression)expression;
+
+                return ProjectionHelper.GetProjection(methodCall.Object, context);
             }
         }
     }

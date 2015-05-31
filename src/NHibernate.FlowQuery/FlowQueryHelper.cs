@@ -16,123 +16,104 @@
     public class FlowQueryHelper
     {
         /// <summary>
-        ///     All custom method call handlers.
+        ///     All custom expression handlers.
         /// </summary>
-        private static readonly Dictionary<string, IMethodCallExpressionHandler> CustomMethodCallHandlers;
+        private static readonly Dictionary<ExpressionType, HashSet<IExpressionHandler>> CustomExpressionHandlers;
 
         /// <summary>
         ///     All default method call handlers.
         /// </summary>
-        private static readonly Dictionary<string, IMethodCallExpressionHandler> DefaultMethodCallHandlers;
+        private static readonly Dictionary<ExpressionType, HashSet<IExpressionHandler>> DefaultExpressionHandlers;
 
         /// <summary>
-        ///     The method call handler lock.
+        ///     The expression handler lock.
         /// </summary>
-        private static readonly object MethodHandlerLock;
+        private static readonly object ExpressionHandlerLock;
 
         /// <summary>
         ///     Initializes static members of the <see cref="FlowQueryHelper" /> class.
         /// </summary>
         static FlowQueryHelper()
         {
-            MethodHandlerLock = new object();
+            ExpressionHandlerLock = new object();
 
-            CustomMethodCallHandlers = new Dictionary<string, IMethodCallExpressionHandler>();
+            CustomExpressionHandlers = new Dictionary<ExpressionType, HashSet<IExpressionHandler>>();
 
-            DefaultMethodCallHandlers = new Dictionary<string, IMethodCallExpressionHandler>();
+            DefaultExpressionHandlers = new Dictionary<ExpressionType, HashSet<IExpressionHandler>>();
 
-            var likeHandler = new LikeHandler();
-
-            AddMethodCallHandlerInternal("As", new AsHandler());
-            AddMethodCallHandlerInternal("Average", new SimpleMethodCallHandler(Projections.Avg));
-            AddMethodCallHandlerInternal("Contains", likeHandler);
-            AddMethodCallHandlerInternal("CountDistinct", new CountDistinctHandler());
-            AddMethodCallHandlerInternal("Count", new SimpleMethodCallHandler(Projections.Count));
-            AddMethodCallHandlerInternal("EndsWith", likeHandler);
-            AddMethodCallHandlerInternal("GroupBy", new SimpleMethodCallHandler(Projections.GroupProperty));
-            AddMethodCallHandlerInternal("Max", new SimpleMethodCallHandler(Projections.Max));
-            AddMethodCallHandlerInternal("Min", new SimpleMethodCallHandler(Projections.Min));
-            AddMethodCallHandlerInternal("Project", new ProjectHandler());
-            AddMethodCallHandlerInternal("Round", new RoundHandler());
-            AddMethodCallHandlerInternal("StartsWith", likeHandler);
-            AddMethodCallHandlerInternal("Subquery", new SubqueryHandler());
-            AddMethodCallHandlerInternal("Substring", new SubstringHandler());
-            AddMethodCallHandlerInternal("Sum", new SimpleMethodCallHandler(Projections.Sum));
-            AddMethodCallHandlerInternal("Trim", new TrimHandler());
-            AddMethodCallHandlerInternal("TrimEnd", new TrimEndHandler());
-            AddMethodCallHandlerInternal("TrimStart", new TrimStartHandler());
+            AddExpressionHandlerInternal(ExpressionType.Call, new AsHandler());
+            AddExpressionHandlerInternal(ExpressionType.Call, new SimpleMethodCallHandler(Projections.Avg, "Average"));
+            AddExpressionHandlerInternal(ExpressionType.Call, new LikeHandler());
+            AddExpressionHandlerInternal(ExpressionType.Call, new CountDistinctHandler());
+            AddExpressionHandlerInternal(ExpressionType.Call, new SimpleMethodCallHandler(Projections.Count, "Count"));
+            AddExpressionHandlerInternal(ExpressionType.Call, new SimpleMethodCallHandler(Projections.GroupProperty, "GroupBy"));
+            AddExpressionHandlerInternal(ExpressionType.Call, new SimpleMethodCallHandler(Projections.Max, "Max"));
+            AddExpressionHandlerInternal(ExpressionType.Call, new SimpleMethodCallHandler(Projections.Min, "Min"));
+            AddExpressionHandlerInternal(ExpressionType.Call, new ProjectHandler());
+            AddExpressionHandlerInternal(ExpressionType.Call, new RoundHandler());
+            AddExpressionHandlerInternal(ExpressionType.Call, new SubqueryHandler());
+            AddExpressionHandlerInternal(ExpressionType.Call, new SubstringHandler());
+            AddExpressionHandlerInternal(ExpressionType.Call, new SimpleMethodCallHandler(Projections.Sum, "Sum"));
+            AddExpressionHandlerInternal(ExpressionType.Call, new TrimHandler());
+            AddExpressionHandlerInternal(ExpressionType.Call, new TrimEndHandler());
+            AddExpressionHandlerInternal(ExpressionType.Call, new TrimStartHandler());
         }
 
         /// <summary>
         ///     Adds a <see cref="IMethodCallExpressionHandler" /> to be used when handling method calls.
         /// </summary>
-        /// <param name="methodName">
-        ///     The name of the method.
+        /// <param name="expressionType">
+        ///     The <see cref="ExpressionType" /> handled by the given <see cref="IExpressionHandler" />
         /// </param>
         /// <param name="handler">
-        ///     The <see cref="IMethodCallExpressionHandler" />.
+        ///     The <see cref="IExpressionHandler" />.
         /// </param>
-        /// <param name="withForce">
-        ///     Determines whether to add the handler with force. In other words: if <paramref name="withForce" /> is
-        ///     <c>true</c> and a handler already exists for the given method name (<paramref name="methodName" />), it
-        ///     will be replaced. If <paramref name="withForce" /> is <c>false</c> and a handler already exists for the
-        ///     given method name (<paramref name="methodName" />), this call will simply be ignored.
-        /// </param>
-        /// <returns>
-        ///     A value indicating whether the <see cref="IMethodCallExpressionHandler" /> was added (true) or not
-        ///     (false). If another <see cref="IMethodCallExpressionHandler" /> with the same method name is already
-        ///     added, false will be returned.
-        /// </returns>
         /// <exception cref="ArgumentNullException">
         ///     <paramref name="handler" /> is null.
         /// </exception>
-        /// <exception cref="ArgumentException">
-        ///     <paramref name="methodName" /> is null or <see cref="string.Empty" />.
-        /// </exception>
-        public static bool AddMethodCallHandler
+        public static void AddExpressionHandler
             (
-            string methodName,
-            IMethodCallExpressionHandler handler,
-            bool withForce = false
+            ExpressionType expressionType,
+            IExpressionHandler handler
             )
         {
-            return AddMethodCallHandlerInternal(methodName, handler, false, withForce);
+            AddExpressionHandlerInternal(expressionType, handler, false);
         }
 
         /// <summary>
-        ///     Clears all custom defined <see cref="IMethodCallExpressionHandler" /> instances.
+        ///     Clears all custom defined <see cref="IExpressionHandler" /> instances.
         /// </summary>
-        public static void ClearMethodCallHandlers()
+        public static void ClearExpressionHandlers()
         {
-            CustomMethodCallHandlers.Clear();
+            CustomExpressionHandlers.Clear();
         }
 
         /// <summary>
-        ///     Gets all defined <see cref="IMethodCallExpressionHandler" /> instances registered for the given
-        ///     <paramref name="methodName" /> (any user-defined handler will come first in the list).
+        ///     Gets all defined <see cref="IExpressionHandler" /> instances registered for the given
+        ///     <paramref name="expressionType" /> (any user-defined handler will come first in the list).
         /// </summary>
-        /// <param name="methodName">
-        ///     The method name.
+        /// <param name="expressionType">
+        ///     The <see cref="ExpressionType" /> handled by the desired <see cref="IExpressionHandler" />.
         /// </param>
         /// <returns>
-        ///     All defined <see cref="IMethodCallExpressionHandler" /> instances registered for the given
-        ///     <paramref name="methodName" /> (any user-defined handler will come first in the list).
+        ///     All defined <see cref="IExpressionHandler" /> instances registered for the given
+        ///     <paramref name="expressionType" /> (any user-defined handler will come first in the list).
         /// </returns>
-        public static IEnumerable<IMethodCallExpressionHandler> GetMethodCallHandlers(string methodName)
+        public static IEnumerable<IExpressionHandler> GetExpressionHandlers(ExpressionType expressionType)
         {
-            methodName = (methodName ?? string.Empty).Trim().ToLower();
+            HashSet<IExpressionHandler> handlers;
 
-            IMethodCallExpressionHandler handler;
-
-            if (CustomMethodCallHandlers.TryGetValue(methodName, out handler))
+            if (CustomExpressionHandlers.TryGetValue(expressionType, out handlers))
             {
-                yield return handler;
+                return handlers;
             }
 
-            if (DefaultMethodCallHandlers.TryGetValue(methodName, out handler))
+            if (DefaultExpressionHandlers.TryGetValue(expressionType, out handlers))
             {
-                yield return handler;
+                return handlers;
             }
+
+            return new HashSet<IExpressionHandler>();
         }
 
         // TODO: Add usage scenario documentation for FlowQueryHelper.Project(..)
@@ -169,74 +150,51 @@
         }
 
         /// <summary>
-        ///     Adds a <see cref="IMethodCallExpressionHandler" /> to be used when handling method calls.
+        ///     Adds a <see cref="IExpressionHandler" /> to be used when handling expressions.
         /// </summary>
-        /// <param name="methodName">
-        ///     The name of the method.
+        /// <param name="expressionType">
+        ///     The <see cref="ExpressionType" /> handled by the given <see cref="IExpressionHandler" />
         /// </param>
         /// <param name="handler">
-        ///     The <see cref="IMethodCallExpressionHandler" />.
+        ///     The <see cref="IExpressionHandler" />.
         /// </param>
         /// <param name="isDefaultHandler">
         ///     A value indicating whether the handler is added internally (true) or externally using
-        ///     <see cref="FlowQueryHelper.AddMethodCallHandler" /> (false).
+        ///     <see cref="FlowQueryHelper.AddExpressionHandler" /> (false).
         /// </param>
-        /// <param name="withForce">
-        ///     Determines whether to add the handler with force. In other words: if <paramref name="withForce" /> is
-        ///     <c>true</c> and a handler already exists for the given method name (<paramref name="methodName" />), it
-        ///     will be replaced. If <paramref name="withForce" /> is <c>false</c> and a handler already exists for the
-        ///     given method name (<paramref name="methodName" />), this call will simply be ignored.
-        /// </param>
-        /// <returns>
-        ///     A value indicating whether the <see cref="IMethodCallExpressionHandler" /> was added (true) or not
-        ///     (false). If another <see cref="IMethodCallExpressionHandler" /> with the same method name is already
-        ///     added, false will be returned.
-        /// </returns>
         /// <exception cref="ArgumentNullException">
         ///     <paramref name="handler" /> is null.
         /// </exception>
-        /// <exception cref="ArgumentException">
-        ///     <paramref name="methodName" /> is null or <see cref="string.Empty" />.
-        /// </exception>
-        internal static bool AddMethodCallHandlerInternal
+        internal static void AddExpressionHandlerInternal
             (
-            string methodName,
-            IMethodCallExpressionHandler handler,
-            bool isDefaultHandler = true,
-            bool withForce = false
+            ExpressionType expressionType,
+            IExpressionHandler handler,
+            bool isDefaultHandler = true
             )
         {
-            lock (MethodHandlerLock)
+            lock (ExpressionHandlerLock)
             {
                 if (handler == null)
                 {
                     throw new ArgumentNullException("handler");
                 }
 
-                methodName = (methodName ?? string.Empty).Trim().ToLower();
+                Dictionary<ExpressionType, HashSet<IExpressionHandler>> collection = isDefaultHandler
+                    ? DefaultExpressionHandlers
+                    : CustomExpressionHandlers;
 
-                if (methodName == string.Empty)
+                HashSet<IExpressionHandler> handlers;
+
+                bool found = collection.TryGetValue(expressionType, out handlers);
+
+                if (found)
                 {
-                    throw new ArgumentException("key");
+                    handlers.Add(handler);
                 }
-
-                Dictionary<string, IMethodCallExpressionHandler> collection = isDefaultHandler
-                    ? DefaultMethodCallHandlers
-                    : CustomMethodCallHandlers;
-
-                if (collection.ContainsKey(methodName))
+                else
                 {
-                    if (withForce)
-                    {
-                        collection[methodName] = handler;
-                    }
-
-                    return withForce;
+                    collection.Add(expressionType, new HashSet<IExpressionHandler> { handler });
                 }
-
-                collection.Add(methodName, handler);
-
-                return true;
             }
         }
     }

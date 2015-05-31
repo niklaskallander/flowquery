@@ -13,6 +13,14 @@
     public class TrimStartHandler : MethodCallExpressionHandlerBase
     {
         /// <summary>
+        ///     Initializes a new instance of the <see cref="TrimStartHandler" /> class.
+        /// </summary>
+        public TrimStartHandler()
+            : base(supportedMethodNames: "TrimStart")
+        {
+        }
+
+        /// <summary>
         ///     Trims the start of the given <see cref="IProjection" />.
         /// </summary>
         /// <param name="projection">
