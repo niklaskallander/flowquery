@@ -98,7 +98,7 @@ namespace NHibernate.FlowQuery.Helpers
         }
 
         /// <summary>
-        ///     Creates a <see cref="System.Func{T,TResult}" /> conversion delegate for the 
+        ///     Creates a <see cref="System.Func{T,TResult}" /> conversion delegate for the
         ///     provided <see cref="Expression" />
         /// </summary>
         /// <param name="expression">
@@ -177,9 +177,6 @@ namespace NHibernate.FlowQuery.Helpers
 
             switch (expression.NodeType)
             {
-                case ExpressionType.New:
-                    return Invoke(expression as NewExpression, arguments, out value);
-
                 case ExpressionType.MemberInit:
                     return Invoke(expression as MemberInitExpression, arguments, out value);
 
@@ -188,6 +185,53 @@ namespace NHibernate.FlowQuery.Helpers
 
                     return 1;
             }
+        }
+
+        /// <summary>
+        ///     Invokes the provided <see cref="Expression" /> with the provided arguments.
+        /// </summary>
+        /// <param name="handlers">
+        ///     The set of <see cref="IExpressionHandler" /> instances to use when constructing a value for the given
+        ///     <see cref="Expression" />.
+        /// </param>
+        /// <param name="expression">
+        ///     The <see cref="Expression" /> expression.
+        /// </param>
+        /// <param name="arguments">
+        ///     The constructor arguments.
+        /// </param>
+        /// <param name="value">
+        ///     The generated instance.
+        /// </param>
+        /// <returns>
+        ///     The number of arguments used.
+        /// </returns>
+        private static int ConstructUsing
+            (
+            IEnumerable<IExpressionHandler> handlers,
+            Expression expression,
+            object[] arguments,
+            out object value
+            )
+        {
+            foreach (IExpressionHandler handler in handlers)
+            {
+                if (handler.CanHandleConstructionOf(expression))
+                {
+                    bool wasHandled;
+
+                    int i = handler.Construct(expression, arguments, out value, out wasHandled);
+
+                    if (wasHandled)
+                    {
+                        return i;
+                    }
+                }
+            }
+
+            value = arguments[0];
+
+            return 1;
         }
 
         /// <summary>
@@ -324,93 +368,6 @@ namespace NHibernate.FlowQuery.Helpers
             Invoke(expression, args, out instance);
 
             return (TDestination)instance;
-        }
-
-        /// <summary>
-        ///     Invokes the provided <see cref="Expression" /> with the provided arguments.
-        /// </summary>
-        /// <param name="handlers">
-        ///     The set of <see cref="IExpressionHandler" /> instances to use when constructing a value for the given
-        ///     <see cref="Expression" />.
-        /// </param>
-        /// <param name="expression">
-        ///     The <see cref="Expression" /> expression.
-        /// </param>
-        /// <param name="arguments">
-        ///     The constructor arguments.
-        /// </param>
-        /// <param name="value">
-        ///     The generated instance.
-        /// </param>
-        /// <returns>
-        ///     The number of arguments used.
-        /// </returns>
-        private static int ConstructUsing
-            (
-            IEnumerable<IExpressionHandler> handlers,
-            Expression expression,
-            object[] arguments,
-            out object value
-            )
-        {
-            foreach (IExpressionHandler handler in handlers)
-            {
-                if (handler.CanHandleConstructionOf(expression))
-                {
-                    bool wasHandled;
-
-                    int i = handler.Construct(expression, arguments, out value, out wasHandled);
-
-                    if (wasHandled)
-                    {
-                        return i;
-                    }
-                }
-            }
-
-            value = arguments[0];
-
-            return 1;
-        }
-
-        /// <summary>
-        ///     Invokes the provided <see cref="NewExpression" /> with the provided arguments.
-        /// </summary>
-        /// <param name="expression">
-        ///     The <see cref="NewExpression" /> constructor.
-        /// </param>
-        /// <param name="arguments">
-        ///     The constructor arguments.
-        /// </param>
-        /// <param name="instance">
-        ///     The generated instance.
-        /// </param>
-        /// <returns>
-        ///     The number of arguments used.
-        /// </returns>
-        private static int Invoke
-            (
-            NewExpression expression,
-            object[] arguments,
-            out object instance
-            )
-        {
-            int i = 0;
-
-            var list = new List<object>();
-
-            foreach (Expression argument in expression.Arguments)
-            {
-                object value;
-
-                i += Invoke(argument, arguments.Skip(i).ToArray(), out value);
-
-                list.Add(value);
-            }
-
-            instance = expression.Constructor.Invoke(list.ToArray());
-
-            return i;
         }
 
         /// <summary>

@@ -103,6 +103,8 @@
     <Compile Include="Helpers\ExpressionHandlers\Misc\ConditionHandler.cs" />
     <Compile Include="Helpers\ExpressionHandlers\Misc\ConvertHandler.cs" />
     <Compile Include="Helpers\ExpressionHandlers\Misc\LambdaHandler.cs" />
+    <Compile Include="Helpers\ExpressionHandlers\Misc\MemberAccessHandler.cs" />
+    <Compile Include="Helpers\ExpressionHandlers\Misc\NewHandler.cs" />
     <Compile Include="Helpers\ExpressionRebaser.cs" />
     <Compile Include="Helpers\OrderHelper.cs" />
     <Compile Include="Helpers\ResultStreamer.cs" />

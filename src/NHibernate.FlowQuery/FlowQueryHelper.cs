@@ -73,6 +73,8 @@
             AddHandler(ExpressionType.Conditional, new ConditionalHandler());
             AddHandler(ExpressionType.Convert, new ConvertHandler());
             AddHandler(ExpressionType.Lambda, new LambdaHandler());
+            AddHandler(ExpressionType.MemberAccess, new MemberAccessHandler());
+            AddHandler(ExpressionType.New, new NewHandler());
         }
 
         /// <summary>

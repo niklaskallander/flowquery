@@ -50,9 +50,6 @@ namespace NHibernate.FlowQuery.Helpers
 
             switch (expression.NodeType)
             {
-                case ExpressionType.MemberAccess:
-                    return GetMemberProjection((MemberExpression)expression, context);
-
                 case ExpressionType.New:
                     return ForNewExpression((NewExpression)expression, context);
 
@@ -272,36 +269,6 @@ namespace NHibernate.FlowQuery.Helpers
                         break;
                 }
             }
-        }
-
-        /// <summary>
-        ///     Creates a <see cref="IProjection" /> for the given <see cref="MemberExpression" />.
-        /// </summary>
-        /// <param name="expression">
-        ///     The expression.
-        /// </param>
-        /// <param name="context">
-        ///     The context for the projection.
-        /// </param>
-        /// <returns>
-        ///     The resolved <see cref="IProjection" /> instance.
-        /// </returns>
-        private static IProjection GetMemberProjection
-            (
-            MemberExpression expression,
-            HelperContext context
-            )
-        {
-            if (ExpressionHelper.IsRooted(expression, context.RootAlias, context.Data))
-            {
-                string property = ExpressionHelper.GetPropertyName(expression, context.RootAlias, true, context);
-
-                return Projections.Property(property);
-            }
-
-            object value = ExpressionHelper.GetValue(expression);
-
-            return Projections.Constant(value, TypeHelper.GuessType(expression.Type));
         }
 
         /// <summary>
