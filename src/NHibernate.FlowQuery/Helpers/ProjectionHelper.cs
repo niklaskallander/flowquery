@@ -52,20 +52,6 @@ namespace NHibernate.FlowQuery.Helpers
 
             switch (expression.NodeType)
             {
-                case ExpressionType.AndAlso:
-                case ExpressionType.NotEqual:
-                case ExpressionType.OrElse:
-                case ExpressionType.Equal:
-                case ExpressionType.GreaterThan:
-                case ExpressionType.GreaterThanOrEqual:
-                case ExpressionType.LessThan:
-                case ExpressionType.LessThanOrEqual:
-                    return GetProjection
-                        (
-                            Expression.Condition(expression, Expression.Constant(true), Expression.Constant(false)),
-                            context
-                        );
-
                 case ExpressionType.Add:
                 case ExpressionType.Subtract:
                 case ExpressionType.Divide:

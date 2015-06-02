@@ -59,6 +59,17 @@
             AddCallHandler(new TrimEndHandler());
             AddCallHandler(new TrimStartHandler());
 
+            var conditionHandler = new ConditionHandler();
+
+            AddHandler(ExpressionType.AndAlso, conditionHandler);
+            AddHandler(ExpressionType.NotEqual, conditionHandler);
+            AddHandler(ExpressionType.OrElse, conditionHandler);
+            AddHandler(ExpressionType.Equal, conditionHandler);
+            AddHandler(ExpressionType.GreaterThan, conditionHandler);
+            AddHandler(ExpressionType.GreaterThanOrEqual, conditionHandler);
+            AddHandler(ExpressionType.LessThan, conditionHandler);
+            AddHandler(ExpressionType.LessThanOrEqual, conditionHandler);
+
             AddHandler(ExpressionType.Conditional, new ConditionalHandler());
             AddHandler(ExpressionType.Lambda, new LambdaHandler());
         }
