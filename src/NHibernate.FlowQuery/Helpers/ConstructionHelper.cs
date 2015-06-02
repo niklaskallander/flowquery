@@ -165,6 +165,13 @@ namespace NHibernate.FlowQuery.Helpers
             out object value
             )
         {
+            IEnumerable<IExpressionHandler> handlers = FlowQueryHelper.GetExpressionHandlers(expression.NodeType);
+
+            if (handlers.Any(x => x.CanHandleConstructionOf(expression)))
+            {
+                return ConstructUsing(handlers, expression, arguments, out value);
+            }
+
             switch (expression.NodeType)
             {
                 case ExpressionType.New:
@@ -172,11 +179,6 @@ namespace NHibernate.FlowQuery.Helpers
 
                 case ExpressionType.MemberInit:
                     return Invoke(expression as MemberInitExpression, arguments, out value);
-
-                case ExpressionType.Call:
-                case ExpressionType.Conditional:
-                case ExpressionType.Lambda:
-                    return InvokeConstructionOf(expression, arguments, out value);
 
                 default:
                     value = arguments[0];
@@ -324,6 +326,10 @@ namespace NHibernate.FlowQuery.Helpers
         /// <summary>
         ///     Invokes the provided <see cref="Expression" /> with the provided arguments.
         /// </summary>
+        /// <param name="handlers">
+        ///     The set of <see cref="IExpressionHandler" /> instances to use when constructing a value for the given
+        ///     <see cref="Expression" />.
+        /// </param>
         /// <param name="expression">
         ///     The <see cref="Expression" /> expression.
         /// </param>
@@ -336,16 +342,14 @@ namespace NHibernate.FlowQuery.Helpers
         /// <returns>
         ///     The number of arguments used.
         /// </returns>
-        private static int InvokeConstructionOf
+        private static int ConstructUsing
             (
+            IEnumerable<IExpressionHandler> handlers,
             Expression expression,
             object[] arguments,
             out object value
             )
         {
-            IEnumerable<IExpressionHandler> handlers = FlowQueryHelper
-                .GetExpressionHandlers(expression.NodeType);
-
             foreach (IExpressionHandler handler in handlers)
             {
                 if (handler.CanHandleConstructionOf(expression))

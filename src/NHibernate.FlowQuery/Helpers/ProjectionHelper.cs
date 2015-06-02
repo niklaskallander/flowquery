@@ -2,6 +2,7 @@ namespace NHibernate.FlowQuery.Helpers
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Linq.Expressions;
 
     using NHibernate.Criterion;
@@ -39,6 +40,13 @@ namespace NHibernate.FlowQuery.Helpers
             HelperContext context
             )
         {
+            IEnumerable<IExpressionHandler> handlers = FlowQueryHelper.GetExpressionHandlers(expression.NodeType);
+
+            if (handlers.Any(x => x.CanHandleProjectionOf(expression, context)))
+            {
+                return GetProjectionUsing(handlers, expression, context);
+            }
+
             switch (expression.NodeType)
             {
                 case ExpressionType.AndAlso:
@@ -75,11 +83,6 @@ namespace NHibernate.FlowQuery.Helpers
 
                 case ExpressionType.MemberInit:
                     return ForMemberInitExpression((MemberInitExpression)expression, context);
-
-                case ExpressionType.Call:
-                case ExpressionType.Conditional:
-                case ExpressionType.Lambda:
-                    return GetProjectionOf(expression, context);
 
                 default:
 
@@ -511,6 +514,10 @@ namespace NHibernate.FlowQuery.Helpers
         /// <summary>
         ///     Creates a <see cref="IProjection" /> from the given <see cref="Expression" />.
         /// </summary>
+        /// <param name="handlers">
+        ///     The set of <see cref="IExpressionHandler" /> instances to use when resolving the 
+        ///     <see cref="IProjection" /> of the given <see cref="Expression" />.
+        /// </param>
         /// <param name="expression">
         ///     The expression.
         /// </param>
@@ -523,15 +530,13 @@ namespace NHibernate.FlowQuery.Helpers
         /// <exception cref="NotSupportedException">
         ///     The <see cref="Expression" /> could not be resolved as it may contain unsupported features or similar.
         /// </exception>
-        private static IProjection GetProjectionOf
+        private static IProjection GetProjectionUsing
             (
+            IEnumerable<IExpressionHandler> handlers,
             Expression expression,
             HelperContext context
             )
         {
-            IEnumerable<IExpressionHandler> handlers = FlowQueryHelper
-                .GetExpressionHandlers(expression.NodeType);
-
             foreach (IExpressionHandler handler in handlers)
             {
                 if (handler.CanHandleProjectionOf(expression, context))
