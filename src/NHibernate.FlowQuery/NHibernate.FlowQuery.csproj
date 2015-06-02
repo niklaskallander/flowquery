@@ -94,6 +94,7 @@
     <Compile Include="Core\IQueryableFlowQueryBase%271.cs" />
     <Compile Include="Core\IQueryFilter%271.cs" />
     <Compile Include="Core\IStreamedFlowQuery%271.cs" />
+    <Compile Include="Helpers\ExpressionHandlers\Misc\LambdaHandler.cs" />
     <Compile Include="Helpers\ExpressionRebaser.cs" />
     <Compile Include="Helpers\OrderHelper.cs" />
     <Compile Include="Helpers\ResultStreamer.cs" />

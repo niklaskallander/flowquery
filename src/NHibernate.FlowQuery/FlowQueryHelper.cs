@@ -7,6 +7,7 @@
     using NHibernate.Criterion;
     using NHibernate.FlowQuery.Helpers.ExpressionHandlers;
     using NHibernate.FlowQuery.Helpers.ExpressionHandlers.MethodCalls;
+    using NHibernate.FlowQuery.Helpers.ExpressionHandlers.Misc;
 
     /// <summary>
     ///     The <see cref="FlowQueryHelper" /> class is intended to replace <see cref="Aggregate" /> and other static
@@ -58,7 +59,7 @@
             AddCallHandler(new TrimEndHandler());
             AddCallHandler(new TrimStartHandler());
 
-            
+            AddHandler(ExpressionType.Lambda, new LambdaHandler());
         }
 
         /// <summary>

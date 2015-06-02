@@ -167,17 +167,15 @@ namespace NHibernate.FlowQuery.Helpers
         {
             switch (expression.NodeType)
             {
-                case ExpressionType.Lambda:
-                    return Invoke(((LambdaExpression)expression).Body, arguments, out value);
-
                 case ExpressionType.New:
                     return Invoke(expression as NewExpression, arguments, out value);
 
                 case ExpressionType.MemberInit:
                     return Invoke(expression as MemberInitExpression, arguments, out value);
 
+                case ExpressionType.Lambda:
                 case ExpressionType.Call:
-                    return Invoke(expression as MethodCallExpression, arguments, out value);
+                    return InvokeConstructionOf(expression, arguments, out value);
 
                 default:
                     value = arguments[0];
@@ -323,10 +321,10 @@ namespace NHibernate.FlowQuery.Helpers
         }
 
         /// <summary>
-        ///     Invokes the provided <see cref="MethodCallExpression" /> with the provided arguments.
+        ///     Invokes the provided <see cref="Expression" /> with the provided arguments.
         /// </summary>
         /// <param name="expression">
-        ///     The <see cref="MethodCallExpression" /> expression.
+        ///     The <see cref="Expression" /> expression.
         /// </param>
         /// <param name="arguments">
         ///     The constructor arguments.
@@ -337,15 +335,15 @@ namespace NHibernate.FlowQuery.Helpers
         /// <returns>
         ///     The number of arguments used.
         /// </returns>
-        private static int Invoke
+        private static int InvokeConstructionOf
             (
-            MethodCallExpression expression,
+            Expression expression,
             object[] arguments,
             out object value
             )
         {
             IEnumerable<IExpressionHandler> handlers = FlowQueryHelper
-                .GetExpressionHandlers(ExpressionType.Call);
+                .GetExpressionHandlers(expression.NodeType);
 
             foreach (IExpressionHandler handler in handlers)
             {

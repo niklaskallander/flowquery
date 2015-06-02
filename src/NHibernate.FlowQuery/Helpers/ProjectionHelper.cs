@@ -64,9 +64,6 @@ namespace NHibernate.FlowQuery.Helpers
                 case ExpressionType.Conditional:
                     return GetConditionalProjection((ConditionalExpression)expression, context);
 
-                case ExpressionType.Call:
-                    return GetMethodCallProjection((MethodCallExpression)expression, context);
-
                 case ExpressionType.MemberAccess:
                     return GetMemberProjection((MemberExpression)expression, context);
 
@@ -76,14 +73,15 @@ namespace NHibernate.FlowQuery.Helpers
                 case ExpressionType.Coalesce:
                     return GetCoalesceProjection((BinaryExpression)expression, context);
 
-                case ExpressionType.Lambda:
-                    return GetProjection(((LambdaExpression)expression).Body, context);
-
                 case ExpressionType.New:
                     return ForNewExpression((NewExpression)expression, context);
 
                 case ExpressionType.MemberInit:
                     return ForMemberInitExpression((MemberInitExpression)expression, context);
+
+                case ExpressionType.Call:
+                case ExpressionType.Lambda:
+                    return GetProjectionOf(expression, context);
 
                 default:
 
@@ -540,7 +538,7 @@ namespace NHibernate.FlowQuery.Helpers
         }
 
         /// <summary>
-        ///     Creates a <see cref="IProjection" /> from the given <see cref="MethodCallExpression" />.
+        ///     Creates a <see cref="IProjection" /> from the given <see cref="Expression" />.
         /// </summary>
         /// <param name="expression">
         ///     The expression.
@@ -554,14 +552,14 @@ namespace NHibernate.FlowQuery.Helpers
         /// <exception cref="NotSupportedException">
         ///     The <see cref="Expression" /> could not be resolved as it may contain unsupported features or similar.
         /// </exception>
-        private static IProjection GetMethodCallProjection
+        private static IProjection GetProjectionOf
             (
-            MethodCallExpression expression,
+            Expression expression,
             HelperContext context
             )
         {
             IEnumerable<IExpressionHandler> handlers = FlowQueryHelper
-                .GetExpressionHandlers(ExpressionType.Call);
+                .GetExpressionHandlers(expression.NodeType);
 
             foreach (IExpressionHandler handler in handlers)
             {
@@ -576,14 +574,10 @@ namespace NHibernate.FlowQuery.Helpers
                 }
             }
 
-            throw new NotSupportedException
-                (
-                string.Format
-                    (
-                        "The expression contains unsupported features. Unable to resolve method call: '{0}'.",
-                        expression.Method.Name
-                    )
-                );
+            const string ErrorMessageFormat
+                = "The expression contains unsupported features. Unable to resolve expression: '{0}'.";
+
+            throw new NotSupportedException(string.Format(ErrorMessageFormat, expression));
         }
 
         /// <summary>
