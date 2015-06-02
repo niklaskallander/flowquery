@@ -19,11 +19,6 @@
         /// </returns>
         public static IEnumerable<Expression> Flatten(this BinaryExpression expression)
         {
-            if (expression == null)
-            {
-                return new Expression[0];
-            }
-
             var expressions = new List<Expression>();
 
             if (expression.Left is BinaryExpression)

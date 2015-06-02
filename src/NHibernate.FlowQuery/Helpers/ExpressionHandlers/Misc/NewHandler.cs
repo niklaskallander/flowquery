@@ -26,7 +26,7 @@
             HelperContext context
             )
         {
-            return false;
+            return expression.NodeType == ExpressionType.New;
         }
 
         /// <inheritdoc />
@@ -67,7 +67,30 @@
             HelperContext context
             )
         {
-            return null;
+            var newExpression = (NewExpression)expression;
+
+            var list = Projections.ProjectionList();
+
+            foreach (Expression argument in newExpression.Arguments)
+            {
+                IProjection projection = ProjectionHelper.GetProjection(argument, context);
+
+                var innerList = projection as ProjectionList;
+
+                if (innerList != null)
+                {
+                    for (int i = 0; i < innerList.Length; i++)
+                    {
+                        list.Add(innerList[i]);
+                    }
+                }
+                else
+                {
+                    list.Add(projection);
+                }
+            }
+
+            return list;
         }
     }
 }

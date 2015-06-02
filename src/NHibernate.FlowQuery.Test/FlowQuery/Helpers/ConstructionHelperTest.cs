@@ -8,7 +8,6 @@
 
     using NHibernate.Criterion;
     using NHibernate.FlowQuery.Helpers;
-    using NHibernate.FlowQuery.Test.Setup.Dtos;
     using NHibernate.FlowQuery.Test.Setup.Entities;
 
     using NUnit.Framework;
@@ -31,42 +30,11 @@
         }
 
         [Test]
-        public void CanHandleSortsOutLambdaExpression()
-        {
-            Expression<Func<UserEntity, UserDto>> expression =
-                x => new UserDto { Fullname = x.Firstname + " " + x.Lastname };
-
-            bool canHandle = ConstructionHelper.CanHandle(expression);
-
-            Assert.That(canHandle, Is.True);
-        }
-
-        [Test]
-        public void CanHandleThrowsWhenExpressionIsNull()
-        {
-            Assert.That(() => ConstructionHelper.CanHandle(null), Throws.InstanceOf<ArgumentNullException>());
-        }
-
-        [Test]
         public void GetListByExpressionReturnsNullIfSelectionIsNull()
         {
             Expression<Func<UserEntity, object>> expression = x => new { x.IsOnline };
 
             IEnumerable<int> list = ConstructionHelper.GetListByExpression<int>(expression, null);
-
-            Assert.That(list, Is.Null);
-        }
-
-        [Test]
-        public void GetListByExpressionReturnsNullIfUnhandlableExpression()
-        {
-            IEnumerable enumerable = Session.CreateCriteria<UserEntity>()
-                .SetProjection(Projections.Property("IsOnline"))
-                .List();
-
-            Expression<Func<UserEntity, object>> expression = x => x.IsOnline;
-
-            IEnumerable<int> list = ConstructionHelper.GetListByExpression<int>(expression, enumerable);
 
             Assert.That(list, Is.Null);
         }
@@ -80,16 +48,6 @@
                     () => ConstructionHelper.GetListByExpression<int>(null, new object[] { }),
                     Throws.InstanceOf<ArgumentNullException>()
                 );
-        }
-
-        [Test]
-        public void GetObjectByExpressionConverterReturnsNullIfUnhandlableExpression()
-        {
-            Expression<Func<UserEntity, object>> expression = x => x.IsOnline;
-
-            Func<object, int> converter = ConstructionHelper.GetObjectByExpressionConverter<int>(expression);
-
-            Assert.That(converter, Is.Null);
         }
 
         [Test]
