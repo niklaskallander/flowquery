@@ -10,26 +10,39 @@
     ///     Handles <see cref="MethodCallExpression" /> expressions representing calls to
     ///     <see cref="FlowQueryHelper.Project{TIn,TOut}" />.
     /// </summary>
-    public class ProjectHandler : MethodCallExpressionHandlerBase
+    public class ProjectHandler : AbstractMethodCallHandler
     {
-        /// <inheritdoc />
-        public override bool CanHandleConstruction(MethodCallExpression expression)
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="ProjectHandler" /> class.
+        /// </summary>
+        public ProjectHandler()
+            : base(supportedMethodNames: "Project")
         {
-            return true;
+        }
+
+        /// <inheritdoc />
+        protected override bool CanHandleConstruction
+        {
+            get
+            {
+                return true;
+            }
         }
 
         /// <inheritdoc />
         public override int Construct
             (
-            MethodCallExpression expression,
+            Expression expression,
             object[] arguments,
             out object value,
             out bool wasHandled
             )
         {
-            if (expression != null)
+            var methodCall = expression as MethodCallExpression;
+
+            if (methodCall != null)
             {
-                var lambda = ExpressionHelper.GetValue<LambdaExpression>(expression.Arguments[1]);
+                var lambda = ExpressionHelper.GetValue<LambdaExpression>(methodCall.Arguments[1]);
 
                 if (lambda != null)
                 {

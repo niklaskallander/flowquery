@@ -2,19 +2,16 @@
 {
     using NHibernate.Criterion;
 
+    using Expression = System.Linq.Expressions.Expression;
+
     /// <summary>
     ///     Defines the functionality required by a class that can extend the <see cref="FlowQuery" /> functionality for
     ///     projections and construction of query results.
     /// </summary>
-    /// <typeparam name="TExpression">
-    ///     The <see cref="Type" /> of the <see cref="System.Linq.Expressions.Expression" /> expression this handler can
-    ///     handle.
-    /// </typeparam>
-    public interface IExpressionHandler<in TExpression>
-        where TExpression : System.Linq.Expressions.Expression
+    public interface IExpressionHandler
     {
         /// <summary>
-        ///     Determines whether this <see cref="IExpressionHandler{TExpression}" /> can handle construction of the
+        ///     Determines whether this <see cref="IExpressionHandler" /> can handle construction of the
         ///     given <see cref="T:TExpression" /> expression.
         /// </summary>
         /// <param name="expression">
@@ -24,10 +21,10 @@
         ///     <c>true</c> if the handler can handle construction of the given <see cref="T:TExpression" /> expression
         ///     otherwise <c>false</c>.
         /// </returns>
-        bool CanHandleConstruction(TExpression expression);
+        bool CanHandleConstructionOf(Expression expression);
 
         /// <summary>
-        ///     Determines whether this <see cref="IExpressionHandler{TExpression}" /> can handle projection of the
+        ///     Determines whether this <see cref="IExpressionHandler" /> can handle projection of the
         ///     given <see cref="T:TExpression" /> expression.
         /// </summary>
         /// <param name="expression">
@@ -40,9 +37,9 @@
         ///     <c>true</c> if the handler can handle projection of the given <see cref="T:TExpression" /> expression
         ///     otherwise <c>false</c>.
         /// </returns>
-        bool CanHandleProjection
+        bool CanHandleProjectionOf
             (
-            TExpression expression,
+            Expression expression,
             HelperContext context
             );
 
@@ -66,10 +63,11 @@
         /// </returns>
         int Construct
             (
-            TExpression expression,
+            Expression expression,
             object[] arguments,
             out object value,
-            out bool wasHandled);
+            out bool wasHandled
+            );
 
         /// <summary>
         ///     Handles projection of the given <see cref="T:TExpression" /> expression.
@@ -85,7 +83,8 @@
         /// </returns>
         IProjection Project
             (
-            TExpression expression,
-            HelperContext context);
+            Expression expression,
+            HelperContext context
+            );
     }
 }

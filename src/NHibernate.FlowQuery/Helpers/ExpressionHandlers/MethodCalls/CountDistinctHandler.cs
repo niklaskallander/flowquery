@@ -9,8 +9,16 @@
     /// <summary>
     ///     Handles method calls to <see cref="Aggregate.CountDistinct{TDestination}(TDestination)" />.
     /// </summary>
-    public class CountDistinctHandler : MethodCallExpressionHandlerBase
+    public class CountDistinctHandler : AbstractMethodCallHandler
     {
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="CountDistinctHandler" /> class.
+        /// </summary>
+        public CountDistinctHandler()
+            : base(supportedMethodNames: "CountDistinct")
+        {
+        }
+
         /// <inheritdoc />
         protected override IProjection ProjectCore
             (

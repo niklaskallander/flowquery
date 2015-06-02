@@ -23,7 +23,8 @@
             (
             QueryHelperData data,
             LambdaExpression expression,
-            HelperType type)
+            HelperType type
+            )
             : this(data, (string)null, type)
         {
             RootAlias = expression != null && expression.Parameters.Count > 0
@@ -47,7 +48,8 @@
             (
             QueryHelperData data,
             string rootAlias,
-            HelperType type)
+            HelperType type
+            )
         {
             Data = data;
             RootAlias = rootAlias;

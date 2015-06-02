@@ -94,6 +94,18 @@
     <Compile Include="Core\IQueryableFlowQueryBase%271.cs" />
     <Compile Include="Core\IQueryFilter%271.cs" />
     <Compile Include="Core\IStreamedFlowQuery%271.cs" />
+    <Compile Include="Helpers\ExpressionExtensions.cs" />
+    <Compile Include="Helpers\ExpressionHandlers\AbstractHandler.cs" />
+    <Compile Include="Helpers\ExpressionHandlers\Misc\ArithmeticHandler.cs" />
+    <Compile Include="Helpers\ExpressionHandlers\Misc\CoalesceHandler.cs" />
+    <Compile Include="Helpers\ExpressionHandlers\Misc\ConcatenationHandler.cs" />
+    <Compile Include="Helpers\ExpressionHandlers\Misc\ConditionalHandler.cs" />
+    <Compile Include="Helpers\ExpressionHandlers\Misc\ConditionHandler.cs" />
+    <Compile Include="Helpers\ExpressionHandlers\Misc\ConvertHandler.cs" />
+    <Compile Include="Helpers\ExpressionHandlers\Misc\LambdaHandler.cs" />
+    <Compile Include="Helpers\ExpressionHandlers\Misc\MemberAccessHandler.cs" />
+    <Compile Include="Helpers\ExpressionHandlers\Misc\MemberInitHandler.cs" />
+    <Compile Include="Helpers\ExpressionHandlers\Misc\NewHandler.cs" />
     <Compile Include="Helpers\ExpressionRebaser.cs" />
     <Compile Include="Helpers\OrderHelper.cs" />
     <Compile Include="Helpers\ResultStreamer.cs" />
@@ -175,7 +187,7 @@
     <Compile Include="Helpers\ExpressionHandlers\MethodCalls\AsHandler.cs" />
     <Compile Include="Helpers\ExpressionHandlers\MethodCalls\CountDistinctHandler.cs" />
     <Compile Include="Helpers\ExpressionHandlers\MethodCalls\LikeHandler.cs" />
-    <Compile Include="Helpers\ExpressionHandlers\MethodCalls\MethodCallExpressionHandlerBase.cs" />
+    <Compile Include="Helpers\ExpressionHandlers\MethodCalls\AbstractMethodCallHandler.cs" />
     <Compile Include="Helpers\ExpressionHandlers\MethodCalls\RoundHandler.cs" />
     <Compile Include="Helpers\ExpressionHandlers\MethodCalls\SimpleMethodCallHandler.cs" />
     <Compile Include="Helpers\ExpressionHandlers\MethodCalls\SubqueryHandler.cs" />

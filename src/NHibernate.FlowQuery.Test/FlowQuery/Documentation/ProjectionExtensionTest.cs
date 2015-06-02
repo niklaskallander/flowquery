@@ -1,6 +1,5 @@
 ﻿namespace NHibernate.FlowQuery.Test.FlowQuery.Documentation
 {
-    using System;
     using System.Linq;
     using System.Linq.Expressions;
 
@@ -11,6 +10,8 @@
 
     using NUnit.Framework;
 
+    using Expression = System.Linq.Expressions.Expression;
+
     [TestFixture]
     public class ProjectionExtensionTest : BaseTest
     {
@@ -18,7 +19,7 @@
         public void Example1()
         {
             // add the handler
-            FlowQueryHelper.AddMethodCallHandler("ToString", new ToStringHandler());
+            FlowQueryHelper.AddExpressionHandler(ExpressionType.Call, new ToStringHandler());
 
             var userIds = Session.FlowQuery<UserEntity>()
                 .Select(x => new
@@ -36,42 +37,50 @@
 
     public class ToStringHandler : IMethodCallExpressionHandler
     {
-        public bool CanHandleConstruction(MethodCallExpression expression)
+        public bool CanHandleConstructionOf(Expression expression)
         {
             return false;
         }
 
-        public bool CanHandleProjection(MethodCallExpression expression, HelperContext context)
+        public bool CanHandleProjectionOf(Expression expression, HelperContext context)
         {
-            return true;
+            var methodCall = expression as MethodCallExpression;
+
+            return methodCall != null
+                && methodCall.Method.Name == "ToString";
         }
 
-        public int Construct(MethodCallExpression expression, object[] arguments, out object value, out bool wasHandled)
+        public int Construct(Expression expression, object[] arguments, out object value, out bool wasHandled)
         {
-            throw new NotImplementedException();
+            value = null;
+            wasHandled = false;
+
+            return 0;
         }
 
         public IProjection Project
             (
-            MethodCallExpression expression,
+            Expression expression,
             HelperContext context
             )
         {
+            var methodCall = (MethodCallExpression)expression;
+
             // return null if called statically
-            if (expression.Object == null)
+            if (methodCall.Object == null)
             {
                 return null;
             }
 
             // return null if called for non-ToString method
-            if (expression.Method.Name != "ToString")
+            if (methodCall.Method.Name != "ToString")
             {
                 return null;
             }
 
             // resolve a projection for the property
             IProjection property = ProjectionHelper
-                .GetProjection(expression.Object, context);
+                .GetProjection(methodCall.Object, context);
 
             // return null if no projection could be resolved
             if (property == null)
@@ -81,10 +90,10 @@
 
             // create a cast projection property
             return new CastProjection
-            (
+                (
                 NHibernateUtil.String,
                 property
-            );
+                );
         }
     }
 }

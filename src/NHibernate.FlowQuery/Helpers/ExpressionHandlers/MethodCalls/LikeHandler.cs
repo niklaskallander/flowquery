@@ -10,8 +10,17 @@
     ///     Handles method calls to <see cref="string.StartsWith(string)" />, <see cref="string.EndsWith(string)" />, or
     ///     <see cref="string.Contains(string)" />.
     /// </summary>
-    public class LikeHandler : MethodCallExpressionHandlerBase
+    public class LikeHandler : AbstractMethodCallHandler
     {
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="LikeHandler"/> class.
+        /// </summary>
+        public LikeHandler()
+            : base(supportedMethodNames: new[] { "Contains", "EndsWith", "StartsWith" })
+        {
+
+        }
+
         /// <inheritdoc />
         protected override IProjection ProjectCore
             (

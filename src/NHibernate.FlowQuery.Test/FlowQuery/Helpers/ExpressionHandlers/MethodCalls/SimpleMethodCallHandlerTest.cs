@@ -16,7 +16,7 @@
             Assert
                 .That
                 (
-                    () => new SimpleMethodCallHandler(null),
+                    () => new SimpleMethodCallHandler(null, "Avg"),
                     Throws.TypeOf<ArgumentNullException>()
                 );
         }
@@ -27,7 +27,7 @@
             Assert
                 .That
                 (
-                    () => new SimpleMethodCallHandler(Projections.Count),
+                    () => new SimpleMethodCallHandler(Projections.Count, "Count"),
                     Throws.Nothing
                 );
         }

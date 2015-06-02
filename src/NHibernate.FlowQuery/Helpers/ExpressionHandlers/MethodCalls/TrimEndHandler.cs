@@ -10,8 +10,16 @@
     /// <summary>
     ///     Handles method calls to <see cref="string.TrimEnd" />.
     /// </summary>
-    public class TrimEndHandler : MethodCallExpressionHandlerBase
+    public class TrimEndHandler : AbstractMethodCallHandler
     {
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="TrimEndHandler" /> class.
+        /// </summary>
+        public TrimEndHandler()
+            : base(supportedMethodNames: "TrimEnd")
+        {
+        }
+
         /// <summary>
         ///     Trims the end of the given <see cref="IProjection" />.
         /// </summary>
@@ -25,8 +33,8 @@
         {
             return new SqlFunctionProjection
                 (
-                new StandardSQLFunction("rtrim"), 
-                NHibernateUtil.String, 
+                new StandardSQLFunction("rtrim"),
+                NHibernateUtil.String,
                 projection
                 );
         }
@@ -34,9 +42,9 @@
         /// <inheritdoc />
         protected override IProjection ProjectCore
             (
-            MethodCallExpression expression, 
-            Expression subExpression, 
-            IProjection projection, 
+            MethodCallExpression expression,
+            Expression subExpression,
+            IProjection projection,
             HelperContext context
             )
         {

@@ -5,7 +5,6 @@ namespace NHibernate.FlowQuery.Helpers
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
-    using System.Reflection;
 
     using NHibernate.FlowQuery.Helpers.ExpressionHandlers;
 
@@ -15,35 +14,6 @@ namespace NHibernate.FlowQuery.Helpers
     /// </summary>
     public static class ConstructionHelper
     {
-        /// <summary>
-        ///     Determines whether the provided <see cref="Expression" /> can be handled by
-        ///     <see cref="GetListByExpression{TDestination}" />.
-        /// </summary>
-        /// <param name="expression">
-        ///     The <see cref="Expression" /> instance to verify.
-        /// </param>
-        /// <returns>
-        ///     True if the <see cref="Expression" /> can be handled; false otherwise.
-        /// </returns>
-        /// <exception cref="ArgumentNullException">
-        ///     <paramref name="expression" /> is null.
-        /// </exception>
-        public static bool CanHandle(Expression expression)
-        {
-            if (expression == null)
-            {
-                throw new ArgumentNullException("expression");
-            }
-
-            if (expression.NodeType == ExpressionType.Lambda)
-            {
-                return CanHandle(((LambdaExpression)expression).Body);
-            }
-
-            return expression.NodeType == ExpressionType.New
-                || expression.NodeType == ExpressionType.MemberInit;
-        }
-
         /// <summary>
         ///     Creates a <see cref="IEnumerable{TDestination}" /> from the provided <see cref="Expression" />
         ///     and <see cref="IEnumerable" />.
@@ -74,31 +44,16 @@ namespace NHibernate.FlowQuery.Helpers
                 throw new ArgumentNullException("expression");
             }
 
-            if (expression.NodeType == ExpressionType.Lambda)
-            {
-                return GetListByExpression<TDestination>(((LambdaExpression)expression).Body, list);
-            }
-
             if (list != null)
             {
-                bool canHandle = CanHandle(expression);
-
-                if (canHandle)
-                {
-                    if (expression.NodeType == ExpressionType.New)
-                    {
-                        return ForNewExpression<TDestination>(expression as NewExpression, list);
-                    }
-
-                    return ForMemberInitExpression<TDestination>(expression as MemberInitExpression, list);
-                }
+                return GetList<TDestination>(expression, list);
             }
 
             return null;
         }
 
         /// <summary>
-        ///     Creates a <see cref="System.Func{T,TResult}" /> conversion delegate for the 
+        ///     Creates a <see cref="System.Func{T,TResult}" /> conversion delegate for the
         ///     provided <see cref="Expression" />
         /// </summary>
         /// <param name="expression">
@@ -123,24 +78,7 @@ namespace NHibernate.FlowQuery.Helpers
                 throw new ArgumentNullException("expression");
             }
 
-            if (expression.NodeType == ExpressionType.Lambda)
-            {
-                return GetObjectByExpressionConverter<TDestination>(((LambdaExpression)expression).Body);
-            }
-
-            bool canHandle = CanHandle(expression);
-
-            if (canHandle)
-            {
-                if (expression.NodeType == ExpressionType.New)
-                {
-                    return x => ForNewExpression<TDestination>(expression as NewExpression, x);
-                }
-
-                return x => ForMemberInitExpression<TDestination>(expression as MemberInitExpression, x);
-            }
-
-            return null;
+            return x => GetItem<TDestination>(expression, x);
         }
 
         /// <summary>
@@ -165,168 +103,30 @@ namespace NHibernate.FlowQuery.Helpers
             out object value
             )
         {
-            switch (expression.NodeType)
+            IEnumerable<IExpressionHandler> handlers = FlowQueryHelper
+                .GetExpressionHandlers(expression.NodeType)
+                .Where(x => x.CanHandleConstructionOf(expression))
+                .ToArray();
+
+            if (handlers.Any())
             {
-                case ExpressionType.Lambda:
-                    return Invoke(((LambdaExpression)expression).Body, arguments, out value);
-
-                case ExpressionType.New:
-                    return Invoke(expression as NewExpression, arguments, out value);
-
-                case ExpressionType.MemberInit:
-                    return Invoke(expression as MemberInitExpression, arguments, out value);
-
-                case ExpressionType.Call:
-                    return Invoke(expression as MethodCallExpression, arguments, out value);
-
-                default:
-                    value = arguments[0];
-
-                    return 1;
-            }
-        }
-
-        /// <summary>
-        ///     Creates a <see cref="IEnumerable{TDestination}" /> from the provided <see cref="MemberInitExpression" />
-        ///     and <see cref="IEnumerable" />.
-        /// </summary>
-        /// <param name="expression">
-        ///     The <see cref="MemberInitExpression" /> constructor.
-        /// </param>
-        /// <param name="list">
-        ///     The <see cref="IEnumerable" /> data list.
-        /// </param>
-        /// <typeparam name="TDestination">
-        ///     The <see cref="System.Type" /> of the result.
-        /// </typeparam>
-        /// <returns>
-        ///     The created <see cref="IEnumerable{TDestination}" /> instance.
-        /// </returns>
-        private static IEnumerable<TDestination> ForMemberInitExpression<TDestination>
-            (
-            MemberInitExpression expression,
-            IEnumerable list
-            )
-        {
-            var temp = new List<TDestination>();
-
-            foreach (object item in list)
-            {
-                var destinationItem = ForMemberInitExpression<TDestination>(expression, item);
-
-                temp.Add(destinationItem);
+                return ConstructUsing(handlers, expression, arguments, out value);
             }
 
-            return temp;
+            value = arguments[0];
+
+            return 1;
         }
 
         /// <summary>
-        ///     Creates a <see cref="T:TDestination" /> from the provided <see cref="MemberInitExpression" />
-        ///     and <see cref="object" />.
+        ///     Invokes the provided <see cref="Expression" /> with the provided arguments.
         /// </summary>
+        /// <param name="handlers">
+        ///     The set of <see cref="IExpressionHandler" /> instances to use when constructing a value for the given
+        ///     <see cref="Expression" />.
+        /// </param>
         /// <param name="expression">
-        ///     The <see cref="MemberInitExpression" /> constructor.
-        /// </param>
-        /// <param name="item">
-        ///     The <see cref="object" /> data item.
-        /// </param>
-        /// <typeparam name="TDestination">
-        ///     The <see cref="System.Type" /> of the result.
-        /// </typeparam>
-        /// <returns>
-        ///     The created <see cref="T:TDestination" /> instance.
-        /// </returns>
-        private static TDestination ForMemberInitExpression<TDestination>
-            (
-            MemberInitExpression expression,
-            object item
-            )
-        {
-            object[] args = item as object[] ?? new[]
-            {
-                item
-            };
-
-            object instance;
-
-            Invoke(expression, args, out instance);
-
-            return (TDestination)instance;
-        }
-
-        /// <summary>
-        ///     Creates a <see cref="IEnumerable{TDestination}" /> from the provided <see cref="NewExpression" />
-        ///     and <see cref="IEnumerable" />.
-        /// </summary>
-        /// <param name="expression">
-        ///     The <see cref="NewExpression" /> constructor.
-        /// </param>
-        /// <param name="list">
-        ///     The <see cref="IEnumerable" /> data list.
-        /// </param>
-        /// <typeparam name="TDestination">
-        ///     The <see cref="System.Type" /> of the result.
-        /// </typeparam>
-        /// <returns>
-        ///     The created <see cref="IEnumerable{TDestination}" /> instance.
-        /// </returns>
-        private static IEnumerable<TDestination> ForNewExpression<TDestination>
-            (
-            NewExpression expression,
-            IEnumerable list
-            )
-        {
-            var temp = new List<TDestination>();
-
-            foreach (object item in list)
-            {
-                var destinationItem = ForNewExpression<TDestination>(expression, item);
-
-                temp.Add(destinationItem);
-            }
-
-            return temp;
-        }
-
-        /// <summary>
-        ///     Creates a <see cref="T:TDestination" /> from the provided <see cref="NewExpression" />
-        ///     and <see cref="object" />.
-        /// </summary>
-        /// <param name="expression">
-        ///     The <see cref="NewExpression" /> constructor.
-        /// </param>
-        /// <param name="item">
-        ///     The <see cref="object" /> data item.
-        /// </param>
-        /// <typeparam name="TDestination">
-        ///     The <see cref="System.Type" /> of the result.
-        /// </typeparam>
-        /// <returns>
-        ///     The created <see cref="T:TDestination" /> instance.
-        /// </returns>
-        private static TDestination ForNewExpression<TDestination>
-            (
-            NewExpression expression,
-            object item
-            )
-        {
-            object[] args = item as object[] ?? new[]
-            {
-                item
-            };
-
-            object instance;
-
-            Invoke(expression, args, out instance);
-
-            return (TDestination)instance;
-        }
-
-        /// <summary>
-        ///     Invokes the provided <see cref="MethodCallExpression" /> with the provided arguments.
-        /// </summary>
-        /// <param name="expression">
-        ///     The <see cref="MethodCallExpression" /> expression.
+        ///     The <see cref="Expression" /> expression.
         /// </param>
         /// <param name="arguments">
         ///     The constructor arguments.
@@ -337,28 +137,23 @@ namespace NHibernate.FlowQuery.Helpers
         /// <returns>
         ///     The number of arguments used.
         /// </returns>
-        private static int Invoke
+        private static int ConstructUsing
             (
-            MethodCallExpression expression,
+            IEnumerable<IExpressionHandler> handlers,
+            Expression expression,
             object[] arguments,
             out object value
             )
         {
-            IEnumerable<IMethodCallExpressionHandler> handlers = FlowQueryHelper
-                .GetMethodCallHandlers(expression.Method.Name.ToLower());
-
-            foreach (IMethodCallExpressionHandler handler in handlers)
+            foreach (IExpressionHandler handler in handlers)
             {
-                if (handler.CanHandleConstruction(expression))
+                bool wasHandled;
+
+                int i = handler.Construct(expression, arguments, out value, out wasHandled);
+
+                if (wasHandled)
                 {
-                    bool wasHandled;
-
-                    int i = handler.Construct(expression, arguments, out value, out wasHandled);
-
-                    if (wasHandled)
-                    {
-                        return i;
-                    }
+                    return i;
                 }
             }
 
@@ -368,124 +163,71 @@ namespace NHibernate.FlowQuery.Helpers
         }
 
         /// <summary>
-        ///     Invokes the provided <see cref="NewExpression" /> with the provided arguments.
+        ///     Creates a <see cref="IEnumerable{TDestination}" /> from the provided <see cref="Expression" />
+        ///     and <see cref="IEnumerable" />.
         /// </summary>
         /// <param name="expression">
-        ///     The <see cref="NewExpression" /> constructor.
+        ///     The <see cref="Expression" /> expression.
         /// </param>
-        /// <param name="arguments">
-        ///     The constructor arguments.
+        /// <param name="list">
+        ///     The <see cref="IEnumerable" /> data list.
         /// </param>
-        /// <param name="instance">
-        ///     The generated instance.
-        /// </param>
+        /// <typeparam name="TDestination">
+        ///     The <see cref="System.Type" /> of the result.
+        /// </typeparam>
         /// <returns>
-        ///     The number of arguments used.
+        ///     The created <see cref="IEnumerable{TDestination}" /> instance.
         /// </returns>
-        private static int Invoke
+        private static IEnumerable<TDestination> GetList<TDestination>
             (
-            NewExpression expression,
-            object[] arguments,
-            out object instance
+            Expression expression,
+            IEnumerable list
             )
         {
-            int i = 0;
+            var temp = new List<TDestination>();
 
-            var list = new List<object>();
-
-            foreach (Expression argument in expression.Arguments)
+            foreach (object item in list)
             {
-                object value;
+                var destinationItem = GetItem<TDestination>(expression, item);
 
-                i += Invoke(argument, arguments.Skip(i).ToArray(), out value);
-
-                list.Add(value);
+                temp.Add(destinationItem);
             }
 
-            instance = expression.Constructor.Invoke(list.ToArray());
-
-            return i;
+            return temp;
         }
 
         /// <summary>
-        ///     Invokes the provided <see cref="MemberInitExpression" /> with the provided arguments.
+        ///     Creates a <see cref="T:TDestination" /> from the provided <see cref="Expression" />
+        ///     and <see cref="object" />.
         /// </summary>
         /// <param name="expression">
-        ///     The <see cref="MemberInitExpression" /> constructor.
+        ///     The <see cref="Expression" /> expression.
         /// </param>
-        /// <param name="arguments">
-        ///     The constructor arguments.
+        /// <param name="item">
+        ///     The <see cref="object" /> data item.
         /// </param>
-        /// <param name="instance">
-        ///     The generated instance.
-        /// </param>
+        /// <typeparam name="TDestination">
+        ///     The <see cref="System.Type" /> of the result.
+        /// </typeparam>
         /// <returns>
-        ///     The number of arguments used.
+        ///     The created <see cref="T:TDestination" /> instance.
         /// </returns>
-        private static int Invoke
+        private static TDestination GetItem<TDestination>
             (
-            MemberInitExpression expression,
-            object[] arguments,
-            out object instance
+            Expression expression,
+            object item
             )
         {
-            int i = Invoke(expression.NewExpression, arguments, out instance);
-
-            foreach (MemberBinding binding in expression.Bindings)
+            object[] args = item as object[] ?? new[]
             {
-                var memberAssignment = binding as MemberAssignment;
+                item
+            };
 
-                if (memberAssignment != null)
-                {
-                    object value;
+            object instance;
 
-                    i += Invoke(memberAssignment.Expression, arguments.Skip(i).ToArray(), out value);
+            Invoke(expression, args, out instance);
 
-                    SetValue(binding.Member, instance, value);
-                }
-            }
-
-            return i;
-        }
-
-        /// <summary>
-        ///     Sets the value of the <see cref="MemberInfo" /> member on <paramref name="instance" /> to
-        ///     <paramref name="value" />.
-        /// </summary>
-        /// <param name="memberInfo">
-        ///     The <see cref="MemberInfo" /> member to set.
-        /// </param>
-        /// <param name="instance">
-        ///     The instance to update.
-        /// </param>
-        /// <param name="value">
-        ///     The value to use.
-        /// </param>
-        /// <remarks>
-        ///     Borrowed from Linq to NHibernate.
-        /// </remarks>
-        private static void SetValue
-            (
-            MemberInfo memberInfo,
-            object instance,
-            object value
-            )
-        {
-            var field = memberInfo as FieldInfo;
-
-            if (field != null)
-            {
-                field.SetValue(instance, value);
-            }
-            else
-            {
-                var prop = memberInfo as PropertyInfo;
-
-                if (prop != null)
-                {
-                    prop.SetValue(instance, value, null);
-                }
-            }
+            return (TDestination)instance;
         }
     }
 }

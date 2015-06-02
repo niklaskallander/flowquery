@@ -6,7 +6,6 @@
     using System.Linq;
 
     using NHibernate.FlowQuery.Core;
-    using NHibernate.FlowQuery.Core.Implementations;
     using NHibernate.FlowQuery.Core.Structures;
 
     /// <summary>
@@ -64,19 +63,14 @@
 
             if (query.Constructor != null)
             {
-                bool canHandle = ConstructionHelper.CanHandle(query.Constructor);
+                IEnumerable enumerable = query.IsDelayed
+                    ? criteria.Future<object>()
+                    : (IEnumerable)criteria.List();
 
-                if (canHandle)
-                {
-                    IEnumerable enumerable = query.IsDelayed
-                        ? criteria.Future<object>()
-                        : (IEnumerable)criteria.List();
-
-                    return new FlowQuerySelection<TDestination>
-                        (
-                        () => ConstructionHelper.GetListByExpression<TDestination>(query.Constructor, enumerable)
-                        );
-                }
+                return new FlowQuerySelection<TDestination>
+                    (
+                    () => ConstructionHelper.GetListByExpression<TDestination>(query.Constructor, enumerable)
+                    );
             }
 
             IEnumerable<TDestination> selection = query.IsDelayed

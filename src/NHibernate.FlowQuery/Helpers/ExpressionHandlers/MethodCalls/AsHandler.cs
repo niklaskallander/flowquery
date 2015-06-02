@@ -9,8 +9,16 @@
     /// <summary>
     ///     Handles method calls to <see cref="NHibernate.FlowQuery.Property.As{TDestination}(string)" />.
     /// </summary>
-    public class AsHandler : MethodCallExpressionHandlerBase
+    public class AsHandler : AbstractMethodCallHandler
     {
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="AsHandler" /> class.
+        /// </summary>
+        public AsHandler()
+            : base(supportedMethodNames: "As")
+        {
+        }
+
         /// <inheritdoc />
         protected override IProjection ProjectCore
             (

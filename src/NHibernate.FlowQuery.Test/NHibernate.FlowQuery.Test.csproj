@@ -152,6 +152,7 @@
     <Compile Include="FlowQuery\FlowQueryHelperTest.cs" />
     <Compile Include="FlowQuery\Helpers\ConstructionHelperTest.cs" />
     <Compile Include="FlowQuery\Helpers\CriteriaHelperTest.cs" />
+    <Compile Include="FlowQuery\Helpers\ExpressionHandlers\MethodCalls\AbstractMethodCallHandlerTest.cs" />
     <Compile Include="FlowQuery\Helpers\ExpressionHandlers\MethodCalls\ProjectHandlerTest.cs" />
     <Compile Include="FlowQuery\Helpers\ExpressionHandlers\MethodCalls\SimpleMethodCallHandlerTest.cs" />
     <Compile Include="FlowQuery\Helpers\ExpressionHelperTest.cs" />

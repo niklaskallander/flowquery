@@ -108,6 +108,9 @@ namespace NHibernate.FlowQuery.Test
         [SetUp]
         public virtual void Setup()
         {
+            // to always start on a clean slate
+            FlowQueryHelper.ClearExpressionHandlers();
+
             _sessionFactory = NHibernateConfigurer.GetSessionFactory();
 
             OnSetup();

@@ -9,7 +9,7 @@
     /// <summary>
     ///     Handles method calls to <see cref="string.Trim()" />.
     /// </summary>
-    public class TrimHandler : MethodCallExpressionHandlerBase
+    public class TrimHandler : AbstractMethodCallHandler
     {
         /// <summary>
         ///     The <see cref="TrimEndHandler" />.
@@ -30,12 +30,20 @@
             End = new TrimEndHandler();
         }
 
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="TrimHandler" /> class.
+        /// </summary>
+        public TrimHandler()
+            : base(supportedMethodNames: "Trim")
+        {
+        }
+
         /// <inheritdoc />
         protected override IProjection ProjectCore
             (
-            MethodCallExpression expression, 
-            Expression subExpression, 
-            IProjection projection, 
+            MethodCallExpression expression,
+            Expression subExpression,
+            IProjection projection,
             HelperContext context
             )
         {

@@ -10,8 +10,16 @@
     /// <summary>
     ///     Handles method calls to <see cref="string.TrimStart" />.
     /// </summary>
-    public class TrimStartHandler : MethodCallExpressionHandlerBase
+    public class TrimStartHandler : AbstractMethodCallHandler
     {
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="TrimStartHandler" /> class.
+        /// </summary>
+        public TrimStartHandler()
+            : base(supportedMethodNames: "TrimStart")
+        {
+        }
+
         /// <summary>
         ///     Trims the start of the given <see cref="IProjection" />.
         /// </summary>
