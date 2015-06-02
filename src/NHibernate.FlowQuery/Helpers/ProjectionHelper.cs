@@ -57,9 +57,6 @@ namespace NHibernate.FlowQuery.Helpers
                 case ExpressionType.Convert:
                     return GetConvertProjection((UnaryExpression)expression, context);
 
-                case ExpressionType.Coalesce:
-                    return GetCoalesceProjection((BinaryExpression)expression, context);
-
                 case ExpressionType.New:
                     return ForNewExpression((NewExpression)expression, context);
 
@@ -279,30 +276,6 @@ namespace NHibernate.FlowQuery.Helpers
                         break;
                 }
             }
-        }
-
-        /// <summary>
-        ///     Creates a <see cref="IProjection" /> instance from the given coalesce <see cref="BinaryExpression" />.
-        /// </summary>
-        /// <param name="expression">
-        ///     The expression.
-        /// </param>
-        /// <param name="context">
-        ///     The context for the projection.
-        /// </param>
-        /// <returns>
-        ///     The created <see cref="IProjection" />.
-        /// </returns>
-        private static IProjection GetCoalesceProjection
-            (
-            BinaryExpression expression,
-            HelperContext context
-            )
-        {
-            IProjection original = GetProjection(expression.Left, context);
-            IProjection fallback = GetProjection(expression.Right, context);
-
-            return Projections.Conditional(Restrictions.IsNull(original), fallback, original);
         }
 
         /// <summary>

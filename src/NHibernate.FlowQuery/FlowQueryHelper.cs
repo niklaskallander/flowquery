@@ -69,6 +69,7 @@
             ArithmeticHandler.SupportExpressionTypes.ForEach(x => AddHandler(x, arithmeticHandler));
 
             AddHandler(ExpressionType.Add, new ConcatenationHandler());
+            AddHandler(ExpressionType.Coalesce, new CoalesceHandler());
             AddHandler(ExpressionType.Conditional, new ConditionalHandler());
             AddHandler(ExpressionType.Lambda, new LambdaHandler());
         }
