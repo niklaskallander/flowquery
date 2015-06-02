@@ -10,6 +10,7 @@
 
     using NHibernate.Cache;
     using NHibernate.Cfg;
+    using NHibernate.Dialect;
     using NHibernate.FlowQuery.Test.Setup.Entities;
     using NHibernate.Mapping;
     using NHibernate.Tool.hbm2ddl;
