@@ -9,29 +9,29 @@
     /// <summary>
     ///     Handles projection of <see cref="LambdaExpression" /> / <see cref="ExpressionType.Lambda" />.
     /// </summary>
-    public class LambdaHandler : IExpressionHandler
+    public class LambdaHandler : AbstractHandler
     {
         /// <inheritdoc />
-        public bool CanHandleConstructionOf
+        public override bool CanHandleConstructionOf
             (
             Expression expression
             )
         {
-            return true;
+            return expression is LambdaExpression;
         }
 
         /// <inheritdoc />
-        public bool CanHandleProjectionOf
+        public override bool CanHandleProjectionOf
             (
             Expression expression,
             HelperContext context
             )
         {
-            return true;
+            return expression is LambdaExpression;
         }
 
         /// <inheritdoc />
-        public int Construct
+        public override int Construct
             (
             Expression expression,
             object[] arguments,
@@ -45,7 +45,7 @@
         }
 
         /// <inheritdoc />
-        public IProjection Project
+        public override IProjection Project
             (
             Expression expression,
             HelperContext context

@@ -173,8 +173,9 @@ namespace NHibernate.FlowQuery.Helpers
                 case ExpressionType.MemberInit:
                     return Invoke(expression as MemberInitExpression, arguments, out value);
 
-                case ExpressionType.Lambda:
                 case ExpressionType.Call:
+                case ExpressionType.Conditional:
+                case ExpressionType.Lambda:
                     return InvokeConstructionOf(expression, arguments, out value);
 
                 default:

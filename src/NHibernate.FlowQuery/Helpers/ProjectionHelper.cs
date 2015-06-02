@@ -49,7 +49,7 @@ namespace NHibernate.FlowQuery.Helpers
                 case ExpressionType.GreaterThanOrEqual:
                 case ExpressionType.LessThan:
                 case ExpressionType.LessThanOrEqual:
-                    return GetConditionalProjection
+                    return GetProjection
                         (
                             Expression.Condition(expression, Expression.Constant(true), Expression.Constant(false)),
                             context
@@ -60,9 +60,6 @@ namespace NHibernate.FlowQuery.Helpers
                 case ExpressionType.Divide:
                 case ExpressionType.Multiply:
                     return GetArithmeticProjection((BinaryExpression)expression, context);
-
-                case ExpressionType.Conditional:
-                    return GetConditionalProjection((ConditionalExpression)expression, context);
 
                 case ExpressionType.MemberAccess:
                     return GetMemberProjection((MemberExpression)expression, context);
@@ -80,6 +77,7 @@ namespace NHibernate.FlowQuery.Helpers
                     return ForMemberInitExpression((MemberInitExpression)expression, context);
 
                 case ExpressionType.Call:
+                case ExpressionType.Conditional:
                 case ExpressionType.Lambda:
                     return GetProjectionOf(expression, context);
 
@@ -445,33 +443,6 @@ namespace NHibernate.FlowQuery.Helpers
             }
 
             return new SqlFunctionProjection("concat", NHibernateUtil.String, projections.ToArray());
-        }
-
-        /// <summary>
-        ///     Creates a <see cref="IProjection" /> from the given <see cref="ConditionalExpression" />.
-        /// </summary>
-        /// <param name="expression">
-        ///     The expression.
-        /// </param>
-        /// <param name="context">
-        ///     The context for the projection.
-        /// </param>
-        /// <returns>
-        ///     The created <see cref="IProjection" />.
-        /// </returns>
-        private static IProjection GetConditionalProjection
-            (
-            ConditionalExpression expression,
-            HelperContext context
-            )
-        {
-            return Projections
-                .Conditional
-                (
-                    RestrictionHelper.GetCriterion(expression.Test, context),
-                    GetProjection(expression.IfTrue, context),
-                    GetProjection(expression.IfFalse, context)
-                );
         }
 
         /// <summary>

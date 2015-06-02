@@ -59,6 +59,7 @@
             AddCallHandler(new TrimEndHandler());
             AddCallHandler(new TrimStartHandler());
 
+            AddHandler(ExpressionType.Conditional, new ConditionalHandler());
             AddHandler(ExpressionType.Lambda, new LambdaHandler());
         }
 

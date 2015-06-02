@@ -13,7 +13,7 @@
     ///     Defines the functionality required of a class used to resolve <see cref="IProjection" /> instances from
     ///     <see cref="MethodCallExpression" />.
     /// </summary>
-    public abstract class AbstractMethodCallHandler : IMethodCallExpressionHandler
+    public abstract class AbstractMethodCallHandler : AbstractHandler, IMethodCallExpressionHandler
     {
         /// <summary>
         ///     The method names supported by this <see cref="AbstractMethodCallHandler" /> instance.
@@ -76,14 +76,14 @@
         }
 
         /// <inheritdoc />
-        public virtual bool CanHandleConstructionOf(Expression expression)
+        public override bool CanHandleConstructionOf(Expression expression)
         {
             return CanHandleConstruction
                 && ExpressionIsOfDesiredKind(expression, _supportedMethodNames);
         }
 
         /// <inheritdoc />
-        public virtual bool CanHandleProjectionOf
+        public override bool CanHandleProjectionOf
             (
             Expression expression,
             HelperContext context
@@ -94,22 +94,7 @@
         }
 
         /// <inheritdoc />
-        public virtual int Construct
-            (
-            Expression expression,
-            object[] arguments,
-            out object value,
-            out bool wasHandled
-            )
-        {
-            value = null;
-            wasHandled = false;
-
-            return 0;
-        }
-
-        /// <inheritdoc />
-        public virtual IProjection Project
+        public override IProjection Project
             (
             Expression expression,
             HelperContext context
