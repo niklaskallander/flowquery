@@ -15,7 +15,7 @@
         /// <summary>
         ///     The supported expression types.
         /// </summary>
-        private static readonly ExpressionType[] SupportedExpressionTypes =
+        public static readonly ExpressionType[] SupportedExpressionTypes =
         {
             ExpressionType.AndAlso,
             ExpressionType.NotEqual,

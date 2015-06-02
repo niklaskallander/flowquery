@@ -6,7 +6,6 @@ namespace NHibernate.FlowQuery.Helpers
     using System.Linq.Expressions;
 
     using NHibernate.Criterion;
-    using NHibernate.Dialect.Function;
     using NHibernate.FlowQuery.Core.CustomProjections;
     using NHibernate.FlowQuery.Helpers.ExpressionHandlers;
     using NHibernate.Type;
@@ -52,12 +51,6 @@ namespace NHibernate.FlowQuery.Helpers
 
             switch (expression.NodeType)
             {
-                case ExpressionType.Add:
-                case ExpressionType.Subtract:
-                case ExpressionType.Divide:
-                case ExpressionType.Multiply:
-                    return GetArithmeticProjection((BinaryExpression)expression, context);
-
                 case ExpressionType.MemberAccess:
                     return GetMemberProjection((MemberExpression)expression, context);
 
@@ -113,40 +106,6 @@ namespace NHibernate.FlowQuery.Helpers
             )
         {
             return GetProjection(expression.Body, new HelperContext(data, expression.Parameters[0].Name, type));
-        }
-
-        /// <summary>
-        ///     Returns all inner <see cref="Expression" />s for the given <see cref="BinaryExpression" /> in a list.
-        /// </summary>
-        /// <param name="expression">
-        ///     The expression to flatten out.
-        /// </param>
-        /// <returns>
-        ///     The list of <see cref="Expression" />s.
-        /// </returns>
-        private static IEnumerable<Expression> FlattenBinaryExpression(BinaryExpression expression)
-        {
-            var expressions = new List<Expression>();
-
-            if (expression.Left is BinaryExpression)
-            {
-                expressions.AddRange(FlattenBinaryExpression(expression.Left as BinaryExpression));
-            }
-            else
-            {
-                expressions.Add(expression.Left);
-            }
-
-            if (expression.Right is BinaryExpression)
-            {
-                expressions.AddRange(FlattenBinaryExpression(expression.Right as BinaryExpression));
-            }
-            else
-            {
-                expressions.Add(expression.Right);
-            }
-
-            return expressions;
         }
 
         /// <summary>
@@ -323,67 +282,6 @@ namespace NHibernate.FlowQuery.Helpers
         }
 
         /// <summary>
-        ///     Gets a arithmetic <see cref="string" /> representation of the given <see cref="ExpressionType" /> type.
-        /// </summary>
-        /// <param name="type">
-        ///     The <see cref="ExpressionType" /> type.
-        /// </param>
-        /// <returns>
-        ///     The arithmetic <see cref="string" /> representation.
-        /// </returns>
-        private static string GetArithmeticOperation(ExpressionType type)
-        {
-            switch (type)
-            {
-                case ExpressionType.Divide:
-                    return "/";
-
-                case ExpressionType.Multiply:
-                    return "*";
-
-                case ExpressionType.Subtract:
-                    return "-";
-
-                default:
-                    return "+";
-            }
-        }
-
-        /// <summary>
-        ///     Creates a <see cref="IProjection" /> for the given arithmetic <see cref="BinaryExpression" />.
-        /// </summary>
-        /// <param name="expression">
-        ///     The expression.
-        /// </param>
-        /// <param name="context">
-        ///     The context for the projection.
-        /// </param>
-        /// <returns>
-        ///     The created <see cref="IProjection" />.
-        /// </returns>
-        private static IProjection GetArithmeticProjection
-            (
-            BinaryExpression expression,
-            HelperContext context
-            )
-        {
-            if (expression.NodeType == ExpressionType.Add && expression.Type == typeof(string))
-            {
-                return GetConcatenationProjection(expression, context);
-            }
-
-            string operation = GetArithmeticOperation(expression.NodeType);
-
-            return new SqlFunctionProjection
-                (
-                new VarArgsSQLFunction("(", operation, ")"),
-                NHibernateUtil.GuessType(expression.Left.Type),
-                GetProjection(expression.Left, context),
-                GetProjection(expression.Right, context)
-                );
-        }
-
-        /// <summary>
         ///     Creates a <see cref="IProjection" /> instance from the given coalesce <see cref="BinaryExpression" />.
         /// </summary>
         /// <param name="expression">
@@ -405,36 +303,6 @@ namespace NHibernate.FlowQuery.Helpers
             IProjection fallback = GetProjection(expression.Right, context);
 
             return Projections.Conditional(Restrictions.IsNull(original), fallback, original);
-        }
-
-        /// <summary>
-        ///     Creates a <see cref="IProjection" /> from the given concatenation <see cref="BinaryExpression" />.
-        /// </summary>
-        /// <param name="expression">
-        ///     The expression.
-        /// </param>
-        /// <param name="context">
-        ///     The context for the projection.
-        /// </param>
-        /// <returns>
-        ///     The created <see cref="IProjection" />.
-        /// </returns>
-        private static IProjection GetConcatenationProjection
-            (
-            BinaryExpression expression,
-            HelperContext context
-            )
-        {
-            var projections = new List<IProjection>();
-
-            foreach (Expression expressionPart in FlattenBinaryExpression(expression))
-            {
-                IProjection projection = GetProjection(expressionPart, context);
-
-                projections.Add(projection);
-            }
-
-            return new SqlFunctionProjection("concat", NHibernateUtil.String, projections.ToArray());
         }
 
         /// <summary>
@@ -504,7 +372,7 @@ namespace NHibernate.FlowQuery.Helpers
         ///     Creates a <see cref="IProjection" /> from the given <see cref="Expression" />.
         /// </summary>
         /// <param name="handlers">
-        ///     The set of <see cref="IExpressionHandler" /> instances to use when resolving the 
+        ///     The set of <see cref="IExpressionHandler" /> instances to use when resolving the
         ///     <see cref="IProjection" /> of the given <see cref="Expression" />.
         /// </param>
         /// <param name="expression">

@@ -8,6 +8,7 @@
     using NHibernate.FlowQuery.Helpers.ExpressionHandlers;
     using NHibernate.FlowQuery.Helpers.ExpressionHandlers.MethodCalls;
     using NHibernate.FlowQuery.Helpers.ExpressionHandlers.Misc;
+    using NHibernate.Util;
 
     /// <summary>
     ///     The <see cref="FlowQueryHelper" /> class is intended to replace <see cref="Aggregate" /> and other static
@@ -61,15 +62,13 @@
 
             var conditionHandler = new ConditionHandler();
 
-            AddHandler(ExpressionType.AndAlso, conditionHandler);
-            AddHandler(ExpressionType.NotEqual, conditionHandler);
-            AddHandler(ExpressionType.OrElse, conditionHandler);
-            AddHandler(ExpressionType.Equal, conditionHandler);
-            AddHandler(ExpressionType.GreaterThan, conditionHandler);
-            AddHandler(ExpressionType.GreaterThanOrEqual, conditionHandler);
-            AddHandler(ExpressionType.LessThan, conditionHandler);
-            AddHandler(ExpressionType.LessThanOrEqual, conditionHandler);
+            ConditionHandler.SupportedExpressionTypes.ForEach(x => AddHandler(x, conditionHandler));
 
+            var arithmeticHandler = new ArithmeticHandler();
+
+            ArithmeticHandler.SupportExpressionTypes.ForEach(x => AddHandler(x, arithmeticHandler));
+
+            AddHandler(ExpressionType.Add, new ConcatenationHandler());
             AddHandler(ExpressionType.Conditional, new ConditionalHandler());
             AddHandler(ExpressionType.Lambda, new LambdaHandler());
         }
