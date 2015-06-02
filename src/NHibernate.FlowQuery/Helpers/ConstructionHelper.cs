@@ -165,9 +165,12 @@ namespace NHibernate.FlowQuery.Helpers
             out object value
             )
         {
-            IEnumerable<IExpressionHandler> handlers = FlowQueryHelper.GetExpressionHandlers(expression.NodeType);
+            IEnumerable<IExpressionHandler> handlers = FlowQueryHelper
+                .GetExpressionHandlers(expression.NodeType)
+                .Where(x => x.CanHandleConstructionOf(expression))
+                .ToArray();
 
-            if (handlers.Any(x => x.CanHandleConstructionOf(expression)))
+            if (handlers.Any())
             {
                 return ConstructUsing(handlers, expression, arguments, out value);
             }

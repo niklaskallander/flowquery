@@ -40,9 +40,12 @@ namespace NHibernate.FlowQuery.Helpers
             HelperContext context
             )
         {
-            IEnumerable<IExpressionHandler> handlers = FlowQueryHelper.GetExpressionHandlers(expression.NodeType);
+            IEnumerable<IExpressionHandler> handlers = FlowQueryHelper
+                .GetExpressionHandlers(expression.NodeType)
+                .Where(x => x.CanHandleProjectionOf(expression, context))
+                .ToArray();
 
-            if (handlers.Any(x => x.CanHandleProjectionOf(expression, context)))
+            if (handlers.Any())
             {
                 return GetProjectionUsing(handlers, expression, context);
             }
