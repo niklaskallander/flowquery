@@ -169,7 +169,16 @@
                         NumberOfLogOns = 12
                     };
 
-                    var u4 = new UserEntity("Lajsa", null, "Lotta", "Brak", DateTime.Now, RoleEnum.Standard, "4")
+                    var u4 = new UserEntity
+                        (
+                        "Lajsa",
+                        null,
+                        "Lotta",
+                        "Brak",
+                        new DateTime(2015, 12, 4),
+                        RoleEnum.Standard,
+                        "4"
+                        )
                     {
                         Setting = s6,
                         NumberOfLogOns = 4
