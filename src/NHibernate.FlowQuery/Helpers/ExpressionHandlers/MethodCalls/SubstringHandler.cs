@@ -10,7 +10,7 @@
     ///     Handles method calls to <see cref="string.Substring(int)" /> and
     ///     <see cref="string.Substring(int, int)" />.
     /// </summary>
-    public class SubstringHandler : MethodCallExpressionHandlerBase
+    public class SubstringHandler : AbstractMethodCallHandler
     {
         /// <summary>
         ///     Initializes a new instance of the <see cref="SubstringHandler" /> class.

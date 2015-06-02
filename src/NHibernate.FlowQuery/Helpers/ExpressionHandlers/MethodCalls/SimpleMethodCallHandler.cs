@@ -11,7 +11,7 @@
     ///     Defines the functionality required of a class used to resolve <see cref="IProjection" /> instances from
     ///     simple <see cref="MethodCallExpression" />s.
     /// </summary>
-    public class SimpleMethodCallHandler : MethodCallExpressionHandlerBase
+    public class SimpleMethodCallHandler : AbstractMethodCallHandler
     {
         /// <summary>
         ///     The resolver.

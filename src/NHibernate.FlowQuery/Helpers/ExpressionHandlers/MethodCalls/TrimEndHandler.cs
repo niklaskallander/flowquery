@@ -10,7 +10,7 @@
     /// <summary>
     ///     Handles method calls to <see cref="string.TrimEnd" />.
     /// </summary>
-    public class TrimEndHandler : MethodCallExpressionHandlerBase
+    public class TrimEndHandler : AbstractMethodCallHandler
     {
         /// <summary>
         ///     Initializes a new instance of the <see cref="TrimEndHandler" /> class.

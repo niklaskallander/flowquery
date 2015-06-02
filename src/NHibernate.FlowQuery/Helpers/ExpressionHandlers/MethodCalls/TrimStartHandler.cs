@@ -10,7 +10,7 @@
     /// <summary>
     ///     Handles method calls to <see cref="string.TrimStart" />.
     /// </summary>
-    public class TrimStartHandler : MethodCallExpressionHandlerBase
+    public class TrimStartHandler : AbstractMethodCallHandler
     {
         /// <summary>
         ///     Initializes a new instance of the <see cref="TrimStartHandler" /> class.

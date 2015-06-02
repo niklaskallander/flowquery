@@ -11,7 +11,7 @@
     ///     Handles method calls to <see cref="Aggregate.Subquery{T}(IDetachedImmutableFlowQuery)" /> and
     ///     <see cref="Aggregate.Subquery{T}(DetachedCriteria)" />.
     /// </summary>
-    public class SubqueryHandler : MethodCallExpressionHandlerBase
+    public class SubqueryHandler : AbstractMethodCallHandler
     {
         /// <summary>
         ///     Initializes a new instance of the <see cref="SubqueryHandler" /> class.

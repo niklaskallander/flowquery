@@ -9,7 +9,7 @@
     /// <summary>
     ///     Handles method calls to <see cref="string.Trim()" />.
     /// </summary>
-    public class TrimHandler : MethodCallExpressionHandlerBase
+    public class TrimHandler : AbstractMethodCallHandler
     {
         /// <summary>
         ///     The <see cref="TrimEndHandler" />.

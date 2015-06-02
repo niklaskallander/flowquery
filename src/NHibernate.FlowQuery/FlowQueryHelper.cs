@@ -41,22 +41,24 @@
 
             DefaultExpressionHandlers = new Dictionary<ExpressionType, HashSet<IExpressionHandler>>();
 
-            AddExpressionHandlerInternal(ExpressionType.Call, new AsHandler());
-            AddExpressionHandlerInternal(ExpressionType.Call, new SimpleMethodCallHandler(Projections.Avg, "Average"));
-            AddExpressionHandlerInternal(ExpressionType.Call, new LikeHandler());
-            AddExpressionHandlerInternal(ExpressionType.Call, new CountDistinctHandler());
-            AddExpressionHandlerInternal(ExpressionType.Call, new SimpleMethodCallHandler(Projections.Count, "Count"));
-            AddExpressionHandlerInternal(ExpressionType.Call, new SimpleMethodCallHandler(Projections.GroupProperty, "GroupBy"));
-            AddExpressionHandlerInternal(ExpressionType.Call, new SimpleMethodCallHandler(Projections.Max, "Max"));
-            AddExpressionHandlerInternal(ExpressionType.Call, new SimpleMethodCallHandler(Projections.Min, "Min"));
-            AddExpressionHandlerInternal(ExpressionType.Call, new ProjectHandler());
-            AddExpressionHandlerInternal(ExpressionType.Call, new RoundHandler());
-            AddExpressionHandlerInternal(ExpressionType.Call, new SubqueryHandler());
-            AddExpressionHandlerInternal(ExpressionType.Call, new SubstringHandler());
-            AddExpressionHandlerInternal(ExpressionType.Call, new SimpleMethodCallHandler(Projections.Sum, "Sum"));
-            AddExpressionHandlerInternal(ExpressionType.Call, new TrimHandler());
-            AddExpressionHandlerInternal(ExpressionType.Call, new TrimEndHandler());
-            AddExpressionHandlerInternal(ExpressionType.Call, new TrimStartHandler());
+            AddCallHandler(new AsHandler());
+            AddCallHandler(new SimpleMethodCallHandler(Projections.Avg, "Average"));
+            AddCallHandler(new LikeHandler());
+            AddCallHandler(new CountDistinctHandler());
+            AddCallHandler(new SimpleMethodCallHandler(Projections.Count, "Count"));
+            AddCallHandler(new SimpleMethodCallHandler(Projections.GroupProperty, "GroupBy"));
+            AddCallHandler(new SimpleMethodCallHandler(Projections.Max, "Max"));
+            AddCallHandler(new SimpleMethodCallHandler(Projections.Min, "Min"));
+            AddCallHandler(new ProjectHandler());
+            AddCallHandler(new RoundHandler());
+            AddCallHandler(new SubqueryHandler());
+            AddCallHandler(new SubstringHandler());
+            AddCallHandler(new SimpleMethodCallHandler(Projections.Sum, "Sum"));
+            AddCallHandler(new TrimHandler());
+            AddCallHandler(new TrimEndHandler());
+            AddCallHandler(new TrimStartHandler());
+
+            
         }
 
         /// <summary>
@@ -77,7 +79,7 @@
             IExpressionHandler handler
             )
         {
-            AddExpressionHandlerInternal(expressionType, handler, false);
+            AddHandler(expressionType, handler, false);
         }
 
         /// <summary>
@@ -134,8 +136,8 @@
         ///     The mapper expression.
         /// </param>
         /// <returns>
-        ///     When overridden in a derived class, the mapped result, otherwise nothing
-        ///     (throws <see cref="NotImplementedException" />).
+        ///     When overridden in a derived class, the mapped result, otherwise nothing (throws 
+        ///     <see cref="NotImplementedException" />).
         /// </returns>
         /// <exception cref="NotImplementedException">
         ///     Unless overridden in a derived class, always thrown.
@@ -144,7 +146,11 @@
         ///     This is a query resolution helper and should not be executed directly (unless overridden in a derived
         ///     class).
         /// </remarks>
-        public virtual TOut Project<TIn, TOut>(TIn alias, Expression<Func<TIn, TOut>> mapper)
+        public virtual TOut Project<TIn, TOut>
+            (
+            TIn alias,
+            Expression<Func<TIn, TOut>> mapper
+            )
         {
             throw new NotImplementedException();
         }
@@ -165,7 +171,7 @@
         /// <exception cref="ArgumentNullException">
         ///     <paramref name="handler" /> is null.
         /// </exception>
-        internal static void AddExpressionHandlerInternal
+        private static void AddHandler
             (
             ExpressionType expressionType,
             IExpressionHandler handler,
@@ -196,6 +202,28 @@
                     collection.Add(expressionType, new HashSet<IExpressionHandler> { handler });
                 }
             }
+        }
+
+        /// <summary>
+        ///     Adds a <see cref="IExpressionHandler" /> to be used when handling method call expressions.
+        /// </summary>
+        /// <param name="handler">
+        ///     The <see cref="IExpressionHandler" />.
+        /// </param>
+        /// <param name="isDefaultHandler">
+        ///     A value indicating whether the handler is added internally (true) or externally using
+        ///     <see cref="FlowQueryHelper.AddExpressionHandler" /> (false).
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        ///     <paramref name="handler" /> is null.
+        /// </exception>
+        private static void AddCallHandler
+            (
+            IExpressionHandler handler,
+            bool isDefaultHandler = true
+            )
+        {
+            AddHandler(ExpressionType.Call, handler, isDefaultHandler);
         }
     }
 }

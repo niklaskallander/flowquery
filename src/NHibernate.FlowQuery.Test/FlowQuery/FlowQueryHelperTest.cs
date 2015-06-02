@@ -118,6 +118,14 @@
             Assert.That(handlers, Has.Member(handler));
         }
 
+        [Test]
+        public void Given_UnsupportedExpressionType_When_GettingExpressionHandlers_Then_ReturnsEmptySetOfHandlers()
+        {
+            var handlers = FlowQueryHelper.GetExpressionHandlers(ExpressionType.NewArrayBounds);
+
+            Assert.That(handlers.Count(), Is.EqualTo(0));
+        }
+
         private class SimpleMethodCallHandler : IMethodCallExpressionHandler
         {
             public bool CanHandleConstructionOf(Expression expression)

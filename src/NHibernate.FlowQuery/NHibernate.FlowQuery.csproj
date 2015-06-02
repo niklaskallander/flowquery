@@ -175,7 +175,7 @@
     <Compile Include="Helpers\ExpressionHandlers\MethodCalls\AsHandler.cs" />
     <Compile Include="Helpers\ExpressionHandlers\MethodCalls\CountDistinctHandler.cs" />
     <Compile Include="Helpers\ExpressionHandlers\MethodCalls\LikeHandler.cs" />
-    <Compile Include="Helpers\ExpressionHandlers\MethodCalls\MethodCallExpressionHandlerBase.cs" />
+    <Compile Include="Helpers\ExpressionHandlers\MethodCalls\AbstractMethodCallHandler.cs" />
     <Compile Include="Helpers\ExpressionHandlers\MethodCalls\RoundHandler.cs" />
     <Compile Include="Helpers\ExpressionHandlers\MethodCalls\SimpleMethodCallHandler.cs" />
     <Compile Include="Helpers\ExpressionHandlers\MethodCalls\SubqueryHandler.cs" />

@@ -12,7 +12,7 @@
     ///     Handles method calls to <see cref="Math.Round(double)" />, <see cref="Math.Round(double, int)" />,
     ///     <see cref="Math.Round(decimal)" />, or <see cref="Math.Round(decimal, int)" />.
     /// </summary>
-    public sealed class RoundHandler : MethodCallExpressionHandlerBase
+    public sealed class RoundHandler : AbstractMethodCallHandler
     {
         /// <summary>
         ///     Initializes a new instance of the <see cref="RoundHandler" /> class.

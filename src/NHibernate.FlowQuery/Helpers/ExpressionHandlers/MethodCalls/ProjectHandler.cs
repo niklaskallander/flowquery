@@ -10,7 +10,7 @@
     ///     Handles <see cref="MethodCallExpression" /> expressions representing calls to
     ///     <see cref="FlowQueryHelper.Project{TIn,TOut}" />.
     /// </summary>
-    public class ProjectHandler : MethodCallExpressionHandlerBase
+    public class ProjectHandler : AbstractMethodCallHandler
     {
         /// <summary>
         ///     Initializes a new instance of the <see cref="ProjectHandler" /> class.
