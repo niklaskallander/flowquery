@@ -8,7 +8,6 @@ namespace NHibernate.FlowQuery.Helpers
     using NHibernate.Criterion;
     using NHibernate.FlowQuery.Core.CustomProjections;
     using NHibernate.FlowQuery.Helpers.ExpressionHandlers;
-    using NHibernate.Type;
 
     using Expression = System.Linq.Expressions.Expression;
 
@@ -53,9 +52,6 @@ namespace NHibernate.FlowQuery.Helpers
             {
                 case ExpressionType.MemberAccess:
                     return GetMemberProjection((MemberExpression)expression, context);
-
-                case ExpressionType.Convert:
-                    return GetConvertProjection((UnaryExpression)expression, context);
 
                 case ExpressionType.New:
                     return ForNewExpression((NewExpression)expression, context);
@@ -276,39 +272,6 @@ namespace NHibernate.FlowQuery.Helpers
                         break;
                 }
             }
-        }
-
-        /// <summary>
-        ///     Creates a <see cref="IProjection" /> for the given <see cref="UnaryExpression" />.
-        /// </summary>
-        /// <param name="expression">
-        ///     The expression.
-        /// </param>
-        /// <param name="context">
-        ///     The context for the projection.
-        /// </param>
-        /// <returns>
-        ///     The resolved <see cref="IProjection" /> instance.
-        /// </returns>
-        private static IProjection GetConvertProjection
-            (
-            UnaryExpression expression,
-            HelperContext context
-            )
-        {
-            IProjection projection = GetProjection(expression.Operand, context);
-
-            if (!expression.IsLiftedToNull)
-            {
-                IType type = TypeHelper.GuessType(expression.Type, true);
-
-                if (type != null)
-                {
-                    return new FqCastProjection(type, projection);
-                }
-            }
-
-            return projection;
         }
 
         /// <summary>

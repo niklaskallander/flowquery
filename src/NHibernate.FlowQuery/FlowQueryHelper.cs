@@ -71,6 +71,7 @@
             AddHandler(ExpressionType.Add, new ConcatenationHandler());
             AddHandler(ExpressionType.Coalesce, new CoalesceHandler());
             AddHandler(ExpressionType.Conditional, new ConditionalHandler());
+            AddHandler(ExpressionType.Convert, new ConvertHandler());
             AddHandler(ExpressionType.Lambda, new LambdaHandler());
         }
 
@@ -149,7 +150,7 @@
         ///     The mapper expression.
         /// </param>
         /// <returns>
-        ///     When overridden in a derived class, the mapped result, otherwise nothing (throws 
+        ///     When overridden in a derived class, the mapped result, otherwise nothing (throws
         ///     <see cref="NotImplementedException" />).
         /// </returns>
         /// <exception cref="NotImplementedException">
@@ -166,6 +167,28 @@
             )
         {
             throw new NotImplementedException();
+        }
+
+        /// <summary>
+        ///     Adds a <see cref="IExpressionHandler" /> to be used when handling method call expressions.
+        /// </summary>
+        /// <param name="handler">
+        ///     The <see cref="IExpressionHandler" />.
+        /// </param>
+        /// <param name="isDefaultHandler">
+        ///     A value indicating whether the handler is added internally (true) or externally using
+        ///     <see cref="FlowQueryHelper.AddExpressionHandler" /> (false).
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        ///     <paramref name="handler" /> is null.
+        /// </exception>
+        private static void AddCallHandler
+            (
+            IExpressionHandler handler,
+            bool isDefaultHandler = true
+            )
+        {
+            AddHandler(ExpressionType.Call, handler, isDefaultHandler);
         }
 
         /// <summary>
@@ -215,28 +238,6 @@
                     collection.Add(expressionType, new HashSet<IExpressionHandler> { handler });
                 }
             }
-        }
-
-        /// <summary>
-        ///     Adds a <see cref="IExpressionHandler" /> to be used when handling method call expressions.
-        /// </summary>
-        /// <param name="handler">
-        ///     The <see cref="IExpressionHandler" />.
-        /// </param>
-        /// <param name="isDefaultHandler">
-        ///     A value indicating whether the handler is added internally (true) or externally using
-        ///     <see cref="FlowQueryHelper.AddExpressionHandler" /> (false).
-        /// </param>
-        /// <exception cref="ArgumentNullException">
-        ///     <paramref name="handler" /> is null.
-        /// </exception>
-        private static void AddCallHandler
-            (
-            IExpressionHandler handler,
-            bool isDefaultHandler = true
-            )
-        {
-            AddHandler(ExpressionType.Call, handler, isDefaultHandler);
         }
     }
 }
