@@ -1,85 +1,99 @@
 ﻿namespace NHibernate.FlowQuery.Test.FlowQuery.Features.NhFq24
 {
-    using System;
     using System.Linq;
     using System.Linq.Expressions;
 
-    using NHibernate.Criterion;
-    using NHibernate.FlowQuery.Helpers;
-    using NHibernate.FlowQuery.Helpers.ExpressionHandlers;
+    using NHibernate.FlowQuery.Helpers.ExpressionHandlers.Members;
     using NHibernate.FlowQuery.Test.Setup.Entities;
 
     using NUnit.Framework;
-
-    using Expression = System.Linq.Expressions.Expression;
 
     [TestFixture]
     public class CustomMemberAccessExpressionHandlerTest : BaseTest
     {
         [Test]
+        public void Given_CustomMemberAccessHandler_When_FilteringOnHandledMember_Then_ReturnsCorrectProjection()
+        {
+            FlowQueryHelper.AddExpressionHandler(ExpressionType.MemberAccess, new DateTimeDayHandler());
+            FlowQueryHelper.AddExpressionHandler(ExpressionType.MemberAccess, new DateTimeDateHandler());
+            FlowQueryHelper.AddExpressionHandler(ExpressionType.MemberAccess, new StringLengthHandler());
+
+            var users = Query<UserEntity>()
+                .Where(x => x.Firstname.Length == 6)
+                .Select(x => new
+                {
+                    CreatedDayInMonth = x.CreatedStamp.Day,
+                    x.LastLoggedInStamp,
+                    LastLoggedInDate = x.LastLoggedInStamp.Value.Date,
+                    LastLoggedInDayInMonth = x.LastLoggedInStamp.Value.Day,
+                    x.Username,
+                    x.Firstname,
+                    FirstnameLength = x.Firstname.Length
+                })
+                .ToArray();
+
+            Assert.That(users.Length, Is.EqualTo(2));
+
+            Assert.That(users.Single(x => x.Username == "Wimpy").CreatedDayInMonth, Is.EqualTo(11));
+            Assert.That(users.Single(x => x.Username == "Wimpy").LastLoggedInDayInMonth, Is.EqualTo(11));
+            Assert.That(users.Single(x => x.Username == "Empor").CreatedDayInMonth, Is.EqualTo(3));
+            Assert.That(users.Single(x => x.Username == "Empor").LastLoggedInDayInMonth, Is.EqualTo(3));
+
+            foreach (var user in users)
+            {
+                Assert.That(user.Firstname.Length, Is.EqualTo(user.FirstnameLength));
+                Assert.That(user.Firstname.Length, Is.EqualTo(6));
+
+                var stamp = user.LastLoggedInStamp;
+
+                if (stamp.HasValue)
+                {
+                    Assert.That(stamp.Value.TimeOfDay, Is.GreaterThan(user.LastLoggedInDate.TimeOfDay));
+                }
+            }
+        }
+
+        [Test]
         public void Given_CustomMemberAccessHandler_When_QueryingUsers_Then_ReturnsCorrectProjection()
         {
-            FlowQueryHelper.AddExpressionHandler(ExpressionType.MemberAccess, new DayInMonthHandler());
+            FlowQueryHelper.AddExpressionHandler(ExpressionType.MemberAccess, new DateTimeDayHandler());
+            FlowQueryHelper.AddExpressionHandler(ExpressionType.MemberAccess, new DateTimeDateHandler());
+            FlowQueryHelper.AddExpressionHandler(ExpressionType.MemberAccess, new StringLengthHandler());
 
             var users = Query<UserEntity>()
                 .Select(x => new
                 {
                     CreatedDayInMonth = x.CreatedStamp.Day,
-                    x.Username
+                    x.LastLoggedInStamp,
+                    LastLoggedInDate = x.LastLoggedInStamp.Value.Date,
+                    LastLoggedInDayInMonth = x.LastLoggedInStamp.Value.Day,
+                    x.Username,
+                    x.Firstname,
+                    FirstnameLength = x.Firstname.Length
                 })
                 .ToArray();
 
             Assert.That(users.Length, Is.EqualTo(4));
 
             Assert.That(users.Single(x => x.Username == "Wimpy").CreatedDayInMonth, Is.EqualTo(11));
+            Assert.That(users.Single(x => x.Username == "Wimpy").LastLoggedInDayInMonth, Is.EqualTo(11));
             Assert.That(users.Single(x => x.Username == "Izmid").CreatedDayInMonth, Is.EqualTo(22));
+            Assert.That(users.Single(x => x.Username == "Izmid").LastLoggedInDayInMonth, Is.EqualTo(22));
             Assert.That(users.Single(x => x.Username == "Empor").CreatedDayInMonth, Is.EqualTo(3));
+            Assert.That(users.Single(x => x.Username == "Empor").LastLoggedInDayInMonth, Is.EqualTo(3));
             Assert.That(users.Single(x => x.Username == "Lajsa").CreatedDayInMonth, Is.EqualTo(4));
-        }
+            Assert.That(users.Single(x => x.Username == "Lajsa").LastLoggedInDayInMonth, Is.EqualTo(0));
 
-        private class DayInMonthHandler : IExpressionHandler
-        {
-            public bool CanHandleConstructionOf(Expression expression)
+            foreach (var user in users)
             {
-                return false;
-            }
+                Assert.That(user.Firstname.Length, Is.EqualTo(user.FirstnameLength));
 
-            public bool CanHandleProjectionOf(Expression expression, HelperContext context)
-            {
-                if (expression.NodeType != ExpressionType.MemberAccess)
+                var stamp = user.LastLoggedInStamp;
+
+                if (stamp.HasValue)
                 {
-                    return false;
+                    Assert.That(stamp.Value.TimeOfDay, Is.GreaterThan(user.LastLoggedInDate.TimeOfDay));
                 }
-
-                var member = (MemberExpression)expression;
-
-                if (member.Expression.Type != typeof(DateTime))
-                {
-                    return false;
-                }
-
-                return member.Member.Name == "Day";
-            }
-
-            public int Construct(Expression expression, object[] arguments, out object value, out bool wasHandled)
-            {
-                value = null;
-                wasHandled = false;
-
-                return 0;
-            }
-
-            public IProjection Project(Expression expression, HelperContext context)
-            {
-                var member = (MemberExpression)expression;
-
-                return Projections
-                    .SqlFunction
-                    (
-                        "day",
-                        NHibernateUtil.Int32,
-                        ProjectionHelper.GetProjection(member.Expression, context)
-                    );
             }
         }
     }
