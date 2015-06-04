@@ -11,7 +11,7 @@
     [TestFixture]
     public class CustomMemberAccessExpressionHandlerTest : BaseTest
     {
-        [Test]
+        [Test, Category("MySqlUnsupported")]
         public void Given_CustomMemberAccessHandler_When_FilteringOnHandledMember_Then_ReturnsCorrectProjection()
         {
             FlowQueryHelper.AddExpressionHandler(ExpressionType.MemberAccess, new DateTimeDayHandler());
@@ -53,7 +53,7 @@
             }
         }
 
-        [Test]
+        [Test, Category("MySqlUnsupported")]
         public void Given_CustomMemberAccessHandler_When_QueryingUsers_Then_ReturnsCorrectProjection()
         {
             FlowQueryHelper.AddExpressionHandler(ExpressionType.MemberAccess, new DateTimeDayHandler());
