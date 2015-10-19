@@ -192,6 +192,22 @@ namespace NHibernate.FlowQuery.Helpers.ExpressionHandlers
     }
 }
 
+namespace NHibernate.FlowQuery.Helpers.ExpressionHandlers.Members
+{
+    using System.Runtime.CompilerServices;
+
+    /// <summary>
+    ///     The <see cref="NHibernate.FlowQuery.Helpers.ExpressionHandlers.Members" /> namespace contains a set of 
+    ///     definitions describing the functionality (and corresponding implementations) for extending the handling of 
+    ///     <see cref="System.Linq.Expressions.MemberExpression" /> expressions in the expression trees used when 
+    ///     projecting with <see cref="FlowQuery" />.
+    /// </summary>
+    [CompilerGenerated]
+    internal class NamespaceDoc
+    {
+    }
+}
+
 namespace NHibernate.FlowQuery.Helpers.ExpressionHandlers.MethodCalls
 {
     using System.Runtime.CompilerServices;

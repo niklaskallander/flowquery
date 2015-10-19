@@ -10,7 +10,6 @@
 
     using NHibernate.Cache;
     using NHibernate.Cfg;
-    using NHibernate.Dialect;
     using NHibernate.FlowQuery.Test.Setup.Entities;
     using NHibernate.Mapping;
     using NHibernate.Tool.hbm2ddl;
@@ -34,7 +33,7 @@
             Configuration configuration = null;
 
             IPersistenceConfigurer databaseConfigurer = MySQLConfiguration.Standard
-                .Dialect<MySQL5Dialect>()
+                .Dialect<Dialect.MySQL5Dialect>()
                 .ConnectionString(@"Server=127.0.0.1;Database=flowquery_test;Uid=root;Pwd=;");
 #endif
 
@@ -129,7 +128,7 @@
                         "1"
                         )
                     {
-                        LastLoggedInStamp = DateTime.Now,
+                        LastLoggedInStamp = new DateTime(2001, 9, 11, 16, 48, 32),
                         IsOnline = true,
                         Setting = s6,
                         NumberOfLogOns = 10
@@ -146,7 +145,7 @@
                         "2"
                         )
                     {
-                        LastLoggedInStamp = DateTime.Now,
+                        LastLoggedInStamp = new DateTime(2001, 4, 22, 12, 59, 23),
                         IsOnline = true,
                         Setting = s6,
                         NumberOfLogOns = 17
@@ -163,13 +162,22 @@
                         "3"
                         )
                     {
-                        LastLoggedInStamp = DateTime.Now,
+                        LastLoggedInStamp = new DateTime(2001, 5, 3, 15, 17, 10),
                         IsOnline = true,
                         Setting = s6,
                         NumberOfLogOns = 12
                     };
 
-                    var u4 = new UserEntity("Lajsa", null, "Lotta", "Brak", DateTime.Now, RoleEnum.Standard, "4")
+                    var u4 = new UserEntity
+                        (
+                        "Lajsa",
+                        null,
+                        "Lotta",
+                        "Brak",
+                        new DateTime(2015, 12, 4),
+                        RoleEnum.Standard,
+                        "4"
+                        )
                     {
                         Setting = s6,
                         NumberOfLogOns = 4

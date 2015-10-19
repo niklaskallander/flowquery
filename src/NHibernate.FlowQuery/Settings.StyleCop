@@ -4,6 +4,8 @@
       <Value>asc</Value>
       <Value>desc</Value>
       <Value>linq</Value>
+      <Value>non-nullable</Value>
+      <Value>nullable</Value>
       <Value>sql</Value>
       <Value>subquery</Value>
     </CollectionProperty>

@@ -19,16 +19,16 @@
         /// <inheritdoc />
         public abstract bool CanHandleProjectionOf
             (
-            Expression expression, 
+            Expression expression,
             HelperContext context
             );
 
         /// <inheritdoc />
         public virtual int Construct
             (
-            Expression expression, 
-            object[] arguments, 
-            out object value, 
+            Expression expression,
+            object[] arguments,
+            out object value,
             out bool wasHandled
             )
         {
@@ -41,7 +41,7 @@
         /// <inheritdoc />
         public abstract IProjection Project
             (
-            Expression expression, 
+            Expression expression,
             HelperContext context
             );
     }

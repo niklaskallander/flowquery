@@ -137,6 +137,7 @@
     <Compile Include="FlowQuery\Core\IFlowQueryTest\CountTest.cs" />
     <Compile Include="FlowQuery\DetachedCriteriaExtensionsTest.cs" />
     <Compile Include="FlowQuery\Features\AggregateFromExpressionTest.cs" />
+    <Compile Include="FlowQuery\Features\NhFq24\CustomMemberAccessExpressionHandlerTest.cs" />
     <Compile Include="FlowQuery\Features\NhFq18\ModelBasedToSourceBasedOrdersTest.cs" />
     <Compile Include="FlowQuery\Features\NhFq7\NhFq7TestBase.cs" />
     <Compile Include="FlowQuery\Features\NhFq7\Where.cs" />
